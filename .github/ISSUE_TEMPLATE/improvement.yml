@@ -2,29 +2,67 @@ name: Improvement
 description: 기존 기능이나 플레이 경험을 개선합니다.
 title: "[Improvement] "
 labels:
-  - improvement
+  - enhancement
 body:
   - type: textarea
-    id: current
+    id: summary
     attributes:
-      label: 현재 상태
-      description: 지금 어떤 점이 불편하거나 부족한지 적어주세요.
+      label: Summary
+      description: 무엇을 개선해야 하나요?
     validations:
       required: true
   - type: textarea
-    id: proposal
+    id: motivation
     attributes:
-      label: 개선 방향
-      description: 어떻게 바꾸면 좋은지 적어주세요.
+      label: Motivation or Problem
+      description: 왜 개선이 필요한가요?
     validations:
       required: true
   - type: textarea
-    id: done
+    id: current_behavior
     attributes:
-      label: 완료 기준
-      value: |
-        - [ ] 개선 전후 차이가 확인된다.
-        - [ ] 기존 기능에 문제가 없다.
-        - [ ] 필요한 문서나 설정을 갱신했다.
+      label: Current Behavior
+      description: 현재는 어떻게 동작하나요?
+    validations:
+      required: true
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected Behavior
+      description: 개선 후에는 어떻게 동작해야 하나요?
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: 어떤 씬, 스크립트, 에셋, UI, 게임 규칙이 영향을 받나요?
+    validations:
+      required: true
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+      description: 이 이슈에서 일부러 다루지 않을 것은 무엇인가요?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: 완료를 증명할 구체적인 결과를 적어주세요.
+      placeholder: |
+        - 개선 전후 차이가 확인된다.
+        - 기존 기능에 문제가 없다.
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification Plan
+      description: 어떤 명령이나 수동 확인을 실행해야 하나요?
+      placeholder: |
+        - Godot에서 관련 씬 실행
+        - 기존 게임 흐름 확인
     validations:
       required: true

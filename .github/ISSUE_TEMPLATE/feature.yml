@@ -1,33 +1,85 @@
-name: Feature
-description: 새 게임 기능을 추가합니다.
+name: Feature or improvement
+description: 새 기능, UX 개선, 게임 동작 변경을 제안합니다.
 title: "[Feature] "
 labels:
-  - feature
+  - enhancement
 body:
   - type: textarea
-    id: goal
+    id: summary
     attributes:
-      label: 목표
-      description: 어떤 기능을 만들지 적어주세요.
+      label: Summary
+      description: 무엇을 추가하거나 개선해야 하나요?
       placeholder: 예) 플레이어가 Space 키로 점프할 수 있게 한다.
     validations:
       required: true
   - type: textarea
-    id: details
+    id: motivation
     attributes:
-      label: 구현 내용
-      description: 필요한 시스템, 화면, 에셋, 규칙을 적어주세요.
-      placeholder: 예) 점프 입력, 중력 적용, 착지 판정, 애니메이션 연결
+      label: Motivation or Problem
+      description: 왜 필요한가요?
+      placeholder: 플레이 경험, 조작감, 게임 규칙, 기술적 이유를 적어주세요.
     validations:
       required: true
   - type: textarea
-    id: done
+    id: current_behavior
     attributes:
-      label: 완료 기준
-      description: PR을 머지해도 되는 기준을 체크리스트로 적어주세요.
-      value: |
-        - [ ] 기능이 로컬에서 정상 동작한다.
-        - [ ] 기존 기능에 문제가 없다.
-        - [ ] 필요한 문서나 주석을 갱신했다.
+      label: Current Behavior
+      description: 현재는 어떻게 동작하나요?
+    validations:
+      required: true
+  - type: textarea
+    id: expected_behavior
+    attributes:
+      label: Expected Behavior
+      description: 구현 후에는 어떻게 동작해야 하나요?
+    validations:
+      required: true
+  - type: textarea
+    id: player_flow
+    attributes:
+      label: Player Flow
+      description: 플레이어가 이 기능을 어떻게 경험해야 하나요?
+      placeholder: |
+        1. 플레이어가 ...
+        2. 플레이어가 ...
+        3. 게임이 ...
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: 어떤 씬, 스크립트, 에셋, UI, 게임 규칙이 영향을 받나요?
+      placeholder: Player, Enemy, UI, Stage, Input, Audio, Docs 등
+    validations:
+      required: true
+  - type: textarea
+    id: non_goals
+    attributes:
+      label: Non-goals
+      description: 이 이슈에서 일부러 다루지 않을 것은 무엇인가요?
+      placeholder: 관련 없는 리팩터링, 밸런스 전체 개편, 새 UI 디자인 등
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: 완료를 증명할 구체적인 결과를 적어주세요.
+      placeholder: |
+        - 플레이어가 ...
+        - 게임이 ...
+        - 기존 기능이 ...
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification Plan
+      description: 어떤 명령이나 수동 확인을 실행해야 하나요?
+      placeholder: |
+        - Godot에서 관련 씬 실행
+        - 플레이어 입력 수동 확인
+        - 기존 게임 흐름 확인
     validations:
       required: true

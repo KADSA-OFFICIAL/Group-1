@@ -2,8 +2,8 @@
 set -euo pipefail
 
 usage() {
-  echo "Usage: scripts/start-task.sh <issue-number> <feature|improvement|bugfix|docs|chore> <slug>"
-  echo "Example: scripts/start-task.sh 12 feature player-jump"
+  echo "Usage: scripts/start-task.sh <issue-number> <feat|fix|issue> <slug>"
+  echo "Example: scripts/start-task.sh 12 feat player-jump"
 }
 
 if [ "$#" -ne 3 ]; then
@@ -16,7 +16,10 @@ kind="$2"
 slug="$3"
 
 case "$kind" in
-  feature|improvement|bugfix|docs|chore) ;;
+  feat|fix|issue) ;;
+  feature) kind="feat" ;;
+  bugfix) kind="fix" ;;
+  improvement|docs|chore) kind="issue" ;;
   *)
     echo "Invalid kind: $kind"
     usage
@@ -52,7 +55,7 @@ fi
 
 git pull --ff-only origin dev
 
-branch_name="$kind/$issue_number-$slug"
+branch_name="$kind-$issue_number-$slug"
 
 if git show-ref --verify --quiet "refs/heads/$branch_name"; then
   echo "Local branch already exists: $branch_name"

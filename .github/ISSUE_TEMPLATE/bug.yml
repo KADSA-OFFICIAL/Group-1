@@ -5,16 +5,24 @@ labels:
   - bug
 body:
   - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: 무엇이 고장났나요?
+    validations:
+      required: true
+  - type: textarea
     id: problem
     attributes:
-      label: 문제
-      description: 어떤 문제가 발생했는지 적어주세요.
+      label: Motivation or Problem
+      description: 이 문제가 왜 수정되어야 하나요?
+      placeholder: 플레이어 영향, 진행 불가, 데이터 손상, 기술적 위험 등을 적어주세요.
     validations:
       required: true
   - type: textarea
     id: reproduce
     attributes:
-      label: 재현 방법
+      label: Reproduction Steps
       description: 문제가 다시 발생하는 순서를 적어주세요.
       value: |
         1. 
@@ -23,18 +31,50 @@ body:
     validations:
       required: true
   - type: textarea
-    id: expected
+    id: current_behavior
     attributes:
-      label: 기대 동작
-      description: 원래 어떻게 동작해야 하는지 적어주세요.
+      label: Current Behavior
+      description: 현재 실제로 어떻게 동작하나요?
     validations:
       required: true
   - type: textarea
-    id: done
+    id: expected_behavior
     attributes:
-      label: 완료 기준
-      value: |
-        - [ ] 재현 방법으로 문제가 다시 발생하지 않는다.
-        - [ ] 관련 기능이 정상 동작한다.
+      label: Expected Behavior
+      description: 원래 어떻게 동작해야 하나요?
     validations:
       required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: 어떤 씬, 스크립트, 에셋, UI, 게임 규칙이 영향을 받나요?
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      description: 완료를 증명할 구체적인 결과를 적어주세요.
+      placeholder: |
+        - 재현 방법으로 문제가 다시 발생하지 않는다.
+        - 관련 기능이 정상 동작한다.
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Verification Plan
+      description: 어떤 명령이나 수동 확인을 실행해야 하나요?
+      placeholder: |
+        - Godot에서 관련 씬 실행
+        - 재현 방법 다시 확인
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Godot 버전, 브랜치 등 관련 환경을 적어주세요.
+    validations:
+      required: false

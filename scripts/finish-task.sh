@@ -43,16 +43,20 @@ if command -v gh >/dev/null 2>&1; then
     --base dev \
     --head "$branch_name" \
     --title "$commit_message" \
-    --body "Refs #$issue_number
+    --body "Closes #$issue_number
 
-## 변경 내용
+## Summary
 
 -
 
-## 확인한 내용
+## Verification
 
-- [ ] 로컬에서 실행 또는 빌드 확인
-- [ ] 기존 기능 영향 확인"
+- [ ] Godot 실행 또는 관련 씬 수동 확인
+- [ ] 기존 게임 흐름 영향 확인
+
+## Notes and Risks
+
+-"
 else
   echo "GitHub CLI 'gh' is not installed or not available."
   echo "Create the PR manually: $branch_name -> dev"
