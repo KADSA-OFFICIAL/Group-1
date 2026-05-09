@@ -1,0 +1,33 @@
+name: Feature
+description: 새 게임 기능을 추가합니다.
+title: "[Feature] "
+labels:
+  - feature
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: 목표
+      description: 어떤 기능을 만들지 적어주세요.
+      placeholder: 예) 플레이어가 Space 키로 점프할 수 있게 한다.
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: 구현 내용
+      description: 필요한 시스템, 화면, 에셋, 규칙을 적어주세요.
+      placeholder: 예) 점프 입력, 중력 적용, 착지 판정, 애니메이션 연결
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 완료 기준
+      description: PR을 머지해도 되는 기준을 체크리스트로 적어주세요.
+      value: |
+        - [ ] 기능이 로컬에서 정상 동작한다.
+        - [ ] 기존 기능에 문제가 없다.
+        - [ ] 필요한 문서나 주석을 갱신했다.
+    validations:
+      required: true

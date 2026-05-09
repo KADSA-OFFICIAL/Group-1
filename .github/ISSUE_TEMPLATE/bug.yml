@@ -1,0 +1,40 @@
+name: Bug
+description: 버그를 기록하고 수정합니다.
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: 문제
+      description: 어떤 문제가 발생했는지 적어주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: 재현 방법
+      description: 문제가 다시 발생하는 순서를 적어주세요.
+      value: |
+        1. 
+        2. 
+        3. 
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: 기대 동작
+      description: 원래 어떻게 동작해야 하는지 적어주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 완료 기준
+      value: |
+        - [ ] 재현 방법으로 문제가 다시 발생하지 않는다.
+        - [ ] 관련 기능이 정상 동작한다.
+    validations:
+      required: true

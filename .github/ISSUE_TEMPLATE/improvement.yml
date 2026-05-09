@@ -1,0 +1,30 @@
+name: Improvement
+description: 기존 기능이나 플레이 경험을 개선합니다.
+title: "[Improvement] "
+labels:
+  - improvement
+body:
+  - type: textarea
+    id: current
+    attributes:
+      label: 현재 상태
+      description: 지금 어떤 점이 불편하거나 부족한지 적어주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: 개선 방향
+      description: 어떻게 바꾸면 좋은지 적어주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 완료 기준
+      value: |
+        - [ ] 개선 전후 차이가 확인된다.
+        - [ ] 기존 기능에 문제가 없다.
+        - [ ] 필요한 문서나 설정을 갱신했다.
+    validations:
+      required: true
