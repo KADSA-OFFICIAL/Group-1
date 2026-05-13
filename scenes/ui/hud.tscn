@@ -1,0 +1,68 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1_hud_script"]
+
+[node name="HUD" type="CanvasLayer"]
+script = ExtResource("1_hud_script")
+
+[node name="Root" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="TopLeft" type="PanelContainer" parent="Root"]
+layout_mode = 1
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 392.0
+offset_bottom = 92.0
+
+[node name="Margin" type="MarginContainer" parent="Root/TopLeft"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="TextRows" type="VBoxContainer" parent="Root/TopLeft/Margin"]
+layout_mode = 2
+
+[node name="ObjectiveLabel" type="Label" parent="Root/TopLeft/Margin/TextRows"]
+layout_mode = 2
+text = "목표: 학교를 탈출하세요."
+
+[node name="InventoryLabel" type="Label" parent="Root/TopLeft/Margin/TextRows"]
+layout_mode = 2
+text = "소지품: 없음"
+
+[node name="NoticePanel" type="PanelContainer" parent="Root"]
+visible = false
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -300.0
+offset_top = -96.0
+offset_right = 300.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Margin" type="MarginContainer" parent="Root/NoticePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 12
+
+[node name="NoticeLabel" type="Label" parent="Root/NoticePanel/Margin"]
+layout_mode = 2
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
