@@ -1,0 +1,33 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1_player_script"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_player"]
+radius = 8.0
+height = 26.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_interaction"]
+size = Vector2(24, 24)
+
+[node name="Player" type="CharacterBody2D"]
+script = ExtResource("1_player_script")
+
+[node name="Body" type="Polygon2D" parent="."]
+color = Color(0.48, 0.72, 0.86, 1)
+polygon = PackedVector2Array(0, -18, 10, -6, 7, 14, -7, 14, -10, -6)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CapsuleShape2D_player")
+
+[node name="InteractionArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+
+[node name="InteractionShape" type="CollisionShape2D" parent="InteractionArea"]
+shape = SubResource("RectangleShape2D_interaction")
+
+[node name="Camera2D" type="Camera2D" parent="."]
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+zoom = Vector2(1.25, 1.25)
+enabled = true
