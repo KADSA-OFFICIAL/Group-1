@@ -81,9 +81,9 @@ gh api -X PUT repos/KADSA-OFFICIAL/Group-1/branches/main/protection \
 # dev 도 동일하게 branches/dev/protection 으로 반복
 ```
 
-### 3) CODEOWNERS 채우기
-[.github/CODEOWNERS](../.github/CODEOWNERS)의 `@MEMBER2-PLACEHOLDER`를
-공동작업자의 실제 GitHub 사용자명으로 바꿉니다.
+### 3) CODEOWNERS 확인
+[.github/CODEOWNERS](../.github/CODEOWNERS)에 두 멤버(`@LouizXT`, `@1jealy`)가
+모두 들어 있는지 확인합니다. 멤버가 바뀌면 사용자명을 갱신합니다.
 
 ### 4) PR 머지 방식
 `Settings → General → Pull Requests`에서 "Allow squash merging"만 켜두면
