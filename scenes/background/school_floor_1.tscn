@@ -1,0 +1,199 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="1_interactable"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_horizontal"]
+size = Vector2(920, 24)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_vertical"]
+size = Vector2(24, 460)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room_wall"]
+size = Vector2(24, 180)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room_top"]
+size = Vector2(210, 18)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_interact_small"]
+size = Vector2(42, 34)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_interact_door"]
+size = Vector2(64, 70)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_window"]
+size = Vector2(90, 26)
+
+[node name="SchoolFloor1" type="Node2D"]
+
+[node name="Floor" type="Polygon2D" parent="."]
+color = Color(0.08, 0.09, 0.1, 1)
+polygon = PackedVector2Array(20, 40, 940, 40, 940, 500, 20, 500)
+
+[node name="Corridor" type="Polygon2D" parent="."]
+color = Color(0.16, 0.17, 0.18, 1)
+polygon = PackedVector2Array(70, 290, 890, 290, 890, 430, 70, 430)
+
+[node name="ClassroomA" type="Polygon2D" parent="."]
+color = Color(0.11, 0.13, 0.13, 1)
+polygon = PackedVector2Array(90, 90, 300, 90, 300, 270, 90, 270)
+
+[node name="ClassroomB" type="Polygon2D" parent="."]
+color = Color(0.12, 0.11, 0.13, 1)
+polygon = PackedVector2Array(375, 90, 585, 90, 585, 270, 375, 270)
+
+[node name="Office" type="Polygon2D" parent="."]
+color = Color(0.13, 0.1, 0.1, 1)
+polygon = PackedVector2Array(660, 90, 870, 90, 870, 270, 660, 270)
+
+[node name="DoorHighlights" type="Node2D" parent="."]
+
+[node name="ClassroomADoor" type="Polygon2D" parent="DoorHighlights"]
+color = Color(0.36, 0.28, 0.18, 1)
+polygon = PackedVector2Array(175, 270, 215, 270, 215, 290, 175, 290)
+
+[node name="ClassroomBDoor" type="Polygon2D" parent="DoorHighlights"]
+color = Color(0.36, 0.28, 0.18, 1)
+polygon = PackedVector2Array(460, 270, 500, 270, 500, 290, 460, 290)
+
+[node name="OfficeDoor" type="Polygon2D" parent="DoorHighlights"]
+color = Color(0.36, 0.28, 0.18, 1)
+polygon = PackedVector2Array(745, 270, 785, 270, 785, 290, 745, 290)
+
+[node name="FrontGateVisual" type="Polygon2D" parent="."]
+color = Color(0.08, 0.07, 0.06, 1)
+polygon = PackedVector2Array(870, 316, 928, 316, 928, 404, 870, 404)
+
+[node name="MurderWindowVisual" type="Polygon2D" parent="."]
+color = Color(0.3, 0.4, 0.45, 1)
+polygon = PackedVector2Array(690, 86, 780, 86, 780, 104, 690, 104)
+
+[node name="Labels" type="Node2D" parent="."]
+
+[node name="ClassroomALabel" type="Label" parent="Labels"]
+offset_left = 120.0
+offset_top = 112.0
+offset_right = 272.0
+offset_bottom = 137.0
+text = "1학년 2반"
+
+[node name="ClassroomBLabel" type="Label" parent="Labels"]
+offset_left = 405.0
+offset_top = 112.0
+offset_right = 557.0
+offset_bottom = 137.0
+text = "국어 교실"
+
+[node name="OfficeLabel" type="Label" parent="Labels"]
+offset_left = 700.0
+offset_top = 112.0
+offset_right = 842.0
+offset_bottom = 137.0
+text = "수위실"
+
+[node name="Walls" type="StaticBody2D" parent="."]
+
+[node name="TopWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(480, 40)
+shape = SubResource("RectangleShape2D_wall_horizontal")
+
+[node name="BottomWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(480, 500)
+shape = SubResource("RectangleShape2D_wall_horizontal")
+
+[node name="LeftWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(20, 270)
+shape = SubResource("RectangleShape2D_wall_vertical")
+
+[node name="RightWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(940, 270)
+shape = SubResource("RectangleShape2D_wall_vertical")
+
+[node name="ClassroomALeftWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(90, 180)
+shape = SubResource("RectangleShape2D_room_wall")
+
+[node name="ClassroomARightWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(300, 180)
+shape = SubResource("RectangleShape2D_room_wall")
+
+[node name="ClassroomATopWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(195, 90)
+shape = SubResource("RectangleShape2D_room_top")
+
+[node name="ClassroomBLeftWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(375, 180)
+shape = SubResource("RectangleShape2D_room_wall")
+
+[node name="ClassroomBRightWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(585, 180)
+shape = SubResource("RectangleShape2D_room_wall")
+
+[node name="ClassroomBTopWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(480, 90)
+shape = SubResource("RectangleShape2D_room_top")
+
+[node name="OfficeLeftWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(660, 180)
+shape = SubResource("RectangleShape2D_room_wall")
+
+[node name="OfficeRightWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(870, 180)
+shape = SubResource("RectangleShape2D_room_wall")
+
+[node name="OfficeTopWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(765, 90)
+shape = SubResource("RectangleShape2D_room_top")
+
+[node name="Interactables" type="Node2D" parent="."]
+
+[node name="KoreanBook" type="Area2D" parent="Interactables"]
+position = Vector2(480, 180)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_interactable")
+message = "책상 위에서 국어책을 찾았다. 이제 탈출할 방법을 찾아야 한다."
+grants_item_id = "korean_book"
+
+[node name="Shape" type="CollisionShape2D" parent="Interactables/KoreanBook"]
+shape = SubResource("RectangleShape2D_interact_small")
+
+[node name="Visual" type="Polygon2D" parent="Interactables/KoreanBook"]
+color = Color(0.74, 0.67, 0.48, 1)
+polygon = PackedVector2Array(-18, -12, 18, -10, 18, 12, -18, 10)
+
+[node name="FrontGateKey" type="Area2D" parent="Interactables"]
+position = Vector2(742, 188)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_interactable")
+message = "수위실 서랍에서 현관 열쇠를 발견했다."
+grants_item_id = "front_gate_key"
+
+[node name="Shape" type="CollisionShape2D" parent="Interactables/FrontGateKey"]
+shape = SubResource("RectangleShape2D_interact_small")
+
+[node name="Visual" type="Polygon2D" parent="Interactables/FrontGateKey"]
+color = Color(0.9, 0.72, 0.28, 1)
+polygon = PackedVector2Array(-16, -5, 4, -5, 4, -10, 16, -10, 16, 10, 4, 10, 4, 5, -16, 5)
+
+[node name="MurderWindow" type="Area2D" parent="Interactables"]
+position = Vector2(735, 100)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_interactable")
+message = "창문 밖 운동장 구석에서 수위 아저씨가 무언가를 묻고 있다. 들킨 것 같다."
+
+[node name="Shape" type="CollisionShape2D" parent="Interactables/MurderWindow"]
+shape = SubResource("RectangleShape2D_window")
+
+[node name="FrontGate" type="Area2D" parent="Interactables"]
+position = Vector2(900, 360)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_interactable")
+message = "현관문을 열었다. 이제 학교 밖으로 빠져나갈 수 있다."
+required_item_id = "front_gate_key"
+locked_message = "현관문은 수위 아저씨가 막아두었다. 열쇠를 찾아야 한다."
+
+[node name="Shape" type="CollisionShape2D" parent="Interactables/FrontGate"]
+shape = SubResource("RectangleShape2D_interact_door")

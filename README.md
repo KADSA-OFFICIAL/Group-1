@@ -1,15 +1,32 @@
 # Group-1
 
-KADSA Group-1 게임 프로젝트 저장소입니다.
+2D 공포 방탈출 게임 프로젝트입니다. 주인공은 국어책을 가지러 밤의 학교에 갔다가, 창문 너머로 시체를 묻는 수위 아저씨를 목격하고 학교 안에 갇히게 됩니다.
 
-## GitHub 작업 흐름
+## 실행 씬
 
-이 프로젝트는 `issue -> branch -> commit -> PR to dev -> PR to main` 흐름으로 작업합니다.
+- 메인 씬: `res://scenes/main/main.tscn`
+- 이동: `WASD` 또는 방향키
+- 조사/상호작용: `E`
 
-- 안정 버전은 `main` 브랜치에 둡니다.
-- 새 기능, 개선, 버그 수정은 `dev`에서 작업 브랜치를 만들어 진행합니다.
-- 작업 브랜치 이름은 `feature/12-player-jump`, `bugfix/18-camera-jitter`처럼 이슈 번호를 포함합니다.
-- 작업 PR은 먼저 `dev`로 올립니다.
-- `dev`에서 문제가 없으면 `dev -> main` PR을 올립니다.
+## 협업용 씬 분리
 
-자세한 규칙과 로컬 명령은 [docs/github-workflow.md](docs/github-workflow.md)를 확인하세요.
+- 배경/맵: `scenes/background`
+- 플레이어: `scenes/player`
+- UI: `scenes/ui`
+- 게임 상태/조립: `scenes/main`, `scripts/game`
+
+자세한 규칙은 `docs/scene_structure.md`를 참고하세요.
+
+## 협업 워크플로우
+
+2인 협업은 `feat/fix/issue → dev → main` 흐름을 따릅니다. 검증된 코드만 `main`에 들어갑니다.
+
+- 2인 협업 가이드: `docs/collaboration.md`
+- 명령 흐름(스크립트): `docs/github-workflow.md`
+- 작업 규칙(하네스): `CLAUDE.md`, `AGENTS.md`
+
+```bash
+scripts/start-task.sh 12 feat player-jump   # 이슈 12로 dev에서 작업 브랜치 시작
+scripts/finish-task.sh 12 "Add player jump" # 커밋·푸시·dev 대상 PR
+scripts/promote-main.sh 12 "Add player jump"# dev 검증 후 main 대상 PR
+```
