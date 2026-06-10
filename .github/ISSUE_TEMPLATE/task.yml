@@ -1,0 +1,22 @@
+name: Task
+description: 문서, 설정, 정리, 빌드 등 일반 작업입니다.
+title: "[Task] "
+labels:
+  - task
+body:
+  - type: textarea
+    id: work
+    attributes:
+      label: 작업 내용
+      description: 해야 할 일을 적어주세요.
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: 완료 기준
+      value: |
+        - [ ] 작업 결과가 저장소에 반영됐다.
+        - [ ] 팀원이 확인할 수 있도록 PR 설명을 작성했다.
+    validations:
+      required: true
