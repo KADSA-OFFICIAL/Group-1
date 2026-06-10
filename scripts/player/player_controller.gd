@@ -1,6 +1,6 @@
 extends CharacterBody2D
 
-@export var speed: float = 160.0
+@export var speed: float = 320.0
 
 @onready var body: Polygon2D = $Body
 @onready var interaction_area: Area2D = $InteractionArea
