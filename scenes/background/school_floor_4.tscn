@@ -1,0 +1,89 @@
+[gd_scene load_steps=3 format=3]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
+size = Vector2(2800, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_v"]
+size = Vector2(40, 1800)
+
+[node name="SchoolFloor4" type="Node2D"]
+
+[node name="Floor" type="Polygon2D" parent="."]
+color = Color(0.07, 0.07, 0.08, 1)
+polygon = PackedVector2Array(0, 0, 2800, 0, 2800, 1800, 0, 1800)
+
+[node name="Corridor" type="Node2D" parent="."]
+
+[node name="CorridorH" type="Polygon2D" parent="Corridor"]
+color = Color(0.14, 0.14, 0.15, 1)
+polygon = PackedVector2Array(120, 820, 2680, 820, 2680, 980, 120, 980)
+
+[node name="CorridorV" type="Polygon2D" parent="Corridor"]
+color = Color(0.14, 0.14, 0.15, 1)
+polygon = PackedVector2Array(1320, 120, 1480, 120, 1480, 1680, 1320, 1680)
+
+[node name="Rooms" type="Node2D" parent="."]
+
+[node name="RoomTL" type="Polygon2D" parent="Rooms"]
+color = Color(0.1, 0.11, 0.12, 1)
+polygon = PackedVector2Array(120, 120, 1320, 120, 1320, 820, 120, 820)
+
+[node name="RoomTR" type="Polygon2D" parent="Rooms"]
+color = Color(0.12, 0.1, 0.11, 1)
+polygon = PackedVector2Array(1480, 120, 2680, 120, 2680, 820, 1480, 820)
+
+[node name="RoomBL" type="Polygon2D" parent="Rooms"]
+color = Color(0.12, 0.1, 0.11, 1)
+polygon = PackedVector2Array(120, 980, 1320, 980, 1320, 1680, 120, 1680)
+
+[node name="RoomBR" type="Polygon2D" parent="Rooms"]
+color = Color(0.1, 0.11, 0.12, 1)
+polygon = PackedVector2Array(1480, 980, 2680, 980, 2680, 1680, 1480, 1680)
+
+[node name="Labels" type="Node2D" parent="."]
+
+[node name="RoomTLLabel" type="Label" parent="Labels"]
+offset_left = 660.0
+offset_top = 455.0
+offset_right = 780.0
+offset_bottom = 485.0
+text = "과학실"
+
+[node name="RoomTRLabel" type="Label" parent="Labels"]
+offset_left = 2020.0
+offset_top = 455.0
+offset_right = 2140.0
+offset_bottom = 485.0
+text = "실험 준비실"
+
+[node name="RoomBLLabel" type="Label" parent="Labels"]
+offset_left = 660.0
+offset_top = 1315.0
+offset_right = 780.0
+offset_bottom = 1345.0
+text = "교무실"
+
+[node name="RoomBRLabel" type="Label" parent="Labels"]
+offset_left = 2020.0
+offset_top = 1315.0
+offset_right = 2140.0
+offset_bottom = 1345.0
+text = "계단"
+
+[node name="Walls" type="StaticBody2D" parent="."]
+
+[node name="TopWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(1400, 20)
+shape = SubResource("RectangleShape2D_wall_h")
+
+[node name="BottomWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(1400, 1780)
+shape = SubResource("RectangleShape2D_wall_h")
+
+[node name="LeftWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(20, 900)
+shape = SubResource("RectangleShape2D_wall_v")
+
+[node name="RightWall" type="CollisionShape2D" parent="Walls"]
+position = Vector2(2780, 900)
+shape = SubResource("RectangleShape2D_wall_v")
