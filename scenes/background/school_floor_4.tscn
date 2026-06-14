@@ -9,66 +9,228 @@ size = Vector2(40, 1800)
 [node name="SchoolFloor4" type="Node2D"]
 
 [node name="Floor" type="Polygon2D" parent="."]
-color = Color(0.07, 0.07, 0.08, 1)
+color = Color(0.14, 0.14, 0.16, 1)
 polygon = PackedVector2Array(0, 0, 2800, 0, 2800, 1800, 0, 1800)
-
-[node name="Corridor" type="Node2D" parent="."]
-
-[node name="CorridorH" type="Polygon2D" parent="Corridor"]
-color = Color(0.14, 0.14, 0.15, 1)
-polygon = PackedVector2Array(120, 820, 2680, 820, 2680, 980, 120, 980)
-
-[node name="CorridorV" type="Polygon2D" parent="Corridor"]
-color = Color(0.14, 0.14, 0.15, 1)
-polygon = PackedVector2Array(1320, 120, 1480, 120, 1480, 1680, 1320, 1680)
 
 [node name="Rooms" type="Node2D" parent="."]
 
-[node name="RoomTL" type="Polygon2D" parent="Rooms"]
+[node name="Class1" type="Polygon2D" parent="Rooms"]
 color = Color(0.1, 0.11, 0.12, 1)
-polygon = PackedVector2Array(120, 120, 1320, 120, 1320, 820, 120, 820)
+polygon = PackedVector2Array(120, 120, 392, 120, 392, 620, 120, 620)
 
-[node name="RoomTR" type="Polygon2D" parent="Rooms"]
-color = Color(0.12, 0.1, 0.11, 1)
-polygon = PackedVector2Array(1480, 120, 2680, 120, 2680, 820, 1480, 820)
-
-[node name="RoomBL" type="Polygon2D" parent="Rooms"]
-color = Color(0.12, 0.1, 0.11, 1)
-polygon = PackedVector2Array(120, 980, 1320, 980, 1320, 1680, 120, 1680)
-
-[node name="RoomBR" type="Polygon2D" parent="Rooms"]
+[node name="Class2" type="Polygon2D" parent="Rooms"]
 color = Color(0.1, 0.11, 0.12, 1)
-polygon = PackedVector2Array(1480, 980, 2680, 980, 2680, 1680, 1480, 1680)
+polygon = PackedVector2Array(422, 120, 694, 120, 694, 620, 422, 620)
+
+[node name="Class3" type="Polygon2D" parent="Rooms"]
+color = Color(0.1, 0.11, 0.12, 1)
+polygon = PackedVector2Array(724, 120, 996, 120, 996, 620, 724, 620)
+
+[node name="StaffRoom" type="Polygon2D" parent="Rooms"]
+color = Color(0.13, 0.1, 0.1, 1)
+polygon = PackedVector2Array(1026, 120, 1298, 120, 1298, 620, 1026, 620)
+
+[node name="Class4" type="Polygon2D" parent="Rooms"]
+color = Color(0.1, 0.11, 0.12, 1)
+polygon = PackedVector2Array(1500, 120, 1772, 120, 1772, 620, 1500, 620)
+
+[node name="Class5" type="Polygon2D" parent="Rooms"]
+color = Color(0.1, 0.11, 0.12, 1)
+polygon = PackedVector2Array(1802, 120, 2074, 120, 2074, 620, 1802, 620)
+
+[node name="Class6" type="Polygon2D" parent="Rooms"]
+color = Color(0.1, 0.11, 0.12, 1)
+polygon = PackedVector2Array(2104, 120, 2376, 120, 2376, 620, 2104, 620)
+
+[node name="Class7" type="Polygon2D" parent="Rooms"]
+color = Color(0.1, 0.11, 0.12, 1)
+polygon = PackedVector2Array(2406, 120, 2678, 120, 2678, 620, 2406, 620)
+
+[node name="StairsTop" type="Polygon2D" parent="Rooms"]
+color = Color(0.1, 0.12, 0.13, 1)
+polygon = PackedVector2Array(120, 720, 560, 720, 560, 1000, 120, 1000)
+
+[node name="Class8" type="Polygon2D" parent="Rooms"]
+color = Color(0.1, 0.11, 0.12, 1)
+polygon = PackedVector2Array(120, 1080, 480, 1080, 480, 1320, 120, 1320)
+
+[node name="HumanitiesDept" type="Polygon2D" parent="Rooms"]
+color = Color(0.11, 0.1, 0.12, 1)
+polygon = PackedVector2Array(510, 1080, 1150, 1080, 1150, 1320, 510, 1320)
+
+[node name="Empty1" type="Polygon2D" parent="Rooms"]
+color = Color(0.08, 0.08, 0.09, 1)
+polygon = PackedVector2Array(1500, 1080, 1873, 1080, 1873, 1320, 1500, 1320)
+
+[node name="Empty2" type="Polygon2D" parent="Rooms"]
+color = Color(0.08, 0.08, 0.09, 1)
+polygon = PackedVector2Array(1903, 1080, 2276, 1080, 2276, 1320, 1903, 1320)
+
+[node name="Empty3" type="Polygon2D" parent="Rooms"]
+color = Color(0.08, 0.08, 0.09, 1)
+polygon = PackedVector2Array(2306, 1080, 2679, 1080, 2679, 1320, 2306, 1320)
+
+[node name="StairsBottom" type="Polygon2D" parent="Rooms"]
+color = Color(0.1, 0.12, 0.13, 1)
+polygon = PackedVector2Array(1180, 1400, 1560, 1400, 1560, 1680, 1180, 1680)
+
+[node name="Empty4" type="Polygon2D" parent="Rooms"]
+color = Color(0.08, 0.08, 0.09, 1)
+polygon = PackedVector2Array(1700, 1400, 2006, 1400, 2006, 1680, 1700, 1680)
+
+[node name="Empty5" type="Polygon2D" parent="Rooms"]
+color = Color(0.08, 0.08, 0.09, 1)
+polygon = PackedVector2Array(2036, 1400, 2342, 1400, 2342, 1680, 2036, 1680)
+
+[node name="Empty6" type="Polygon2D" parent="Rooms"]
+color = Color(0.08, 0.08, 0.09, 1)
+polygon = PackedVector2Array(2372, 1400, 2678, 1400, 2678, 1680, 2372, 1680)
 
 [node name="Labels" type="Node2D" parent="."]
 
-[node name="RoomTLLabel" type="Label" parent="Labels"]
-offset_left = 660.0
-offset_top = 455.0
-offset_right = 780.0
-offset_bottom = 485.0
-text = "과학실"
+[node name="L1" type="Label" parent="Labels"]
+offset_left = 181.0
+offset_top = 355.0
+offset_right = 331.0
+offset_bottom = 385.0
+text = "1반"
+horizontal_alignment = 1
 
-[node name="RoomTRLabel" type="Label" parent="Labels"]
-offset_left = 2020.0
-offset_top = 455.0
-offset_right = 2140.0
-offset_bottom = 485.0
-text = "실험 준비실"
+[node name="L2" type="Label" parent="Labels"]
+offset_left = 483.0
+offset_top = 355.0
+offset_right = 633.0
+offset_bottom = 385.0
+text = "2반"
+horizontal_alignment = 1
 
-[node name="RoomBLLabel" type="Label" parent="Labels"]
-offset_left = 660.0
-offset_top = 1315.0
-offset_right = 780.0
-offset_bottom = 1345.0
+[node name="L3" type="Label" parent="Labels"]
+offset_left = 785.0
+offset_top = 355.0
+offset_right = 935.0
+offset_bottom = 385.0
+text = "3반"
+horizontal_alignment = 1
+
+[node name="LStaff" type="Label" parent="Labels"]
+offset_left = 1087.0
+offset_top = 355.0
+offset_right = 1237.0
+offset_bottom = 385.0
 text = "교무실"
+horizontal_alignment = 1
 
-[node name="RoomBRLabel" type="Label" parent="Labels"]
-offset_left = 2020.0
-offset_top = 1315.0
-offset_right = 2140.0
-offset_bottom = 1345.0
+[node name="L4" type="Label" parent="Labels"]
+offset_left = 1561.0
+offset_top = 355.0
+offset_right = 1711.0
+offset_bottom = 385.0
+text = "4반"
+horizontal_alignment = 1
+
+[node name="L5" type="Label" parent="Labels"]
+offset_left = 1863.0
+offset_top = 355.0
+offset_right = 2013.0
+offset_bottom = 385.0
+text = "5반"
+horizontal_alignment = 1
+
+[node name="L6" type="Label" parent="Labels"]
+offset_left = 2165.0
+offset_top = 355.0
+offset_right = 2315.0
+offset_bottom = 385.0
+text = "6반"
+horizontal_alignment = 1
+
+[node name="L7" type="Label" parent="Labels"]
+offset_left = 2467.0
+offset_top = 355.0
+offset_right = 2617.0
+offset_bottom = 385.0
+text = "7반"
+horizontal_alignment = 1
+
+[node name="LStairsTop" type="Label" parent="Labels"]
+offset_left = 265.0
+offset_top = 845.0
+offset_right = 415.0
+offset_bottom = 875.0
 text = "계단"
+horizontal_alignment = 1
+
+[node name="L8" type="Label" parent="Labels"]
+offset_left = 225.0
+offset_top = 1185.0
+offset_right = 375.0
+offset_bottom = 1215.0
+text = "8반"
+horizontal_alignment = 1
+
+[node name="LHumanities" type="Label" parent="Labels"]
+offset_left = 755.0
+offset_top = 1185.0
+offset_right = 905.0
+offset_bottom = 1215.0
+text = "인문사회부"
+horizontal_alignment = 1
+
+[node name="LEmpty1" type="Label" parent="Labels"]
+offset_left = 1611.0
+offset_top = 1185.0
+offset_right = 1761.0
+offset_bottom = 1215.0
+text = "빈 방"
+horizontal_alignment = 1
+
+[node name="LEmpty2" type="Label" parent="Labels"]
+offset_left = 2014.0
+offset_top = 1185.0
+offset_right = 2164.0
+offset_bottom = 1215.0
+text = "빈 방"
+horizontal_alignment = 1
+
+[node name="LEmpty3" type="Label" parent="Labels"]
+offset_left = 2417.0
+offset_top = 1185.0
+offset_right = 2567.0
+offset_bottom = 1215.0
+text = "빈 방"
+horizontal_alignment = 1
+
+[node name="LStairsBottom" type="Label" parent="Labels"]
+offset_left = 1295.0
+offset_top = 1525.0
+offset_right = 1445.0
+offset_bottom = 1555.0
+text = "계단"
+horizontal_alignment = 1
+
+[node name="LEmpty4" type="Label" parent="Labels"]
+offset_left = 1778.0
+offset_top = 1525.0
+offset_right = 1928.0
+offset_bottom = 1555.0
+text = "빈 방"
+horizontal_alignment = 1
+
+[node name="LEmpty5" type="Label" parent="Labels"]
+offset_left = 2114.0
+offset_top = 1525.0
+offset_right = 2264.0
+offset_bottom = 1555.0
+text = "빈 방"
+horizontal_alignment = 1
+
+[node name="LEmpty6" type="Label" parent="Labels"]
+offset_left = 2450.0
+offset_top = 1525.0
+offset_right = 2600.0
+offset_bottom = 1555.0
+text = "빈 방"
+horizontal_alignment = 1
 
 [node name="Walls" type="StaticBody2D" parent="."]
 
