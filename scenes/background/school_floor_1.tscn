@@ -108,6 +108,323 @@ offset_right = 2520.0
 offset_bottom = 1400.0
 text = "계단 (2층)"
 
+
+[node name="RoomWalls" type="StaticBody2D" parent="."]
+
+[node name="WC_RoomTopA_left" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(120, 120, 136, 120, 136, 720, 120, 720)
+
+[node name="WC_RoomTopA_right" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(704, 120, 720, 120, 720, 720, 704, 720)
+
+[node name="WC_RoomTopA_top" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(120, 120, 720, 120, 720, 136, 120, 136)
+
+[node name="WC_RoomTopA_botL" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(120, 704, 365.0, 704, 365.0, 720, 120, 720)
+
+[node name="WC_RoomTopA_botR" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(475.0, 704, 720, 704, 720, 720, 475.0, 720)
+
+[node name="WC_RoomTopB_left" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(800, 120, 816, 120, 816, 720, 800, 720)
+
+[node name="WC_RoomTopB_right" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1384, 120, 1400, 120, 1400, 720, 1384, 720)
+
+[node name="WC_RoomTopB_top" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(800, 120, 1400, 120, 1400, 136, 800, 136)
+
+[node name="WC_RoomTopB_botL" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(800, 704, 1045.0, 704, 1045.0, 720, 800, 720)
+
+[node name="WC_RoomTopB_botR" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1155.0, 704, 1400, 704, 1400, 720, 1155.0, 720)
+
+[node name="WC_RoomTopC_left" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1480, 120, 1496, 120, 1496, 720, 1480, 720)
+
+[node name="WC_RoomTopC_right" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2064, 120, 2080, 120, 2080, 720, 2064, 720)
+
+[node name="WC_RoomTopC_top" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1480, 120, 2080, 120, 2080, 136, 1480, 136)
+
+[node name="WC_RoomTopC_botL" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1480, 704, 1725.0, 704, 1725.0, 720, 1480, 720)
+
+[node name="WC_RoomTopC_botR" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1835.0, 704, 2080, 704, 2080, 720, 1835.0, 720)
+
+[node name="WC_RoomTopD_left" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2160, 120, 2176, 120, 2176, 720, 2160, 720)
+
+[node name="WC_RoomTopD_right" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2744, 120, 2760, 120, 2760, 720, 2744, 720)
+
+[node name="WC_RoomTopD_top" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2160, 120, 2760, 120, 2760, 136, 2160, 136)
+
+[node name="WC_RoomTopD_botL" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2160, 704, 2405.0, 704, 2405.0, 720, 2160, 720)
+
+[node name="WC_RoomTopD_botR" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2515.0, 704, 2760, 704, 2760, 720, 2515.0, 720)
+
+[node name="WC_RoomBottomA_left" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(120, 1080, 136, 1080, 136, 1680, 120, 1680)
+
+[node name="WC_RoomBottomA_right" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(704, 1080, 720, 1080, 720, 1680, 704, 1680)
+
+[node name="WC_RoomBottomA_bot" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(120, 1664, 720, 1664, 720, 1680, 120, 1680)
+
+[node name="WC_RoomBottomA_topL" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(120, 1080, 365.0, 1080, 365.0, 1096, 120, 1096)
+
+[node name="WC_RoomBottomA_topR" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(475.0, 1080, 720, 1080, 720, 1096, 475.0, 1096)
+
+[node name="WC_RoomBottomB_left" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(800, 1080, 816, 1080, 816, 1680, 800, 1680)
+
+[node name="WC_RoomBottomB_right" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1384, 1080, 1400, 1080, 1400, 1680, 1384, 1680)
+
+[node name="WC_RoomBottomB_bot" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(800, 1664, 1400, 1664, 1400, 1680, 800, 1680)
+
+[node name="WC_RoomBottomB_topL" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(800, 1080, 1045.0, 1080, 1045.0, 1096, 800, 1096)
+
+[node name="WC_RoomBottomB_topR" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1155.0, 1080, 1400, 1080, 1400, 1096, 1155.0, 1096)
+
+[node name="WC_RoomBottomC_left" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1480, 1080, 1496, 1080, 1496, 1680, 1480, 1680)
+
+[node name="WC_RoomBottomC_right" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2064, 1080, 2080, 1080, 2080, 1680, 2064, 1680)
+
+[node name="WC_RoomBottomC_bot" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1480, 1664, 2080, 1664, 2080, 1680, 1480, 1680)
+
+[node name="WC_RoomBottomC_topL" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1480, 1080, 1725.0, 1080, 1725.0, 1096, 1480, 1096)
+
+[node name="WC_RoomBottomC_topR" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1835.0, 1080, 2080, 1080, 2080, 1096, 1835.0, 1096)
+
+[node name="WC_RoomBottomD_left" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2160, 1080, 2176, 1080, 2176, 1680, 2160, 1680)
+
+[node name="WC_RoomBottomD_right" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2744, 1080, 2760, 1080, 2760, 1680, 2744, 1680)
+
+[node name="WC_RoomBottomD_bot" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2160, 1664, 2760, 1664, 2760, 1680, 2160, 1680)
+
+[node name="WC_RoomBottomD_topL" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2160, 1080, 2405.0, 1080, 2405.0, 1096, 2160, 1096)
+
+[node name="WC_RoomBottomD_topR" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2515.0, 1080, 2760, 1080, 2760, 1096, 2515.0, 1096)
+
+[node name="RoomWallVisuals" type="Node2D" parent="."]
+
+[node name="WV_RoomTopA_left" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(120, 120, 136, 120, 136, 720, 120, 720)
+
+[node name="WV_RoomTopA_right" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(704, 120, 720, 120, 720, 720, 704, 720)
+
+[node name="WV_RoomTopA_top" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(120, 120, 720, 120, 720, 136, 120, 136)
+
+[node name="WV_RoomTopA_botL" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(120, 704, 365.0, 704, 365.0, 720, 120, 720)
+
+[node name="WV_RoomTopA_botR" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(475.0, 704, 720, 704, 720, 720, 475.0, 720)
+
+[node name="Door_RoomTopA" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.45, 0.32, 0.2, 1)
+polygon = PackedVector2Array(365.0, 704, 475.0, 704, 475.0, 720, 365.0, 720)
+
+[node name="WV_RoomTopB_left" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(800, 120, 816, 120, 816, 720, 800, 720)
+
+[node name="WV_RoomTopB_right" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1384, 120, 1400, 120, 1400, 720, 1384, 720)
+
+[node name="WV_RoomTopB_top" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(800, 120, 1400, 120, 1400, 136, 800, 136)
+
+[node name="WV_RoomTopB_botL" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(800, 704, 1045.0, 704, 1045.0, 720, 800, 720)
+
+[node name="WV_RoomTopB_botR" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1155.0, 704, 1400, 704, 1400, 720, 1155.0, 720)
+
+[node name="Door_RoomTopB" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.45, 0.32, 0.2, 1)
+polygon = PackedVector2Array(1045.0, 704, 1155.0, 704, 1155.0, 720, 1045.0, 720)
+
+[node name="WV_RoomTopC_left" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1480, 120, 1496, 120, 1496, 720, 1480, 720)
+
+[node name="WV_RoomTopC_right" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2064, 120, 2080, 120, 2080, 720, 2064, 720)
+
+[node name="WV_RoomTopC_top" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1480, 120, 2080, 120, 2080, 136, 1480, 136)
+
+[node name="WV_RoomTopC_botL" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1480, 704, 1725.0, 704, 1725.0, 720, 1480, 720)
+
+[node name="WV_RoomTopC_botR" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1835.0, 704, 2080, 704, 2080, 720, 1835.0, 720)
+
+[node name="Door_RoomTopC" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.45, 0.32, 0.2, 1)
+polygon = PackedVector2Array(1725.0, 704, 1835.0, 704, 1835.0, 720, 1725.0, 720)
+
+[node name="WV_RoomTopD_left" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2160, 120, 2176, 120, 2176, 720, 2160, 720)
+
+[node name="WV_RoomTopD_right" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2744, 120, 2760, 120, 2760, 720, 2744, 720)
+
+[node name="WV_RoomTopD_top" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2160, 120, 2760, 120, 2760, 136, 2160, 136)
+
+[node name="WV_RoomTopD_botL" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2160, 704, 2405.0, 704, 2405.0, 720, 2160, 720)
+
+[node name="WV_RoomTopD_botR" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2515.0, 704, 2760, 704, 2760, 720, 2515.0, 720)
+
+[node name="Door_RoomTopD" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.45, 0.32, 0.2, 1)
+polygon = PackedVector2Array(2405.0, 704, 2515.0, 704, 2515.0, 720, 2405.0, 720)
+
+[node name="WV_RoomBottomA_left" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(120, 1080, 136, 1080, 136, 1680, 120, 1680)
+
+[node name="WV_RoomBottomA_right" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(704, 1080, 720, 1080, 720, 1680, 704, 1680)
+
+[node name="WV_RoomBottomA_bot" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(120, 1664, 720, 1664, 720, 1680, 120, 1680)
+
+[node name="WV_RoomBottomA_topL" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(120, 1080, 365.0, 1080, 365.0, 1096, 120, 1096)
+
+[node name="WV_RoomBottomA_topR" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(475.0, 1080, 720, 1080, 720, 1096, 475.0, 1096)
+
+[node name="Door_RoomBottomA" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.45, 0.32, 0.2, 1)
+polygon = PackedVector2Array(365.0, 1080, 475.0, 1080, 475.0, 1096, 365.0, 1096)
+
+[node name="WV_RoomBottomB_left" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(800, 1080, 816, 1080, 816, 1680, 800, 1680)
+
+[node name="WV_RoomBottomB_right" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1384, 1080, 1400, 1080, 1400, 1680, 1384, 1680)
+
+[node name="WV_RoomBottomB_bot" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(800, 1664, 1400, 1664, 1400, 1680, 800, 1680)
+
+[node name="WV_RoomBottomB_topL" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(800, 1080, 1045.0, 1080, 1045.0, 1096, 800, 1096)
+
+[node name="WV_RoomBottomB_topR" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1155.0, 1080, 1400, 1080, 1400, 1096, 1155.0, 1096)
+
+[node name="Door_RoomBottomB" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.45, 0.32, 0.2, 1)
+polygon = PackedVector2Array(1045.0, 1080, 1155.0, 1080, 1155.0, 1096, 1045.0, 1096)
+
+[node name="WV_RoomBottomC_left" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1480, 1080, 1496, 1080, 1496, 1680, 1480, 1680)
+
+[node name="WV_RoomBottomC_right" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2064, 1080, 2080, 1080, 2080, 1680, 2064, 1680)
+
+[node name="WV_RoomBottomC_bot" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1480, 1664, 2080, 1664, 2080, 1680, 1480, 1680)
+
+[node name="WV_RoomBottomC_topL" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1480, 1080, 1725.0, 1080, 1725.0, 1096, 1480, 1096)
+
+[node name="WV_RoomBottomC_topR" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1835.0, 1080, 2080, 1080, 2080, 1096, 1835.0, 1096)
+
+[node name="Door_RoomBottomC" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.45, 0.32, 0.2, 1)
+polygon = PackedVector2Array(1725.0, 1080, 1835.0, 1080, 1835.0, 1096, 1725.0, 1096)
+
+[node name="WV_RoomBottomD_left" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2160, 1080, 2176, 1080, 2176, 1680, 2160, 1680)
+
+[node name="WV_RoomBottomD_right" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2744, 1080, 2760, 1080, 2760, 1680, 2744, 1680)
+
+[node name="WV_RoomBottomD_bot" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2160, 1664, 2760, 1664, 2760, 1680, 2160, 1680)
+
+[node name="WV_RoomBottomD_topL" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2160, 1080, 2405.0, 1080, 2405.0, 1096, 2160, 1096)
+
+[node name="WV_RoomBottomD_topR" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2515.0, 1080, 2760, 1080, 2760, 1096, 2515.0, 1096)
+
+[node name="Door_RoomBottomD" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.45, 0.32, 0.2, 1)
+polygon = PackedVector2Array(2405.0, 1080, 2515.0, 1080, 2515.0, 1096, 2405.0, 1096)
+
 [node name="Walls" type="StaticBody2D" parent="."]
 
 [node name="TopWall" type="CollisionShape2D" parent="Walls"]
