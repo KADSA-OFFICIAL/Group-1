@@ -86,6 +86,30 @@ polygon = PackedVector2Array(2036, 1400, 2342, 1400, 2342, 1680, 2036, 1680)
 color = Color(0.08, 0.08, 0.09, 1)
 polygon = PackedVector2Array(2372, 1400, 2678, 1400, 2678, 1680, 2372, 1680)
 
+[node name="DanceRoom" type="Polygon2D" parent="Rooms"]
+color = Color(0.1, 0.11, 0.12, 1)
+polygon = PackedVector2Array(620, 720, 1150, 720, 1150, 1000, 620, 1000)
+
+[node name="PEPrepRoom" type="Polygon2D" parent="Rooms"]
+color = Color(0.1, 0.11, 0.12, 1)
+polygon = PackedVector2Array(1500, 720, 1892, 720, 1892, 1000, 1500, 1000)
+
+[node name="LockerM" type="Polygon2D" parent="Rooms"]
+color = Color(0.1, 0.11, 0.12, 1)
+polygon = PackedVector2Array(1922, 720, 2286, 720, 2286, 1000, 1922, 1000)
+
+[node name="LockerF" type="Polygon2D" parent="Rooms"]
+color = Color(0.1, 0.11, 0.12, 1)
+polygon = PackedVector2Array(2316, 720, 2678, 720, 2678, 1000, 2316, 1000)
+
+[node name="ShowerRoom" type="Polygon2D" parent="Rooms"]
+color = Color(0.1, 0.11, 0.12, 1)
+polygon = PackedVector2Array(450, 1400, 780, 1400, 780, 1680, 450, 1680)
+
+[node name="FitnessRoom" type="Polygon2D" parent="Rooms"]
+color = Color(0.1, 0.11, 0.12, 1)
+polygon = PackedVector2Array(810, 1400, 1140, 1400, 1140, 1680, 810, 1680)
+
 [node name="Labels" type="Node2D" parent="."]
 
 [node name="L1" type="Label" parent="Labels"]
@@ -230,6 +254,55 @@ offset_top = 1525.0
 offset_right = 2600.0
 offset_bottom = 1555.0
 text = "빈 방"
+horizontal_alignment = 1
+
+
+[node name="LDance" type="Label" parent="Labels"]
+offset_left = 810.0
+offset_top = 845.0
+offset_right = 960.0
+offset_bottom = 875.0
+text = "무용실"
+horizontal_alignment = 1
+
+[node name="LPEPrep" type="Label" parent="Labels"]
+offset_left = 1621.0
+offset_top = 845.0
+offset_right = 1771.0
+offset_bottom = 875.0
+text = "체육 준비실"
+horizontal_alignment = 1
+
+[node name="LLockerM" type="Label" parent="Labels"]
+offset_left = 2029.0
+offset_top = 845.0
+offset_right = 2179.0
+offset_bottom = 875.0
+text = "탈의실(남)"
+horizontal_alignment = 1
+
+[node name="LLockerF" type="Label" parent="Labels"]
+offset_left = 2422.0
+offset_top = 845.0
+offset_right = 2572.0
+offset_bottom = 875.0
+text = "탈의실(여)"
+horizontal_alignment = 1
+
+[node name="LShower" type="Label" parent="Labels"]
+offset_left = 540.0
+offset_top = 1525.0
+offset_right = 690.0
+offset_bottom = 1555.0
+text = "샤워실"
+horizontal_alignment = 1
+
+[node name="LFitness" type="Label" parent="Labels"]
+offset_left = 900.0
+offset_top = 1525.0
+offset_right = 1050.0
+offset_bottom = 1555.0
+text = "체력단련실"
 horizontal_alignment = 1
 
 
@@ -504,6 +577,96 @@ polygon = PackedVector2Array(2372, 1400, 2470.0, 1400, 2470.0, 1416, 2372, 1416)
 
 [node name="WC_Empty6_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2580.0, 1400, 2678, 1400, 2678, 1416, 2580.0, 1416)
+
+[node name="WC_DanceRoom_left" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(620, 720, 636, 720, 636, 1000, 620, 1000)
+
+[node name="WC_DanceRoom_right" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1134, 720, 1150, 720, 1150, 1000, 1134, 1000)
+
+[node name="WC_DanceRoom_top" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(620, 720, 1150, 720, 1150, 736, 620, 736)
+
+[node name="WC_DanceRoom_botL" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(620, 984, 830.0, 984, 830.0, 1000, 620, 1000)
+
+[node name="WC_DanceRoom_botR" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(940.0, 984, 1150, 984, 1150, 1000, 940.0, 1000)
+
+[node name="WC_PEPrepRoom_left" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1500, 720, 1516, 720, 1516, 1000, 1500, 1000)
+
+[node name="WC_PEPrepRoom_right" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1876, 720, 1892, 720, 1892, 1000, 1876, 1000)
+
+[node name="WC_PEPrepRoom_top" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1500, 720, 1892, 720, 1892, 736, 1500, 736)
+
+[node name="WC_PEPrepRoom_botL" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1500, 984, 1641.0, 984, 1641.0, 1000, 1500, 1000)
+
+[node name="WC_PEPrepRoom_botR" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1751.0, 984, 1892, 984, 1892, 1000, 1751.0, 1000)
+
+[node name="WC_LockerM_left" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1922, 720, 1938, 720, 1938, 1000, 1922, 1000)
+
+[node name="WC_LockerM_right" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2270, 720, 2286, 720, 2286, 1000, 2270, 1000)
+
+[node name="WC_LockerM_top" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1922, 720, 2286, 720, 2286, 736, 1922, 736)
+
+[node name="WC_LockerM_botL" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1922, 984, 2049.0, 984, 2049.0, 1000, 1922, 1000)
+
+[node name="WC_LockerM_botR" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2159.0, 984, 2286, 984, 2286, 1000, 2159.0, 1000)
+
+[node name="WC_LockerF_left" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2316, 720, 2332, 720, 2332, 1000, 2316, 1000)
+
+[node name="WC_LockerF_right" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2662, 720, 2678, 720, 2678, 1000, 2662, 1000)
+
+[node name="WC_LockerF_top" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2316, 720, 2678, 720, 2678, 736, 2316, 736)
+
+[node name="WC_LockerF_botL" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2316, 984, 2442.0, 984, 2442.0, 1000, 2316, 1000)
+
+[node name="WC_LockerF_botR" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2552.0, 984, 2678, 984, 2678, 1000, 2552.0, 1000)
+
+[node name="WC_ShowerRoom_left" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(450, 1400, 466, 1400, 466, 1680, 450, 1680)
+
+[node name="WC_ShowerRoom_right" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(764, 1400, 780, 1400, 780, 1680, 764, 1680)
+
+[node name="WC_ShowerRoom_bot" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(450, 1664, 780, 1664, 780, 1680, 450, 1680)
+
+[node name="WC_ShowerRoom_topL" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(450, 1400, 560.0, 1400, 560.0, 1416, 450, 1416)
+
+[node name="WC_ShowerRoom_topR" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(670.0, 1400, 780, 1400, 780, 1416, 670.0, 1416)
+
+[node name="WC_FitnessRoom_left" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(810, 1400, 826, 1400, 826, 1680, 810, 1680)
+
+[node name="WC_FitnessRoom_right" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1124, 1400, 1140, 1400, 1140, 1680, 1124, 1680)
+
+[node name="WC_FitnessRoom_bot" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(810, 1664, 1140, 1664, 1140, 1680, 810, 1680)
+
+[node name="WC_FitnessRoom_topL" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(810, 1400, 920.0, 1400, 920.0, 1416, 810, 1416)
+
+[node name="WC_FitnessRoom_topR" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1030.0, 1400, 1140, 1400, 1140, 1416, 1030.0, 1416)
 
 [node name="RoomWallVisuals" type="Node2D" parent="."]
 
@@ -938,6 +1101,150 @@ polygon = PackedVector2Array(2580.0, 1400, 2678, 1400, 2678, 1416, 2580.0, 1416)
 [node name="Door_Empty6" type="Polygon2D" parent="RoomWallVisuals"]
 color = Color(0.45, 0.32, 0.2, 1)
 polygon = PackedVector2Array(2470.0, 1400, 2580.0, 1400, 2580.0, 1416, 2470.0, 1416)
+
+[node name="WV_DanceRoom_left" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(620, 720, 636, 720, 636, 1000, 620, 1000)
+
+[node name="WV_DanceRoom_right" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1134, 720, 1150, 720, 1150, 1000, 1134, 1000)
+
+[node name="WV_DanceRoom_top" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(620, 720, 1150, 720, 1150, 736, 620, 736)
+
+[node name="WV_DanceRoom_botL" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(620, 984, 830.0, 984, 830.0, 1000, 620, 1000)
+
+[node name="WV_DanceRoom_botR" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(940.0, 984, 1150, 984, 1150, 1000, 940.0, 1000)
+
+[node name="Door_DanceRoom" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.45, 0.32, 0.2, 1)
+polygon = PackedVector2Array(830.0, 984, 940.0, 984, 940.0, 1000, 830.0, 1000)
+
+[node name="WV_PEPrepRoom_left" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1500, 720, 1516, 720, 1516, 1000, 1500, 1000)
+
+[node name="WV_PEPrepRoom_right" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1876, 720, 1892, 720, 1892, 1000, 1876, 1000)
+
+[node name="WV_PEPrepRoom_top" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1500, 720, 1892, 720, 1892, 736, 1500, 736)
+
+[node name="WV_PEPrepRoom_botL" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1500, 984, 1641.0, 984, 1641.0, 1000, 1500, 1000)
+
+[node name="WV_PEPrepRoom_botR" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1751.0, 984, 1892, 984, 1892, 1000, 1751.0, 1000)
+
+[node name="Door_PEPrepRoom" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.45, 0.32, 0.2, 1)
+polygon = PackedVector2Array(1641.0, 984, 1751.0, 984, 1751.0, 1000, 1641.0, 1000)
+
+[node name="WV_LockerM_left" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1922, 720, 1938, 720, 1938, 1000, 1922, 1000)
+
+[node name="WV_LockerM_right" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2270, 720, 2286, 720, 2286, 1000, 2270, 1000)
+
+[node name="WV_LockerM_top" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1922, 720, 2286, 720, 2286, 736, 1922, 736)
+
+[node name="WV_LockerM_botL" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1922, 984, 2049.0, 984, 2049.0, 1000, 1922, 1000)
+
+[node name="WV_LockerM_botR" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2159.0, 984, 2286, 984, 2286, 1000, 2159.0, 1000)
+
+[node name="Door_LockerM" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.45, 0.32, 0.2, 1)
+polygon = PackedVector2Array(2049.0, 984, 2159.0, 984, 2159.0, 1000, 2049.0, 1000)
+
+[node name="WV_LockerF_left" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2316, 720, 2332, 720, 2332, 1000, 2316, 1000)
+
+[node name="WV_LockerF_right" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2662, 720, 2678, 720, 2678, 1000, 2662, 1000)
+
+[node name="WV_LockerF_top" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2316, 720, 2678, 720, 2678, 736, 2316, 736)
+
+[node name="WV_LockerF_botL" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2316, 984, 2442.0, 984, 2442.0, 1000, 2316, 1000)
+
+[node name="WV_LockerF_botR" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(2552.0, 984, 2678, 984, 2678, 1000, 2552.0, 1000)
+
+[node name="Door_LockerF" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.45, 0.32, 0.2, 1)
+polygon = PackedVector2Array(2442.0, 984, 2552.0, 984, 2552.0, 1000, 2442.0, 1000)
+
+[node name="WV_ShowerRoom_left" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(450, 1400, 466, 1400, 466, 1680, 450, 1680)
+
+[node name="WV_ShowerRoom_right" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(764, 1400, 780, 1400, 780, 1680, 764, 1680)
+
+[node name="WV_ShowerRoom_bot" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(450, 1664, 780, 1664, 780, 1680, 450, 1680)
+
+[node name="WV_ShowerRoom_topL" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(450, 1400, 560.0, 1400, 560.0, 1416, 450, 1416)
+
+[node name="WV_ShowerRoom_topR" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(670.0, 1400, 780, 1400, 780, 1416, 670.0, 1416)
+
+[node name="Door_ShowerRoom" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.45, 0.32, 0.2, 1)
+polygon = PackedVector2Array(560.0, 1400, 670.0, 1400, 670.0, 1416, 560.0, 1416)
+
+[node name="WV_FitnessRoom_left" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(810, 1400, 826, 1400, 826, 1680, 810, 1680)
+
+[node name="WV_FitnessRoom_right" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1124, 1400, 1140, 1400, 1140, 1680, 1124, 1680)
+
+[node name="WV_FitnessRoom_bot" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(810, 1664, 1140, 1664, 1140, 1680, 810, 1680)
+
+[node name="WV_FitnessRoom_topL" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(810, 1400, 920.0, 1400, 920.0, 1416, 810, 1416)
+
+[node name="WV_FitnessRoom_topR" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1030.0, 1400, 1140, 1400, 1140, 1416, 1030.0, 1416)
+
+[node name="Door_FitnessRoom" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.45, 0.32, 0.2, 1)
+polygon = PackedVector2Array(920.0, 1400, 1030.0, 1400, 1030.0, 1416, 920.0, 1416)
 
 [node name="Walls" type="StaticBody2D" parent="."]
 
