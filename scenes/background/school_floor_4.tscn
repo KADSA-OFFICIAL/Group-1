@@ -46,10 +46,6 @@ polygon = PackedVector2Array(2104, 120, 2376, 120, 2376, 620, 2104, 620)
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(2406, 120, 2678, 120, 2678, 620, 2406, 620)
 
-[node name="StairsTop" type="Polygon2D" parent="Rooms"]
-color = Color(0.1, 0.12, 0.13, 1)
-polygon = PackedVector2Array(120, 720, 560, 720, 560, 1000, 120, 1000)
-
 [node name="Class8" type="Polygon2D" parent="Rooms"]
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(120, 1080, 480, 1080, 480, 1320, 120, 1320)
@@ -69,10 +65,6 @@ polygon = PackedVector2Array(1903, 1080, 2276, 1080, 2276, 1320, 1903, 1320)
 [node name="Empty3" type="Polygon2D" parent="Rooms"]
 color = Color(0.08, 0.08, 0.09, 1)
 polygon = PackedVector2Array(2306, 1080, 2679, 1080, 2679, 1320, 2306, 1320)
-
-[node name="StairsBottom" type="Polygon2D" parent="Rooms"]
-color = Color(0.1, 0.12, 0.13, 1)
-polygon = PackedVector2Array(1180, 1400, 1560, 1400, 1560, 1680, 1180, 1680)
 
 [node name="Empty4" type="Polygon2D" parent="Rooms"]
 color = Color(0.08, 0.08, 0.09, 1)
@@ -109,6 +101,121 @@ polygon = PackedVector2Array(120, 1400, 600, 1400, 600, 1680, 120, 1680)
 [node name="HistoryRoom" type="Polygon2D" parent="Rooms"]
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(630, 1400, 1140, 1400, 1140, 1680, 630, 1680)
+
+[node name="Stairwells" type="Node2D" parent="."]
+
+[node name="Slab_StairUp" type="Polygon2D" parent="Stairwells"]
+color = Color(0.1, 0.12, 0.13, 1)
+polygon = PackedVector2Array(120, 720, 560, 720, 560, 1000, 120, 1000)
+
+[node name="Rail_StairUp_L" type="Polygon2D" parent="Stairwells"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(120, 720, 136, 720, 136, 1000, 120, 1000)
+
+[node name="Rail_StairUp_R" type="Polygon2D" parent="Stairwells"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(544, 720, 560, 720, 560, 1000, 544, 1000)
+
+[node name="Rail_StairUp_F" type="Polygon2D" parent="Stairwells"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(120, 720, 560, 720, 560, 736, 120, 736)
+
+[node name="Rail_StairUp_EL" type="Polygon2D" parent="Stairwells"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(120, 984, 230.0, 984, 230.0, 1000, 120, 1000)
+
+[node name="Rail_StairUp_ER" type="Polygon2D" parent="Stairwells"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(450.0, 984, 560, 984, 560, 1000, 450.0, 1000)
+
+[node name="Step_StairUp_1" type="Polygon2D" parent="Stairwells"]
+color = Color(0.22, 0.24, 0.28, 1)
+polygon = PackedVector2Array(146, 748, 534, 748, 534, 762, 146, 762)
+
+[node name="Step_StairUp_2" type="Polygon2D" parent="Stairwells"]
+color = Color(0.22, 0.24, 0.28, 1)
+polygon = PackedVector2Array(146, 774, 534, 774, 534, 788, 146, 788)
+
+[node name="Step_StairUp_3" type="Polygon2D" parent="Stairwells"]
+color = Color(0.22, 0.24, 0.28, 1)
+polygon = PackedVector2Array(146, 800, 534, 800, 534, 814, 146, 814)
+
+[node name="Step_StairUp_4" type="Polygon2D" parent="Stairwells"]
+color = Color(0.22, 0.24, 0.28, 1)
+polygon = PackedVector2Array(146, 826, 534, 826, 534, 840, 146, 840)
+
+[node name="Slab_StairDown" type="Polygon2D" parent="Stairwells"]
+color = Color(0.1, 0.12, 0.13, 1)
+polygon = PackedVector2Array(1180, 1400, 1560, 1400, 1560, 1680, 1180, 1680)
+
+[node name="Rail_StairDown_L" type="Polygon2D" parent="Stairwells"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1180, 1400, 1196, 1400, 1196, 1680, 1180, 1680)
+
+[node name="Rail_StairDown_R" type="Polygon2D" parent="Stairwells"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1544, 1400, 1560, 1400, 1560, 1680, 1544, 1680)
+
+[node name="Rail_StairDown_F" type="Polygon2D" parent="Stairwells"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1180, 1664, 1560, 1664, 1560, 1680, 1180, 1680)
+
+[node name="Rail_StairDown_EL" type="Polygon2D" parent="Stairwells"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1180, 1400, 1260.0, 1400, 1260.0, 1416, 1180, 1416)
+
+[node name="Rail_StairDown_ER" type="Polygon2D" parent="Stairwells"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(1480.0, 1400, 1560, 1400, 1560, 1416, 1480.0, 1416)
+
+[node name="Step_StairDown_1" type="Polygon2D" parent="Stairwells"]
+color = Color(0.22, 0.24, 0.28, 1)
+polygon = PackedVector2Array(1206, 1638, 1534, 1638, 1534, 1652, 1206, 1652)
+
+[node name="Step_StairDown_2" type="Polygon2D" parent="Stairwells"]
+color = Color(0.22, 0.24, 0.28, 1)
+polygon = PackedVector2Array(1206, 1612, 1534, 1612, 1534, 1626, 1206, 1626)
+
+[node name="Step_StairDown_3" type="Polygon2D" parent="Stairwells"]
+color = Color(0.22, 0.24, 0.28, 1)
+polygon = PackedVector2Array(1206, 1586, 1534, 1586, 1534, 1600, 1206, 1600)
+
+[node name="Step_StairDown_4" type="Polygon2D" parent="Stairwells"]
+color = Color(0.22, 0.24, 0.28, 1)
+polygon = PackedVector2Array(1206, 1560, 1534, 1560, 1534, 1574, 1206, 1574)
+
+[node name="StairWalls" type="StaticBody2D" parent="."]
+
+[node name="RC_StairUp_L" type="CollisionPolygon2D" parent="StairWalls"]
+polygon = PackedVector2Array(120, 720, 136, 720, 136, 1000, 120, 1000)
+
+[node name="RC_StairUp_R" type="CollisionPolygon2D" parent="StairWalls"]
+polygon = PackedVector2Array(544, 720, 560, 720, 560, 1000, 544, 1000)
+
+[node name="RC_StairUp_F" type="CollisionPolygon2D" parent="StairWalls"]
+polygon = PackedVector2Array(120, 720, 560, 720, 560, 736, 120, 736)
+
+[node name="RC_StairUp_EL" type="CollisionPolygon2D" parent="StairWalls"]
+polygon = PackedVector2Array(120, 984, 230.0, 984, 230.0, 1000, 120, 1000)
+
+[node name="RC_StairUp_ER" type="CollisionPolygon2D" parent="StairWalls"]
+polygon = PackedVector2Array(450.0, 984, 560, 984, 560, 1000, 450.0, 1000)
+
+[node name="RC_StairDown_L" type="CollisionPolygon2D" parent="StairWalls"]
+polygon = PackedVector2Array(1180, 1400, 1196, 1400, 1196, 1680, 1180, 1680)
+
+[node name="RC_StairDown_R" type="CollisionPolygon2D" parent="StairWalls"]
+polygon = PackedVector2Array(1544, 1400, 1560, 1400, 1560, 1680, 1544, 1680)
+
+[node name="RC_StairDown_F" type="CollisionPolygon2D" parent="StairWalls"]
+polygon = PackedVector2Array(1180, 1664, 1560, 1664, 1560, 1680, 1180, 1680)
+
+[node name="RC_StairDown_EL" type="CollisionPolygon2D" parent="StairWalls"]
+polygon = PackedVector2Array(1180, 1400, 1260.0, 1400, 1260.0, 1416, 1180, 1416)
+
+[node name="RC_StairDown_ER" type="CollisionPolygon2D" parent="StairWalls"]
+polygon = PackedVector2Array(1480.0, 1400, 1560, 1400, 1560, 1416, 1480.0, 1416)
+
 
 [node name="Labels" type="Node2D" parent="."]
 
@@ -178,9 +285,9 @@ horizontal_alignment = 1
 
 [node name="LStairsTop" type="Label" parent="Labels"]
 offset_left = 265.0
-offset_top = 845.0
+offset_top = 903.0
 offset_right = 415.0
-offset_bottom = 875.0
+offset_bottom = 933.0
 text = "계단"
 horizontal_alignment = 1
 
@@ -226,9 +333,9 @@ horizontal_alignment = 1
 
 [node name="LStairsBottom" type="Label" parent="Labels"]
 offset_left = 1295.0
-offset_top = 1525.0
+offset_top = 1467.0
 offset_right = 1445.0
-offset_bottom = 1555.0
+offset_bottom = 1497.0
 text = "계단"
 horizontal_alignment = 1
 
@@ -304,6 +411,7 @@ offset_right = 960.0
 offset_bottom = 1555.0
 text = "역사자료실"
 horizontal_alignment = 1
+
 
 
 [node name="RoomWalls" type="StaticBody2D" parent="."]
@@ -428,21 +536,6 @@ polygon = PackedVector2Array(2406, 604, 2487.0, 604, 2487.0, 620, 2406, 620)
 [node name="WC_Class7_botR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2597.0, 604, 2678, 604, 2678, 620, 2597.0, 620)
 
-[node name="WC_StairsTop_left" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(120, 720, 136, 720, 136, 1000, 120, 1000)
-
-[node name="WC_StairsTop_right" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(544, 720, 560, 720, 560, 1000, 544, 1000)
-
-[node name="WC_StairsTop_top" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(120, 720, 560, 720, 560, 736, 120, 736)
-
-[node name="WC_StairsTop_botL" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(120, 984, 285.0, 984, 285.0, 1000, 120, 1000)
-
-[node name="WC_StairsTop_botR" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(395.0, 984, 560, 984, 560, 1000, 395.0, 1000)
-
 [node name="WC_Class8_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(120, 1080, 136, 1080, 136, 1320, 120, 1320)
 
@@ -517,21 +610,6 @@ polygon = PackedVector2Array(2306, 1080, 2437.5, 1080, 2437.5, 1096, 2306, 1096)
 
 [node name="WC_Empty3_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2547.5, 1080, 2679, 1080, 2679, 1096, 2547.5, 1096)
-
-[node name="WC_StairsBottom_left" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1180, 1400, 1196, 1400, 1196, 1680, 1180, 1680)
-
-[node name="WC_StairsBottom_right" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1544, 1400, 1560, 1400, 1560, 1680, 1544, 1680)
-
-[node name="WC_StairsBottom_bot" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1180, 1664, 1560, 1664, 1560, 1680, 1180, 1680)
-
-[node name="WC_StairsBottom_topL" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1180, 1400, 1315.0, 1400, 1315.0, 1416, 1180, 1416)
-
-[node name="WC_StairsBottom_topR" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1425.0, 1400, 1560, 1400, 1560, 1416, 1425.0, 1416)
 
 [node name="WC_Empty4_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1700, 1400, 1716, 1400, 1716, 1680, 1700, 1680)
@@ -862,30 +940,6 @@ polygon = PackedVector2Array(2597.0, 604, 2678, 604, 2678, 620, 2597.0, 620)
 color = Color(0.45, 0.32, 0.2, 1)
 polygon = PackedVector2Array(2487.0, 604, 2597.0, 604, 2597.0, 620, 2487.0, 620)
 
-[node name="WV_StairsTop_left" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(120, 720, 136, 720, 136, 1000, 120, 1000)
-
-[node name="WV_StairsTop_right" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(544, 720, 560, 720, 560, 1000, 544, 1000)
-
-[node name="WV_StairsTop_top" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(120, 720, 560, 720, 560, 736, 120, 736)
-
-[node name="WV_StairsTop_botL" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(120, 984, 285.0, 984, 285.0, 1000, 120, 1000)
-
-[node name="WV_StairsTop_botR" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(395.0, 984, 560, 984, 560, 1000, 395.0, 1000)
-
-[node name="Door_StairsTop" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.45, 0.32, 0.2, 1)
-polygon = PackedVector2Array(285.0, 984, 395.0, 984, 395.0, 1000, 285.0, 1000)
-
 [node name="WV_Class8_left" type="Polygon2D" parent="RoomWallVisuals"]
 color = Color(0.32, 0.32, 0.37, 1)
 polygon = PackedVector2Array(120, 1080, 136, 1080, 136, 1320, 120, 1320)
@@ -1005,30 +1059,6 @@ polygon = PackedVector2Array(2547.5, 1080, 2679, 1080, 2679, 1096, 2547.5, 1096)
 [node name="Door_Empty3" type="Polygon2D" parent="RoomWallVisuals"]
 color = Color(0.45, 0.32, 0.2, 1)
 polygon = PackedVector2Array(2437.5, 1080, 2547.5, 1080, 2547.5, 1096, 2437.5, 1096)
-
-[node name="WV_StairsBottom_left" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1180, 1400, 1196, 1400, 1196, 1680, 1180, 1680)
-
-[node name="WV_StairsBottom_right" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1544, 1400, 1560, 1400, 1560, 1680, 1544, 1680)
-
-[node name="WV_StairsBottom_bot" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1180, 1664, 1560, 1664, 1560, 1680, 1180, 1680)
-
-[node name="WV_StairsBottom_topL" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1180, 1400, 1315.0, 1400, 1315.0, 1416, 1180, 1416)
-
-[node name="WV_StairsBottom_topR" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1425.0, 1400, 1560, 1400, 1560, 1416, 1425.0, 1416)
-
-[node name="Door_StairsBottom" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.45, 0.32, 0.2, 1)
-polygon = PackedVector2Array(1315.0, 1400, 1425.0, 1400, 1425.0, 1416, 1315.0, 1416)
 
 [node name="WV_Empty4_left" type="Polygon2D" parent="RoomWallVisuals"]
 color = Color(0.32, 0.32, 0.37, 1)
