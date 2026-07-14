@@ -5,6 +5,9 @@
 
 [node name="Main" type="Node2D"]
 
+[node name="Darkness" type="CanvasModulate" parent="."]
+color = Color(0.1, 0.1, 0.13, 1)
+
 [node name="Background" parent="." instance=ExtResource("1_floor")]
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
