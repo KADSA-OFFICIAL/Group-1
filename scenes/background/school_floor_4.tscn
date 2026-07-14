@@ -78,22 +78,6 @@ polygon = PackedVector2Array(2036, 1400, 2342, 1400, 2342, 1680, 2036, 1680)
 color = Color(0.08, 0.08, 0.09, 1)
 polygon = PackedVector2Array(2372, 1400, 2678, 1400, 2678, 1680, 2372, 1680)
 
-[node name="SeminarRoom" type="Polygon2D" parent="Rooms"]
-color = Color(0.1, 0.11, 0.12, 1)
-polygon = PackedVector2Array(620, 720, 1150, 720, 1150, 1000, 620, 1000)
-
-[node name="ScienceLab" type="Polygon2D" parent="Rooms"]
-color = Color(0.1, 0.11, 0.12, 1)
-polygon = PackedVector2Array(1500, 720, 1892, 720, 1892, 1000, 1500, 1000)
-
-[node name="LabPrepRoom" type="Polygon2D" parent="Rooms"]
-color = Color(0.1, 0.11, 0.12, 1)
-polygon = PackedVector2Array(1922, 720, 2286, 720, 2286, 1000, 1922, 1000)
-
-[node name="SpecimenRoom" type="Polygon2D" parent="Rooms"]
-color = Color(0.1, 0.11, 0.12, 1)
-polygon = PackedVector2Array(2316, 720, 2678, 720, 2678, 1000, 2316, 1000)
-
 [node name="MathRoom" type="Polygon2D" parent="Rooms"]
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(120, 1400, 600, 1400, 600, 1680, 120, 1680)
@@ -364,38 +348,6 @@ text = "빈 방"
 horizontal_alignment = 1
 
 
-[node name="LSeminar" type="Label" parent="Labels"]
-offset_left = 810.0
-offset_top = 845.0
-offset_right = 960.0
-offset_bottom = 875.0
-text = "세미나실"
-horizontal_alignment = 1
-
-[node name="LScience" type="Label" parent="Labels"]
-offset_left = 1621.0
-offset_top = 845.0
-offset_right = 1771.0
-offset_bottom = 875.0
-text = "과학실"
-horizontal_alignment = 1
-
-[node name="LLabPrep" type="Label" parent="Labels"]
-offset_left = 2029.0
-offset_top = 845.0
-offset_right = 2179.0
-offset_bottom = 875.0
-text = "실험 준비실"
-horizontal_alignment = 1
-
-[node name="LSpecimen" type="Label" parent="Labels"]
-offset_left = 2422.0
-offset_top = 845.0
-offset_right = 2572.0
-offset_bottom = 875.0
-text = "표본실"
-horizontal_alignment = 1
-
 [node name="LMath" type="Label" parent="Labels"]
 offset_left = 285.0
 offset_top = 1525.0
@@ -411,6 +363,7 @@ offset_right = 960.0
 offset_bottom = 1555.0
 text = "역사자료실"
 horizontal_alignment = 1
+
 
 
 
@@ -655,66 +608,6 @@ polygon = PackedVector2Array(2372, 1400, 2470.0, 1400, 2470.0, 1416, 2372, 1416)
 
 [node name="WC_Empty6_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2580.0, 1400, 2678, 1400, 2678, 1416, 2580.0, 1416)
-
-[node name="WC_SeminarRoom_left" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(620, 720, 636, 720, 636, 1000, 620, 1000)
-
-[node name="WC_SeminarRoom_right" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1134, 720, 1150, 720, 1150, 1000, 1134, 1000)
-
-[node name="WC_SeminarRoom_top" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(620, 720, 1150, 720, 1150, 736, 620, 736)
-
-[node name="WC_SeminarRoom_botL" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(620, 984, 830.0, 984, 830.0, 1000, 620, 1000)
-
-[node name="WC_SeminarRoom_botR" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(940.0, 984, 1150, 984, 1150, 1000, 940.0, 1000)
-
-[node name="WC_ScienceLab_left" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1500, 720, 1516, 720, 1516, 1000, 1500, 1000)
-
-[node name="WC_ScienceLab_right" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1876, 720, 1892, 720, 1892, 1000, 1876, 1000)
-
-[node name="WC_ScienceLab_top" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1500, 720, 1892, 720, 1892, 736, 1500, 736)
-
-[node name="WC_ScienceLab_botL" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1500, 984, 1641.0, 984, 1641.0, 1000, 1500, 1000)
-
-[node name="WC_ScienceLab_botR" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1751.0, 984, 1892, 984, 1892, 1000, 1751.0, 1000)
-
-[node name="WC_LabPrepRoom_left" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1922, 720, 1938, 720, 1938, 1000, 1922, 1000)
-
-[node name="WC_LabPrepRoom_right" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(2270, 720, 2286, 720, 2286, 1000, 2270, 1000)
-
-[node name="WC_LabPrepRoom_top" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1922, 720, 2286, 720, 2286, 736, 1922, 736)
-
-[node name="WC_LabPrepRoom_botL" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1922, 984, 2049.0, 984, 2049.0, 1000, 1922, 1000)
-
-[node name="WC_LabPrepRoom_botR" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(2159.0, 984, 2286, 984, 2286, 1000, 2159.0, 1000)
-
-[node name="WC_SpecimenRoom_left" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(2316, 720, 2332, 720, 2332, 1000, 2316, 1000)
-
-[node name="WC_SpecimenRoom_right" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(2662, 720, 2678, 720, 2678, 1000, 2662, 1000)
-
-[node name="WC_SpecimenRoom_top" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(2316, 720, 2678, 720, 2678, 736, 2316, 736)
-
-[node name="WC_SpecimenRoom_botL" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(2316, 984, 2442.0, 984, 2442.0, 1000, 2316, 1000)
-
-[node name="WC_SpecimenRoom_botR" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(2552.0, 984, 2678, 984, 2678, 1000, 2552.0, 1000)
 
 [node name="WC_MathRoom_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(120, 1400, 136, 1400, 136, 1680, 120, 1680)
@@ -1131,102 +1024,6 @@ polygon = PackedVector2Array(2580.0, 1400, 2678, 1400, 2678, 1416, 2580.0, 1416)
 [node name="Door_Empty6" type="Polygon2D" parent="RoomWallVisuals"]
 color = Color(0.45, 0.32, 0.2, 1)
 polygon = PackedVector2Array(2470.0, 1400, 2580.0, 1400, 2580.0, 1416, 2470.0, 1416)
-
-[node name="WV_SeminarRoom_left" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(620, 720, 636, 720, 636, 1000, 620, 1000)
-
-[node name="WV_SeminarRoom_right" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1134, 720, 1150, 720, 1150, 1000, 1134, 1000)
-
-[node name="WV_SeminarRoom_top" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(620, 720, 1150, 720, 1150, 736, 620, 736)
-
-[node name="WV_SeminarRoom_botL" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(620, 984, 830.0, 984, 830.0, 1000, 620, 1000)
-
-[node name="WV_SeminarRoom_botR" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(940.0, 984, 1150, 984, 1150, 1000, 940.0, 1000)
-
-[node name="Door_SeminarRoom" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.45, 0.32, 0.2, 1)
-polygon = PackedVector2Array(830.0, 984, 940.0, 984, 940.0, 1000, 830.0, 1000)
-
-[node name="WV_ScienceLab_left" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1500, 720, 1516, 720, 1516, 1000, 1500, 1000)
-
-[node name="WV_ScienceLab_right" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1876, 720, 1892, 720, 1892, 1000, 1876, 1000)
-
-[node name="WV_ScienceLab_top" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1500, 720, 1892, 720, 1892, 736, 1500, 736)
-
-[node name="WV_ScienceLab_botL" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1500, 984, 1641.0, 984, 1641.0, 1000, 1500, 1000)
-
-[node name="WV_ScienceLab_botR" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1751.0, 984, 1892, 984, 1892, 1000, 1751.0, 1000)
-
-[node name="Door_ScienceLab" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.45, 0.32, 0.2, 1)
-polygon = PackedVector2Array(1641.0, 984, 1751.0, 984, 1751.0, 1000, 1641.0, 1000)
-
-[node name="WV_LabPrepRoom_left" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1922, 720, 1938, 720, 1938, 1000, 1922, 1000)
-
-[node name="WV_LabPrepRoom_right" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(2270, 720, 2286, 720, 2286, 1000, 2270, 1000)
-
-[node name="WV_LabPrepRoom_top" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1922, 720, 2286, 720, 2286, 736, 1922, 736)
-
-[node name="WV_LabPrepRoom_botL" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1922, 984, 2049.0, 984, 2049.0, 1000, 1922, 1000)
-
-[node name="WV_LabPrepRoom_botR" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(2159.0, 984, 2286, 984, 2286, 1000, 2159.0, 1000)
-
-[node name="Door_LabPrepRoom" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.45, 0.32, 0.2, 1)
-polygon = PackedVector2Array(2049.0, 984, 2159.0, 984, 2159.0, 1000, 2049.0, 1000)
-
-[node name="WV_SpecimenRoom_left" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(2316, 720, 2332, 720, 2332, 1000, 2316, 1000)
-
-[node name="WV_SpecimenRoom_right" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(2662, 720, 2678, 720, 2678, 1000, 2662, 1000)
-
-[node name="WV_SpecimenRoom_top" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(2316, 720, 2678, 720, 2678, 736, 2316, 736)
-
-[node name="WV_SpecimenRoom_botL" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(2316, 984, 2442.0, 984, 2442.0, 1000, 2316, 1000)
-
-[node name="WV_SpecimenRoom_botR" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(2552.0, 984, 2678, 984, 2678, 1000, 2552.0, 1000)
-
-[node name="Door_SpecimenRoom" type="Polygon2D" parent="RoomWallVisuals"]
-color = Color(0.45, 0.32, 0.2, 1)
-polygon = PackedVector2Array(2442.0, 984, 2552.0, 984, 2552.0, 1000, 2442.0, 1000)
 
 [node name="WV_MathRoom_left" type="Polygon2D" parent="RoomWallVisuals"]
 color = Color(0.32, 0.32, 0.37, 1)
