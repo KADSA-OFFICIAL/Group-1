@@ -18,9 +18,10 @@ const START_FLOOR := 3
 # 전환 트리거 존: 각 계단실 반쪽의 안쪽 끝 (인덱스 0=좌상단 계단, 1=중앙 하단 계단)
 const UP_ZONES := [Rect2(136, 930, 196, 54), Rect2(1196, 1610, 166, 54)]
 const DOWN_ZONES := [Rect2(348, 930, 196, 54), Rect2(1378, 1610, 166, 54)]
-# 도착 지점: 같은 계단실의 반대편 반쪽 입구 (트리거 존 밖)
-const ARRIVE_FROM_BELOW := [Vector2(446, 760), Vector2(1461, 1445)]
-const ARRIVE_FROM_ABOVE := [Vector2(234, 760), Vector2(1279, 1445)]
+# 도착 지점: 들어간 반쪽과 같은 반쪽의 입구 (트리거 존 밖)
+# 위층 이동 = 왼쪽 반 입구, 아래층 이동 = 오른쪽 반 입구
+const ARRIVE_AFTER_UP := [Vector2(234, 760), Vector2(1279, 1445)]
+const ARRIVE_AFTER_DOWN := [Vector2(446, 760), Vector2(1461, 1445)]
 
 var current_floor: int = START_FLOOR
 
@@ -32,12 +33,12 @@ func _physics_process(_delta: float) -> void:
 
 	for i in UP_ZONES.size():
 		if UP_ZONES[i].has_point(pos) and current_floor < MAX_FLOOR:
-			_change_floor(current_floor + 1, ARRIVE_FROM_BELOW[i])
+			_change_floor(current_floor + 1, ARRIVE_AFTER_UP[i])
 			return
 
 	for i in DOWN_ZONES.size():
 		if DOWN_ZONES[i].has_point(pos) and current_floor > MIN_FLOOR:
-			_change_floor(current_floor - 1, ARRIVE_FROM_ABOVE[i])
+			_change_floor(current_floor - 1, ARRIVE_AFTER_DOWN[i])
 			return
 
 
