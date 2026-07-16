@@ -13,7 +13,7 @@ const FLOOR_SCENES := {
 }
 const MIN_FLOOR := 1
 const MAX_FLOOR := 5
-const START_FLOOR := 3
+const START_FLOOR := 5
 
 # 전환 트리거 존: 각 계단실 반쪽의 안쪽 끝 (인덱스 0=좌상단 계단, 1=중앙 하단 계단)
 const UP_ZONES := [Rect2(136, 930, 196, 54), Rect2(1196, 1610, 166, 54)]
