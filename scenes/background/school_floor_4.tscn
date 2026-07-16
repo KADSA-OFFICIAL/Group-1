@@ -164,6 +164,22 @@ polygon = PackedVector2Array(332, 720, 348, 720, 348, 1000, 332, 1000)
 color = Color(0.32, 0.32, 0.37, 1)
 polygon = PackedVector2Array(1362, 1400, 1378, 1400, 1378, 1680, 1362, 1680)
 
+[node name="Arrow_StairUp_Up" type="Polygon2D" parent="Stairwells"]
+color = Color(0.55, 0.58, 0.65, 1)
+polygon = PackedVector2Array(214, 814, 254, 814, 234, 786)
+
+[node name="Arrow_StairDown_Up" type="Polygon2D" parent="Stairwells"]
+color = Color(0.55, 0.58, 0.65, 1)
+polygon = PackedVector2Array(1259, 1496, 1299, 1496, 1279, 1468)
+
+[node name="Arrow_StairUp_Down" type="Polygon2D" parent="Stairwells"]
+color = Color(0.55, 0.58, 0.65, 1)
+polygon = PackedVector2Array(426, 786, 466, 786, 446, 814)
+
+[node name="Arrow_StairDown_Down" type="Polygon2D" parent="Stairwells"]
+color = Color(0.55, 0.58, 0.65, 1)
+polygon = PackedVector2Array(1441, 1468, 1481, 1468, 1461, 1496)
+
 [node name="StairWalls" type="StaticBody2D" parent="."]
 
 [node name="RC_StairUp_L" type="CollisionPolygon2D" parent="StairWalls"]
@@ -341,38 +357,6 @@ offset_bottom = 1215.0
 text = "과학 실험실"
 horizontal_alignment = 1
 
-
-[node name="L_StairUp_Up" type="Label" parent="Labels"]
-offset_left = 159.0
-offset_top = 785.0
-offset_right = 309.0
-offset_bottom = 815.0
-text = "위층"
-horizontal_alignment = 1
-
-[node name="L_StairUp_Down" type="Label" parent="Labels"]
-offset_left = 371.0
-offset_top = 785.0
-offset_right = 521.0
-offset_bottom = 815.0
-text = "아래층"
-horizontal_alignment = 1
-
-[node name="L_StairDown_Up" type="Label" parent="Labels"]
-offset_left = 1204.0
-offset_top = 1467.0
-offset_right = 1354.0
-offset_bottom = 1497.0
-text = "위층"
-horizontal_alignment = 1
-
-[node name="L_StairDown_Down" type="Label" parent="Labels"]
-offset_left = 1386.0
-offset_top = 1467.0
-offset_right = 1536.0
-offset_bottom = 1497.0
-text = "아래층"
-horizontal_alignment = 1
 
 [node name="RoomWalls" type="StaticBody2D" parent="."]
 
