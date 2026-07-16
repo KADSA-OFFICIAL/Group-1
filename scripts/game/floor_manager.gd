@@ -19,8 +19,8 @@ const START_FLOOR := 3
 const UP_ZONES := [Rect2(136, 930, 196, 54), Rect2(1196, 1610, 166, 54)]
 const DOWN_ZONES := [Rect2(348, 930, 196, 54), Rect2(1378, 1610, 166, 54)]
 # 도착 지점: 같은 계단실의 반대편 반쪽 입구 (트리거 존 밖)
-const ARRIVE_FROM_BELOW := [Vector2(446, 775), Vector2(1461, 1460)]
-const ARRIVE_FROM_ABOVE := [Vector2(234, 775), Vector2(1279, 1460)]
+const ARRIVE_FROM_BELOW := [Vector2(446, 760), Vector2(1461, 1445)]
+const ARRIVE_FROM_ABOVE := [Vector2(234, 760), Vector2(1279, 1445)]
 
 var current_floor: int = START_FLOOR
 
