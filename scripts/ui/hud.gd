@@ -7,7 +7,13 @@ extends CanvasLayer
 @onready var notice_label: Label = $Root/NoticePanel/Margin/NoticeLabel
 @onready var inventory_panel: PanelContainer = $Root/InventoryPanel
 @onready var inventory_title: Label = $Root/InventoryPanel/Margin/Rows/InventoryTitle
-@onready var inventory_list: Label = $Root/InventoryPanel/Margin/Rows/InventoryList
+@onready var slot_labels: Array[Label] = [
+	$Root/InventoryPanel/Margin/Rows/Slots/Slot1/ItemLabel,
+	$Root/InventoryPanel/Margin/Rows/Slots/Slot2/ItemLabel,
+	$Root/InventoryPanel/Margin/Rows/Slots/Slot3/ItemLabel,
+	$Root/InventoryPanel/Margin/Rows/Slots/Slot4/ItemLabel,
+	$Root/InventoryPanel/Margin/Rows/Slots/Slot5/ItemLabel,
+]
 
 var notice_token: int = 0
 var current_items: Array[String] = []
@@ -62,15 +68,12 @@ func set_inventory(items: Array[String]) -> void:
 func _refresh_inventory_panel() -> void:
 	inventory_title.text = "소지품 (%d/%d)" % [current_items.size(), max_items]
 
-	if current_items.is_empty():
-		inventory_list.text = "비어 있음"
-		return
-
-	var lines := PackedStringArray()
-	for item_id in current_items:
-		lines.append("- " + _get_item_display_name(item_id))
-
-	inventory_list.text = "\n".join(lines)
+	# 슬롯에 아이템 이름 표시 (아이템 이미지는 추후 교체 예정)
+	for i in slot_labels.size():
+		if i < current_items.size():
+			slot_labels[i].text = _get_item_display_name(current_items[i])
+		else:
+			slot_labels[i].text = ""
 
 
 func show_notice(text: String) -> void:
