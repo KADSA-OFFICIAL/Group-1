@@ -1,7 +1,9 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
+[ext_resource type="Script" path="res://scripts/interactions/exit_door.gd" id="3_exit"]
+[ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="4_interactable"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_stair_zone"]
 size = Vector2(240, 56)
@@ -296,6 +298,64 @@ color = Color(0.62, 0.55, 0.28, 1)
 polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
 
 [node name="StairKeyZone" type="CollisionShape2D" parent="StairKey"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="ExitDoor" type="Area2D" parent="."]
+position = Vector2(1654, 1750)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_exit")
+
+[node name="ExitZone" type="CollisionShape2D" parent="ExitDoor"]
+shape = SubResource("RectangleShape2D_stair_zone")
+
+[node name="JanitorItems" type="Area2D" parent="."]
+position = Vector2(250, 1500)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("4_interactable")
+message = "책가방, 이름표, 신발주머니… 실종된 학생들의 물건이 쌓여 있다."
+prompt_text = "조사"
+
+[node name="ItemsVisual" type="Polygon2D" parent="JanitorItems"]
+z_index = 1
+color = Color(0.3, 0.25, 0.2, 1)
+polygon = PackedVector2Array(-16, -10, 16, -10, 16, 10, -16, 10)
+
+[node name="ItemsZone" type="CollisionShape2D" parent="JanitorItems"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="JanitorSafe" type="Area2D" parent="."]
+position = Vector2(480, 1600)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("4_interactable")
+message = "금고 안, 낡은 일지 — '11시에 학교 옥상으로 오세요. 제 책들 좀 가져와 주세요.' 오래된 뉴스 기사가 함께 들어 있다."
+prompt_text = "금고 열기"
+
+[node name="SafeVisual" type="Polygon2D" parent="JanitorSafe"]
+z_index = 1
+color = Color(0.35, 0.35, 0.4, 1)
+polygon = PackedVector2Array(-12, -12, 12, -12, 12, 12, -12, 12)
+
+[node name="SafeZone" type="CollisionShape2D" parent="JanitorSafe"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="KeyBundle" type="Area2D" parent="."]
+position = Vector2(360, 1560)
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("2_pickup")
+item_id = "front_gate_key"
+message = "피 묻은 열쇠꾸러미를 주웠다. 현관 열쇠가 섞여 있다."
+pickup_id = "front_gate_key_taken"
+
+[node name="KeyBundleVisual" type="Polygon2D" parent="KeyBundle"]
+z_index = 1
+color = Color(0.62, 0.55, 0.28, 1)
+polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
+
+[node name="KeyBundleZone" type="CollisionShape2D" parent="KeyBundle"]
 shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="Labels" type="Node2D" parent="."]

@@ -318,6 +318,22 @@ polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
 [node name="StairKeyZone" type="CollisionShape2D" parent="StairKey"]
 shape = SubResource("RectangleShape2D_key_zone")
 
+[node name="Blackboard" type="Area2D" parent="."]
+position = Vector2(900, 1442)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_interactable")
+message = "칠판 가득, 피로 쓰인 세 개의 규칙이 번들거린다. …11시. 눈. 물건."
+prompt_text = "칠판 보기"
+
+[node name="BlackboardVisual" type="Polygon2D" parent="Blackboard"]
+z_index = 1
+color = Color(0.4, 0.15, 0.12, 1)
+polygon = PackedVector2Array(-40, -22, 40, -22, 40, -8, -40, -8)
+
+[node name="BlackboardZone" type="CollisionShape2D" parent="Blackboard"]
+shape = SubResource("RectangleShape2D_key_zone")
+
 [node name="Labels" type="Node2D" parent="."]
 
 [node name="L_AVRoom" type="Label" parent="Labels"]
