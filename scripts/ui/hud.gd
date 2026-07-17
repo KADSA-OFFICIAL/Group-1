@@ -98,7 +98,5 @@ func _get_item_display_name(item_id: String) -> String:
 			return "국어책"
 		"front_gate_key":
 			return "현관 열쇠"
-		"art_room_key":
-			return "미술실 열쇠"
 		_:
 			return item_id
