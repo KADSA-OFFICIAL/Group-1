@@ -314,7 +314,7 @@ polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
 shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="Blackboard" type="Area2D" parent="."]
-position = Vector2(340, 1130)
+position = Vector2(147, 1300)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("1_interactable")
@@ -324,7 +324,7 @@ prompt_text = "칠판 보기"
 [node name="BlackboardVisual" type="Polygon2D" parent="Blackboard"]
 z_index = 1
 color = Color(0.4, 0.15, 0.12, 1)
-polygon = PackedVector2Array(-40, -22, 40, -22, 40, -8, -40, -8)
+polygon = PackedVector2Array(-11, -45, 3, -45, 3, 45, -11, 45)
 
 [node name="BlackboardZone" type="CollisionShape2D" parent="Blackboard"]
 shape = SubResource("RectangleShape2D_key_zone")
