@@ -1,4 +1,13 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="1_interactable"]
+[ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="2_locked_door"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door_zone"]
+size = Vector2(140, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_key_zone"]
+size = Vector2(48, 48)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(2800, 40)
@@ -205,6 +214,45 @@ polygon = PackedVector2Array(332, 720, 348, 720, 348, 1000, 332, 1000)
 
 [node name="RC_StairDown_M" type="CollisionPolygon2D" parent="StairWalls"]
 polygon = PackedVector2Array(1362, 1400, 1378, 1400, 1378, 1680, 1362, 1680)
+
+[node name="ArtRoomDoor" type="StaticBody2D" parent="."]
+
+[node name="ArtRoomDoorVisual" type="Polygon2D" parent="ArtRoomDoor"]
+z_index = 1
+color = Color(0.35, 0.18, 0.15, 1)
+polygon = PackedVector2Array(575, 1400, 685, 1400, 685, 1416, 575, 1416)
+
+[node name="ArtRoomDoorCollision" type="CollisionPolygon2D" parent="ArtRoomDoor"]
+polygon = PackedVector2Array(575, 1400, 685, 1400, 685, 1416, 575, 1416)
+
+[node name="ArtRoomDoorLock" type="Area2D" parent="."]
+position = Vector2(630, 1408)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("2_locked_door")
+required_item_id = "art_room_key"
+locked_message = "문이 잠겨 있다. 열쇠가 필요할 것 같다."
+open_message = "열쇠로 미술실 문을 열었다."
+barrier_path = NodePath("../ArtRoomDoor")
+
+[node name="LockZone" type="CollisionShape2D" parent="ArtRoomDoorLock"]
+shape = SubResource("RectangleShape2D_door_zone")
+
+[node name="ArtRoomKey" type="Area2D" parent="."]
+position = Vector2(220, 1620)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_interactable")
+message = "물감 선반 아래에서 작은 열쇠를 찾았다."
+grants_item_id = "art_room_key"
+
+[node name="KeyVisual" type="Polygon2D" parent="ArtRoomKey"]
+z_index = 1
+color = Color(0.62, 0.55, 0.28, 1)
+polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
+
+[node name="KeyZone" type="CollisionShape2D" parent="ArtRoomKey"]
+shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="Labels" type="Node2D" parent="."]
 
