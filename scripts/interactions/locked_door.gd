@@ -7,6 +7,7 @@ extends Area2D
 @export_multiline var locked_message: String = "문이 잠겨 있다."
 @export_multiline var open_message: String = "문이 열렸다."
 @export var barrier_path: NodePath
+@export var prompt_text: String = "문 열기"
 
 
 func interact(_player: Node) -> void:
