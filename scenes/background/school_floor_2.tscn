@@ -1,4 +1,13 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
+[ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_stair_zone"]
+size = Vector2(240, 56)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_key_zone"]
+size = Vector2(48, 48)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(2800, 40)
@@ -230,6 +239,79 @@ polygon = PackedVector2Array(332, 720, 348, 720, 348, 1000, 332, 1000)
 
 [node name="RC_StairDown_M" type="CollisionPolygon2D" parent="StairWalls"]
 polygon = PackedVector2Array(1362, 1400, 1378, 1400, 1378, 1680, 1362, 1680)
+
+[node name="StairLocks" type="Node2D" parent="."]
+
+[node name="SUBarrier" type="StaticBody2D" parent="StairLocks"]
+
+[node name="SUBarrierVisual" type="Polygon2D" parent="StairLocks/SUBarrier"]
+z_index = 1
+color = Color(0.35, 0.18, 0.15, 1)
+polygon = PackedVector2Array(230, 720, 450, 720, 450, 736, 230, 736)
+
+[node name="SUBarrierCollision" type="CollisionPolygon2D" parent="StairLocks/SUBarrier"]
+polygon = PackedVector2Array(230, 720, 450, 720, 450, 736, 230, 736)
+
+[node name="SDBarrier" type="StaticBody2D" parent="StairLocks"]
+
+[node name="SDBarrierVisual" type="Polygon2D" parent="StairLocks/SDBarrier"]
+z_index = 1
+color = Color(0.35, 0.18, 0.15, 1)
+polygon = PackedVector2Array(1260, 1400, 1480, 1400, 1480, 1416, 1260, 1416)
+
+[node name="SDBarrierCollision" type="CollisionPolygon2D" parent="StairLocks/SDBarrier"]
+polygon = PackedVector2Array(1260, 1400, 1480, 1400, 1480, 1416, 1260, 1416)
+
+[node name="SULock" type="Area2D" parent="."]
+position = Vector2(340, 728)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_locked_door")
+required_item_id = "stair_key_2"
+locked_message = "계단 입구가 잠겨 있다. 이 층 어딘가에 열쇠가 있을 것이다."
+open_message = "계단 자물쇠를 열었다. 이 층의 계단을 모두 쓸 수 있다."
+barrier_path = NodePath("../StairLocks")
+prompt_text = "계단 열기"
+door_id = "stairs_f2_unlocked"
+consume_key = true
+also_remove_paths = Array[NodePath]([NodePath("../SDLock")])
+
+[node name="SULockZone" type="CollisionShape2D" parent="SULock"]
+shape = SubResource("RectangleShape2D_stair_zone")
+
+[node name="SDLock" type="Area2D" parent="."]
+position = Vector2(1370, 1408)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_locked_door")
+required_item_id = "stair_key_2"
+locked_message = "계단 입구가 잠겨 있다. 이 층 어딘가에 열쇠가 있을 것이다."
+open_message = "계단 자물쇠를 열었다. 이 층의 계단을 모두 쓸 수 있다."
+barrier_path = NodePath("../StairLocks")
+prompt_text = "계단 열기"
+door_id = "stairs_f2_unlocked"
+consume_key = true
+also_remove_paths = Array[NodePath]([NodePath("../SULock")])
+
+[node name="SDLockZone" type="CollisionShape2D" parent="SDLock"]
+shape = SubResource("RectangleShape2D_stair_zone")
+
+[node name="StairKey" type="Area2D" parent="."]
+position = Vector2(975, 1560)
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("2_pickup")
+item_id = "stair_key_2"
+message = "체력단련실에서 2층 계단 열쇠를 주웠다."
+pickup_id = "stair_key_2_taken"
+
+[node name="StairKeyVisual" type="Polygon2D" parent="StairKey"]
+z_index = 1
+color = Color(0.62, 0.55, 0.28, 1)
+polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
+
+[node name="StairKeyZone" type="CollisionShape2D" parent="StairKey"]
+shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="Labels" type="Node2D" parent="."]
 
