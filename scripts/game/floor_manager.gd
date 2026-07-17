@@ -27,10 +27,16 @@ var current_floor: int = START_FLOOR
 
 @onready var player: CharacterBody2D = $Player
 @onready var floor_label: Label = $UI/FloorLabel
+@onready var fade_rect: ColorRect = $UI/FadeRect
+
+const FADE_IN_SECONDS := 1.5
 
 
 func _ready() -> void:
 	_update_floor_label()
+	fade_rect.color.a = 1.0
+	var tween := create_tween()
+	tween.tween_property(fade_rect, "color:a", 0.0, FADE_IN_SECONDS)
 
 
 func _physics_process(_delta: float) -> void:
