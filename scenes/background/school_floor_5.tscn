@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3]
 
-[ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="1_interactable"]
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="2_locked_door"]
+[ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="3_pickup"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_door_zone"]
 size = Vector2(140, 60)
@@ -240,11 +240,11 @@ shape = SubResource("RectangleShape2D_door_zone")
 
 [node name="ArtRoomKey" type="Area2D" parent="."]
 position = Vector2(220, 1620)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("1_interactable")
-message = "물감 선반 아래에서 작은 열쇠를 찾았다."
-grants_item_id = "art_room_key"
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("3_pickup")
+item_id = "art_room_key"
+message = "물감 선반 아래에서 미술실 열쇠를 주웠다."
 
 [node name="KeyVisual" type="Polygon2D" parent="ArtRoomKey"]
 z_index = 1
