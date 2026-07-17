@@ -13,7 +13,7 @@ const FLOOR_SCENES := {
 }
 const MIN_FLOOR := 1
 const MAX_FLOOR := 5
-const START_FLOOR := 3
+const START_FLOOR := 5
 
 # 전환 트리거 존: 각 계단실 반쪽의 안쪽 끝 (인덱스 0=좌상단 계단, 1=중앙 하단 계단)
 const UP_ZONES := [Rect2(136, 930, 196, 54), Rect2(1196, 1610, 166, 54)]
@@ -26,6 +26,11 @@ const ARRIVE_AFTER_DOWN := [Vector2(234, 760), Vector2(1279, 1445)]
 var current_floor: int = START_FLOOR
 
 @onready var player: CharacterBody2D = $Player
+@onready var floor_label: Label = $UI/FloorLabel
+
+
+func _ready() -> void:
+	_update_floor_label()
 
 
 func _physics_process(_delta: float) -> void:
@@ -55,7 +60,12 @@ func _change_floor(target: int, arrive: Vector2) -> void:
 
 	player.position = arrive
 	current_floor = target
+	_update_floor_label()
 
 	var camera: Camera2D = player.get_node_or_null("Camera2D")
 	if camera != null:
 		camera.reset_smoothing()
+
+
+func _update_floor_label() -> void:
+	floor_label.text = "%d층" % current_floor
