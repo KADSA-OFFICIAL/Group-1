@@ -6,6 +6,7 @@ signal interacted(player: Node)
 @export var grants_item_id: String = ""
 @export var required_item_id: String = ""
 @export_multiline var locked_message: String = "아직 열 수 없다."
+@export var prompt_text: String = "조사"
 
 
 func interact(player: Node) -> void:
