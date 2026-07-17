@@ -90,6 +90,9 @@ func show_notice(text: String) -> void:
 
 
 func _get_item_display_name(item_id: String) -> String:
+	if item_id.begins_with("stair_key_"):
+		return item_id.trim_prefix("stair_key_") + "층 계단 열쇠"
+
 	match item_id:
 		"korean_book":
 			return "국어책"
