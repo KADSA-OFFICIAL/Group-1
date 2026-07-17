@@ -16,8 +16,9 @@ func _on_body_entered(body: Node) -> void:
 
 	var game_state = get_tree().get_first_node_in_group("game_state")
 	if game_state != null:
-		if not item_id.is_empty():
-			game_state.call("add_item", item_id)
+		if not item_id.is_empty() and not game_state.call("add_item", item_id):
+			game_state.call("request_notice", "가방이 가득 차서 주울 수 없다.")
+			return
 		game_state.call("request_notice", message)
 
 	queue_free()
