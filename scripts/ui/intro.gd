@@ -26,6 +26,7 @@ const SCENES: Array = [
 	},
 ]
 const SCENE_FADE_SECONDS := 0.5
+const TYPING_SECONDS_PER_CHAR := 0.05
 
 @onready var scene_caption: Label = $SceneCaption
 @onready var name_label: Label = $DialogueBox/Margin/Rows/NameLabel
@@ -36,6 +37,8 @@ var scene_index: int = 0
 var line_index: int = -1
 var transitioning: bool = false
 var finished: bool = false
+var typing: bool = false
+var typing_tween: Tween
 
 
 func _ready() -> void:
@@ -53,7 +56,15 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not (event.is_action_pressed("interact") or event.is_action_pressed("ui_accept")):
 		return
 
-	_next_line()
+	if typing:
+		# 타이핑 중이면 남은 글자를 즉시 전부 표시
+		if typing_tween != null:
+			typing_tween.kill()
+		text_label.visible_characters = -1
+		typing = false
+	else:
+		_next_line()
+
 	get_viewport().set_input_as_handled()
 
 
@@ -73,6 +84,19 @@ func _next_line() -> void:
 
 	name_label.text = lines[line_index][0]
 	text_label.text = lines[line_index][1]
+
+	# 타이핑 효과: 왼쪽부터 한 글자씩 출력
+	text_label.visible_characters = 0
+	typing = true
+
+	var total_chars := text_label.get_total_character_count()
+	if total_chars == 0:
+		total_chars = text_label.text.length()
+
+	typing_tween = create_tween()
+	typing_tween.tween_property(text_label, "visible_characters", total_chars, total_chars * TYPING_SECONDS_PER_CHAR)
+	typing_tween.tween_callback(func() -> void:
+		typing = false)
 
 
 func _next_scene() -> void:
