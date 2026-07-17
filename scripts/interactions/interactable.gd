@@ -6,6 +6,7 @@ signal interacted(player: Node)
 @export var grants_item_id: String = ""
 @export var required_item_id: String = ""
 @export_multiline var locked_message: String = "아직 열 수 없다."
+@export var prompt_text: String = "조사"
 
 
 func interact(player: Node) -> void:
@@ -16,7 +17,9 @@ func interact(player: Node) -> void:
 		return
 
 	if game_state != null and not grants_item_id.is_empty():
-		game_state.call("add_item", grants_item_id)
+		if not game_state.call("add_item", grants_item_id):
+			game_state.call("request_notice", "가방이 가득 차서 가져갈 수 없다.")
+			return
 
 	if game_state != null:
 		game_state.call("request_notice", message)

@@ -18,19 +18,25 @@ const START_FLOOR := 5
 # 전환 트리거 존: 각 계단실 반쪽의 안쪽 끝 (인덱스 0=좌상단 계단, 1=중앙 하단 계단)
 const UP_ZONES := [Rect2(136, 930, 196, 54), Rect2(1196, 1610, 166, 54)]
 const DOWN_ZONES := [Rect2(348, 930, 196, 54), Rect2(1378, 1610, 166, 54)]
-# 도착 지점: 들어간 반쪽의 반대편 반쪽 입구 (트리거 존 밖)
-# 올라가면 위층의 오른쪽(아래층) 반에서, 내려가면 아래층의 왼쪽(위층) 반에서 등장
-const ARRIVE_AFTER_UP := [Vector2(446, 760), Vector2(1461, 1445)]
-const ARRIVE_AFTER_DOWN := [Vector2(234, 760), Vector2(1279, 1445)]
+# 도착 지점: 계단실 입구 바로 앞 복도 (입구가 잠겨 있어도 갇히지 않도록 계단실 밖)
+# 올라가면 입구 오른쪽 앞, 내려가면 입구 왼쪽 앞에서 등장
+const ARRIVE_AFTER_UP := [Vector2(399, 692), Vector2(1429, 1372)]
+const ARRIVE_AFTER_DOWN := [Vector2(281, 692), Vector2(1311, 1372)]
 
 var current_floor: int = START_FLOOR
 
 @onready var player: CharacterBody2D = $Player
 @onready var floor_label: Label = $UI/FloorLabel
+@onready var fade_rect: ColorRect = $UI/FadeRect
+
+const FADE_IN_SECONDS := 1.5
 
 
 func _ready() -> void:
 	_update_floor_label()
+	fade_rect.color.a = 1.0
+	var tween := create_tween()
+	tween.tween_property(fade_rect, "color:a", 0.0, FADE_IN_SECONDS)
 
 
 func _physics_process(_delta: float) -> void:
