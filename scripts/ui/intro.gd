@@ -26,6 +26,7 @@ const SCENES: Array = [
 	},
 ]
 const SCENE_FADE_SECONDS := 0.5
+const SCENE_FADE_IN_SECONDS := 1.0  # 장면 전환 시 새 장면이 드러나는 페이드인
 const TYPING_SECONDS_PER_CHAR := 0.05
 
 @onready var scene_caption: Label = $SceneCaption
@@ -111,7 +112,7 @@ func _next_scene() -> void:
 		scene_index += 1
 		line_index = -1
 		_apply_scene())
-	tween.tween_property(fade_rect, "color:a", 0.0, SCENE_FADE_SECONDS)
+	tween.tween_property(fade_rect, "color:a", 0.0, SCENE_FADE_IN_SECONDS)
 	tween.tween_callback(func() -> void:
 		transitioning = false
 		_next_line())
