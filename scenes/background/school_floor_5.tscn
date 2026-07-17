@@ -1,5 +1,6 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
+[ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="1_interactable"]
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="2_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="3_pickup"]
 
@@ -60,7 +61,7 @@ polygon = PackedVector2Array(2406, 120, 2678, 120, 2678, 620, 2406, 620)
 
 [node name="ArtPrep" type="Polygon2D" parent="Rooms"]
 color = Color(0.1, 0.11, 0.12, 1)
-polygon = PackedVector2Array(120, 1080, 480, 1080, 480, 1320, 120, 1320)
+polygon = PackedVector2Array(120, 1080, 480, 1080, 480, 1400, 120, 1400)
 
 [node name="MusicPrep" type="Polygon2D" parent="Rooms"]
 color = Color(0.1, 0.11, 0.12, 1)
@@ -218,6 +219,11 @@ polygon = PackedVector2Array(332, 720, 348, 720, 348, 1000, 332, 1000)
 [node name="RC_StairDown_M" type="CollisionPolygon2D" parent="StairWalls"]
 polygon = PackedVector2Array(1362, 1400, 1378, 1400, 1378, 1680, 1362, 1680)
 
+[node name="ArtRoomWindow" type="Polygon2D" parent="."]
+z_index = 1
+color = Color(0.45, 0.62, 0.75, 0.55)
+polygon = PackedVector2Array(260, 1384, 330, 1384, 330, 1416, 260, 1416)
+
 [node name="ArtRoomDoor" type="StaticBody2D" parent="."]
 
 [node name="ArtRoomDoorVisual" type="Polygon2D" parent="ArtRoomDoor"]
@@ -232,33 +238,12 @@ polygon = PackedVector2Array(575, 1400, 685, 1400, 685, 1416, 575, 1416)
 position = Vector2(630, 1408)
 collision_layer = 2
 collision_mask = 0
-script = ExtResource("2_locked_door")
-required_item_id = "art_room_key"
-pickup_id = "art_room_key_taken"
-locked_message = "문이 잠겨 있다. 열쇠가 필요할 것 같다."
-open_message = "열쇠로 미술실 문을 열었다."
-barrier_path = NodePath("../ArtRoomDoor")
-door_id = "art_room_door_open"
-consume_key = true
+script = ExtResource("1_interactable")
+message = "문이 단단히 잠겨 열리지 않는다. 다른 길을 찾아야 한다."
+prompt_text = "문 열어보기"
 
 [node name="LockZone" type="CollisionShape2D" parent="ArtRoomDoorLock"]
 shape = SubResource("RectangleShape2D_door_zone")
-
-[node name="ArtRoomKey" type="Area2D" parent="."]
-position = Vector2(220, 1620)
-collision_layer = 0
-collision_mask = 1
-script = ExtResource("3_pickup")
-item_id = "art_room_key"
-message = "물감 선반 아래에서 미술실 열쇠를 주웠다."
-
-[node name="KeyVisual" type="Polygon2D" parent="ArtRoomKey"]
-z_index = 1
-color = Color(0.62, 0.55, 0.28, 1)
-polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
-
-[node name="KeyZone" type="CollisionShape2D" parent="ArtRoomKey"]
-shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="StairLocks" type="Node2D" parent="."]
 
@@ -401,9 +386,9 @@ horizontal_alignment = 1
 
 [node name="L_ArtPrep" type="Label" parent="Labels"]
 offset_left = 225.0
-offset_top = 1185.0
+offset_top = 1225.0
 offset_right = 375.0
-offset_bottom = 1215.0
+offset_bottom = 1255.0
 text = "미술 준비실"
 horizontal_alignment = 1
 
@@ -571,13 +556,16 @@ polygon = PackedVector2Array(2406, 604, 2487.0, 604, 2487.0, 620, 2406, 620)
 polygon = PackedVector2Array(2597.0, 604, 2678, 604, 2678, 620, 2597.0, 620)
 
 [node name="WC_ArtPrep_left" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(120, 1080, 136, 1080, 136, 1320, 120, 1320)
+polygon = PackedVector2Array(120, 1080, 136, 1080, 136, 1400, 120, 1400)
 
 [node name="WC_ArtPrep_right" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(464, 1080, 480, 1080, 480, 1320, 464, 1320)
+polygon = PackedVector2Array(464, 1080, 480, 1080, 480, 1400, 464, 1400)
 
 [node name="WC_ArtPrep_bot" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(120, 1304, 480, 1304, 480, 1320, 120, 1320)
+polygon = PackedVector2Array(120, 1384, 260, 1384, 260, 1400, 120, 1400)
+
+[node name="WC_ArtPrep_bot2" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(330, 1384, 480, 1384, 480, 1400, 330, 1400)
 
 [node name="WC_ArtPrep_topL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(120, 1080, 245.0, 1080, 245.0, 1096, 120, 1096)
@@ -654,8 +642,11 @@ polygon = PackedVector2Array(1124, 1400, 1140, 1400, 1140, 1680, 1124, 1680)
 [node name="WC_ArtRoom_bot" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(120, 1664, 1140, 1664, 1140, 1680, 120, 1680)
 
+[node name="WC_ArtRoom_topL2" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(330, 1400, 575.0, 1400, 575.0, 1416, 330, 1416)
+
 [node name="WC_ArtRoom_topL" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(120, 1400, 575.0, 1400, 575.0, 1416, 120, 1416)
+polygon = PackedVector2Array(120, 1400, 260, 1400, 260, 1416, 120, 1416)
 
 [node name="WC_ArtRoom_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(685.0, 1400, 1140, 1400, 1140, 1416, 685.0, 1416)
@@ -856,15 +847,19 @@ polygon = PackedVector2Array(2487.0, 604, 2597.0, 604, 2597.0, 620, 2487.0, 620)
 
 [node name="WV_ArtPrep_left" type="Polygon2D" parent="RoomWallVisuals"]
 color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(120, 1080, 136, 1080, 136, 1320, 120, 1320)
+polygon = PackedVector2Array(120, 1080, 136, 1080, 136, 1400, 120, 1400)
 
 [node name="WV_ArtPrep_right" type="Polygon2D" parent="RoomWallVisuals"]
 color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(464, 1080, 480, 1080, 480, 1320, 464, 1320)
+polygon = PackedVector2Array(464, 1080, 480, 1080, 480, 1400, 464, 1400)
 
 [node name="WV_ArtPrep_bot" type="Polygon2D" parent="RoomWallVisuals"]
 color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(120, 1304, 480, 1304, 480, 1320, 120, 1320)
+polygon = PackedVector2Array(120, 1384, 260, 1384, 260, 1400, 120, 1400)
+
+[node name="WV_ArtPrep_bot2" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(330, 1384, 480, 1384, 480, 1400, 330, 1400)
 
 [node name="WV_ArtPrep_topL" type="Polygon2D" parent="RoomWallVisuals"]
 color = Color(0.32, 0.32, 0.37, 1)
@@ -986,9 +981,13 @@ polygon = PackedVector2Array(1124, 1400, 1140, 1400, 1140, 1680, 1124, 1680)
 color = Color(0.32, 0.32, 0.37, 1)
 polygon = PackedVector2Array(120, 1664, 1140, 1664, 1140, 1680, 120, 1680)
 
+[node name="WV_ArtRoom_topL2" type="Polygon2D" parent="RoomWallVisuals"]
+color = Color(0.32, 0.32, 0.37, 1)
+polygon = PackedVector2Array(330, 1400, 575.0, 1400, 575.0, 1416, 330, 1416)
+
 [node name="WV_ArtRoom_topL" type="Polygon2D" parent="RoomWallVisuals"]
 color = Color(0.32, 0.32, 0.37, 1)
-polygon = PackedVector2Array(120, 1400, 575.0, 1400, 575.0, 1416, 120, 1416)
+polygon = PackedVector2Array(120, 1400, 260, 1400, 260, 1416, 120, 1416)
 
 [node name="WV_ArtRoom_topR" type="Polygon2D" parent="RoomWallVisuals"]
 color = Color(0.32, 0.32, 0.37, 1)
