@@ -106,8 +106,9 @@ const TYPING_SECONDS_PER_CHAR := 0.05
 @onready var name_label: Label = $DialogueBox/Margin/Rows/NameLabel
 @onready var text_label: Label = $DialogueBox/Margin/Rows/TextLabel
 @onready var fade_rect: ColorRect = $FadeRect
-@onready var choice_box: VBoxContainer = $ChoiceBox
-@onready var choice_prompt: Label = $ChoiceBox/ChoicePrompt
+@onready var choice_panel: PanelContainer = $ChoicePanel
+@onready var choice_box: VBoxContainer = $ChoicePanel/Margin/ChoiceBox
+@onready var choice_prompt: Label = $ChoicePanel/Margin/ChoiceBox/ChoicePrompt
 @onready var blackboard_art: PanelContainer = $BlackboardArt
 
 var current_node: String = START_NODE
@@ -121,7 +122,7 @@ var typing_tween: Tween
 
 func _ready() -> void:
 	fade_rect.color.a = 1.0
-	choice_box.visible = false
+	choice_panel.visible = false
 	_apply_scene()
 
 	var tween := create_tween()
@@ -208,13 +209,13 @@ func _show_choice(choice: Dictionary) -> void:
 		if first_button == null:
 			first_button = button
 
-	choice_box.visible = true
+	choice_panel.visible = true
 	if first_button != null:
 		first_button.grab_focus()
 
 
 func _on_choice_selected(target: String) -> void:
-	choice_box.visible = false
+	choice_panel.visible = false
 	choosing = false
 	_go_to(target)
 
