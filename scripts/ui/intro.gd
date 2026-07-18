@@ -53,9 +53,15 @@ const SCRIPT_NODES: Dictionary = {
 			["", "창밖 — 수위 아저씨가 삽으로 무언가를 묻고 있다. 사람의 형상을 한 무언가를."],
 			["", "철컥. 미술실 문이 잠겼다. 창밖 가로등이 하나씩 꺼져 간다."],
 			["", "칠판 위로, 피로 쓰인 글씨가 번져 나온다."],
-			["???", "하나. 밤 11시 이후 학교에 남아 있는 학생은 '폐기물'로 간주한다."],
-			["???", "둘. 나의 눈을 3초 이상 마주친 학생은 '교칙 위반'이다."],
-			["???", "셋. 학교 물건을 허락 없이 가져가는 자는 '도둑'이다."],
+		],
+		"next": "rules",
+	},
+	"rules": {
+		"caption": "— 5층 미술실 —",
+		"blackboard": true,
+		"lines": [
+			["이설", "……!"],
+			["이설", "나가야 해. 지금 당장."],
 		],
 		"choice": {
 			"prompt": "어떻게 할까?",
@@ -67,6 +73,7 @@ const SCRIPT_NODES: Dictionary = {
 	},
 	"talk": {
 		"caption": "— 5층 미술실 —",
+		"blackboard": true,
 		"lines": [
 			["이설", "저기요! 수위 아저씨! 문 좀 열어 주세요!"],
 			["", "쿵— 쿵— 계단을 올라오는 발소리."],
@@ -101,6 +108,7 @@ const TYPING_SECONDS_PER_CHAR := 0.05
 @onready var fade_rect: ColorRect = $FadeRect
 @onready var choice_box: VBoxContainer = $ChoiceBox
 @onready var choice_prompt: Label = $ChoiceBox/ChoicePrompt
+@onready var blackboard_art: PanelContainer = $BlackboardArt
 
 var current_node: String = START_NODE
 var line_index: int = -1
@@ -140,7 +148,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _apply_scene() -> void:
-	scene_caption.text = SCRIPT_NODES[current_node]["caption"]
+	var node: Dictionary = SCRIPT_NODES[current_node]
+	scene_caption.text = node["caption"]
+	# 배경 칠판(규칙) 표시 여부 — 이미지 에셋이 생기면 BlackboardArt 노드만 교체
+	blackboard_art.visible = node.get("blackboard", false)
 	name_label.text = ""
 	text_label.text = ""
 
