@@ -100,6 +100,7 @@ const SCRIPT_NODES: Dictionary = {
 const START_NODE := "home"
 const SCENE_FADE_SECONDS := 0.5
 const SCENE_FADE_IN_SECONDS := 1.7  # 장면 전환 시 새 장면이 드러나는 페이드인
+const CHOICE_FADE_SECONDS := 0.4    # 선택창 등장 페이드인
 const TYPING_SECONDS_PER_CHAR := 0.05
 
 @onready var scene_caption: Label = $SceneCaption
@@ -209,7 +210,11 @@ func _show_choice(choice: Dictionary) -> void:
 		if first_button == null:
 			first_button = button
 
+	choice_panel.modulate.a = 0.0
 	choice_panel.visible = true
+	var tween := create_tween()
+	tween.tween_property(choice_panel, "modulate:a", 1.0, CHOICE_FADE_SECONDS)
+
 	if first_button != null:
 		first_button.grab_focus()
 
