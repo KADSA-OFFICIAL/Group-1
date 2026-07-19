@@ -60,6 +60,8 @@ const SCRIPT_NODES: Dictionary = {
 		"caption": "— 5층 미술실 —",
 		"blackboard": true,
 		"lines": [
+			["???", "규칙을 어긴 학생이 있군…"],
+			["???", "폐기물은 처리한다…"],
 			["이설", "……!"],
 			["이설", "나가야 해. 지금 당장."],
 		],
