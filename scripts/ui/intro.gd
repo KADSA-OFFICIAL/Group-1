@@ -59,6 +59,7 @@ const SCRIPT_NODES: Dictionary = {
 	"rules": {
 		"caption": "— 5층 미술실 —",
 		"blackboard": true,
+		"start_delay": 1.2,
 		"lines": [
 			["???", "규칙을 어긴 학생이 있군…"],
 			["???", "폐기물은 처리한다…"],
@@ -236,6 +237,9 @@ func _go_to(target: String) -> void:
 		return
 
 	transitioning = true
+	# start_delay: 새 장면이 드러난 뒤 첫 대사까지 두는 시간차
+	var start_delay: float = SCRIPT_NODES[target].get("start_delay", 0.0)
+
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 1.0, SCENE_FADE_SECONDS)
 	tween.tween_callback(func() -> void:
@@ -243,6 +247,8 @@ func _go_to(target: String) -> void:
 		line_index = -1
 		_apply_scene())
 	tween.tween_property(fade_rect, "color:a", 0.0, SCENE_FADE_IN_SECONDS)
+	if start_delay > 0.0:
+		tween.tween_interval(start_delay)
 	tween.tween_callback(func() -> void:
 		transitioning = false
 		_next_line())
