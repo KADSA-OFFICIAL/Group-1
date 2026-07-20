@@ -30,6 +30,7 @@ var current_floor: int = START_FLOOR
 @onready var fade_rect: ColorRect = $UI/FadeRect
 
 const FADE_IN_SECONDS := 1.5
+const START_HINT := "문은 잠겨서 열리지 않는다. …아래쪽 창문으로 나가는 게 좋겠어."
 
 
 func _ready() -> void:
@@ -37,6 +38,13 @@ func _ready() -> void:
 	fade_rect.color.a = 1.0
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 0.0, FADE_IN_SECONDS)
+	tween.tween_callback(_show_start_hint)
+
+
+func _show_start_hint() -> void:
+	var game_state = get_tree().get_first_node_in_group("game_state")
+	if game_state != null:
+		game_state.call("request_notice", START_HINT)
 
 
 func _physics_process(_delta: float) -> void:
