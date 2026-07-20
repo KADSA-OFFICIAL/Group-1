@@ -53,9 +53,18 @@ const SCRIPT_NODES: Dictionary = {
 			["", "창밖 — 수위 아저씨가 삽으로 무언가를 묻고 있다. 사람의 형상을 한 무언가를."],
 			["", "철컥. 미술실 문이 잠겼다. 창밖 가로등이 하나씩 꺼져 간다."],
 			["", "칠판 위로, 피로 쓰인 글씨가 번져 나온다."],
-			["???", "하나. 밤 11시 이후 학교에 남아 있는 학생은 '폐기물'로 간주한다."],
-			["???", "둘. 나의 눈을 3초 이상 마주친 학생은 '교칙 위반'이다."],
-			["???", "셋. 학교 물건을 허락 없이 가져가는 자는 '도둑'이다."],
+		],
+		"next": "rules",
+	},
+	"rules": {
+		"caption": "— 5층 미술실 —",
+		"blackboard": true,
+		"start_delay": 1.2,
+		"lines": [
+			["???", "규칙을 어긴 학생이 있군…"],
+			["???", "폐기물은 처리한다…"],
+			["이설", "……!"],
+			["이설", "나가야 해. 지금 당장."],
 		],
 		"choice": {
 			"prompt": "어떻게 할까?",
@@ -67,6 +76,7 @@ const SCRIPT_NODES: Dictionary = {
 	},
 	"talk": {
 		"caption": "— 5층 미술실 —",
+		"blackboard": true,
 		"lines": [
 			["이설", "저기요! 수위 아저씨! 문 좀 열어 주세요!"],
 			["", "쿵— 쿵— 계단을 올라오는 발소리."],
@@ -93,14 +103,17 @@ const SCRIPT_NODES: Dictionary = {
 const START_NODE := "home"
 const SCENE_FADE_SECONDS := 0.5
 const SCENE_FADE_IN_SECONDS := 1.7  # 장면 전환 시 새 장면이 드러나는 페이드인
+const CHOICE_FADE_SECONDS := 0.4    # 선택창 등장 페이드인
 const TYPING_SECONDS_PER_CHAR := 0.05
 
 @onready var scene_caption: Label = $SceneCaption
 @onready var name_label: Label = $DialogueBox/Margin/Rows/NameLabel
 @onready var text_label: Label = $DialogueBox/Margin/Rows/TextLabel
 @onready var fade_rect: ColorRect = $FadeRect
-@onready var choice_box: VBoxContainer = $ChoiceBox
-@onready var choice_prompt: Label = $ChoiceBox/ChoicePrompt
+@onready var choice_panel: PanelContainer = $ChoicePanel
+@onready var choice_box: VBoxContainer = $ChoicePanel/Margin/ChoiceBox
+@onready var choice_prompt: Label = $ChoicePanel/Margin/ChoiceBox/ChoicePrompt
+@onready var blackboard_art: PanelContainer = $BlackboardArt
 
 var current_node: String = START_NODE
 var line_index: int = -1
@@ -113,7 +126,7 @@ var typing_tween: Tween
 
 func _ready() -> void:
 	fade_rect.color.a = 1.0
-	choice_box.visible = false
+	choice_panel.visible = false
 	_apply_scene()
 
 	var tween := create_tween()
@@ -140,7 +153,10 @@ func _unhandled_input(event: InputEvent) -> void:
 
 
 func _apply_scene() -> void:
-	scene_caption.text = SCRIPT_NODES[current_node]["caption"]
+	var node: Dictionary = SCRIPT_NODES[current_node]
+	scene_caption.text = node["caption"]
+	# 배경 칠판(규칙) 표시 여부 — 이미지 에셋이 생기면 BlackboardArt 노드만 교체
+	blackboard_art.visible = node.get("blackboard", false)
 	name_label.text = ""
 	text_label.text = ""
 
@@ -197,13 +213,17 @@ func _show_choice(choice: Dictionary) -> void:
 		if first_button == null:
 			first_button = button
 
-	choice_box.visible = true
+	choice_panel.modulate.a = 0.0
+	choice_panel.visible = true
+	var tween := create_tween()
+	tween.tween_property(choice_panel, "modulate:a", 1.0, CHOICE_FADE_SECONDS)
+
 	if first_button != null:
 		first_button.grab_focus()
 
 
 func _on_choice_selected(target: String) -> void:
-	choice_box.visible = false
+	choice_panel.visible = false
 	choosing = false
 	_go_to(target)
 
@@ -217,6 +237,9 @@ func _go_to(target: String) -> void:
 		return
 
 	transitioning = true
+	# start_delay: 새 장면이 드러난 뒤 첫 대사까지 두는 시간차
+	var start_delay: float = SCRIPT_NODES[target].get("start_delay", 0.0)
+
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 1.0, SCENE_FADE_SECONDS)
 	tween.tween_callback(func() -> void:
@@ -224,6 +247,8 @@ func _go_to(target: String) -> void:
 		line_index = -1
 		_apply_scene())
 	tween.tween_property(fade_rect, "color:a", 0.0, SCENE_FADE_IN_SECONDS)
+	if start_delay > 0.0:
+		tween.tween_interval(start_delay)
 	tween.tween_callback(func() -> void:
 		transitioning = false
 		_next_line())
