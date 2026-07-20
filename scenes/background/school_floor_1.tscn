@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=93 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
@@ -16,6 +16,258 @@ size = Vector2(2800, 40)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_v"]
 size = Vector2(40, 1800)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairUp_L"]
+polygon = PackedVector2Array(120, 720, 136, 720, 136, 1000, 120, 1000)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairUp_R"]
+polygon = PackedVector2Array(544, 720, 560, 720, 560, 1000, 544, 1000)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairUp_F"]
+polygon = PackedVector2Array(120, 984, 560, 984, 560, 1000, 120, 1000)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairUp_EL"]
+polygon = PackedVector2Array(120, 720, 230.0, 720, 230.0, 736, 120, 736)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairUp_ER"]
+polygon = PackedVector2Array(450.0, 720, 560, 720, 560, 736, 450.0, 736)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairDown_L"]
+polygon = PackedVector2Array(1180, 1400, 1196, 1400, 1196, 1680, 1180, 1680)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairDown_R"]
+polygon = PackedVector2Array(1544, 1400, 1560, 1400, 1560, 1680, 1544, 1680)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairDown_F"]
+polygon = PackedVector2Array(1180, 1664, 1560, 1664, 1560, 1680, 1180, 1680)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairDown_EL"]
+polygon = PackedVector2Array(1180, 1400, 1260.0, 1400, 1260.0, 1416, 1180, 1416)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairDown_ER"]
+polygon = PackedVector2Array(1480.0, 1400, 1560, 1400, 1560, 1416, 1480.0, 1416)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairUp_M"]
+polygon = PackedVector2Array(332, 720, 348, 720, 348, 1000, 332, 1000)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairDown_M"]
+polygon = PackedVector2Array(1362, 1400, 1378, 1400, 1378, 1680, 1362, 1680)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_SUBarrierCollision"]
+polygon = PackedVector2Array(230, 720, 450, 720, 450, 736, 230, 736)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_SDBarrierCollision"]
+polygon = PackedVector2Array(1260, 1400, 1480, 1400, 1480, 1416, 1260, 1416)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Class1_1_left"]
+polygon = PackedVector2Array(120, 120, 136, 120, 136, 620, 120, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Class1_1_right"]
+polygon = PackedVector2Array(376, 120, 392, 120, 392, 620, 376, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Class1_1_top"]
+polygon = PackedVector2Array(120, 120, 392, 120, 392, 136, 120, 136)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Class1_1_botL"]
+polygon = PackedVector2Array(120, 604, 201.0, 604, 201.0, 620, 120, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Class1_1_botR"]
+polygon = PackedVector2Array(311.0, 604, 392, 604, 392, 620, 311.0, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Class1_2_left"]
+polygon = PackedVector2Array(422, 120, 438, 120, 438, 620, 422, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Class1_2_right"]
+polygon = PackedVector2Array(678, 120, 694, 120, 694, 620, 678, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Class1_2_top"]
+polygon = PackedVector2Array(422, 120, 694, 120, 694, 136, 422, 136)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Class1_2_botL"]
+polygon = PackedVector2Array(422, 604, 503.0, 604, 503.0, 620, 422, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Class1_2_botR"]
+polygon = PackedVector2Array(613.0, 604, 694, 604, 694, 620, 613.0, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Class1_3_left"]
+polygon = PackedVector2Array(724, 120, 740, 120, 740, 620, 724, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Class1_3_right"]
+polygon = PackedVector2Array(980, 120, 996, 120, 996, 620, 980, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Class1_3_top"]
+polygon = PackedVector2Array(724, 120, 996, 120, 996, 136, 724, 136)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Class1_3_botL"]
+polygon = PackedVector2Array(724, 604, 805.0, 604, 805.0, 620, 724, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Class1_3_botR"]
+polygon = PackedVector2Array(915.0, 604, 996, 604, 996, 620, 915.0, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_PrincipalRoom_left"]
+polygon = PackedVector2Array(1026, 120, 1042, 120, 1042, 620, 1026, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_PrincipalRoom_right"]
+polygon = PackedVector2Array(1282, 120, 1298, 120, 1298, 620, 1282, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_PrincipalRoom_top"]
+polygon = PackedVector2Array(1026, 120, 1298, 120, 1298, 136, 1026, 136)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_PrincipalRoom_botL"]
+polygon = PackedVector2Array(1026, 604, 1107.0, 604, 1107.0, 620, 1026, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_PrincipalRoom_botR"]
+polygon = PackedVector2Array(1217.0, 604, 1298, 604, 1298, 620, 1217.0, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_KoreanRoom_left"]
+polygon = PackedVector2Array(1500, 120, 1516, 120, 1516, 620, 1500, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_KoreanRoom_right"]
+polygon = PackedVector2Array(1756, 120, 1772, 120, 1772, 620, 1756, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_KoreanRoom_top"]
+polygon = PackedVector2Array(1500, 120, 1772, 120, 1772, 136, 1500, 136)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_KoreanRoom_botL"]
+polygon = PackedVector2Array(1500, 604, 1581.0, 604, 1581.0, 620, 1500, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_KoreanRoom_botR"]
+polygon = PackedVector2Array(1691.0, 604, 1772, 604, 1772, 620, 1691.0, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_ArtRoom_left"]
+polygon = PackedVector2Array(1802, 120, 1818, 120, 1818, 620, 1802, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_ArtRoom_right"]
+polygon = PackedVector2Array(2058, 120, 2074, 120, 2074, 620, 2058, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_ArtRoom_top"]
+polygon = PackedVector2Array(1802, 120, 2074, 120, 2074, 136, 1802, 136)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_ArtRoom_botL"]
+polygon = PackedVector2Array(1802, 604, 1883.0, 604, 1883.0, 620, 1802, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_ArtRoom_botR"]
+polygon = PackedVector2Array(1993.0, 604, 2074, 604, 2074, 620, 1993.0, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_MusicRoom_left"]
+polygon = PackedVector2Array(2104, 120, 2120, 120, 2120, 620, 2104, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_MusicRoom_right"]
+polygon = PackedVector2Array(2360, 120, 2376, 120, 2376, 620, 2360, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_MusicRoom_top"]
+polygon = PackedVector2Array(2104, 120, 2376, 120, 2376, 136, 2104, 136)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_MusicRoom_botL"]
+polygon = PackedVector2Array(2104, 604, 2185.0, 604, 2185.0, 620, 2104, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_MusicRoom_botR"]
+polygon = PackedVector2Array(2295.0, 604, 2376, 604, 2376, 620, 2295.0, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_ScienceRoom_left"]
+polygon = PackedVector2Array(2406, 120, 2422, 120, 2422, 620, 2406, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_ScienceRoom_right"]
+polygon = PackedVector2Array(2662, 120, 2678, 120, 2678, 620, 2662, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_ScienceRoom_top"]
+polygon = PackedVector2Array(2406, 120, 2678, 120, 2678, 136, 2406, 136)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_ScienceRoom_botL"]
+polygon = PackedVector2Array(2406, 604, 2487.0, 604, 2487.0, 620, 2406, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_ScienceRoom_botR"]
+polygon = PackedVector2Array(2597.0, 604, 2678, 604, 2678, 620, 2597.0, 620)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Storage_left"]
+polygon = PackedVector2Array(120, 1080, 136, 1080, 136, 1320, 120, 1320)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Storage_right"]
+polygon = PackedVector2Array(464, 1080, 480, 1080, 480, 1320, 464, 1320)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Storage_bot"]
+polygon = PackedVector2Array(120, 1304, 480, 1304, 480, 1320, 120, 1320)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Storage_topL"]
+polygon = PackedVector2Array(120, 1080, 245.0, 1080, 245.0, 1096, 120, 1096)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Storage_topR"]
+polygon = PackedVector2Array(355.0, 1080, 480, 1080, 480, 1096, 355.0, 1096)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_AdminOffice_left"]
+polygon = PackedVector2Array(510, 1080, 526, 1080, 526, 1320, 510, 1320)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_AdminOffice_right"]
+polygon = PackedVector2Array(1134, 1080, 1150, 1080, 1150, 1320, 1134, 1320)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_AdminOffice_bot"]
+polygon = PackedVector2Array(510, 1304, 1150, 1304, 1150, 1320, 510, 1320)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_AdminOffice_topL"]
+polygon = PackedVector2Array(510, 1080, 775.0, 1080, 775.0, 1096, 510, 1096)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_AdminOffice_topR"]
+polygon = PackedVector2Array(885.0, 1080, 1150, 1080, 1150, 1096, 885.0, 1096)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty1_left"]
+polygon = PackedVector2Array(1500, 1080, 1516, 1080, 1516, 1320, 1500, 1320)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty1_right"]
+polygon = PackedVector2Array(1857, 1080, 1873, 1080, 1873, 1320, 1857, 1320)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty1_bot"]
+polygon = PackedVector2Array(1500, 1304, 1873, 1304, 1873, 1320, 1500, 1320)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty1_topL"]
+polygon = PackedVector2Array(1500, 1080, 1631.5, 1080, 1631.5, 1096, 1500, 1096)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty1_topR"]
+polygon = PackedVector2Array(1741.5, 1080, 1873, 1080, 1873, 1096, 1741.5, 1096)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty2_left"]
+polygon = PackedVector2Array(1903, 1080, 1919, 1080, 1919, 1320, 1903, 1320)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty2_right"]
+polygon = PackedVector2Array(2260, 1080, 2276, 1080, 2276, 1320, 2260, 1320)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty2_bot"]
+polygon = PackedVector2Array(1903, 1304, 2276, 1304, 2276, 1320, 1903, 1320)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty2_topL"]
+polygon = PackedVector2Array(1903, 1080, 2034.5, 1080, 2034.5, 1096, 1903, 1096)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty2_topR"]
+polygon = PackedVector2Array(2144.5, 1080, 2276, 1080, 2276, 1096, 2144.5, 1096)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty3_left"]
+polygon = PackedVector2Array(2306, 1080, 2322, 1080, 2322, 1320, 2306, 1320)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty3_right"]
+polygon = PackedVector2Array(2663, 1080, 2679, 1080, 2679, 1320, 2663, 1320)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty3_bot"]
+polygon = PackedVector2Array(2306, 1304, 2679, 1304, 2679, 1320, 2306, 1320)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty3_topL"]
+polygon = PackedVector2Array(2306, 1080, 2437.5, 1080, 2437.5, 1096, 2306, 1096)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty3_topR"]
+polygon = PackedVector2Array(2547.5, 1080, 2679, 1080, 2679, 1096, 2547.5, 1096)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_JanitorRoom_left"]
+polygon = PackedVector2Array(120, 1400, 136, 1400, 136, 1680, 120, 1680)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_JanitorRoom_right"]
+polygon = PackedVector2Array(584, 1400, 600, 1400, 600, 1680, 584, 1680)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_JanitorRoom_bot"]
+polygon = PackedVector2Array(120, 1664, 600, 1664, 600, 1680, 120, 1680)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_JanitorRoom_topL"]
+polygon = PackedVector2Array(120, 1400, 305.0, 1400, 305.0, 1416, 120, 1416)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_JanitorRoom_topR"]
+polygon = PackedVector2Array(415.0, 1400, 600, 1400, 600, 1416, 415.0, 1416)
 
 [node name="SchoolFloor1" type="Node2D"]
 
@@ -239,6 +491,10 @@ polygon = PackedVector2Array(230, 720, 450, 720, 450, 736, 230, 736)
 [node name="SUBarrierCollision" type="CollisionPolygon2D" parent="StairLocks/SUBarrier"]
 polygon = PackedVector2Array(230, 720, 450, 720, 450, 736, 230, 736)
 
+[node name="LO_SUBarrierCollision" type="LightOccluder2D" parent="StairLocks/SUBarrier"]
+occluder = SubResource("Occ_SUBarrierCollision")
+
+
 [node name="SDBarrier" type="StaticBody2D" parent="StairLocks"]
 
 [node name="SDBarrierVisual" type="Polygon2D" parent="StairLocks/SDBarrier"]
@@ -248,6 +504,10 @@ polygon = PackedVector2Array(1260, 1400, 1480, 1400, 1480, 1416, 1260, 1416)
 
 [node name="SDBarrierCollision" type="CollisionPolygon2D" parent="StairLocks/SDBarrier"]
 polygon = PackedVector2Array(1260, 1400, 1480, 1400, 1480, 1416, 1260, 1416)
+
+[node name="LO_SDBarrierCollision" type="LightOccluder2D" parent="StairLocks/SDBarrier"]
+occluder = SubResource("Occ_SDBarrierCollision")
+
 
 [node name="SULock" type="Area2D" parent="."]
 position = Vector2(340, 728)
@@ -357,6 +617,254 @@ polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
 
 [node name="KeyBundleZone" type="CollisionShape2D" parent="KeyBundle"]
 shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="Occluders" type="Node2D" parent="."]
+
+[node name="LO_RC_StairUp_L" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_RC_StairUp_L")
+
+[node name="LO_RC_StairUp_R" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_RC_StairUp_R")
+
+[node name="LO_RC_StairUp_F" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_RC_StairUp_F")
+
+[node name="LO_RC_StairUp_EL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_RC_StairUp_EL")
+
+[node name="LO_RC_StairUp_ER" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_RC_StairUp_ER")
+
+[node name="LO_RC_StairDown_L" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_RC_StairDown_L")
+
+[node name="LO_RC_StairDown_R" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_RC_StairDown_R")
+
+[node name="LO_RC_StairDown_F" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_RC_StairDown_F")
+
+[node name="LO_RC_StairDown_EL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_RC_StairDown_EL")
+
+[node name="LO_RC_StairDown_ER" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_RC_StairDown_ER")
+
+[node name="LO_RC_StairUp_M" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_RC_StairUp_M")
+
+[node name="LO_RC_StairDown_M" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_RC_StairDown_M")
+
+[node name="LO_WC_Class1_1_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Class1_1_left")
+
+[node name="LO_WC_Class1_1_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Class1_1_right")
+
+[node name="LO_WC_Class1_1_top" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Class1_1_top")
+
+[node name="LO_WC_Class1_1_botL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Class1_1_botL")
+
+[node name="LO_WC_Class1_1_botR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Class1_1_botR")
+
+[node name="LO_WC_Class1_2_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Class1_2_left")
+
+[node name="LO_WC_Class1_2_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Class1_2_right")
+
+[node name="LO_WC_Class1_2_top" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Class1_2_top")
+
+[node name="LO_WC_Class1_2_botL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Class1_2_botL")
+
+[node name="LO_WC_Class1_2_botR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Class1_2_botR")
+
+[node name="LO_WC_Class1_3_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Class1_3_left")
+
+[node name="LO_WC_Class1_3_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Class1_3_right")
+
+[node name="LO_WC_Class1_3_top" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Class1_3_top")
+
+[node name="LO_WC_Class1_3_botL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Class1_3_botL")
+
+[node name="LO_WC_Class1_3_botR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Class1_3_botR")
+
+[node name="LO_WC_PrincipalRoom_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_PrincipalRoom_left")
+
+[node name="LO_WC_PrincipalRoom_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_PrincipalRoom_right")
+
+[node name="LO_WC_PrincipalRoom_top" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_PrincipalRoom_top")
+
+[node name="LO_WC_PrincipalRoom_botL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_PrincipalRoom_botL")
+
+[node name="LO_WC_PrincipalRoom_botR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_PrincipalRoom_botR")
+
+[node name="LO_WC_KoreanRoom_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_KoreanRoom_left")
+
+[node name="LO_WC_KoreanRoom_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_KoreanRoom_right")
+
+[node name="LO_WC_KoreanRoom_top" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_KoreanRoom_top")
+
+[node name="LO_WC_KoreanRoom_botL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_KoreanRoom_botL")
+
+[node name="LO_WC_KoreanRoom_botR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_KoreanRoom_botR")
+
+[node name="LO_WC_ArtRoom_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_ArtRoom_left")
+
+[node name="LO_WC_ArtRoom_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_ArtRoom_right")
+
+[node name="LO_WC_ArtRoom_top" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_ArtRoom_top")
+
+[node name="LO_WC_ArtRoom_botL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_ArtRoom_botL")
+
+[node name="LO_WC_ArtRoom_botR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_ArtRoom_botR")
+
+[node name="LO_WC_MusicRoom_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_MusicRoom_left")
+
+[node name="LO_WC_MusicRoom_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_MusicRoom_right")
+
+[node name="LO_WC_MusicRoom_top" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_MusicRoom_top")
+
+[node name="LO_WC_MusicRoom_botL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_MusicRoom_botL")
+
+[node name="LO_WC_MusicRoom_botR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_MusicRoom_botR")
+
+[node name="LO_WC_ScienceRoom_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_ScienceRoom_left")
+
+[node name="LO_WC_ScienceRoom_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_ScienceRoom_right")
+
+[node name="LO_WC_ScienceRoom_top" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_ScienceRoom_top")
+
+[node name="LO_WC_ScienceRoom_botL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_ScienceRoom_botL")
+
+[node name="LO_WC_ScienceRoom_botR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_ScienceRoom_botR")
+
+[node name="LO_WC_Storage_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Storage_left")
+
+[node name="LO_WC_Storage_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Storage_right")
+
+[node name="LO_WC_Storage_bot" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Storage_bot")
+
+[node name="LO_WC_Storage_topL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Storage_topL")
+
+[node name="LO_WC_Storage_topR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Storage_topR")
+
+[node name="LO_WC_AdminOffice_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_AdminOffice_left")
+
+[node name="LO_WC_AdminOffice_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_AdminOffice_right")
+
+[node name="LO_WC_AdminOffice_bot" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_AdminOffice_bot")
+
+[node name="LO_WC_AdminOffice_topL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_AdminOffice_topL")
+
+[node name="LO_WC_AdminOffice_topR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_AdminOffice_topR")
+
+[node name="LO_WC_Empty1_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Empty1_left")
+
+[node name="LO_WC_Empty1_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Empty1_right")
+
+[node name="LO_WC_Empty1_bot" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Empty1_bot")
+
+[node name="LO_WC_Empty1_topL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Empty1_topL")
+
+[node name="LO_WC_Empty1_topR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Empty1_topR")
+
+[node name="LO_WC_Empty2_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Empty2_left")
+
+[node name="LO_WC_Empty2_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Empty2_right")
+
+[node name="LO_WC_Empty2_bot" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Empty2_bot")
+
+[node name="LO_WC_Empty2_topL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Empty2_topL")
+
+[node name="LO_WC_Empty2_topR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Empty2_topR")
+
+[node name="LO_WC_Empty3_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Empty3_left")
+
+[node name="LO_WC_Empty3_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Empty3_right")
+
+[node name="LO_WC_Empty3_bot" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Empty3_bot")
+
+[node name="LO_WC_Empty3_topL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Empty3_topL")
+
+[node name="LO_WC_Empty3_topR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_Empty3_topR")
+
+[node name="LO_WC_JanitorRoom_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_JanitorRoom_left")
+
+[node name="LO_WC_JanitorRoom_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_JanitorRoom_right")
+
+[node name="LO_WC_JanitorRoom_bot" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_JanitorRoom_bot")
+
+[node name="LO_WC_JanitorRoom_topL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_JanitorRoom_topL")
+
+[node name="LO_WC_JanitorRoom_topR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_JanitorRoom_topR")
 
 [node name="Labels" type="Node2D" parent="."]
 
