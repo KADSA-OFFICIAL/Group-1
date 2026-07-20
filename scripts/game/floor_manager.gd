@@ -24,12 +24,16 @@ const ARRIVE_AFTER_UP := [Vector2(399, 692), Vector2(1429, 1372)]
 const ARRIVE_AFTER_DOWN := [Vector2(281, 692), Vector2(1311, 1372)]
 
 var current_floor: int = START_FLOOR
+var changing_floor: bool = false
 
 @onready var player: CharacterBody2D = $Player
 @onready var floor_label: Label = $UI/FloorLabel
 @onready var fade_rect: ColorRect = $UI/FadeRect
 
 const FADE_IN_SECONDS := 1.5
+const FLOOR_FADE_OUT_SECONDS := 0.25
+const FLOOR_FADE_IN_SECONDS := 0.35
+const START_HINT := "문은 잠겨서 열리지 않는다. …아래쪽 창문으로 나가는 게 좋겠어."
 
 
 func _ready() -> void:
@@ -37,9 +41,19 @@ func _ready() -> void:
 	fade_rect.color.a = 1.0
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 0.0, FADE_IN_SECONDS)
+	tween.tween_callback(_show_start_hint)
+
+
+func _show_start_hint() -> void:
+	var game_state = get_tree().get_first_node_in_group("game_state")
+	if game_state != null:
+		game_state.call("request_notice", START_HINT)
 
 
 func _physics_process(_delta: float) -> void:
+	if changing_floor:
+		return
+
 	var pos := player.position
 
 	for i in UP_ZONES.size():
@@ -54,6 +68,17 @@ func _physics_process(_delta: float) -> void:
 
 
 func _change_floor(target: int, arrive: Vector2) -> void:
+	changing_floor = true
+
+	var tween := create_tween()
+	tween.tween_property(fade_rect, "color:a", 1.0, FLOOR_FADE_OUT_SECONDS)
+	tween.tween_callback(_swap_floor.bind(target, arrive))
+	tween.tween_property(fade_rect, "color:a", 0.0, FLOOR_FADE_IN_SECONDS)
+	tween.tween_callback(func() -> void:
+		changing_floor = false)
+
+
+func _swap_floor(target: int, arrive: Vector2) -> void:
 	var old_background: Node = $Background
 	var next_background: Node2D = load(FLOOR_SCENES[target]).instantiate()
 	var background_index := old_background.get_index()
