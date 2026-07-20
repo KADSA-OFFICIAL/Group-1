@@ -16,7 +16,7 @@ import re, pathlib
 T = 16        # 벽 두께
 D = 110       # 문 틈 폭
 CENTER_Y = 900
-WALL_COLOR = "Color(0.32, 0.32, 0.37, 1)"
+WALL_COLOR = "Color(0.58, 0.64, 0.86, 1)"
 DOOR_COLOR = "Color(0.45, 0.32, 0.2, 1)"
 
 FILES = [f"scenes/background/school_floor_{i}.tscn" for i in range(1, 6)]
