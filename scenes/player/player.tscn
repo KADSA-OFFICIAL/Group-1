@@ -52,6 +52,9 @@ text = "[E] 상호작용"
 
 [node name="PlayerLight" type="PointLight2D" parent="."]
 energy = 1.3
+shadow_enabled = true
+shadow_filter = 1
+shadow_filter_smooth = 2.0
 texture = SubResource("GradientTexture2D_player_light")
 texture_scale = 1.3
 
