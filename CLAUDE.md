@@ -2,6 +2,40 @@
 
 이 저장소는 issue-first workflow를 사용합니다. Claude Code는 새 기능, 버그 수정, 개선, 리팩터링, 동작 변경을 시작하기 전에 이 하네스를 따라야 합니다.
 
+## 게임 정보 (방과 후)
+
+2D 탑다운 공포 방탈출, Godot 4.6. 주인공 이설이 밤 10시 30분 국어책을 가지러 학교에 갔다가 갇히고, 5층 미술실에서 시작해 1층 현관으로 탈출한다.
+시나리오 문서: https://docs.google.com/document/d/1q5yRBDpXJDYmvcUaN82z0U_xv3DtuZPG5ipWiTHMZVc
+
+### 씬 흐름
+
+main_menu → intro(프롤로그 장면 그래프: 집→TV→정문→뒷문→미술실→규칙 칠판→분기 2개+사망 엔딩, scripts/ui/intro.gd의 SCRIPT_NODES) → main(게임 본편) → ending(기본 엔딩) → main_menu
+
+### 구조 요약
+
+- `scenes/main/main.tscn` = 조립 씬: Darkness(CanvasModulate 어둠), Background(층 씬 인스턴스), Player, GameState, HUD, UI(FloorLabel·FadeRect). 루트 스크립트 `scripts/game/floor_manager.gd`가 층 전환·시작 힌트·페이드 담당.
+- 층 씬 `scenes/background/school_floor_1~5.tscn`: 2800×1800, 공통 뼈대(상단 교실 8칸). 계단실 2곳은 전 층 동일 좌표 — 좌상단 (120,720)~(560,1000), 중앙 하단 (1180,1400)~(1560,1680).
+- 벽 규약: 두께 16px, 방 문 폭 110px(가로 중앙, 방 중심 y<900이면 아래변/아니면 위변). 벽은 충돌(WC_*)+시각(WV_*)+광원 차단(Occ_/LO_*) 3종 세트 — 벽 수정 시 셋 다 갱신. 생성 도구는 `tools/`(재실행 경고는 각 스크립트 주석 참조).
+- 계단: 가운데 난간으로 반 분할(왼쪽=위층▲, 오른쪽=아래층▼). 층 전환 트리거 존·도착점은 floor_manager.gd 상수. 입구는 층별 열쇠 `stair_key_N`으로 개방(소모형, 한 번에 그 층 2곳 개방).
+- 상태 영속: `scripts/game/game_state.gd` — 인벤토리(최대 5개), 플래그(set_flag/has_flag)로 문 개방·아이템 획득 기록(층 씬이 재로드돼도 유지).
+- 상호작용(E): `scripts/interactions/` — interactable(조사), locked_door(열쇠 문), pickup_item(접촉 획득), exit_door(현관 탈출→엔딩). Area2D는 collision_layer 2, prompt_text로 "[E] …" 안내 표시.
+- 조명: main의 CanvasModulate + 플레이어 PointLight2D(shadow_enabled) — 벽 차단체 때문에 벽 너머는 보이지 않음. 문·창문 틈으로만 빛이 샘.
+- UI: R 인벤토리 패널(5슬롯), 좌상단 HUD(목표/소지품)+층 표시, 하단 알림(game_state.request_notice).
+
+### 진행 요소 위치
+
+- 5층: 미술실(시작, 문 영구 잠금) → 아래쪽 창문 → 남쪽 외벽 난간 → 빈 교실 창문 → 복도. 계단 열쇠는 보건실. 미술실 칠판 조사 가능.
+- 계단 열쇠: 4층 과학 실험실, 3층 방송실, 2층 체력단련실, 1층 행정실(복귀용).
+- 1층: 수위실(실종자 물품·금고 일지·현관 열쇠꾸러미 front_gate_key) → 현관 로비 남쪽 현관에서 E → 기본 엔딩.
+- 미구현: 괴물 추격 AI(시나리오 #5), 숨은 엔딩(#11, 손전등 처치+국어책 일지), 옥상 씬.
+
+### 개발 시 주의
+
+- 이 환경에는 Godot 바이너리가 없음 — 실행 검증(F5)은 사용자가 수동으로 함. 정적 검증(기하·경로 대조 스크립트)을 기록하고 PR을 연 뒤 사용자 확인을 기다린다.
+- .tscn 수정 시 `load_steps` = ext_resource 수 + sub_resource 수 + 1 유지.
+- project.godot에 사용자의 미커밋 변경이 있을 수 있음 — 내 커밋에 섞지 말 것(필요 시 stash로 분리).
+- .gd 스크립트를 새로 만들면 사용자 에디터가 .uid 파일을 생성함 — 발견 시 해당 이슈 브랜치에 커밋.
+
 ## Issue-First Rule
 
 - 기능, 버그 수정, 개선, 리팩터링 작업은 GitHub 이슈 없이 구현을 시작하지 않습니다.
