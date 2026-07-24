@@ -8,6 +8,9 @@
   FILES에서 제외하거나 수동 벽을 다시 넣어야 한다.
 - 벽을 바꾸면 광원 차단체(Occluders)와 어긋난다 — gen_occluders.py를 다시 돌릴 것
   (기존 Occluders 섹션·Occ_ sub_resource를 먼저 제거해야 함).
+- 벽 시각(RoomWallVisuals)은 어둠(CanvasModulate)을 받지 않는 WallGlow
+  CanvasLayer(layer 1) 아래에 산다(#117) — 이 도구도 그 부모로 생성한다.
+  대상 층에 WallGlow 노드가 없으면 먼저 만들어야 한다(Godot 부모 누락 에러 방지).
 
 규약: 벽 두께 16px, 문 폭 110px(방 가로 중앙), 방 중심 y<900이면 문은 아래변/아니면 위변.
 """
@@ -16,7 +19,8 @@ import re, pathlib
 T = 16        # 벽 두께
 D = 110       # 문 틈 폭
 CENTER_Y = 900
-WALL_COLOR = "Color(0.32, 0.32, 0.37, 1)"
+# WallGlow 레이어 위(어둠 제외)이므로 이 색이 곧 최종 화면색이다(#117).
+WALL_COLOR = "Color(0.45, 0.48, 0.55, 1)"
 DOOR_COLOR = "Color(0.45, 0.32, 0.2, 1)"
 
 FILES = [f"scenes/background/school_floor_{i}.tscn" for i in range(1, 6)]
@@ -59,13 +63,13 @@ def gen_for_room(name, x0, y0, x1, y1):
             f'polygon = {rect_poly(ax, ay, bx, by)}\n'
         )
         vis.append(
-            f'[node name="WV_{nm}" type="Polygon2D" parent="RoomWallVisuals"]\n'
+            f'[node name="WV_{nm}" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]\n'
             f'color = {WALL_COLOR}\n'
             f'polygon = {rect_poly(ax, ay, bx, by)}\n'
         )
     ax, ay, bx, by = door
     vis.append(
-        f'[node name="Door_{name}" type="Polygon2D" parent="RoomWallVisuals"]\n'
+        f'[node name="Door_{name}" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]\n'
         f'color = {DOOR_COLOR}\n'
         f'polygon = {rect_poly(ax, ay, bx, by)}\n'
     )
@@ -101,7 +105,7 @@ for rel in FILES:
     block = (
         '[node name="RoomWalls" type="StaticBody2D" parent="."]\n\n'
         + "\n".join(col_all)
-        + '\n[node name="RoomWallVisuals" type="Node2D" parent="."]\n\n'
+        + '\n[node name="RoomWallVisuals" type="Node2D" parent="WallGlow"]\n\n'
         + "\n".join(vis_all)
     )
 
