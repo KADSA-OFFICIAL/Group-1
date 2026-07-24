@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/background/school_floor_5.tscn" id="1_floor"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -6,6 +6,8 @@
 [ext_resource type="Script" path="res://scripts/game/game_state.gd" id="4_game_state"]
 [ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="5_hud"]
 [ext_resource type="PackedScene" path="res://scenes/npc/janitor.tscn" id="6_janitor"]
+[ext_resource type="Texture2D" path="res://scenes/main/wall_fade_mask.tres" id="7_fade_mask"]
+[ext_resource type="Script" path="res://scripts/game/wall_fade_mask.gd" id="8_fade_mask"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("3_floor_manager")
@@ -20,6 +22,15 @@ position = Vector2(1325, 940)
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
 position = Vector2(260, 1380)
+
+[node name="WallFade" type="CanvasLayer" parent="."]
+layer = 1
+follow_viewport_enabled = true
+
+[node name="Mask" type="Sprite2D" parent="WallFade"]
+scale = Vector2(4, 4)
+texture = ExtResource("7_fade_mask")
+script = ExtResource("8_fade_mask")
 
 [node name="GameState" type="Node" parent="."]
 script = ExtResource("4_game_state")
