@@ -32,10 +32,12 @@ const NEIGHBORS := {
 	"lower_e": ["lower_mid"],
 }
 const ARRIVE_DISTANCE := 6.0
-const STUCK_SECONDS := 1.2
+const STUCK_SECONDS := 0.6      # 목표에 가까워지지 않는 상태가 이만큼 이어지면 막힌 것으로 본다
 const REPATH_SECONDS := 0.3     # 추적 경로 재계산 주기
 const CONTACT_DISTANCE := 30.0  # 이 안까지 붙으면 멈춰 마주본다(페널티는 후속 이슈)
 const WALL_MASK := 1            # LOS 레이캐스트 대상(벽·바리케이드)
+const BODY_CLEARANCE := 15.0    # 몸통 반폭(캡슐 18×30의 최대 반경) — 지날 수 있는 틈인지 판정
+const UNSTICK_SECONDS := 0.35   # 벽에 걸렸을 때 벽을 타고 도는 시간
 
 var player: CharacterBody2D = null
 var my_floor: int = -1
@@ -47,10 +49,13 @@ var previous_waypoint: String = ""
 
 # 추적 상태: 비어 있으면 직진 추격, 아니면 따라갈 웨이포인트 이름 목록
 var chase_path: Array[String] = []
+var path_locked: bool = false   # 우회 확정 — 다음 웨이포인트에 닿기 전엔 직진 단축 금지
 var repath_timer: float = 0.0
+var unstick_time: float = 0.0
+var unstick_direction: Vector2 = Vector2.ZERO
 
 var stuck_time: float = 0.0
-var last_position: Vector2 = Vector2.ZERO
+var last_goal_distance: float = INF
 
 @onready var body: Polygon2D = $Body
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
@@ -90,9 +95,10 @@ func _spawn_away_from(player_position: Vector2) -> void:
 	previous_waypoint = best
 	target_waypoint = NEIGHBORS[best].pick_random()
 	chase_path.clear()
+	path_locked = false
 	repath_timer = 0.0
-	stuck_time = 0.0
-	last_position = position
+	unstick_time = 0.0
+	_reset_progress()
 
 
 func _physics_process(delta: float) -> void:
@@ -115,8 +121,16 @@ func _move_chase(delta: float) -> void:
 	if to_player <= CONTACT_DISTANCE:
 		velocity = Vector2.ZERO
 		body.rotation = position.direction_to(player.position).angle() - Vector2.UP.angle()
-		stuck_time = 0.0
-		last_position = position
+		unstick_time = 0.0
+		_reset_progress()
+		return
+
+	# 벽에 걸린 직후에는 잠깐 벽을 타고 돌아 몸을 빼낸다(경로 판단은 그 뒤에).
+	if unstick_time > 0.0:
+		unstick_time -= delta
+		velocity = unstick_direction * chase_speed
+		move_and_slide()
+		body.rotation = unstick_direction.angle() - Vector2.UP.angle()
 		return
 
 	repath_timer -= delta
@@ -124,31 +138,45 @@ func _move_chase(delta: float) -> void:
 		repath_timer = REPATH_SECONDS
 		_update_chase_path()
 
-	if chase_path.is_empty():
-		_step_toward(player.position, chase_speed, delta)
-	else:
-		var next_point: Vector2 = WAYPOINTS[chase_path[0]]
-		if position.distance_to(next_point) <= ARRIVE_DISTANCE:
+	var goal: Vector2 = player.position
+	if not chase_path.is_empty():
+		goal = WAYPOINTS[chase_path[0]]
+		if position.distance_to(goal) <= ARRIVE_DISTANCE:
 			chase_path.pop_front()
+			path_locked = false  # 우회 한 구간을 소화 — 다시 직진 단축을 검토할 수 있다
+			_reset_progress()
 			return
-		_step_toward(next_point, chase_speed, delta)
+	_step_toward(goal, chase_speed, delta)
 
-	# 벽 모서리·문 틈에 걸려 제자리면 그래프로 복귀해 경로를 다시 짠다.
+	# 벽 모서리·문 틈에 걸려 목표에 가까워지지 못하면 그래프로 우회하고 몸을 빼낸다.
 	# 플레이어를 바로 앞에 두고 몸이 부딪혀 멈춘 것은 스턱으로 치지 않는다.
 	if stuck_time >= STUCK_SECONDS and to_player > CONTACT_DISTANCE * 2.0:
 		chase_path = _build_chase_path()
-		repath_timer = REPATH_SECONDS * 3.0
-		stuck_time = 0.0
+		path_locked = true
+		repath_timer = REPATH_SECONDS
+		_begin_unstick(goal)
+		_reset_progress()
 
 
 func _update_chase_path() -> void:
-	if _clear_line(position, player.position):
-		chase_path.clear()
+	# 우회를 확정했으면 다음 웨이포인트에 닿기 전까지 직진 단축으로 되돌리지 않는다.
+	# (없으면 모서리 옆에서 직진↔우회가 0.3초마다 왕복하며 계속 끼인다)
+	if path_locked and not chase_path.is_empty():
 		return
+
+	if _clear_line(position, player.position):
+		if not chase_path.is_empty():
+			chase_path.clear()
+			_reset_progress()
+		return
+
+	var previous_goal: String = "" if chase_path.is_empty() else chase_path[0]
 	chase_path = _build_chase_path()
 	# 이미 지나친(또는 안 거쳐도 보이는) 앞 노드는 건너뛰어 되돌아가는 걸음을 없앤다.
 	while chase_path.size() >= 2 and _clear_line(position, WAYPOINTS[chase_path[1]]):
 		chase_path.pop_front()
+	if chase_path.is_empty() or chase_path[0] != previous_goal:
+		_reset_progress()
 
 
 func _build_chase_path() -> Array[String]:
@@ -192,11 +220,42 @@ func _bfs_path(from: String, to: String) -> Array[String]:
 	return path
 
 
-## 두 점 사이에 벽이 없는지 레이캐스트로 확인(자신·플레이어 몸은 제외).
+## 두 점 사이를 "몸통이" 지날 수 있는지 확인(자신·플레이어 몸은 제외).
+## 중심선 한 발만 쏘면 두께가 0이라 벽 모서리를 스치는 경로도 뚫린 것으로 보고돼
+## 직진 추격에 들어갔다가 몸이 끼인다. 진행 방향 수직으로 몸통 반폭만큼 벌린
+## 평행선까지 검사해 실제로 통과 가능한 폭인지 본다.
 func _clear_line(from: Vector2, to: Vector2) -> bool:
-	var query := PhysicsRayQueryParameters2D.create(from, to, WALL_MASK, [get_rid(), player.get_rid()])
+	if not _clear_ray(from, to):
+		return false
+	var side := from.direction_to(to).orthogonal() * BODY_CLEARANCE
+	return _clear_ray(from + side, to + side) and _clear_ray(from - side, to - side)
+
+
+func _clear_ray(from: Vector2, to: Vector2) -> bool:
+	var exclude: Array[RID] = [get_rid()]
+	if player != null:
+		exclude.append(player.get_rid())
+	var query := PhysicsRayQueryParameters2D.create(from, to, WALL_MASK, exclude)
+	query.hit_from_inside = true  # 벽에 붙어 시작한 평행선이 그 벽을 놓치지 않게
 	var hit := get_world_2d().direct_space_state.intersect_ray(query)
 	return hit.is_empty()
+
+
+## 마지막 충돌면의 접선 중 목표에 가까워지는 쪽으로 잠깐 벽을 타고 돈다.
+func _begin_unstick(goal: Vector2) -> void:
+	var collision := get_last_slide_collision()
+	if collision == null:
+		return
+	var tangent := collision.get_normal().orthogonal()
+	if position.direction_to(goal).dot(tangent) < 0.0:
+		tangent = -tangent
+	unstick_direction = tangent
+	unstick_time = UNSTICK_SECONDS
+
+
+func _reset_progress() -> void:
+	stuck_time = 0.0
+	last_goal_distance = INF
 
 
 # ── 순찰 (층이 어긋났을 때의 폴백) ───────────────────────────────
@@ -220,7 +279,7 @@ func _pick_next_waypoint() -> void:
 		options.erase(previous_waypoint)
 	previous_waypoint = target_waypoint
 	target_waypoint = options.pick_random()
-	stuck_time = 0.0
+	_reset_progress()
 
 
 func _turn_around() -> void:
@@ -228,7 +287,7 @@ func _turn_around() -> void:
 		var swap := target_waypoint
 		target_waypoint = previous_waypoint
 		previous_waypoint = swap
-	stuck_time = 0.0
+	_reset_progress()
 
 
 # ── 공통 이동 ────────────────────────────────────────────────────
@@ -239,8 +298,11 @@ func _step_toward(target: Vector2, move_speed: float, delta: float) -> void:
 	move_and_slide()
 	body.rotation = direction.angle() - Vector2.UP.angle()
 
-	if position.distance_to(last_position) < move_speed * delta * 0.25:
+	# 이동량이 아니라 "목표까지 가까워졌는지"로 막힘을 판정한다. 벽에 비스듬히 끼면
+	# move_and_slide가 벽을 따라 옆으로 밀어내므로 이동량 기준은 계속 "움직이는 중"이 된다.
+	var goal_distance := position.distance_to(target)
+	if goal_distance > last_goal_distance - move_speed * delta * 0.25:
 		stuck_time += delta
 	else:
 		stuck_time = 0.0
-	last_position = position
+	last_goal_distance = goal_distance
