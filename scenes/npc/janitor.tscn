@@ -7,6 +7,7 @@ radius = 9.0
 height = 30.0
 
 [node name="Janitor" type="CharacterBody2D"]
+motion_mode = 1
 script = ExtResource("1_janitor_script")
 
 [node name="Body" type="Polygon2D" parent="."]
