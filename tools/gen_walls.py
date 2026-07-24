@@ -20,7 +20,7 @@ T = 16        # 벽 두께
 D = 110       # 문 틈 폭
 CENTER_Y = 900
 # WallGlow 레이어 위(어둠 제외)이므로 이 색이 곧 최종 화면색이다(#117).
-WALL_COLOR = "Color(0.42, 0.47, 0.64, 1)"
+WALL_COLOR = "Color(0.45, 0.48, 0.55, 1)"
 DOOR_COLOR = "Color(0.45, 0.32, 0.2, 1)"
 
 FILES = [f"scenes/background/school_floor_{i}.tscn" for i in range(1, 6)]
