@@ -14,6 +14,7 @@ const FLOOR_SCENES := {
 const MIN_FLOOR := 1
 const MAX_FLOOR := 5
 const START_FLOOR := 5
+const JANITOR_FREE_FLOOR := 5  # 수위아저씨가 나타나지 않는 층
 
 # 전환 트리거 존: 각 계단실 반쪽의 안쪽 끝 (인덱스 0=좌상단 계단, 1=중앙 하단 계단)
 const UP_ZONES := [Rect2(136, 930, 196, 54), Rect2(1196, 1610, 166, 54)]
@@ -27,6 +28,7 @@ var current_floor: int = START_FLOOR
 var changing_floor: bool = false
 
 @onready var player: CharacterBody2D = $Player
+@onready var janitor: CharacterBody2D = $Janitor
 @onready var floor_label: Label = $UI/FloorLabel
 @onready var fade_rect: ColorRect = $UI/FadeRect
 
@@ -38,6 +40,7 @@ const START_HINT := "문은 잠겨서 열리지 않는다. …아래쪽 창문�
 
 func _ready() -> void:
 	_update_floor_label()
+	janitor.sync_floor(current_floor != JANITOR_FREE_FLOOR, current_floor, player, $Background)
 	fade_rect.color.a = 1.0
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 0.0, FADE_IN_SECONDS)
@@ -92,6 +95,9 @@ func _swap_floor(target: int, arrive: Vector2) -> void:
 	player.position = arrive
 	current_floor = target
 	_update_floor_label()
+	# 새 층 씬의 벽으로 수위 경로탐색 격자를 다시 만든다(위에서 add_child 완료됨)
+	janitor.sync_floor(current_floor != JANITOR_FREE_FLOOR, current_floor, player,
+		next_background)
 
 	var camera: Camera2D = player.get_node_or_null("Camera2D")
 	if camera != null:
