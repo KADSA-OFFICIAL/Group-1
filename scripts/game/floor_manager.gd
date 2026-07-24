@@ -40,7 +40,7 @@ const START_HINT := "문은 잠겨서 열리지 않는다. …아래쪽 창문�
 
 func _ready() -> void:
 	_update_floor_label()
-	janitor.sync_floor(current_floor != JANITOR_FREE_FLOOR, current_floor, player)
+	janitor.sync_floor(current_floor != JANITOR_FREE_FLOOR, current_floor, player, $Background)
 	fade_rect.color.a = 1.0
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 0.0, FADE_IN_SECONDS)
@@ -95,7 +95,9 @@ func _swap_floor(target: int, arrive: Vector2) -> void:
 	player.position = arrive
 	current_floor = target
 	_update_floor_label()
-	janitor.sync_floor(current_floor != JANITOR_FREE_FLOOR, current_floor, player)
+	# 새 층 씬의 벽으로 수위 경로탐색 격자를 다시 만든다(위에서 add_child 완료됨)
+	janitor.sync_floor(current_floor != JANITOR_FREE_FLOOR, current_floor, player,
+		next_background)
 
 	var camera: Camera2D = player.get_node_or_null("Camera2D")
 	if camera != null:
