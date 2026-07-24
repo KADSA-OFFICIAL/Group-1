@@ -7,7 +7,7 @@ extends CharacterBody2D
 ## 활성/비활성과 스폰 위치는 floor_manager가 sync_floor로 제어한다.
 
 @export var patrol_speed: float = 110.0
-@export var chase_speed: float = 260.0
+@export var chase_speed: float = 220.0
 
 # 복도 웨이포인트 — 전 층 공통 좌표(방·계단실·외벽 충돌 rect와 겹치지 않음).
 # stair_top_*: 좌상단 계단실 위 복도, main_*: 메인 복도(y=940), lower_*: 아래 복도(y=1360)
