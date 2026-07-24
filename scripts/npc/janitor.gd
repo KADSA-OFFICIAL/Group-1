@@ -49,6 +49,10 @@ var player: CharacterBody2D = null
 var my_floor: int = -1
 var player_floor: int = -1
 
+# F3 디버그 오버레이 — 이 환경에 Godot이 없어 실행 관찰을 사용자가 대신 해야 한다.
+# 이상 동작이 보일 때 켜서 "직진인가 우회인가 / LOS가 막혔다고 보는가"를 확인한다.
+var debug_draw: bool = false
+
 # 순찰(폴백) 상태
 var target_waypoint: String = "main_mid"
 var previous_waypoint: String = ""
@@ -117,6 +121,18 @@ func _physics_process(delta: float) -> void:
 		_move_chase(delta)
 	else:
 		_move_patrol(delta)
+
+	if debug_draw:
+		queue_redraw()
+
+
+## project.godot에 입력 액션을 추가하지 않으려고 키코드를 직접 본다
+## (사용자 미커밋 변경이 있는 파일이라 건드리지 않는다).
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo \
+			and event.keycode == KEY_F3:
+		debug_draw = not debug_draw
+		queue_redraw()
 
 
 ## 혹시 모를 어긋남 대비: 플레이어가 수위와 같은 층에 있을 때만 추적한다.
@@ -266,6 +282,43 @@ func _clear_ray(from: Vector2, to: Vector2) -> bool:
 	var query := PhysicsRayQueryParameters2D.create(from, to, WALL_MASK, exclude)
 	var hit := get_world_2d().direct_space_state.intersect_ray(query)
 	return hit.is_empty()
+
+
+# ── 디버그 오버레이 (F3) ─────────────────────────────────────────
+
+func _draw() -> void:
+	if not debug_draw:
+		return
+
+	var font := ThemeDB.fallback_font
+	var mode := "직진"
+	if not _is_chasing():
+		mode = "순찰"
+	elif not chase_path.is_empty():
+		mode = "우회(%d)" % chase_path.size()
+
+	# 우회 경로 — 첫 선분은 자기 위치(로컬 원점)에서 첫 웨이포인트로
+	var previous := Vector2.ZERO
+	for i in chase_path.size():
+		var point := to_local(WAYPOINTS[chase_path[i]])
+		draw_circle(point, 7.0, Color(0.3, 0.9, 1.0, 0.8))
+		draw_line(previous, point, Color(0.3, 0.9, 1.0, 0.6), 2.0)
+		previous = point
+
+	if player != null:
+		# 플레이어까지 LOS 프로브 3발 — 통과=초록 / 차단=빨강
+		var target := player.position
+		var side := _side_offset(position.direction_to(target))
+		for offset in [Vector2.ZERO, side, -side]:
+			var from: Vector2 = position + offset
+			var to: Vector2 = target + offset
+			var color := Color(0.2, 1.0, 0.3, 0.7) if _clear_ray(from, to) \
+				else Color(1.0, 0.25, 0.2, 0.7)
+			draw_line(to_local(from), to_local(to), color, 1.5)
+
+	draw_string(font, Vector2(-40, -34), "%s  stuck %.2f  block %.2f"
+		% [mode, stuck_time, direct_block_time], HORIZONTAL_ALIGNMENT_LEFT, -1, 13,
+		Color(1, 1, 0.6, 1))
 
 
 # ── 순찰 (층이 어긋났을 때의 폴백) ───────────────────────────────
