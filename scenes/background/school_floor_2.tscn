@@ -337,6 +337,16 @@ polygon = PackedVector2Array(0, 0, 2800, 0, 2800, 1800, 0, 1800)
 layer = 1
 follow_viewport_enabled = true
 
+[node name="SUBarrierVisual" type="Polygon2D" parent="WallGlow"]
+z_index = 1
+color = Color(0.35, 0.18, 0.15, 1)
+polygon = PackedVector2Array(230, 720, 450, 720, 450, 736, 230, 736)
+
+[node name="SDBarrierVisual" type="Polygon2D" parent="WallGlow"]
+z_index = 1
+color = Color(0.35, 0.18, 0.15, 1)
+polygon = PackedVector2Array(1260, 1400, 1480, 1400, 1480, 1416, 1260, 1416)
+
 [node name="Rooms" type="Node2D" parent="."]
 
 [node name="Class1" type="Polygon2D" parent="Rooms"]
@@ -560,11 +570,6 @@ polygon = PackedVector2Array(1362, 1400, 1378, 1400, 1378, 1680, 1362, 1680)
 
 [node name="SUBarrier" type="StaticBody2D" parent="StairLocks"]
 
-[node name="SUBarrierVisual" type="Polygon2D" parent="StairLocks/SUBarrier"]
-z_index = 1
-color = Color(0.35, 0.18, 0.15, 1)
-polygon = PackedVector2Array(230, 720, 450, 720, 450, 736, 230, 736)
-
 [node name="SUBarrierCollision" type="CollisionPolygon2D" parent="StairLocks/SUBarrier"]
 polygon = PackedVector2Array(230, 720, 450, 720, 450, 736, 230, 736)
 
@@ -573,11 +578,6 @@ occluder = SubResource("Occ_SUBarrierCollision")
 
 
 [node name="SDBarrier" type="StaticBody2D" parent="StairLocks"]
-
-[node name="SDBarrierVisual" type="Polygon2D" parent="StairLocks/SDBarrier"]
-z_index = 1
-color = Color(0.35, 0.18, 0.15, 1)
-polygon = PackedVector2Array(1260, 1400, 1480, 1400, 1480, 1416, 1260, 1416)
 
 [node name="SDBarrierCollision" type="CollisionPolygon2D" parent="StairLocks/SDBarrier"]
 polygon = PackedVector2Array(1260, 1400, 1480, 1400, 1480, 1416, 1260, 1416)
@@ -598,7 +598,7 @@ barrier_path = NodePath("../StairLocks")
 prompt_text = "계단 열기"
 door_id = "stairs_f2_unlocked"
 consume_key = true
-also_remove_paths = Array[NodePath]([NodePath("../SDLock")])
+also_remove_paths = Array[NodePath]([NodePath("../SDLock"), NodePath("../WallGlow/SUBarrierVisual"), NodePath("../WallGlow/SDBarrierVisual")])
 
 [node name="SULockZone" type="CollisionShape2D" parent="SULock"]
 shape = SubResource("RectangleShape2D_stair_zone")
@@ -615,7 +615,7 @@ barrier_path = NodePath("../StairLocks")
 prompt_text = "계단 열기"
 door_id = "stairs_f2_unlocked"
 consume_key = true
-also_remove_paths = Array[NodePath]([NodePath("../SULock")])
+also_remove_paths = Array[NodePath]([NodePath("../SULock"), NodePath("../WallGlow/SUBarrierVisual"), NodePath("../WallGlow/SDBarrierVisual")])
 
 [node name="SDLockZone" type="CollisionShape2D" parent="SDLock"]
 shape = SubResource("RectangleShape2D_stair_zone")
