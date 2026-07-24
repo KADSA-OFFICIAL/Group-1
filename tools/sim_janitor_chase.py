@@ -1,0 +1,439 @@
+#!/usr/bin/env python3
+"""수위아저씨 추격 제어 루프를 실제 층 지오메트리 위에서 시간축 시뮬레이션한다.
+
+이 맥에는 Godot 바이너리가 없어 F5 검증을 개발자가 할 수 없다. 추격 로직은
+"정적으로는 맞아 보이는데 실제로는 어긋나는" 실패를 여러 번 냈기 때문에,
+제어 루프를 프레임 단위로 돌려 도달률과 뒤로 가는 시간을 수치로 비교한다.
+
+사용법:
+    python3 tools/sim_janitor_chase.py [층번호 ...]      # 기본: 2 3
+
+무엇을 재현하는가
+- janitor.gd의 _clear_line(중심 + 진행방향 수직 ±몸통반폭, hit_from_inside 없음)
+- 격자 A*: 벽 AABB를 몸통 반폭만큼 부풀려 칸 중심이 그 안이면 통행 불가,
+  대각선은 양옆이 뚫린 경우만, 경로 지점은 칸 중심
+- 경로 다듬기: 앞쪽 PATH_LOOKAHEAD개 중 시야가 트인 가장 먼 지점으로 건너뜀
+- move_and_slide: 축분리 이동(FLOATING 모드의 벽 슬라이드 근사)
+
+근사(주의)
+- 콜리전 캡슐(18×30)을 AABB로 다룬다 — 모서리에서 실제와 미세하게 다르다.
+- 플레이어는 정지 상태로 둔다(결정론 확보). 실제 추격은 움직이는 표적이다.
+"""
+import heapq
+import math
+import pathlib
+import random
+import re
+import sys
+
+DT = 1.0 / 60.0
+CHASE_SPEED = 220.0
+ARRIVE = 6.0
+STUCK_SECONDS = 0.6
+PROGRESS_RATIO = 0.3
+REPATH = 0.3
+CONTACT = 30.0
+HALF_W, HALF_H, PROBE_MARGIN = 9.0, 15.0, 1.0
+CELL = 25.0
+GRID_W, GRID_H = 112, 72
+LOOKAHEAD = 12
+
+# 교체 전 구현(웨이포인트 8노드 + direct_block_time) — 비교 기준
+OLD_WAYPOINTS = {
+    "stair_top_w": (170, 670), "stair_top_e": (620, 670), "main_w": (620, 940),
+    "main_mid": (1325, 940), "main_e": (2600, 940), "lower_mid": (1325, 1360),
+    "lower_w": (170, 1360), "lower_e": (2600, 1360),
+}
+OLD_NEIGHBORS = {
+    "stair_top_w": ["stair_top_e"], "stair_top_e": ["stair_top_w", "main_w"],
+    "main_w": ["stair_top_e", "main_mid"], "main_mid": ["main_w", "main_e", "lower_mid"],
+    "main_e": ["main_mid"], "lower_mid": ["main_mid", "lower_w", "lower_e"],
+    "lower_w": ["lower_mid"], "lower_e": ["lower_mid"],
+}
+OLD_DIRECT_BLOCK = 1.0
+
+ROOT = pathlib.Path(__file__).resolve().parent.parent
+
+
+# ── 층 씬에서 벽 수집 (janitor.gd _collect_blockers와 같은 규칙) ──────────
+
+def load_blockers(floor: int) -> list[tuple[float, float, float, float]]:
+    text = (ROOT / f"scenes/background/school_floor_{floor}.tscn").read_text()
+    shapes = {
+        m.group(1): [float(v) for v in m.group(2).split(",")]
+        for m in re.finditer(
+            r'\[sub_resource type="RectangleShape2D" id="([^"]+)"\]\s*\nsize = Vector2\(([^)]*)\)',
+            text)
+    }
+    static_bodies = {
+        m.group(1) for m in re.finditer(
+            r'\[node name="([^"]+)" type="StaticBody2D"', text)
+    }
+    node_re = re.compile(
+        r'\[node name="([^"]+)" type="([^"]+)"(?: parent="([^"]+)")?\]\s*\n'
+        r'((?:[a-z_].*\n)*)', re.M)
+
+    out = []
+    for match in node_re.finditer(text):
+        name, kind, parent, body = (match.group(1), match.group(2),
+                                    match.group(3) or "", match.group(4))
+        # 부모가 StaticBody2D인 도형만 (Area2D 상호작용 존 제외)
+        if parent.split("/")[-1] not in static_bodies:
+            continue
+        if kind == "CollisionPolygon2D":
+            poly = re.search(r'polygon = PackedVector2Array\(([^)]*)\)', body)
+            if not poly:
+                continue
+            nums = [float(v) for v in poly.group(1).split(",")]
+            xs, ys = nums[0::2], nums[1::2]
+            out.append((min(xs), min(ys), max(xs), max(ys)))
+        elif kind == "CollisionShape2D":
+            pos = re.search(r'position = Vector2\(([^)]*)\)', body)
+            shp = re.search(r'shape = SubResource\("([^"]+)"\)', body)
+            if not (shp and shp.group(1) in shapes):
+                continue
+            cx, cy = ([float(v) for v in pos.group(1).split(",")] if pos else [0.0, 0.0])
+            w, h = shapes[shp.group(1)]
+            out.append((cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2))
+    return out
+
+
+# ── 시야 판정 (_clear_line) ───────────────────────────────────────────────
+
+def _ray_hits(a, b, rect) -> bool:
+    x0, y0, x1, y1 = rect
+    ax, ay = a
+    if x0 <= ax <= x1 and y0 <= ay <= y1:
+        return False                      # hit_from_inside = false
+    dx, dy = b[0] - ax, b[1] - ay
+    tmin, tmax = 0.0, 1.0
+    for p, d, lo, hi in ((ax, dx, x0, x1), (ay, dy, y0, y1)):
+        if abs(d) < 1e-12:
+            if p < lo or p > hi:
+                return False
+            continue
+        t1, t2 = (lo - p) / d, (hi - p) / d
+        if t1 > t2:
+            t1, t2 = t2, t1
+        tmin, tmax = max(tmin, t1), min(tmax, t2)
+        if tmin > tmax:
+            return False
+    return True
+
+
+def clear_ray(a, b, rects) -> bool:
+    return not any(_ray_hits(a, b, r) for r in rects)
+
+
+def clear_line(a, b, rects) -> bool:
+    length = math.dist(a, b)
+    if length < 1e-9:
+        return True
+    if not clear_ray(a, b, rects):
+        return False
+    dx, dy = (b[0] - a[0]) / length, (b[1] - a[1]) / length
+    px, py = dy, -dx                       # Vector2.orthogonal()
+    extent = max(abs(px) * HALF_W + abs(py) * HALF_H - PROBE_MARGIN, 0.0)
+    ox, oy = px * extent, py * extent
+    return (clear_ray((a[0] + ox, a[1] + oy), (b[0] + ox, b[1] + oy), rects)
+            and clear_ray((a[0] - ox, a[1] - oy), (b[0] - ox, b[1] - oy), rects))
+
+
+# ── 물리 근사 ────────────────────────────────────────────────────────────
+
+def body_blocked(pos, rects) -> bool:
+    x0, y0 = pos[0] - HALF_W, pos[1] - HALF_H
+    x1, y1 = pos[0] + HALF_W, pos[1] + HALF_H
+    return any(x0 < r[2] and r[0] < x1 and y0 < r[3] and r[1] < y1 for r in rects)
+
+
+def move_and_slide(pos, vel, rects):
+    nx = pos[0] + vel[0] * DT
+    if body_blocked((nx, pos[1]), rects):
+        nx = pos[0]
+    ny = pos[1] + vel[1] * DT
+    if body_blocked((nx, ny), rects):
+        ny = pos[1]
+    return (nx, ny)
+
+
+# ── 격자 A* (교체 후 구현) ───────────────────────────────────────────────
+
+def cell_of(p):
+    return (int(math.floor(p[0] / CELL)), int(math.floor(p[1] / CELL)))
+
+
+def cell_center(c):
+    return (c[0] * CELL + CELL / 2, c[1] * CELL + CELL / 2)
+
+
+def build_grid(rects):
+    solid = [[False] * GRID_H for _ in range(GRID_W)]
+    for x0, y0, x1, y1 in rects:
+        gx0, gy0 = x0 - HALF_W, y0 - HALF_H
+        gx1, gy1 = x1 + HALF_W, y1 + HALF_H
+        c0, c1 = cell_of((gx0, gy0)), cell_of((gx1, gy1))
+        for cx in range(max(c0[0], 0), min(c1[0], GRID_W - 1) + 1):
+            for cy in range(max(c0[1], 0), min(c1[1], GRID_H - 1) + 1):
+                px, py = cell_center((cx, cy))
+                if gx0 <= px <= gx1 and gy0 <= py <= gy1:
+                    solid[cx][cy] = True
+    return solid
+
+
+def nearest_free(solid, point):
+    c = cell_of(point)
+    c = (min(max(c[0], 0), GRID_W - 1), min(max(c[1], 0), GRID_H - 1))
+    if not solid[c[0]][c[1]]:
+        return c
+    for radius in range(1, 8):
+        best, best_d = None, float("inf")
+        for dx in range(-radius, radius + 1):
+            for dy in range(-radius, radius + 1):
+                if abs(dx) != radius and abs(dy) != radius:
+                    continue
+                p = (c[0] + dx, c[1] + dy)
+                if not (0 <= p[0] < GRID_W and 0 <= p[1] < GRID_H) or solid[p[0]][p[1]]:
+                    continue
+                d = math.dist(cell_center(p), point)
+                if d < best_d:
+                    best_d, best = d, p
+        if best:
+            return best
+    return c
+
+
+NBR8 = [(1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+
+
+def astar(solid, start, goal):
+    if solid[start[0]][start[1]] or solid[goal[0]][goal[1]]:
+        return []
+    openh = [(math.dist(start, goal), 0.0, start)]
+    came, gscore = {start: None}, {start: 0.0}
+    while openh:
+        _, g, cur = heapq.heappop(openh)
+        if cur == goal:
+            break
+        if g > gscore.get(cur, 1e18):
+            continue
+        for dx, dy in NBR8:
+            n = (cur[0] + dx, cur[1] + dy)
+            if not (0 <= n[0] < GRID_W and 0 <= n[1] < GRID_H) or solid[n[0]][n[1]]:
+                continue
+            # DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
+            if dx and dy and (solid[cur[0] + dx][cur[1]] or solid[cur[0]][cur[1] + dy]):
+                continue
+            ng = g + math.hypot(dx, dy)
+            if ng < gscore.get(n, 1e18):
+                gscore[n] = ng
+                came[n] = cur
+                heapq.heappush(openh, (ng + math.dist(n, goal), ng, n))
+    if goal not in came:
+        return []
+    path, c = [], goal
+    while c:
+        path.append(cell_center(c))
+        c = came[c]
+    return path[::-1]
+
+
+def next_point(pos, path, rects, fallback):
+    if not path:
+        return fallback, path
+    limit = min(len(path), LOOKAHEAD)
+    index = 0
+    for i in range(limit - 1, -1, -1):
+        if clear_line(pos, path[i], rects):
+            index = i
+            break
+    while index > 0 and len(path) > 1:
+        path.pop(0)
+        index -= 1
+    if len(path) > 1 and math.dist(pos, path[0]) <= ARRIVE:
+        path.pop(0)
+    return path[0], path
+
+
+def run_grid(pos, player, rects, solid, seconds):
+    path, repath, stuck, backward, reached = [], 0.0, 0.0, 0, None
+    for frame in range(int(seconds / DT)):
+        if math.dist(pos, player) <= CONTACT:
+            reached = frame * DT
+            break
+        repath -= DT
+        if repath <= 0.0 or stuck >= STUCK_SECONDS:
+            repath, stuck = REPATH, 0.0
+            if clear_line(pos, player, rects):
+                path = []
+            else:
+                path = astar(solid, nearest_free(solid, pos), nearest_free(solid, player))
+        target, path = next_point(pos, path, rects, player)
+        length = math.dist(pos, target)
+        if length < 1e-9:
+            continue
+        d = ((target[0] - pos[0]) / length, (target[1] - pos[1]) / length)
+        before = pos
+        pos = move_and_slide(pos, (d[0] * CHASE_SPEED, d[1] * CHASE_SPEED), rects)
+        adv = (pos[0] - before[0]) * d[0] + (pos[1] - before[1]) * d[1]
+        stuck = stuck + DT if adv < CHASE_SPEED * DT * PROGRESS_RATIO else 0.0
+        if math.dist(pos, player) - math.dist(before, player) > 0.05:
+            backward += 1
+    return {"reached": reached, "backward": backward * DT,
+            "dist": math.dist(pos, player)}
+
+
+# ── 교체 전 구현 (비교 기준) ─────────────────────────────────────────────
+
+def _old_bfs(a, b):
+    came, queue = {a: None}, [a]
+    while queue:
+        cur = queue.pop(0)
+        if cur == b:
+            break
+        for n in OLD_NEIGHBORS[cur]:
+            if n not in came:
+                came[n] = cur
+                queue.append(n)
+    if b not in came:
+        return []
+    out, c = [], b
+    while c:
+        out.append(c)
+        c = came[c]
+    return out[::-1]
+
+
+_OLD_PATHS = {(a, b): _old_bfs(a, b) for a in OLD_WAYPOINTS for b in OLD_WAYPOINTS}
+
+
+def _old_reachable(point, rects):
+    out = [n for n in OLD_WAYPOINTS if clear_line(point, OLD_WAYPOINTS[n], rects)]
+    if out:
+        return out
+    return [min(OLD_WAYPOINTS, key=lambda n: math.dist(point, OLD_WAYPOINTS[n]))]
+
+
+def _old_build(pos, player, rects):
+    best, best_cost = [], float("inf")
+    for s in _old_reachable(pos, rects):
+        d0 = math.dist(pos, OLD_WAYPOINTS[s])
+        for e in _old_reachable(player, rects):
+            p = _OLD_PATHS[(s, e)]
+            cost = (d0 + sum(math.dist(OLD_WAYPOINTS[p[i - 1]], OLD_WAYPOINTS[p[i]])
+                             for i in range(1, len(p)))
+                    + math.dist(OLD_WAYPOINTS[e], player))
+            if cost < best_cost:
+                best_cost, best = cost, p
+    return list(best)
+
+
+def run_old(pos, player, rects, seconds):
+    path, repath, block, stuck, backward, reached = [], 0.0, 0.0, 0.0, 0, None
+    for frame in range(int(seconds / DT)):
+        to_player = math.dist(pos, player)
+        if to_player <= CONTACT:
+            reached = frame * DT
+            break
+        block = max(block - DT, 0.0)
+        repath -= DT
+        if repath <= 0.0:
+            repath = REPATH
+            if block <= 0.0 and clear_line(pos, player, rects):
+                path = []
+            else:
+                prev = path[0] if path else ""
+                path = _old_build(pos, player, rects)
+                if not path or path[0] != prev:
+                    stuck = 0.0
+        goal = player
+        if path:
+            goal = OLD_WAYPOINTS[path[0]]
+            if math.dist(pos, goal) <= ARRIVE:
+                path.pop(0)
+                stuck = 0.0
+                continue
+        length = math.dist(pos, goal)
+        if length < 1e-9:
+            continue
+        d = ((goal[0] - pos[0]) / length, (goal[1] - pos[1]) / length)
+        before = pos
+        pos = move_and_slide(pos, (d[0] * CHASE_SPEED, d[1] * CHASE_SPEED), rects)
+        adv = (pos[0] - before[0]) * d[0] + (pos[1] - before[1]) * d[1]
+        stuck = stuck + DT if adv < CHASE_SPEED * DT * PROGRESS_RATIO else 0.0
+        if stuck >= STUCK_SECONDS and to_player > CONTACT * 2.0:
+            block = OLD_DIRECT_BLOCK
+            path = _old_build(pos, player, rects)
+            repath, stuck = REPATH, 0.0
+        if math.dist(pos, player) - math.dist(before, player) > 0.05:
+            backward += 1
+    return {"reached": reached, "backward": backward * DT,
+            "dist": math.dist(pos, player)}
+
+
+# ── 평가 ─────────────────────────────────────────────────────────────────
+
+def evaluate(floor: int, seed: int = 11) -> bool:
+    rects = load_blockers(floor)
+    solid = build_grid(rects)
+    free = sum(1 for x in range(GRID_W) for y in range(GRID_H) if not solid[x][y])
+    print(f"\n=== {floor}층 · 벽 {len(rects)}개 · 격자 {GRID_W}×{GRID_H} "
+          f"(통행 가능 {free}칸) ===")
+
+    random.seed(seed)
+    spots = [(x, y) for x in range(60, 2760, 50) for y in range(60, 1760, 50)
+             if not body_blocked((x, y), rects)]
+    random.shuffle(spots)
+
+    all_ok = True
+    for label, lo, hi, count in (("근거리 80~350px", 80, 350, 90),
+                                 ("원거리 600~1500px", 600, 1500, 45)):
+        pairs = []
+        for start in spots:
+            near = [p for p in spots if lo <= math.dist(start, p) <= hi]
+            if near:
+                pairs.append((start, random.choice(near)))
+                if len(pairs) >= count:
+                    break
+
+        old_fail = new_fail = skipped = tested = 0
+        old_back = new_back = 0.0
+        for start, target in pairs:
+            path = astar(solid, nearest_free(solid, start), nearest_free(solid, target))
+            if not path:
+                skipped += 1          # 실제로 도달 불가(잠긴 계단실 등)
+                continue
+            length = sum(math.dist(path[i - 1], path[i]) for i in range(1, len(path)))
+            budget = max(4.0, 2.5 * length / CHASE_SPEED + 2.0)
+            tested += 1
+            old = run_old(start, target, rects, budget)
+            new = run_grid(start, target, rects, solid, budget)
+            old_fail += old["reached"] is None
+            new_fail += new["reached"] is None
+            old_back += old["backward"]
+            new_back += new["backward"]
+
+        if not tested:
+            continue
+        print(f"  [{label}] 검사 {tested}건 (도달불가 제외 {skipped}건)")
+        print(f"     교체 전(웨이포인트) 실패 {old_fail:>3}건 "
+              f"({old_fail / tested * 100:4.0f}%)  평균 뒤로 {old_back / tested:.2f}s")
+        print(f"     교체 후(격자 A*)    실패 {new_fail:>3}건 "
+              f"({new_fail / tested * 100:4.0f}%)  평균 뒤로 {new_back / tested:.2f}s")
+        if new_fail / tested > 0.10:
+            print("     ⚠ 목표(10% 이하) 미달")
+            all_ok = False
+    return all_ok
+
+
+def main() -> int:
+    floors = [int(a) for a in sys.argv[1:]] or [2, 3]
+    ok = True
+    for floor in floors:
+        ok = evaluate(floor) and ok
+    print("\n전체:", "PASS" if ok else "FAIL")
+    return 0 if ok else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
