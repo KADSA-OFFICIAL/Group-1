@@ -1,7 +1,8 @@
-[gd_scene load_steps=111 format=3]
+[gd_scene load_steps=112 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
+[ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="3_hiding"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_stair_zone"]
 size = Vector2(240, 56)
@@ -1818,3 +1819,51 @@ shape = SubResource("RectangleShape2D_wall_v")
 [node name="RightWall" type="CollisionShape2D" parent="Walls"]
 position = Vector2(2780, 900)
 shape = SubResource("RectangleShape2D_wall_v")
+
+[node name="HideClass1" type="Area2D" parent="."]
+position = Vector2(262, 362)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_hiding")
+prompt_text = "사물함에 숨기"
+message = "누군가의 사물함. 안쪽에 이름표가 떨어져 있다."
+
+[node name="HideClass1Visual" type="Polygon2D" parent="HideClass1"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+[node name="HideClass1Zone" type="CollisionShape2D" parent="HideClass1"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="HideClass6" type="Area2D" parent="."]
+position = Vector2(2238, 362)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_hiding")
+prompt_text = "사물함에 숨기"
+message = "문이 헐거운 사물함. 몸을 웅크리고 숨을 참았다."
+
+[node name="HideClass6Visual" type="Polygon2D" parent="HideClass6"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+[node name="HideClass6Zone" type="CollisionShape2D" parent="HideClass6"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="HideShower" type="Area2D" parent="."]
+position = Vector2(612, 1538)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_hiding")
+prompt_text = "샤워칸에 숨기"
+message = "샤워칸 커튼 뒤. 마른 배수구에서 쇠 냄새가 올라온다."
+
+[node name="HideShowerVisual" type="Polygon2D" parent="HideShower"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+[node name="HideShowerZone" type="CollisionShape2D" parent="HideShower"]
+shape = SubResource("RectangleShape2D_key_zone")

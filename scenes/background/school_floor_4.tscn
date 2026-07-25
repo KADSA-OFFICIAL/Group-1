@@ -1,7 +1,8 @@
-[gd_scene load_steps=101 format=3]
+[gd_scene load_steps=102 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
+[ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="3_hiding"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_stair_zone"]
 size = Vector2(240, 56)
@@ -1657,3 +1658,51 @@ shape = SubResource("RectangleShape2D_wall_v")
 [node name="RightWall" type="CollisionShape2D" parent="Walls"]
 position = Vector2(2780, 900)
 shape = SubResource("RectangleShape2D_wall_v")
+
+[node name="HideClass1" type="Area2D" parent="."]
+position = Vector2(262, 362)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_hiding")
+prompt_text = "사물함에 숨기"
+message = "사물함 안으로 몸을 밀어 넣었다. 경첩이 작게 울었다."
+
+[node name="HideClass1Visual" type="Polygon2D" parent="HideClass1"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+[node name="HideClass1Zone" type="CollisionShape2D" parent="HideClass1"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="HideClass6" type="Area2D" parent="."]
+position = Vector2(2238, 362)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_hiding")
+prompt_text = "사물함에 숨기"
+message = "사물함 깊숙이. 문틈으로 들어오는 빛이 전부다."
+
+[node name="HideClass6Visual" type="Polygon2D" parent="HideClass6"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+[node name="HideClass6Zone" type="CollisionShape2D" parent="HideClass6"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="HideHistoryArchive" type="Area2D" parent="."]
+position = Vector2(888, 1538)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_hiding")
+prompt_text = "자료함에 숨기"
+message = "역사자료실 캐비닛. 곰팡이 슬은 종이 냄새가 코를 찌른다."
+
+[node name="HideHistoryArchiveVisual" type="Polygon2D" parent="HideHistoryArchive"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+[node name="HideHistoryArchiveZone" type="CollisionShape2D" parent="HideHistoryArchive"]
+shape = SubResource("RectangleShape2D_key_zone")

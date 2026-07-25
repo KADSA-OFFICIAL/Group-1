@@ -1,9 +1,10 @@
-[gd_scene load_steps=93 format=3]
+[gd_scene load_steps=94 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
 [ext_resource type="Script" path="res://scripts/interactions/exit_door.gd" id="3_exit"]
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="4_interactable"]
+[ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="5_hiding"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_stair_zone"]
 size = Vector2(240, 56)
@@ -1567,3 +1568,51 @@ shape = SubResource("RectangleShape2D_wall_v")
 [node name="RightWall" type="CollisionShape2D" parent="Walls"]
 position = Vector2(2780, 900)
 shape = SubResource("RectangleShape2D_wall_v")
+
+[node name="HideClass1_1" type="Area2D" parent="."]
+position = Vector2(262, 362)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("5_hiding")
+prompt_text = "사물함에 숨기"
+message = "1학년 1반 사물함. 낡은 체육복 냄새 사이로 몸을 접어 넣었다."
+
+[node name="HideClass1_1Visual" type="Polygon2D" parent="HideClass1_1"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+[node name="HideClass1_1Zone" type="CollisionShape2D" parent="HideClass1_1"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="HideMusicRoom" type="Area2D" parent="."]
+position = Vector2(2238, 362)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("5_hiding")
+prompt_text = "악기함에 숨기"
+message = "첼로 케이스를 밀어내고 그 자리에 들어갔다. 숨소리를 죽인다."
+
+[node name="HideMusicRoomVisual" type="Polygon2D" parent="HideMusicRoom"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+[node name="HideMusicRoomZone" type="CollisionShape2D" parent="HideMusicRoom"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="HideEmptyRoom" type="Area2D" parent="."]
+position = Vector2(1688, 1212)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("5_hiding")
+prompt_text = "청소함에 숨기"
+message = "대걸레와 양동이 사이. 문틈으로 복도가 실처럼 보인다."
+
+[node name="HideEmptyRoomVisual" type="Polygon2D" parent="HideEmptyRoom"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+[node name="HideEmptyRoomZone" type="CollisionShape2D" parent="HideEmptyRoom"]
+shape = SubResource("RectangleShape2D_key_zone")
