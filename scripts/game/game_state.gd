@@ -2,6 +2,7 @@ extends Node
 
 signal inventory_changed(items: Array[String])
 signal notice_requested(message: String)
+signal game_over(reason: String)
 
 @export var starting_items: Array[String] = []
 @export var max_items: int = 5
@@ -9,6 +10,9 @@ signal notice_requested(message: String)
 var items: Array[String] = []
 # 세션 내 진행 상태(문 개방, 아이템 획득 등)를 문자열 플래그로 기록
 var flags: Array[String] = []
+
+# 런이 끝났는지(붙잡힘 등). 끝난 뒤 들어오는 중복 신호를 여기서 흡수한다.
+var _is_finished: bool = false
 
 
 func _enter_tree() -> void:
@@ -56,3 +60,17 @@ func request_notice(message: String) -> void:
 		return
 
 	notice_requested.emit(message)
+
+
+## 런이 실패로 끝났음을 알린다(붙잡힘 등). 접촉 판정은 매 프레임 들어오므로
+## _is_finished로 첫 호출만 통과시킨다 — 호출자가 따로 가드할 필요가 없다.
+func trigger_game_over(reason: String = "") -> void:
+	if _is_finished:
+		return
+
+	_is_finished = true
+	game_over.emit(reason)
+
+
+func is_finished() -> bool:
+	return _is_finished
