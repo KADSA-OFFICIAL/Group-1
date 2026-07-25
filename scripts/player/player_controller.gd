@@ -14,7 +14,7 @@ const HIDDEN_PROMPT := "나오기"
 @onready var player_light: PointLight2D = $PlayerLight
 
 var facing_direction: Vector2 = Vector2.DOWN
-var hidden: bool = false
+var is_hiding: bool = false
 var _light_energy: float = 1.0
 
 
@@ -23,18 +23,18 @@ func _ready() -> void:
 
 
 ## 은신처(hiding_spot.gd)가 숨길 때, 플레이어가 E로 나올 때 호출된다.
-func set_hidden(value: bool) -> void:
-	if hidden == value:
+func set_hiding(value: bool) -> void:
+	if is_hiding == value:
 		return
 
-	hidden = value
+	is_hiding = value
 	velocity = Vector2.ZERO
-	body.visible = not hidden
-	player_light.energy = HIDDEN_LIGHT_ENERGY if hidden else _light_energy
+	body.visible = not is_hiding
+	player_light.energy = HIDDEN_LIGHT_ENERGY if is_hiding else _light_energy
 
 
 func _physics_process(_delta: float) -> void:
-	if hidden:
+	if is_hiding:
 		# 숨은 자리에 고정. 프롬프트만 갱신해 "나오기" 안내를 유지한다.
 		velocity = Vector2.ZERO
 		_update_interact_prompt()
@@ -59,8 +59,8 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	# 숨은 동안 E는 항상 "나오기". 상호작용 영역이 은신처에서 어긋나 있어도
 	# 나올 수 있어야 한다(갇힘 방지).
-	if hidden:
-		set_hidden(false)
+	if is_hiding:
+		set_hiding(false)
 		get_viewport().set_input_as_handled()
 		return
 
@@ -78,7 +78,7 @@ func _find_interactable() -> Area2D:
 
 
 func _update_interact_prompt() -> void:
-	if hidden:
+	if is_hiding:
 		interact_prompt.text = "[E] " + HIDDEN_PROMPT
 		interact_prompt.visible = true
 		return

@@ -211,7 +211,7 @@ func _physics_process(delta: float) -> void:
 func _is_chasing() -> bool:
 	if player == null or player_floor != my_floor:
 		return false
-	return player.get("hidden") != true
+	return player.get("is_hiding") != true
 
 
 func _move_chase(delta: float) -> void:

@@ -12,10 +12,10 @@ extends Area2D
 
 
 func interact(player: Node) -> void:
-	if player.get("hidden") == true:
+	if player.get("is_hiding") == true:
 		return
 
-	player.call("set_hidden", true)
+	player.call("set_hiding", true)
 
 	var game_state = get_tree().get_first_node_in_group("game_state")
 	if game_state != null:
