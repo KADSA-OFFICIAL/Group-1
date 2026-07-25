@@ -207,8 +207,11 @@ func _physics_process(delta: float) -> void:
 
 
 ## 혹시 모를 어긋남 대비: 플레이어가 수위와 같은 층에 있을 때만 추적한다.
+## 은신 중(#6)이면 발각되지 않아 순찰로 돌아간다.
 func _is_chasing() -> bool:
-	return player != null and player_floor == my_floor
+	if player == null or player_floor != my_floor:
+		return false
+	return player.get("is_hiding") != true
 
 
 func _move_chase(delta: float) -> void:

@@ -1,7 +1,8 @@
-[gd_scene load_steps=111 format=3]
+[gd_scene load_steps=112 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
+[ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="3_hiding"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_stair_zone"]
 size = Vector2(240, 56)
@@ -1818,3 +1819,51 @@ shape = SubResource("RectangleShape2D_wall_v")
 [node name="RightWall" type="CollisionShape2D" parent="Walls"]
 position = Vector2(2780, 900)
 shape = SubResource("RectangleShape2D_wall_v")
+
+[node name="HideClass2" type="Area2D" parent="."]
+position = Vector2(562, 362)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_hiding")
+prompt_text = "사물함에 숨기"
+message = "사물함 안. 어둠에 눈이 익을 때까지 기다린다."
+
+[node name="HideClass2Visual" type="Polygon2D" parent="HideClass2"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+[node name="HideClass2Zone" type="CollisionShape2D" parent="HideClass2"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="HideClass5" type="Area2D" parent="."]
+position = Vector2(1938, 362)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_hiding")
+prompt_text = "사물함에 숨기"
+message = "빈 사물함. 등을 붙이자 철판이 서늘하다."
+
+[node name="HideClass5Visual" type="Polygon2D" parent="HideClass5"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+[node name="HideClass5Zone" type="CollisionShape2D" parent="HideClass5"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="HideBroadcastRoom" type="Area2D" parent="."]
+position = Vector2(888, 1538)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_hiding")
+prompt_text = "장비함에 숨기"
+message = "방송 장비함. 케이블 뭉치를 껴안은 자세로 굳었다."
+
+[node name="HideBroadcastRoomVisual" type="Polygon2D" parent="HideBroadcastRoom"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+[node name="HideBroadcastRoomZone" type="CollisionShape2D" parent="HideBroadcastRoom"]
+shape = SubResource("RectangleShape2D_key_zone")
