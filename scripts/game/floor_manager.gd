@@ -12,9 +12,10 @@ const FLOOR_SCENES := {
 	5: "res://scenes/background/school_floor_5.tscn",
 }
 const MIN_FLOOR := 1
-const MAX_FLOOR := 5
-const START_FLOOR := 5
-const JANITOR_FREE_FLOOR := 5  # 수위아저씨가 나타나지 않는 층
+const MAX_FLOOR := 4  # 5층은 프롤로그 전용 — 본편에서 올라가지 않는다
+const START_FLOOR := 4
+# 시작 층은 안전 구간 — 기획서상 수위는 3층부터 활동한다.
+const JANITOR_FREE_FLOOR := 4
 
 # 전환 트리거 존: 각 계단실 반쪽의 안쪽 끝 (인덱스 0=좌상단 계단, 1=중앙 하단 계단)
 const UP_ZONES := [Rect2(136, 930, 196, 54), Rect2(1196, 1610, 166, 54)]
@@ -35,7 +36,7 @@ var changing_floor: bool = false
 const FADE_IN_SECONDS := 1.5
 const FLOOR_FADE_OUT_SECONDS := 0.25
 const FLOOR_FADE_IN_SECONDS := 0.35
-const START_HINT := "문은 잠겨서 열리지 않는다. …아래쪽 창문으로 나가는 게 좋겠어."
+const START_HINT := "4층 복도. 계단으로 내려가야 한다. 이 층 어딘가에 계단 열쇠가 있을 것이다."
 
 # 붙잡힌 순간을 잠깐 보여준 뒤 실패 화면으로 넘어간다(수위가 마주보는 연출).
 const GAME_OVER_SCENE := "res://scenes/ui/game_over.tscn"

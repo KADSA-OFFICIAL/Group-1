@@ -1,9 +1,9 @@
 extends Control
 
-## 게임 시작 전 프롤로그 — 계획서 #1~#4-1, #12.
-## 장면(집→TV→앞문→뒷문→미술실)을 진행하고, 미술실에서 분기:
-## 빠져나가기(게임 시작) / 말 걸기(#4-1: 창문 도망=게임 시작, 얼어붙기=사망 엔딩).
+## 게임 시작 전 프롤로그 컷신 (기획서: street → back_gate → art_room → cabinet → next_room).
+## 마지막에 창문으로 외벽을 타고 4층으로 내려가 본편(@game)이 시작된다.
 ## 대사는 하단 대화창에 한 글자씩 출력, E/Enter로 진행. 배경 이미지는 추후 추가.
+## 장면 노드는 choice(분기)도 지원한다 — 신고 선택지 등 후속 이슈에서 사용.
 
 @export_file("*.tscn") var game_scene_path: String = "res://scenes/main/main.tscn"
 @export_file("*.tscn") var title_scene_path: String = "res://scenes/ui/main_menu.tscn"
@@ -11,96 +11,70 @@ extends Control
 # 장면 노드: caption, lines([화자, 대사]), 그리고 next(다음 장면 키) 또는
 # choice({prompt, options: [[라벨, 다음 키]]}). 특수 키: @game(게임 시작), @title(타이틀 복귀)
 const SCRIPT_NODES: Dictionary = {
-	"home": {
-		"caption": "— 이설의 집, 저녁 —",
+	"street": {
+		"caption": "— 밤 10시 20분, 학원에서 집으로 —",
 		"lines": [
-			["이설", "아, 낼 수행평가인데 책 놓고 왔네…"],
-			["엄마", "너 또 물건 놓고 왔니?"],
-			["이설", "다녀오겠습니다!"],
-		],
-		"next": "tv",
-	},
-	"tv": {
-		"caption": "— 거실 TV —",
-		"lines": [
-			["TV 아나운서", "최근 불암고등학교에서 학생 실종 사건이 발생했습니다."],
-			["TV 아나운서", "실종된 학생은 불암고등학교 2학년, 김— …지지직."],
-		],
-		"next": "front_gate",
-	},
-	"front_gate": {
-		"caption": "— 밤 10시 30분, 학교 정문 —",
-		"lines": [
-			["이설", "…잠겼네. 이 시간엔 정문을 잠그는구나."],
-			["이설", "뒷문은 열려 있으려나."],
-			["", "담장을 따라 돌아가던 그때 — 운동장 구석, 피 묻은 삽을 든 거대한 형체가 무언가를 끌고 간다."],
-			["이설", "……?"],
+			["", "가방이 가볍다. 이설은 걸음을 멈췄다."],
+			["이설", "…국어책."],
+			["이설", "아, 미술실에 두고 왔네. 내일 수행평가인데."],
+			["", "학교까지는 10분. 뒷문은 늦게까지 열려 있다고 들었다."],
+			["이설", "책만 챙겨서 바로 나오면 되지."],
 		],
 		"next": "back_gate",
 	},
 	"back_gate": {
 		"caption": "— 학교 뒷문 —",
 		"lines": [
-			["이설", "…뭐지, 방금 그거. 잘못 본 거겠지."],
-			["이설", "빨리 책만 챙겨서 나가자."],
+			["", "뒷문을 밀어 본다. 끼익 — 열렸다."],
+			["이설", "역시 안 잠겨 있네."],
+			["", "복도 전등은 모두 꺼져 있다. 이설은 핸드폰 손전등을 켰다."],
+			["", "빛이 닿는 곳만 세상이고, 그 밖은 아무것도 없다."],
+			["이설", "5층까지만. 빨리 다녀오자."],
 		],
 		"next": "art_room",
 	},
 	"art_room": {
 		"caption": "— 5층 미술실 —",
 		"lines": [
-			["이설", "책, 여기 있다. …어?"],
-			["", "창밖 — 수위 아저씨가 삽으로 무언가를 묻고 있다. 사람의 형상을 한 무언가를."],
-			["", "철컥. 미술실 문이 잠겼다. 창밖 가로등이 하나씩 꺼져 간다."],
-			["", "칠판 위로, 피로 쓰인 글씨가 번져 나온다."],
+			["", "미술실 문은 열려 있었다. 책상 위, 국어책이 그대로 놓여 있다."],
+			["이설", "찾았다."],
+			["", "그때 복도에서 발소리가 들렸다. 열쇠 꾸러미가 부딪히는 소리."],
+			["수위", "이 문 왜 열려 있어?"],
+			["", "이설은 생각할 틈도 없이 캐비넷 안으로 몸을 밀어 넣었다."],
 		],
-		"next": "rules",
+		"next": "cabinet",
 	},
-	"rules": {
-		"caption": "— 5층 미술실 —",
-		"blackboard": true,
-		"start_delay": 1.2,
+	"cabinet": {
+		"caption": "— 미술실 캐비넷 안 —",
 		"lines": [
-			["???", "규칙을 어긴 학생이 있군…"],
-			["???", "폐기물은 처리한다…"],
-			["이설", "……!"],
-			["이설", "나가야 해. 지금 당장."],
+			["", "숨을 참는다. 손전등도 껐다. 문틈으로 빛이 지나간다."],
+			["", "수위는 교실을 천천히 돌았다. 이젤을, 책상을, 벽에 붙은 그림을 하나하나."],
+			["수위", "시우 그림은… 괜찮고."],
+			["수위", "문단속 다시 해야겠네."],
+			["", "철컥. 미술실 문이 잠겼다. 발소리가 멀어진다."],
+			["", "숨을 내쉬고 나서야, 발밑에 뭔가 밟히는 걸 알았다. 플라스틱 카드."],
+			["", "학생증. 1학년 3반 송하람. 뉴스에서 들은 이름이다."],
+			["이설", "왜 없어진 학생 학생증이 미술실 캐비넷에 있는 거야?"],
 		],
-		"choice": {
-			"prompt": "어떻게 할까?",
-			"options": [
-				["조용히 빠져나갈 길을 찾는다", "@game"],
-				["밖에 대고 말을 걸어 본다", "talk"],
-			],
-		},
+		"next": "next_room",
 	},
-	"talk": {
-		"caption": "— 5층 미술실 —",
-		"blackboard": true,
+	"next_room": {
+		"caption": "— 미술실 옆, 준비실 —",
 		"lines": [
-			["이설", "저기요! 수위 아저씨! 문 좀 열어 주세요!"],
-			["", "쿵— 쿵— 계단을 올라오는 발소리."],
-			["", "콰앙! 문 너머에서 삽이 문을 내리친다!"],
+			["", "미술실 문은 잠겼다. 대신 옆 준비실로 통하는 연결문이 열려 있었다."],
+			["", "책상 위에 비닐봉투 몇 개. 손전등을 비춰 본다."],
+			["", "교복 단추, 이름표, 머리끈, 볼펜. 학생 소지품이다. 하나가 아니다. 여러 명 것이다."],
+			["", "벽에는 날짜가 적혀 있었다. 3월 14일. 5월 22일. 8월 9일. 11월 3일. 1월 18일."],
+			["이설", "…뉴스에서 들은 실종 시기랑 같아."],
+			["", "복도에서 다시 발소리. 이번엔 이쪽으로 오고 있다."],
+			["이설", "(창문…!)"],
+			["", "이설은 창문을 열고 외벽 난간으로 몸을 내밀었다. 발밑은 5층 높이."],
+			["", "난간을 따라 옆 창문으로, 그리고 아래층으로 — 4층 복도에 발이 닿았다."],
 		],
-		"choice": {
-			"prompt": "어떻게 할까?",
-			"options": [
-				["창문 쪽으로 도망친다", "@game"],
-				["그 자리에 얼어붙는다", "death"],
-			],
-		},
-	},
-	"death": {
-		"caption": "— 엔딩: 폐기물 —",
-		"lines": [
-			["", "문이 부서졌다. 삽이 허공을 갈랐다."],
-			["수위", "…이걸로 여섯 명째인가."],
-			["", "수위는 이설의 이름표를 챙겨, 어둠 속으로 사라졌다."],
-		],
-		"next": "@title",
+		"next": "@game",
 	},
 }
-const START_NODE := "home"
+const START_NODE := "street"
 const SCENE_FADE_SECONDS := 0.5
 const SCENE_FADE_IN_SECONDS := 1.7  # 장면 전환 시 새 장면이 드러나는 페이드인
 const CHOICE_FADE_SECONDS := 0.4    # 선택창 등장 페이드인
@@ -113,7 +87,6 @@ const TYPING_SECONDS_PER_CHAR := 0.05
 @onready var choice_panel: PanelContainer = $ChoicePanel
 @onready var choice_box: VBoxContainer = $ChoicePanel/Margin/ChoiceBox
 @onready var choice_prompt: Label = $ChoicePanel/Margin/ChoiceBox/ChoicePrompt
-@onready var blackboard_art: PanelContainer = $BlackboardArt
 
 var current_node: String = START_NODE
 var line_index: int = -1
@@ -155,8 +128,6 @@ func _unhandled_input(event: InputEvent) -> void:
 func _apply_scene() -> void:
 	var node: Dictionary = SCRIPT_NODES[current_node]
 	scene_caption.text = node["caption"]
-	# 배경 칠판(규칙) 표시 여부 — 이미지 에셋이 생기면 BlackboardArt 노드만 교체
-	blackboard_art.visible = node.get("blackboard", false)
 	name_label.text = ""
 	text_label.text = ""
 

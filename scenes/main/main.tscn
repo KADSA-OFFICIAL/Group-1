@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3]
 
-[ext_resource type="PackedScene" path="res://scenes/background/school_floor_5.tscn" id="1_floor"]
+[ext_resource type="PackedScene" path="res://scenes/background/school_floor_4.tscn" id="1_floor"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
 [ext_resource type="Script" path="res://scripts/game/floor_manager.gd" id="3_floor_manager"]
 [ext_resource type="Script" path="res://scripts/game/game_state.gd" id="4_game_state"]
@@ -21,7 +21,7 @@ color = Color(0.1, 0.1, 0.13, 1)
 position = Vector2(1325, 940)
 
 [node name="Player" parent="." instance=ExtResource("2_player")]
-position = Vector2(260, 1380)
+position = Vector2(399, 692)
 
 [node name="WallFade" type="CanvasLayer" parent="."]
 layer = 1
