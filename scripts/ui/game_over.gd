@@ -8,7 +8,7 @@ extends Control
 static var pending_reason: String = "caught"
 
 const MESSAGES := {
-	"caught": "수위 아저씨의 손이 어깨를 붙잡았다.",
+	"caught": "이설은 수위실에서 아침까지 붙잡혀 있었다.\n다음 날, 야간 무단 침입으로 교무실에 호출되었다.\n이설이 본 것들은 아무에게도 말할 기회가 없었다.",
 }
 const DEFAULT_MESSAGE := "이설은 학교를 빠져나오지 못했다."
 

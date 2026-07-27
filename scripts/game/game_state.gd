@@ -5,6 +5,8 @@ signal notice_requested(message: String)
 signal game_over(reason: String)
 
 @export var starting_items: Array[String] = []
+## 시작 시 미리 세워 둘 플래그. 엔딩 분기처럼 뒤쪽 진행을 확인할 때 에디터에서 채워 쓴다.
+@export var starting_flags: Array[String] = []
 @export var max_items: int = 5
 
 var items: Array[String] = []
@@ -21,6 +23,7 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	items = starting_items.duplicate()
+	flags = starting_flags.duplicate()
 	inventory_changed.emit(items)
 
 
@@ -53,6 +56,20 @@ func set_flag(flag: String) -> void:
 
 func has_flag(flag: String) -> bool:
 	return flag in flags
+
+
+func has_all_flags(required: Array[String]) -> bool:
+	for flag in required:
+		if flag not in flags:
+			return false
+	return true
+
+
+func has_any_flag(candidates: Array[String]) -> bool:
+	for flag in candidates:
+		if flag in flags:
+			return true
+	return false
 
 
 func request_notice(message: String) -> void:
