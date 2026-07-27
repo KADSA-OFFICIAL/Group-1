@@ -26,9 +26,9 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-# 수위아저씨가 순찰하는 층(floor_manager.JANITOR_FREE_FLOOR = 5 제외).
+# 수위아저씨가 순찰하는 층(floor_manager.JANITOR_FREE_FLOOR = 4 제외 — 시작 층은 안전 구간, #143).
 # 좌표는 씬에서 직접 읽는다 — 여기에 베껴 두면 씬과 어긋나도 통과해버린다.
-PATROLLED_FLOORS = [1, 2, 3, 4]
+PATROLLED_FLOORS = [1, 2, 3]
 
 HIDING_SCRIPT = "res://scripts/interactions/hiding_spot.gd"
 
