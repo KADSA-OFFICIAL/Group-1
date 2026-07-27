@@ -12,9 +12,10 @@ const FLOOR_SCENES := {
 	5: "res://scenes/background/school_floor_5.tscn",
 }
 const MIN_FLOOR := 1
-const MAX_FLOOR := 5
-const START_FLOOR := 5
-const JANITOR_FREE_FLOOR := 5  # 수위아저씨가 나타나지 않는 층
+const MAX_FLOOR := 4  # 5층은 프롤로그 전용 — 본편에서 올라가지 않는다
+const START_FLOOR := 4
+# 시작 층은 안전 구간 — 기획서상 수위는 3층부터 활동한다.
+const JANITOR_FREE_FLOOR := 4
 
 # 전환 트리거 존: 각 계단실 반쪽의 안쪽 끝 (인덱스 0=좌상단 계단, 1=중앙 하단 계단)
 const UP_ZONES := [Rect2(136, 930, 196, 54), Rect2(1196, 1610, 166, 54)]
@@ -35,10 +36,20 @@ var changing_floor: bool = false
 const FADE_IN_SECONDS := 1.5
 const FLOOR_FADE_OUT_SECONDS := 0.25
 const FLOOR_FADE_IN_SECONDS := 0.35
-const START_HINT := "문은 잠겨서 열리지 않는다. …아래쪽 창문으로 나가는 게 좋겠어."
+const START_HINT := "4층 복도. 계단으로 내려가야 한다. 이 층 어딘가에 계단 열쇠가 있을 것이다."
+
+# 붙잡힌 순간을 잠깐 보여준 뒤 실패 화면으로 넘어간다(수위가 마주보는 연출).
+const GAME_OVER_SCENE := "res://scenes/ui/game_over.tscn"
+const GAME_OVER_FADE_SECONDS := 1.2
+
+var game_over_active: bool = false
 
 
 func _ready() -> void:
+	var game_state = get_tree().get_first_node_in_group("game_state")
+	if game_state != null:
+		game_state.connect("game_over", _on_game_over)
+
 	_update_floor_label()
 	janitor.sync_floor(current_floor != JANITOR_FREE_FLOOR, current_floor, player, $Background)
 	fade_rect.color.a = 1.0
@@ -51,6 +62,29 @@ func _show_start_hint() -> void:
 	var game_state = get_tree().get_first_node_in_group("game_state")
 	if game_state != null:
 		game_state.call("request_notice", START_HINT)
+
+
+## 붙잡힘 → 조작 정지 후 실패 화면. game_state가 중복 발동을 막지만,
+## 층 전환 페이드와 겹치면 트윈이 서로 알파를 다투므로 여기서도 가드한다.
+func _on_game_over(reason: String) -> void:
+	if game_over_active:
+		return
+	game_over_active = true
+	changing_floor = true   # 계단 트리거 검사 정지
+
+	# 플레이어는 이동(_physics_process)과 E 상호작용(_unhandled_input)을 모두 끊고,
+	# 수위는 붙잡은 자리에 그대로 세워 둔다.
+	player.velocity = Vector2.ZERO
+	player.set_physics_process(false)
+	player.set_process_unhandled_input(false)
+	janitor.set_physics_process(false)
+
+	GameOverScreen.pending_reason = reason
+
+	var tween := create_tween()
+	tween.tween_property(fade_rect, "color:a", 1.0, GAME_OVER_FADE_SECONDS)
+	tween.tween_callback(func() -> void:
+		get_tree().change_scene_to_file(GAME_OVER_SCENE))
 
 
 func _physics_process(_delta: float) -> void:

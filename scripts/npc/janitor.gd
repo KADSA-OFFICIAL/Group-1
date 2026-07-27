@@ -15,7 +15,7 @@ const ARRIVE_DISTANCE := 6.0
 const STUCK_SECONDS := 0.6      # 가려던 방향으로 못 나아간 시간이 이만큼이면 막힌 것
 const PROGRESS_RATIO := 0.3     # 기대 전진량의 이 비율 미만이면 나아가지 못한 것으로 본다
 const REPATH_SECONDS := 0.3     # 경로 재계산 주기
-const CONTACT_DISTANCE := 30.0  # 이 안까지 붙으면 멈춰 마주본다(페널티는 후속 이슈)
+const CONTACT_DISTANCE := 30.0  # 이 안까지 붙으면 멈춰 마주보고 붙잡는다(#4)
 const WALL_MASK := 1            # LOS 레이캐스트 대상(벽·바리케이드)
 
 # 콜리전 캡슐(18×30)은 회전하지 않으므로 반폭이 축마다 다르다.
@@ -207,8 +207,11 @@ func _physics_process(delta: float) -> void:
 
 
 ## 혹시 모를 어긋남 대비: 플레이어가 수위와 같은 층에 있을 때만 추적한다.
+## 은신 중(#6)이면 발각되지 않아 순찰로 돌아간다.
 func _is_chasing() -> bool:
-	return player != null and player_floor == my_floor
+	if player == null or player_floor != my_floor:
+		return false
+	return player.get("is_hiding") != true
 
 
 func _move_chase(delta: float) -> void:
@@ -216,6 +219,7 @@ func _move_chase(delta: float) -> void:
 		velocity = Vector2.ZERO
 		body.rotation = position.direction_to(player.position).angle() - Vector2.UP.angle()
 		stuck_time = 0.0
+		_catch_player()
 		return
 
 	repath_timer -= delta
@@ -228,6 +232,14 @@ func _move_chase(delta: float) -> void:
 		_update_chase_path()
 
 	_step_toward(_next_point(player.position), chase_speed, delta)
+
+
+## 붙잡힘 통보. 접촉 상태가 유지되는 동안 매 프레임 불리지만
+## game_state가 첫 호출만 통과시키므로 여기서 따로 가드하지 않는다.
+func _catch_player() -> void:
+	var game_state = get_tree().get_first_node_in_group("game_state")
+	if game_state != null:
+		game_state.call("trigger_game_over", "caught")
 
 
 func _update_chase_path() -> void:
