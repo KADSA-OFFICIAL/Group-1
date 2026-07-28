@@ -648,11 +648,9 @@ position = Vector2(2290, 1620)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
-message = "벽에 걸린 액자. 구석에 작게 적힌 서명 — 박시우. 그냥 풍경화인 것 같다."
+message = "벽에 걸린 액자. 구석에 작게 적힌 서명 — 박시우. 나무 그늘 아래에 붓끝으로 눌러 쓴 작은 글씨가 있다. — 도와줘."
 prompt_text = "그림 보기"
-revisit_required_flags = Array[String](["found_kangyujin", "found_baekseungho", "found_imnayeon", "found_jominhyuk", "found_songharam", "read_siwoo_counseling", "read_janitor_notebook"])
-revisit_message = "그림을 다시 본다. 나무 그늘 아래, 붓끝으로 눌러 쓴 작은 글씨가 있다. — 도와줘."
-revisit_grants_flag = "revisit_siwoo_painting"
+grants_flag = "read_siwoo_painting"
 
 [node name="SiwooPaintingVisual" type="Polygon2D" parent="SiwooPainting"]
 z_index = 1
