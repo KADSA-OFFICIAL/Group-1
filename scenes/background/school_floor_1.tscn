@@ -574,20 +574,72 @@ script = ExtResource("3_exit")
 [node name="ExitZone" type="CollisionShape2D" parent="ExitDoor"]
 shape = SubResource("RectangleShape2D_stair_zone")
 
-[node name="JanitorItems" type="Area2D" parent="."]
+[node name="PrincipalLetter" type="Area2D" parent="."]
+position = Vector2(1150, 250)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("4_interactable")
+message = "교장 책상 위, 열어 보지 않은 편지. '제 딸 시우가 죽은 지 10년입니다. 선생님들은 그때도 모른 척하셨습니다. 이제는 제가 하겠습니다. — 박종태'"
+prompt_text = "편지 읽기"
+grants_flag = "read_principal_letter"
+
+[node name="PrincipalLetterVisual" type="Polygon2D" parent="PrincipalLetter"]
+z_index = 1
+color = Color(0.78, 0.76, 0.68, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+[node name="PrincipalLetterZone" type="CollisionShape2D" parent="PrincipalLetter"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="PhotoWall" type="Area2D" parent="."]
 position = Vector2(250, 1500)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("4_interactable")
-message = "책가방, 이름표, 신발주머니… 실종된 학생들의 물건이 쌓여 있다."
-prompt_text = "조사"
+message = "벽 한 면이 사진으로 덮여 있다. 가운데는 교복을 입은 여학생 한 명 — 박시우. 나머지는 이 학교 학생들의 얼굴이고, 몇 장은 붉은 펜으로 동그라미가 쳐져 있다."
+prompt_text = "사진벽 보기"
+grants_flag = "saw_photo_wall"
 
-[node name="ItemsVisual" type="Polygon2D" parent="JanitorItems"]
+[node name="PhotoWallVisual" type="Polygon2D" parent="PhotoWall"]
 z_index = 1
 color = Color(0.3, 0.25, 0.2, 1)
 polygon = PackedVector2Array(-16, -10, 16, -10, 16, 10, -16, 10)
 
-[node name="ItemsZone" type="CollisionShape2D" parent="JanitorItems"]
+[node name="PhotoWallZone" type="CollisionShape2D" parent="PhotoWall"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="StudentCards" type="Area2D" parent="."]
+position = Vector2(170, 1620)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("4_interactable")
+message = "서랍 안에 학생증 두 장이 나란히 놓여 있다. 3학년 1반 강유진. 2학년 2반 조민혁. 미술실 캐비넷에서 주운 송하람의 것과 같은 방식으로 정리돼 있다."
+prompt_text = "서랍 열기"
+grants_flag = "saw_student_cards"
+
+[node name="StudentCardsVisual" type="Polygon2D" parent="StudentCards"]
+z_index = 1
+color = Color(0.7, 0.68, 0.6, 1)
+polygon = PackedVector2Array(-14, -8, 14, -8, 14, 8, -14, 8)
+
+[node name="StudentCardsZone" type="CollisionShape2D" parent="StudentCards"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="JanitorNotebook" type="Area2D" parent="."]
+position = Vector2(450, 1450)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("4_interactable")
+message = "손때 묻은 공책. 이름과 짧은 판단이 줄줄이 적혀 있다. '강유진 — 후배 때림.' '조민혁 — 집에서 맞음.' 그리고 마지막 줄. '송하람 — 확실하지 않음. 그래도 만약을 위해.'"
+prompt_text = "공책 읽기"
+grants_flag = "read_janitor_notebook"
+
+[node name="JanitorNotebookVisual" type="Polygon2D" parent="JanitorNotebook"]
+z_index = 1
+color = Color(0.45, 0.4, 0.32, 1)
+polygon = PackedVector2Array(-12, -10, 12, -10, 12, 10, -12, 10)
+
+[node name="JanitorNotebookZone" type="CollisionShape2D" parent="JanitorNotebook"]
 shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="JanitorSafe" type="Area2D" parent="."]
@@ -595,8 +647,10 @@ position = Vector2(480, 1600)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("4_interactable")
-message = "금고 안, 낡은 일지 — '11시에 학교 옥상으로 오세요. 제 책들 좀 가져와 주세요.' 오래된 뉴스 기사가 함께 들어 있다."
+message = "금고 문이 반쯤 열려 있다. 안에는 서류 봉투와 열쇠꾸러미. 현관 열쇠를 꺼냈다."
 prompt_text = "금고 열기"
+grants_item_id = "front_gate_key"
+grants_flag = "front_gate_key_taken"
 
 [node name="SafeVisual" type="Polygon2D" parent="JanitorSafe"]
 z_index = 1
@@ -604,23 +658,6 @@ color = Color(0.35, 0.35, 0.4, 1)
 polygon = PackedVector2Array(-12, -12, 12, -12, 12, 12, -12, 12)
 
 [node name="SafeZone" type="CollisionShape2D" parent="JanitorSafe"]
-shape = SubResource("RectangleShape2D_key_zone")
-
-[node name="KeyBundle" type="Area2D" parent="."]
-position = Vector2(360, 1560)
-collision_layer = 0
-collision_mask = 1
-script = ExtResource("2_pickup")
-item_id = "front_gate_key"
-message = "피 묻은 열쇠꾸러미를 주웠다. 현관 열쇠가 섞여 있다."
-pickup_id = "front_gate_key_taken"
-
-[node name="KeyBundleVisual" type="Polygon2D" parent="KeyBundle"]
-z_index = 1
-color = Color(0.62, 0.55, 0.28, 1)
-polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
-
-[node name="KeyBundleZone" type="CollisionShape2D" parent="KeyBundle"]
 shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="Occluders" type="Node2D" parent="."]

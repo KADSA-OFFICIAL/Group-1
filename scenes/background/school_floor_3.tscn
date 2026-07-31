@@ -1,8 +1,9 @@
-[gd_scene load_steps=112 format=3]
+[gd_scene load_steps=113 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
 [ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="3_hiding"]
+[ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="4_interactable"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_stair_zone"]
 size = Vector2(240, 56)
@@ -621,21 +622,90 @@ also_remove_paths = Array[NodePath]([NodePath("../SULock"), NodePath("../WallGlo
 [node name="SDLockZone" type="CollisionShape2D" parent="SDLock"]
 shape = SubResource("RectangleShape2D_stair_zone")
 
-[node name="StairKey" type="Area2D" parent="."]
-position = Vector2(885, 1560)
-collision_layer = 0
-collision_mask = 1
-script = ExtResource("2_pickup")
-item_id = "stair_key_3"
-message = "방송실에서 3층 계단 열쇠를 주웠다."
-pickup_id = "stair_key_3_taken"
+[node name="NayeonClue" type="Area2D" parent="."]
+position = Vector2(700, 1620)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("4_interactable")
+message = "방송 원고 뭉치 사이에 인쇄된 캡처 화면. 1학년 6반 임나연을 두고 오간 글들이다. 맨 아래 누군가 볼펜으로 눌러 썼다. — '장난이었다잖아.'"
+prompt_text = "조사"
+grants_flag = "found_imnayeon"
 
-[node name="StairKeyVisual" type="Polygon2D" parent="StairKey"]
+[node name="NayeonClueVisual" type="Polygon2D" parent="NayeonClue"]
+z_index = 1
+color = Color(0.72, 0.7, 0.62, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+[node name="NayeonClueZone" type="CollisionShape2D" parent="NayeonClue"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="ReportFlyer" type="Area2D" parent="."]
+position = Vector2(200, 1620)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("4_interactable")
+message = "벽에 붙은 학교폭력 신고 절차 전단. 그 위에 빨간 펜으로 크게 X. 여백에 적힌 글씨 — '이걸로 해결된 적 있어?'"
+prompt_text = "조사"
+grants_flag = "read_report_flyer"
+
+[node name="ReportFlyerVisual" type="Polygon2D" parent="ReportFlyer"]
+z_index = 1
+color = Color(0.72, 0.7, 0.62, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+[node name="ReportFlyerZone" type="CollisionShape2D" parent="ReportFlyer"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="JanitorWarning" type="Area2D" parent="."]
+position = Vector2(1080, 250)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("4_interactable")
+message = "2년 전 인사 기록. '시설관리사 박종태 — 야간 순찰 중 학생에게 훈계. 주의 조치.' 아래 교감 메모가 붙어 있다. '30년 근무자다. 더 문제 삼지 말자.'"
+prompt_text = "조사"
+grants_flag = "read_janitor_warning"
+
+[node name="JanitorWarningVisual" type="Polygon2D" parent="JanitorWarning"]
+z_index = 1
+color = Color(0.72, 0.7, 0.62, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+[node name="JanitorWarningZone" type="CollisionShape2D" parent="JanitorWarning"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="KeyCabinet" type="Area2D" parent="."]
+position = Vector2(1240, 250)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("4_interactable")
+message = "교무실 열쇠 보관함. 고리 하나가 비어 있고, 남은 것 중에 '2F 계단' 표가 붙은 열쇠가 있다. 챙겼다."
+prompt_text = "보관함 열기"
+grants_item_id = "stair_key_2"
+grants_flag = "opened_key_cabinet"
+
+[node name="KeyCabinetVisual" type="Polygon2D" parent="KeyCabinet"]
+z_index = 1
+color = Color(0.45, 0.42, 0.3, 1)
+polygon = PackedVector2Array(-12, -14, 12, -14, 12, 14, -12, 14)
+
+[node name="KeyCabinetZone" type="CollisionShape2D" parent="KeyCabinet"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="SpareKeyHook" type="Area2D" parent="."]
+position = Vector2(1160, 380)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("4_interactable")
+message = "보관함 옆 고리에 여벌 열쇠가 걸려 있다. '3F 계단'. 4층에서 이미 챙겼더라도, 하나 더 있어서 나쁠 것은 없다."
+prompt_text = "여벌 열쇠 챙기기"
+grants_item_id = "stair_key_3"
+
+[node name="SpareKeyHookVisual" type="Polygon2D" parent="SpareKeyHook"]
 z_index = 1
 color = Color(0.62, 0.55, 0.28, 1)
 polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
 
-[node name="StairKeyZone" type="CollisionShape2D" parent="StairKey"]
+[node name="SpareKeyHookZone" type="CollisionShape2D" parent="SpareKeyHook"]
 shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="Occluders" type="Node2D" parent="."]
