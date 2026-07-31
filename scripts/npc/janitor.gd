@@ -16,6 +16,9 @@ extends CharacterBody2D
 @export var sight_range: float = 320.0
 # 시야에 들어온 뒤 추적을 시작하기까지의 유예 — 플레이어에게 반응 시간을 준다.
 @export var reveal_delay: float = 1.0
+# 시야를 잃은 뒤에도 추적을 유지하는 시간. 0이면 모퉁이를 도는 순간 태세를 풀어
+# 돌진하다 갑자기 산책하는 모습이 된다.
+@export var lose_sight_seconds: float = 1.5
 
 const ARRIVE_DISTANCE := 6.0
 const STUCK_SECONDS := 0.6      # 가려던 방향으로 못 나아간 시간이 이만큼이면 막힌 것
@@ -53,6 +56,8 @@ var corridor_cells: Array[Vector2i] = []   # 순찰은 복도만 돈다(방 폴�
 
 # 플레이어 시야에 연속으로 노출된 시간. reveal_delay를 넘기면 추적이 시작된다.
 var seen_time: float = 0.0
+# 추적 유지 잔여 시간. 보이는 동안 계속 갱신되고, 시야를 잃으면 줄어든다.
+var chase_hold: float = 0.0
 
 var path_points: PackedVector2Array = PackedVector2Array()
 var patrol_target: Vector2 = Vector2.ZERO
@@ -239,16 +244,13 @@ func _spawn_away_from(player_position: Vector2) -> void:
 	repath_timer = 0.0
 	stuck_time = 0.0
 	seen_time = 0.0
+	chase_hold = 0.0
 
 
 # ── 이동 ─────────────────────────────────────────────────────────
 
 func _physics_process(delta: float) -> void:
-	# 플레이어 시야에 노출된 시간을 먼저 갱신한다 — 추적 여부가 여기서 결정된다.
-	if _can_be_seen():
-		seen_time += delta
-	else:
-		seen_time = 0.0
+	_update_awareness(delta)
 
 	if _is_chasing():
 		_move_chase(delta)
@@ -259,27 +261,45 @@ func _physics_process(delta: float) -> void:
 		queue_redraw()
 
 
+## 발각 상태 갱신. 추적 여부는 chase_hold 하나로 결정된다.
+func _update_awareness(delta: float) -> void:
+	# 은신(#6)은 즉시 추적을 끊는다. 여기에 유지 시간을 주면 캐비넷에 숨은
+	# 직후에도 수위가 들이닥쳐 접촉 판정(#4)으로 붙잡히므로 은신이 무의미해진다.
+	if player != null and player.get("is_hiding") == true:
+		seen_time = 0.0
+		chase_hold = 0.0
+		return
+
+	if _can_be_seen():
+		seen_time += delta
+		# 이미 추적 중이면 재확인에 유예를 다시 요구하지 않는다 — 유예는 최초
+		# 발각에만 적용된다. 그러지 않으면 시야를 끊었다 다시 보일 때마다
+		# 추적이 잠깐 풀렸다 붙는 깜빡임이 생긴다.
+		if seen_time >= reveal_delay or chase_hold > 0.0:
+			chase_hold = lose_sight_seconds
+	else:
+		seen_time = 0.0
+		chase_hold = maxf(chase_hold - delta, 0.0)
+
+
 ## 플레이어가 수위를 실제로 볼 수 있는가.
 ## 어두운 학교라 손전등이 닿는 거리(sight_range) 안이어야 하고, 벽에 가리면 안 된다.
 ## 손전등은 원형이라 시야각은 없다 — 방향은 보지 않는다.
 ## 여기서 쓰는 것은 중심선 레이 1발이다. _clear_line(몸통 통과 가능성)은 이동용이고,
 ## "보이는지"와는 다른 문제다.
-## 혹시 모를 어긋남 대비로 같은 층 조건을 유지하고, 은신 중(#6)이면 발각되지 않는다.
+## 혹시 모를 어긋남 대비로 같은 층 조건은 유지한다.
 func _can_be_seen() -> bool:
 	if player == null or player_floor != my_floor:
-		return false
-	if player.get("is_hiding") == true:
 		return false
 	if position.distance_to(player.position) > sight_range:
 		return false
 	return _clear_ray(position, player.position)
 
 
-## 시야에 연속으로 reveal_delay만큼 노출된 뒤부터 추적한다.
-## 노출이 끊기면 seen_time이 0으로 초기화되므로, 이 조건은 "지금 보이고 있고
-## 1초 이상 보였다"와 같다 — 즉 시야를 끊으면 추적이 멈춘다.
+## 최초 발각은 시야에 reveal_delay만큼 연속 노출돼야 하고, 그 뒤 시야를 잃어도
+## lose_sight_seconds 동안은 추적을 유지한다(모퉁이에서 갑자기 태세를 푸는 것 방지).
 func _is_chasing() -> bool:
-	return seen_time >= reveal_delay
+	return chase_hold > 0.0
 
 
 func _move_chase(delta: float) -> void:
@@ -438,8 +458,12 @@ func _draw() -> void:
 			mode = "발각까지 %.2f" % maxf(reveal_delay - seen_time, 0.0)
 		else:
 			mode = "순찰"
-	elif not path_points.is_empty():
-		mode = "경로(%d)" % path_points.size()
+	else:
+		if not path_points.is_empty():
+			mode = "경로(%d)" % path_points.size()
+		# 시야를 잃고 유지 시간으로 쫓는 중이면 남은 시간을 덧붙인다.
+		if not _can_be_seen():
+			mode += " 유지%.2f" % chase_hold
 
 	# A* 경로 — 첫 선분은 자기 위치(로컬 원점)에서
 	var previous := Vector2.ZERO

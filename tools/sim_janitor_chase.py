@@ -19,6 +19,8 @@
 - 콜리전 캡슐(18×30)을 AABB로 다룬다 — 모서리에서 실제와 미세하게 다르다.
 - 플레이어는 정지 상태로 둔다(결정론 확보). 실제 추격은 움직이는 표적이다.
 """
+from __future__ import annotations   # 사용자 맥의 python 3.9에서 `float | None` 표기 허용
+
 import heapq
 import math
 import pathlib
@@ -40,6 +42,7 @@ LOOKAHEAD = 12
 PATROL_SPEED = 110.0
 SIGHT_RANGE = 320.0     # 플레이어 손전등이 닿는 거리
 REVEAL_DELAY = 1.0      # 시야 노출 후 추적 시작까지
+LOSE_SIGHT = 1.5        # 시야 상실 후 추적 유지
 
 # 교체 전 구현(웨이포인트 8노드 + direct_block_time) — 비교 기준
 OLD_WAYPOINTS = {
@@ -440,11 +443,18 @@ def can_be_seen(pos, player, rects) -> bool:
 
 def run_sighted(pos, player, rects, solid, seconds, patrol_target=None):
     """시야 게이트를 포함한 루프. 추적 시작 시각과 최소 거리를 돌려준다."""
-    path, repath, stuck, seen = [], 0.0, 0.0, 0.0
+    path, repath, stuck, seen, hold = [], 0.0, 0.0, 0.0, 0.0
     chase_started, closest, caught = None, math.dist(pos, player), None
     for frame in range(int(seconds / DT)):
-        seen = seen + DT if can_be_seen(pos, player, rects) else 0.0
-        chasing = seen >= REVEAL_DELAY
+        # _update_awareness와 동일: 최초 발각은 유예 필요, 이후 시야 상실은 유지 시간
+        if can_be_seen(pos, player, rects):
+            seen += DT
+            if seen >= REVEAL_DELAY or hold > 0.0:
+                hold = LOSE_SIGHT
+        else:
+            seen = 0.0
+            hold = max(hold - DT, 0.0)
+        chasing = hold > 0.0
         if chasing and chase_started is None:
             chase_started = frame * DT
 
@@ -572,6 +582,102 @@ def check_sight_gate(floor: int) -> bool:
     return ok
 
 
+def awareness_timeline(steps: list[tuple[bool, bool]]) -> list[bool]:
+    """janitor.gd _update_awareness를 그대로 재현.
+
+    steps: 프레임별 (보임, 은신) → 프레임별 추적 여부.
+    """
+    seen, hold, out = 0.0, 0.0, []
+    for visible, hiding in steps:
+        if hiding:
+            seen, hold = 0.0, 0.0
+        elif visible:
+            seen += DT
+            if seen >= REVEAL_DELAY or hold > 0.0:
+                hold = LOSE_SIGHT
+        else:
+            seen = 0.0
+            hold = max(hold - DT, 0.0)
+        out.append(hold > 0.0)
+    return out
+
+
+def _first_true(flags: list[bool]) -> float | None:
+    for i, v in enumerate(flags):
+        if v:
+            return i * DT
+    return None
+
+
+def _first_false_after(flags: list[bool], start_frame: int) -> float | None:
+    for i in range(start_frame, len(flags)):
+        if not flags[i]:
+            return i * DT
+    return None
+
+
+def check_awareness() -> bool:
+    """발각 타이머 상태기계 검증(지오메트리 없이 타이밍만)."""
+    print("\n=== 발각/추적 유지 타이머 (#153) ===")
+    ok = True
+    frames = lambda s: int(round(s / DT))
+
+    # 1) 계속 보임 → REVEAL_DELAY에 추적 시작
+    t = awareness_timeline([(True, False)] * frames(3.0))
+    start = _first_true(t)
+    passed = start is not None and abs(start - REVEAL_DELAY) <= DT * 1.5
+    ok &= passed
+    print(f"  계속 보임 → 시작 {start:.3f}s (기대 {REVEAL_DELAY})  "
+          f"[{'OK' if passed else 'FAIL'}]")
+
+    # 2) 1.0초 노출 뒤 시야 상실 → LOSE_SIGHT 동안 유지되고 그 뒤 해제
+    seq = [(True, False)] * frames(1.2) + [(False, False)] * frames(3.0)
+    t = awareness_timeline(seq)
+    start = _first_true(t)
+    stop = _first_false_after(t, frames(1.2))
+    held = stop - frames(1.2) * DT if stop is not None else None
+    passed = held is not None and abs(held - LOSE_SIGHT) <= DT * 2
+    ok &= passed
+    print(f"  1.2초 노출 후 시야 상실 → 유지 {held:.3f}s (기대 {LOSE_SIGHT})  "
+          f"[{'OK' if passed else 'FAIL'}]")
+
+    # 3) 유지 중 재노출 → 끊김 없이 이어져야 한다(깜빡임 없음)
+    seq = ([(True, False)] * frames(1.2) + [(False, False)] * frames(0.8)
+           + [(True, False)] * frames(0.5) + [(False, False)] * frames(3.0))
+    t = awareness_timeline(seq)
+    engaged = t[frames(1.2):frames(2.5)]
+    passed = all(engaged)
+    ok &= passed
+    print(f"  유지 중 재노출 → 구간 내 추적 연속 {passed}  "
+          f"[{'OK' if passed else 'FAIL'}]")
+
+    # 4) 재노출로 유지가 갱신되어 마지막 노출 시점부터 다시 1.5초
+    stop = _first_false_after(t, frames(2.5))
+    expected = (frames(1.2) + frames(0.8) + frames(0.5)) * DT + LOSE_SIGHT
+    passed = stop is not None and abs(stop - expected) <= DT * 2
+    ok &= passed
+    print(f"  재노출 후 해제 {stop:.3f}s (기대 {expected:.3f}s)  "
+          f"[{'OK' if passed else 'FAIL'}]")
+
+    # 5) 은신은 즉시 끊는다 — 유지 시간을 주지 않는다(캐비넷 안 붙잡힘 방지)
+    seq = [(True, False)] * frames(1.2) + [(True, True)] * frames(1.0)
+    t = awareness_timeline(seq)
+    stop = _first_false_after(t, frames(1.2))
+    passed = stop is not None and stop - frames(1.2) * DT <= DT * 1.5
+    ok &= passed
+    print(f"  은신 시작 → 즉시 해제(경과 {stop - frames(1.2) * DT:.3f}s)  "
+          f"[{'OK' if passed else 'FAIL'}]")
+
+    # 6) 유예 미달 노출은 추적을 만들지 않는다
+    seq = [(True, False)] * frames(0.8) + [(False, False)] * frames(1.0)
+    t = awareness_timeline(seq)
+    passed = not any(t)
+    ok &= passed
+    print(f"  0.8초만 노출(유예 미달) → 추적 없음 {passed}  "
+          f"[{'OK' if passed else 'FAIL'}]")
+    return ok
+
+
 def load_room_rects(floor: int) -> list[tuple[float, float, float, float]]:
     """층 씬 Rooms 아래 방 폴리곤 영역(순찰 제외 대상)."""
     text = (ROOT / f"scenes/background/school_floor_{floor}.tscn").read_text()
@@ -592,6 +698,7 @@ def main() -> int:
         ok = evaluate(floor) and ok
     for floor in floors:
         ok = check_sight_gate(floor) and ok
+    ok = check_awareness() and ok
     print("\n전체:", "PASS" if ok else "FAIL")
     return 0 if ok else 1
 
