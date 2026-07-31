@@ -19,6 +19,8 @@
 - 콜리전 캡슐(18×30)을 AABB로 다룬다 — 모서리에서 실제와 미세하게 다르다.
 - 플레이어는 정지 상태로 둔다(결정론 확보). 실제 추격은 움직이는 표적이다.
 """
+from __future__ import annotations   # 사용자 맥의 python 3.9에서 `float | None` 표기 허용
+
 import heapq
 import math
 import pathlib
@@ -37,6 +39,10 @@ HALF_W, HALF_H, PROBE_MARGIN = 9.0, 15.0, 1.0
 CELL = 25.0
 GRID_W, GRID_H = 112, 72
 LOOKAHEAD = 12
+PATROL_SPEED = 110.0
+SIGHT_RANGE = 320.0     # 플레이어 손전등이 닿는 거리
+REVEAL_DELAY = 1.0      # 시야 노출 후 추적 시작까지
+LOSE_SIGHT = 1.5        # 시야 상실 후 추적 유지
 
 # 교체 전 구현(웨이포인트 8노드 + direct_block_time) — 비교 기준
 OLD_WAYPOINTS = {
@@ -426,11 +432,273 @@ def evaluate(floor: int, seed: int = 11) -> bool:
     return all_ok
 
 
+# ── 시야 기반 추적 게이트 (#153) ─────────────────────────────────────────
+
+def can_be_seen(pos, player, rects) -> bool:
+    """janitor.gd _can_be_seen: 손전등 거리 안 + 벽에 안 가림(중심선 1발)."""
+    if math.dist(pos, player) > SIGHT_RANGE:
+        return False
+    return clear_ray(pos, player, rects)
+
+
+def run_sighted(pos, player, rects, solid, seconds, patrol_target=None):
+    """시야 게이트를 포함한 루프. 추적 시작 시각과 최소 거리를 돌려준다."""
+    path, repath, stuck, seen, hold = [], 0.0, 0.0, 0.0, 0.0
+    chase_started, closest, caught = None, math.dist(pos, player), None
+    for frame in range(int(seconds / DT)):
+        # _update_awareness와 동일: 최초 발각은 유예 필요, 이후 시야 상실은 유지 시간
+        if can_be_seen(pos, player, rects):
+            seen += DT
+            if seen >= REVEAL_DELAY or hold > 0.0:
+                hold = LOSE_SIGHT
+        else:
+            seen = 0.0
+            hold = max(hold - DT, 0.0)
+        chasing = hold > 0.0
+        if chasing and chase_started is None:
+            chase_started = frame * DT
+
+        if chasing:
+            if math.dist(pos, player) <= CONTACT:
+                caught = frame * DT
+                break
+            repath -= DT
+            if repath <= 0.0 or stuck >= STUCK_SECONDS:
+                repath, stuck = REPATH, 0.0
+                if clear_line(pos, player, rects):
+                    path = []
+                else:
+                    path = astar(solid, nearest_free(solid, pos),
+                                 nearest_free(solid, player))
+            target, path = next_point(pos, path, rects, player)
+            speed = CHASE_SPEED
+        else:
+            if not path or math.dist(pos, patrol_target) <= ARRIVE:
+                path = astar(solid, nearest_free(solid, pos),
+                             nearest_free(solid, patrol_target))
+            target, path = next_point(pos, path, rects, patrol_target)
+            speed = PATROL_SPEED
+
+        length = math.dist(pos, target)
+        if length < 1e-9:
+            continue
+        d = ((target[0] - pos[0]) / length, (target[1] - pos[1]) / length)
+        before = pos
+        pos = move_and_slide(pos, (d[0] * speed, d[1] * speed), rects)
+        adv = (pos[0] - before[0]) * d[0] + (pos[1] - before[1]) * d[1]
+        stuck = stuck + DT if adv < speed * DT * PROGRESS_RATIO else 0.0
+        closest = min(closest, math.dist(pos, player))
+    return {"chase_started": chase_started, "closest": closest, "caught": caught}
+
+
+def check_sight_gate(floor: int) -> bool:
+    rects = load_blockers(floor)
+    solid = build_grid(rects)
+    ok = True
+    print(f"\n=== {floor}층 · 시야 기반 추적 게이트 (#153) ===")
+
+    # 1) 시야 거리 밖: 추적이 시작되지 않고 플레이어에게 접근하지 않아야 한다
+    player = (1325, 940)
+    far = (1325 + 600, 940)
+    if solid[cell_of(far)[0]][cell_of(far)[1]]:
+        far = (1325 + 550, 940)
+    start_gap = math.dist(far, player)
+    r = run_sighted(far, player, rects, solid, 6.0, patrol_target=(2600, 1360))
+    passed = r["chase_started"] is None and r["closest"] > SIGHT_RANGE
+    ok = ok and passed
+    print(f"  시야 밖({start_gap:.0f}px) → 추적 시작 {r['chase_started']}, "
+          f"최근접 {r['closest']:.0f}px  [{'OK' if passed else 'FAIL'}]")
+
+    # 2) 벽에 가린 근거리: 거리는 시야 안이지만 차폐되어 추적이 시작되지 않아야 한다
+    blocked = None
+    for cx in range(GRID_W):
+        for cy in range(GRID_H):
+            if solid[cx][cy]:
+                continue
+            p = cell_center((cx, cy))
+            if math.dist(p, player) < SIGHT_RANGE and not clear_ray(p, player, rects):
+                blocked = p
+                break
+        if blocked:
+            break
+    if blocked:
+        r = run_sighted(blocked, player, rects, solid, 3.0, patrol_target=(170, 1360))
+        passed = r["chase_started"] is None
+        ok = ok and passed
+        print(f"  시야 내 거리이나 벽에 가림 {tuple(int(v) for v in blocked)} "
+              f"({math.dist(blocked, player):.0f}px) → 추적 시작 {r['chase_started']}  "
+              f"[{'OK' if passed else 'FAIL'}]")
+
+    # 3) 시야 안 + 트임: 정확히 REVEAL_DELAY 후 추적이 시작되어야 한다
+    visible = None
+    for cx in range(GRID_W):
+        for cy in range(GRID_H):
+            if solid[cx][cy]:
+                continue
+            p = cell_center((cx, cy))
+            gap = math.dist(p, player)
+            if 150 < gap < SIGHT_RANGE - 40 and clear_ray(p, player, rects):
+                visible = p
+                break
+        if visible:
+            break
+    if visible:
+        # 유예 타이밍은 정지 상태로 검증한다(순찰 목표 = 자기 위치).
+        # 순찰로 움직이면 1초 안에 시야를 벗어날 수 있어 타이밍이 흔들린다.
+        r = run_sighted(visible, player, rects, solid, 6.0, patrol_target=visible)
+        started = r["chase_started"]
+        passed = started is not None and abs(started - REVEAL_DELAY) <= DT * 1.5
+        ok = ok and passed
+        shown = f"{started:.3f}s" if started is not None else "없음"
+        print(f"  시야 내 + 트임(정지) {tuple(int(v) for v in visible)} "
+              f"({math.dist(visible, player):.0f}px) → 추적 시작 {shown} "
+              f"(기대 {REVEAL_DELAY:.3f}s)  [{'OK' if passed else 'FAIL'}]")
+        print(f"     이후 접촉까지 {r['caught']:.1f}s" if r["caught"]
+              else "     접촉 미도달")
+
+        # 순찰 중 노출: 유예 1초 사이에 순찰이 시야를 끊으면 발각이 초기화된다.
+        # 사양상 허용되는 동작이므로 단정하지 않고 관찰값만 남긴다.
+        moving = run_sighted(visible, player, rects, solid, 6.0,
+                             patrol_target=(170, 1360))
+        note = (f"{moving['chase_started']:.2f}s"
+                if moving["chase_started"] is not None else "미발동")
+        print(f"     (참고) 같은 지점에서 순찰 이동 중이면 추적 시작 {note} "
+              f"— 유예 중 이동으로 시야가 끊기면 누적이 초기화된다")
+
+    # 4) 순찰 목표는 복도만 — 방 폴리곤 내부 칸이 제외되는지
+    rooms = load_room_rects(floor)
+    corridor = [c for c in ((x, y) for x in range(GRID_W) for y in range(GRID_H))
+                if not solid[c[0]][c[1]]
+                and not any(r[0] <= cell_center(c)[0] <= r[2]
+                            and r[1] <= cell_center(c)[1] <= r[3] for r in rooms)]
+    walkable = sum(1 for x in range(GRID_W) for y in range(GRID_H) if not solid[x][y])
+    in_room = [c for c in corridor
+               if any(r[0] <= cell_center(c)[0] <= r[2]
+                      and r[1] <= cell_center(c)[1] <= r[3] for r in rooms)]
+    passed = len(corridor) > 0 and not in_room and len(corridor) < walkable
+    ok = ok and passed
+    print(f"  복도 칸 {len(corridor)} / 통행 가능 {walkable} "
+          f"(방 내부 포함 {len(in_room)}개)  [{'OK' if passed else 'FAIL'}]")
+    return ok
+
+
+def awareness_timeline(steps: list[tuple[bool, bool]]) -> list[bool]:
+    """janitor.gd _update_awareness를 그대로 재현.
+
+    steps: 프레임별 (보임, 은신) → 프레임별 추적 여부.
+    """
+    seen, hold, out = 0.0, 0.0, []
+    for visible, hiding in steps:
+        if hiding:
+            seen, hold = 0.0, 0.0
+        elif visible:
+            seen += DT
+            if seen >= REVEAL_DELAY or hold > 0.0:
+                hold = LOSE_SIGHT
+        else:
+            seen = 0.0
+            hold = max(hold - DT, 0.0)
+        out.append(hold > 0.0)
+    return out
+
+
+def _first_true(flags: list[bool]) -> float | None:
+    for i, v in enumerate(flags):
+        if v:
+            return i * DT
+    return None
+
+
+def _first_false_after(flags: list[bool], start_frame: int) -> float | None:
+    for i in range(start_frame, len(flags)):
+        if not flags[i]:
+            return i * DT
+    return None
+
+
+def check_awareness() -> bool:
+    """발각 타이머 상태기계 검증(지오메트리 없이 타이밍만)."""
+    print("\n=== 발각/추적 유지 타이머 (#153) ===")
+    ok = True
+    frames = lambda s: int(round(s / DT))
+
+    # 1) 계속 보임 → REVEAL_DELAY에 추적 시작
+    t = awareness_timeline([(True, False)] * frames(3.0))
+    start = _first_true(t)
+    passed = start is not None and abs(start - REVEAL_DELAY) <= DT * 1.5
+    ok &= passed
+    print(f"  계속 보임 → 시작 {start:.3f}s (기대 {REVEAL_DELAY})  "
+          f"[{'OK' if passed else 'FAIL'}]")
+
+    # 2) 1.0초 노출 뒤 시야 상실 → LOSE_SIGHT 동안 유지되고 그 뒤 해제
+    seq = [(True, False)] * frames(1.2) + [(False, False)] * frames(3.0)
+    t = awareness_timeline(seq)
+    start = _first_true(t)
+    stop = _first_false_after(t, frames(1.2))
+    held = stop - frames(1.2) * DT if stop is not None else None
+    passed = held is not None and abs(held - LOSE_SIGHT) <= DT * 2
+    ok &= passed
+    print(f"  1.2초 노출 후 시야 상실 → 유지 {held:.3f}s (기대 {LOSE_SIGHT})  "
+          f"[{'OK' if passed else 'FAIL'}]")
+
+    # 3) 유지 중 재노출 → 끊김 없이 이어져야 한다(깜빡임 없음)
+    seq = ([(True, False)] * frames(1.2) + [(False, False)] * frames(0.8)
+           + [(True, False)] * frames(0.5) + [(False, False)] * frames(3.0))
+    t = awareness_timeline(seq)
+    engaged = t[frames(1.2):frames(2.5)]
+    passed = all(engaged)
+    ok &= passed
+    print(f"  유지 중 재노출 → 구간 내 추적 연속 {passed}  "
+          f"[{'OK' if passed else 'FAIL'}]")
+
+    # 4) 재노출로 유지가 갱신되어 마지막 노출 시점부터 다시 1.5초
+    stop = _first_false_after(t, frames(2.5))
+    expected = (frames(1.2) + frames(0.8) + frames(0.5)) * DT + LOSE_SIGHT
+    passed = stop is not None and abs(stop - expected) <= DT * 2
+    ok &= passed
+    print(f"  재노출 후 해제 {stop:.3f}s (기대 {expected:.3f}s)  "
+          f"[{'OK' if passed else 'FAIL'}]")
+
+    # 5) 은신은 즉시 끊는다 — 유지 시간을 주지 않는다(캐비넷 안 붙잡힘 방지)
+    seq = [(True, False)] * frames(1.2) + [(True, True)] * frames(1.0)
+    t = awareness_timeline(seq)
+    stop = _first_false_after(t, frames(1.2))
+    passed = stop is not None and stop - frames(1.2) * DT <= DT * 1.5
+    ok &= passed
+    print(f"  은신 시작 → 즉시 해제(경과 {stop - frames(1.2) * DT:.3f}s)  "
+          f"[{'OK' if passed else 'FAIL'}]")
+
+    # 6) 유예 미달 노출은 추적을 만들지 않는다
+    seq = [(True, False)] * frames(0.8) + [(False, False)] * frames(1.0)
+    t = awareness_timeline(seq)
+    passed = not any(t)
+    ok &= passed
+    print(f"  0.8초만 노출(유예 미달) → 추적 없음 {passed}  "
+          f"[{'OK' if passed else 'FAIL'}]")
+    return ok
+
+
+def load_room_rects(floor: int) -> list[tuple[float, float, float, float]]:
+    """층 씬 Rooms 아래 방 폴리곤 영역(순찰 제외 대상)."""
+    text = (ROOT / f"scenes/background/school_floor_{floor}.tscn").read_text()
+    out = []
+    for m in re.finditer(
+            r'\[node name="[^"]+" type="Polygon2D" parent="Rooms"\]\s*\n'
+            r'(?:[a-z_].*\n)*?polygon = PackedVector2Array\(([^)]*)\)', text):
+        nums = [float(v) for v in m.group(1).split(",")]
+        xs, ys = nums[0::2], nums[1::2]
+        out.append((min(xs), min(ys), max(xs), max(ys)))
+    return out
+
+
 def main() -> int:
     floors = [int(a) for a in sys.argv[1:]] or [2, 3]
     ok = True
     for floor in floors:
         ok = evaluate(floor) and ok
+    for floor in floors:
+        ok = check_sight_gate(floor) and ok
+    ok = check_awareness() and ok
     print("\n전체:", "PASS" if ok else "FAIL")
     return 0 if ok else 1
 

@@ -10,6 +10,15 @@ extends CharacterBody2D
 
 @export var patrol_speed: float = 110.0
 @export var chase_speed: float = 220.0
+# 플레이어가 수위를 알아볼 수 있는 거리. 플레이어 PointLight2D가 512×512 방사
+# 그라디언트(텍스처 반경 256) × texture_scale 1.3 ≈ 333px까지 비춘다.
+# 카메라(zoom 1.25, 1600×900)의 가시 반경은 360px이라 이 범위는 항상 화면 안이다.
+@export var sight_range: float = 320.0
+# 시야에 들어온 뒤 추적을 시작하기까지의 유예 — 플레이어에게 반응 시간을 준다.
+@export var reveal_delay: float = 1.0
+# 시야를 잃은 뒤에도 추적을 유지하는 시간. 0이면 모퉁이를 도는 순간 태세를 풀어
+# 돌진하다 갑자기 산책하는 모습이 된다.
+@export var lose_sight_seconds: float = 1.5
 
 const ARRIVE_DISTANCE := 6.0
 const STUCK_SECONDS := 0.6      # 가려던 방향으로 못 나아간 시간이 이만큼이면 막힌 것
@@ -43,6 +52,12 @@ var debug_draw: bool = false
 var astar_grid := AStarGrid2D.new()
 var grid_ready: bool = false
 var walkable_cells: Array[Vector2i] = []
+var corridor_cells: Array[Vector2i] = []   # 순찰은 복도만 돈다(방 폴리곤 외부)
+
+# 플레이어 시야에 연속으로 노출된 시간. reveal_delay를 넘기면 추적이 시작된다.
+var seen_time: float = 0.0
+# 추적 유지 잔여 시간. 보이는 동안 계속 갱신되고, 시야를 잃으면 줄어든다.
+var chase_hold: float = 0.0
 
 var path_points: PackedVector2Array = PackedVector2Array()
 var patrol_target: Vector2 = Vector2.ZERO
@@ -109,7 +124,42 @@ func _rebuild_grid(floor_root: Node) -> void:
 			var cell := Vector2i(cell_x, cell_y)
 			if not astar_grid.is_point_solid(cell):
 				walkable_cells.append(cell)
+
+	# 순찰용 복도 칸: 방 폴리곤 안에 들어가는 칸을 뺀다.
+	var rooms: Array[Rect2] = []
+	_collect_room_rects(floor_root, rooms)
+	corridor_cells.clear()
+	for cell in walkable_cells:
+		var center := _cell_center(cell)
+		var in_room := false
+		for room in rooms:
+			if room.has_point(center):
+				in_room = true
+				break
+		if not in_room:
+			corridor_cells.append(cell)
+	if corridor_cells.is_empty():
+		corridor_cells = walkable_cells.duplicate()
+
+	# 경로탐색과 순찰 목표가 모두 준비된 뒤에 사용 가능으로 표시한다.
 	grid_ready = not walkable_cells.is_empty()
+
+
+## 층 씬의 Rooms 아래 방 폴리곤 영역(순찰에서 제외할 실내)을 모은다.
+func _collect_room_rects(floor_root: Node, out: Array[Rect2]) -> void:
+	var rooms := floor_root.get_node_or_null("Rooms")
+	if rooms == null:
+		return
+	for child in rooms.get_children():
+		if child is Polygon2D:
+			var polygon := (child as Polygon2D).polygon
+			if polygon.size() == 0:
+				continue
+			var node_2d := child as Node2D
+			var rect := Rect2(node_2d.to_global(polygon[0]), Vector2.ZERO)
+			for i in range(1, polygon.size()):
+				rect = rect.expand(node_2d.to_global(polygon[i]))
+			out.append(rect)
 
 
 ## 층 씬에서 StaticBody2D 하위 충돌 도형만 모은다(Area2D 상호작용 존은 제외).
@@ -175,13 +225,14 @@ func _spawn_away_from(player_position: Vector2) -> void:
 	if not grid_ready:
 		return
 
+	# 순찰이 기본 상태이므로 복도에서 등장한다.
 	var max_distance := 0.0
-	for cell in walkable_cells:
+	for cell in corridor_cells:
 		max_distance = maxf(max_distance, _cell_center(cell).distance_to(player_position))
 
 	# 가장 먼 한 칸만 쓰면 매번 같은 구석에서 나온다 — 충분히 먼 칸 중 무작위.
 	var candidates: Array[Vector2i] = []
-	for cell in walkable_cells:
+	for cell in corridor_cells:
 		if _cell_center(cell).distance_to(player_position) >= max_distance * FAR_SPAWN_RATIO:
 			candidates.append(cell)
 	if candidates.is_empty():
@@ -192,11 +243,15 @@ func _spawn_away_from(player_position: Vector2) -> void:
 	patrol_target = position
 	repath_timer = 0.0
 	stuck_time = 0.0
+	seen_time = 0.0
+	chase_hold = 0.0
 
 
 # ── 이동 ─────────────────────────────────────────────────────────
 
 func _physics_process(delta: float) -> void:
+	_update_awareness(delta)
+
 	if _is_chasing():
 		_move_chase(delta)
 	else:
@@ -206,12 +261,45 @@ func _physics_process(delta: float) -> void:
 		queue_redraw()
 
 
-## 혹시 모를 어긋남 대비: 플레이어가 수위와 같은 층에 있을 때만 추적한다.
-## 은신 중(#6)이면 발각되지 않아 순찰로 돌아간다.
-func _is_chasing() -> bool:
+## 발각 상태 갱신. 추적 여부는 chase_hold 하나로 결정된다.
+func _update_awareness(delta: float) -> void:
+	# 은신(#6)은 즉시 추적을 끊는다. 여기에 유지 시간을 주면 캐비넷에 숨은
+	# 직후에도 수위가 들이닥쳐 접촉 판정(#4)으로 붙잡히므로 은신이 무의미해진다.
+	if player != null and player.get("is_hiding") == true:
+		seen_time = 0.0
+		chase_hold = 0.0
+		return
+
+	if _can_be_seen():
+		seen_time += delta
+		# 이미 추적 중이면 재확인에 유예를 다시 요구하지 않는다 — 유예는 최초
+		# 발각에만 적용된다. 그러지 않으면 시야를 끊었다 다시 보일 때마다
+		# 추적이 잠깐 풀렸다 붙는 깜빡임이 생긴다.
+		if seen_time >= reveal_delay or chase_hold > 0.0:
+			chase_hold = lose_sight_seconds
+	else:
+		seen_time = 0.0
+		chase_hold = maxf(chase_hold - delta, 0.0)
+
+
+## 플레이어가 수위를 실제로 볼 수 있는가.
+## 어두운 학교라 손전등이 닿는 거리(sight_range) 안이어야 하고, 벽에 가리면 안 된다.
+## 손전등은 원형이라 시야각은 없다 — 방향은 보지 않는다.
+## 여기서 쓰는 것은 중심선 레이 1발이다. _clear_line(몸통 통과 가능성)은 이동용이고,
+## "보이는지"와는 다른 문제다.
+## 혹시 모를 어긋남 대비로 같은 층 조건은 유지한다.
+func _can_be_seen() -> bool:
 	if player == null or player_floor != my_floor:
 		return false
-	return player.get("is_hiding") != true
+	if position.distance_to(player.position) > sight_range:
+		return false
+	return _clear_ray(position, player.position)
+
+
+## 최초 발각은 시야에 reveal_delay만큼 연속 노출돼야 하고, 그 뒤 시야를 잃어도
+## lose_sight_seconds 동안은 추적을 유지한다(모퉁이에서 갑자기 태세를 푸는 것 방지).
+func _is_chasing() -> bool:
+	return chase_hold > 0.0
 
 
 func _move_chase(delta: float) -> void:
@@ -268,7 +356,7 @@ func _move_patrol(delta: float) -> void:
 
 
 func _pick_patrol_target() -> void:
-	patrol_target = _cell_center(walkable_cells.pick_random())
+	patrol_target = _cell_center(corridor_cells.pick_random())
 	path_points = astar_grid.get_point_path(
 		_nearest_free_cell(position), _nearest_free_cell(patrol_target))
 
@@ -365,9 +453,17 @@ func _draw() -> void:
 
 	var mode := "직진"
 	if not _is_chasing():
-		mode = "순찰"
-	elif not path_points.is_empty():
-		mode = "경로(%d)" % path_points.size()
+		# 보이는 중이면 발각까지 남은 시간을, 아니면 순찰임을 보여준다.
+		if seen_time > 0.0:
+			mode = "발각까지 %.2f" % maxf(reveal_delay - seen_time, 0.0)
+		else:
+			mode = "순찰"
+	else:
+		if not path_points.is_empty():
+			mode = "경로(%d)" % path_points.size()
+		# 시야를 잃고 유지 시간으로 쫓는 중이면 남은 시간을 덧붙인다.
+		if not _can_be_seen():
+			mode += " 유지%.2f" % chase_hold
 
 	# A* 경로 — 첫 선분은 자기 위치(로컬 원점)에서
 	var previous := Vector2.ZERO
@@ -376,6 +472,9 @@ func _draw() -> void:
 		draw_circle(point, 4.0, Color(0.3, 0.9, 1.0, 0.8))
 		draw_line(previous, point, Color(0.3, 0.9, 1.0, 0.6), 2.0)
 		previous = point
+
+	# 플레이어가 알아볼 수 있는 거리 — 이 안이고 벽에 안 가리면 발각이 누적된다
+	draw_arc(Vector2.ZERO, sight_range, 0.0, TAU, 48, Color(1, 1, 0.5, 0.18), 1.0)
 
 	if player != null:
 		# 플레이어까지 LOS 프로브 3발 — 통과=초록 / 차단=빨강
@@ -389,5 +488,7 @@ func _draw() -> void:
 			draw_line(to_local(from), to_local(to), color, 1.5)
 
 	draw_string(ThemeDB.fallback_font, Vector2(-40, -34),
-		"%s  stuck %.2f  grid %s" % [mode, stuck_time, "OK" if grid_ready else "X"],
+		"%s  보임 %s  stuck %.2f  grid %s"
+			% [mode, "O" if _can_be_seen() else "X", stuck_time,
+				"OK" if grid_ready else "X"],
 		HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color(1, 1, 0.6, 1))
