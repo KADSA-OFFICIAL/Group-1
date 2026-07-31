@@ -1,7 +1,8 @@
-[gd_scene load_steps=101 format=3]
+[gd_scene load_steps=102 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
+[ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_stair_zone"]
 size = Vector2(240, 56)
@@ -207,49 +208,49 @@ polygon = PackedVector2Array(510, 1080, 775.0, 1080, 775.0, 1096, 510, 1096)
 [sub_resource type="OccluderPolygon2D" id="Occ_WC_HumanitiesDept_topR"]
 polygon = PackedVector2Array(885.0, 1080, 1150, 1080, 1150, 1096, 885.0, 1096)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty4_left"]
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_DasanRoom_left"]
 polygon = PackedVector2Array(1700, 1400, 1716, 1400, 1716, 1680, 1700, 1680)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty4_right"]
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_DasanRoom_right"]
 polygon = PackedVector2Array(1990, 1400, 2006, 1400, 2006, 1680, 1990, 1680)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty4_bot"]
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_DasanRoom_bot"]
 polygon = PackedVector2Array(1700, 1664, 2006, 1664, 2006, 1680, 1700, 1680)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty4_topL"]
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_DasanRoom_topL"]
 polygon = PackedVector2Array(1700, 1400, 1798.0, 1400, 1798.0, 1416, 1700, 1416)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty4_topR"]
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_DasanRoom_topR"]
 polygon = PackedVector2Array(1908.0, 1400, 2006, 1400, 2006, 1416, 1908.0, 1416)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty5_left"]
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_CounselRoom_left"]
 polygon = PackedVector2Array(2036, 1400, 2052, 1400, 2052, 1680, 2036, 1680)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty5_right"]
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_CounselRoom_right"]
 polygon = PackedVector2Array(2326, 1400, 2342, 1400, 2342, 1680, 2326, 1680)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty5_bot"]
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_CounselRoom_bot"]
 polygon = PackedVector2Array(2036, 1664, 2342, 1664, 2342, 1680, 2036, 1680)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty5_topL"]
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_CounselRoom_topL"]
 polygon = PackedVector2Array(2036, 1400, 2134.0, 1400, 2134.0, 1416, 2036, 1416)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty5_topR"]
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_CounselRoom_topR"]
 polygon = PackedVector2Array(2244.0, 1400, 2342, 1400, 2342, 1416, 2244.0, 1416)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty6_left"]
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_PrintRoom_left"]
 polygon = PackedVector2Array(2372, 1400, 2388, 1400, 2388, 1680, 2372, 1680)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty6_right"]
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_PrintRoom_right"]
 polygon = PackedVector2Array(2662, 1400, 2678, 1400, 2678, 1680, 2662, 1680)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty6_bot"]
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_PrintRoom_bot"]
 polygon = PackedVector2Array(2372, 1664, 2678, 1664, 2678, 1680, 2372, 1680)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty6_topL"]
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_PrintRoom_topL"]
 polygon = PackedVector2Array(2372, 1400, 2470.0, 1400, 2470.0, 1416, 2372, 1416)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_Empty6_topR"]
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_PrintRoom_topR"]
 polygon = PackedVector2Array(2580.0, 1400, 2678, 1400, 2678, 1416, 2580.0, 1416)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_WC_MathRoom_left"]
@@ -359,15 +360,15 @@ polygon = PackedVector2Array(120, 1080, 480, 1080, 480, 1320, 120, 1320)
 color = Color(0.11, 0.1, 0.12, 1)
 polygon = PackedVector2Array(510, 1080, 1150, 1080, 1150, 1320, 510, 1320)
 
-[node name="Empty4" type="Polygon2D" parent="Rooms"]
+[node name="DasanRoom" type="Polygon2D" parent="Rooms"]
 color = Color(0.08, 0.08, 0.09, 1)
 polygon = PackedVector2Array(1700, 1400, 2006, 1400, 2006, 1680, 1700, 1680)
 
-[node name="Empty5" type="Polygon2D" parent="Rooms"]
+[node name="CounselRoom" type="Polygon2D" parent="Rooms"]
 color = Color(0.08, 0.08, 0.09, 1)
 polygon = PackedVector2Array(2036, 1400, 2342, 1400, 2342, 1680, 2036, 1680)
 
-[node name="Empty6" type="Polygon2D" parent="Rooms"]
+[node name="PrintRoom" type="Polygon2D" parent="Rooms"]
 color = Color(0.08, 0.08, 0.09, 1)
 polygon = PackedVector2Array(2372, 1400, 2678, 1400, 2678, 1680, 2372, 1680)
 
@@ -591,6 +592,160 @@ polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
 [node name="StairKeyZone" type="CollisionShape2D" parent="StairKey"]
 shape = SubResource("RectangleShape2D_key_zone")
 
+[node name="FriendNote" type="Area2D" parent="."]
+position = Vector2(1760, 1620)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "책상 위에 접힌 쪽지. '하람아, 은수 때린 거 수위 아저씨가 봤다더라.' 뒷면에 다른 글씨로 — '나 안 때렸어. 쓰러지길래 잡은 건데.'"
+prompt_text = "조사"
+grants_flag = "found_songharam"
+
+[node name="FriendNoteVisual" type="Polygon2D" parent="FriendNote"]
+z_index = 1
+color = Color(0.72, 0.7, 0.62, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+[node name="FriendNoteZone" type="CollisionShape2D" parent="FriendNote"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="DasanStairKey" type="Area2D" parent="."]
+position = Vector2(1950, 1620)
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("2_pickup")
+item_id = "stair_key_4"
+message = "다산실 사물함 위에서 4층 계단 열쇠를 주웠다."
+pickup_id = "stair_key_4_dasan_taken"
+
+[node name="DasanStairKeyVisual" type="Polygon2D" parent="DasanStairKey"]
+z_index = 1
+color = Color(0.62, 0.55, 0.28, 1)
+polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
+
+[node name="DasanStairKeyZone" type="CollisionShape2D" parent="DasanStairKey"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="CounselRecord" type="Area2D" parent="."]
+position = Vector2(2090, 1620)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "상담기록부가 펼쳐져 있다. 2학년 박시우 — 7회차. 마지막 장에 학교 회신이 붙어 있다. '가해 학생 특정 어려움. 추가 조치 없음.'"
+prompt_text = "조사"
+grants_flag = "read_siwoo_counseling"
+
+[node name="CounselRecordVisual" type="Polygon2D" parent="CounselRecord"]
+z_index = 1
+color = Color(0.72, 0.7, 0.62, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+[node name="CounselRecordZone" type="CollisionShape2D" parent="CounselRecord"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="SiwooPainting" type="Area2D" parent="."]
+position = Vector2(2290, 1620)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "벽에 걸린 액자. 구석에 작게 적힌 서명 — 박시우. 나무 그늘 아래에 붓끝으로 눌러 쓴 작은 글씨가 있다. — 도와줘."
+prompt_text = "그림 보기"
+grants_flag = "read_siwoo_painting"
+
+[node name="SiwooPaintingVisual" type="Polygon2D" parent="SiwooPainting"]
+z_index = 1
+color = Color(0.35, 0.3, 0.45, 1)
+polygon = PackedVector2Array(-14, -12, 14, -12, 14, 12, -14, 12)
+
+[node name="SiwooPaintingZone" type="CollisionShape2D" parent="SiwooPainting"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="CrisisManual" type="Area2D" parent="."]
+position = Vector2(2430, 1620)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "인쇄기 옆에 시험 인쇄물이 남아 있다. '학생 사망 사고 대응 매뉴얼 — 언론 차단, 유가족 합의 우선, 재학생 동요 최소화.'"
+prompt_text = "조사"
+grants_flag = "read_crisis_manual"
+
+[node name="CrisisManualVisual" type="Polygon2D" parent="CrisisManual"]
+z_index = 1
+color = Color(0.72, 0.7, 0.62, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+[node name="CrisisManualZone" type="CollisionShape2D" parent="CrisisManual"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="InkCan" type="Area2D" parent="."]
+position = Vector2(2620, 1620)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "인쇄기 아래 잉크통. 뚜껑이 헐겁다. 챙겨 두면 쓸 데가 있을지도 모른다."
+prompt_text = "잉크통 챙기기"
+grants_item_id = "ink_can"
+
+[node name="InkCanVisual" type="Polygon2D" parent="InkCan"]
+z_index = 1
+color = Color(0.2, 0.2, 0.28, 1)
+polygon = PackedVector2Array(-10, -12, 10, -12, 10, 12, -10, 12)
+
+[node name="InkCanZone" type="CollisionShape2D" parent="InkCan"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="ScienceClue" type="Area2D" parent="."]
+position = Vector2(1650, 1240)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "깨진 비커가 치워지지 않은 채로 있다. 그 아래 가정통신문 뒷면에 눌러쓴 글씨 — '집에서 맞고 학교서 혼나고. 그럼 나는 어디로 가.' 이름 칸: 2학년 2반 조민혁."
+prompt_text = "조사"
+grants_flag = "found_jominhyuk"
+
+[node name="ScienceClueVisual" type="Polygon2D" parent="ScienceClue"]
+z_index = 1
+color = Color(0.55, 0.62, 0.6, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+[node name="ScienceClueZone" type="CollisionShape2D" parent="ScienceClue"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="HistoryClue" type="Area2D" parent="."]
+position = Vector2(710, 1620)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "10년 전 졸업앨범. 2학년 박시우의 사진 위에 검은 테두리가 그려져 있다. 사이에 끼워진 신문 스크랩 — '교내 추락 사고로 학생 1명 사망'."
+prompt_text = "조사"
+grants_flag = "read_siwoo_past"
+
+[node name="HistoryClueVisual" type="Polygon2D" parent="HistoryClue"]
+z_index = 1
+color = Color(0.6, 0.5, 0.4, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+[node name="HistoryClueZone" type="CollisionShape2D" parent="HistoryClue"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="TaehoNote" type="Area2D" parent="."]
+position = Vector2(200, 1620)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "교구함에 쪽지가 붙어 있다. '민혁아, 과학실 기구 부수지 마. 걸리면 너만 혼나. 열쇠 여기 숨겨둘게. -태호' 쪽지 뒤에서 3층 계단 열쇠가 나왔다."
+prompt_text = "쪽지 살펴보기"
+grants_item_id = "stair_key_3"
+grants_flag = "read_taeho_note"
+
+[node name="TaehoNoteVisual" type="Polygon2D" parent="TaehoNote"]
+z_index = 1
+color = Color(0.72, 0.7, 0.62, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+[node name="TaehoNoteZone" type="CollisionShape2D" parent="TaehoNote"]
+shape = SubResource("RectangleShape2D_key_zone")
+
 [node name="Occluders" type="Node2D" parent="."]
 
 [node name="LO_RC_StairUp_L" type="LightOccluder2D" parent="Occluders"]
@@ -779,50 +934,50 @@ occluder = SubResource("Occ_WC_HumanitiesDept_topL")
 [node name="LO_WC_HumanitiesDept_topR" type="LightOccluder2D" parent="Occluders"]
 occluder = SubResource("Occ_WC_HumanitiesDept_topR")
 
-[node name="LO_WC_Empty4_left" type="LightOccluder2D" parent="Occluders"]
-occluder = SubResource("Occ_WC_Empty4_left")
+[node name="LO_WC_DasanRoom_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_DasanRoom_left")
 
-[node name="LO_WC_Empty4_right" type="LightOccluder2D" parent="Occluders"]
-occluder = SubResource("Occ_WC_Empty4_right")
+[node name="LO_WC_DasanRoom_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_DasanRoom_right")
 
-[node name="LO_WC_Empty4_bot" type="LightOccluder2D" parent="Occluders"]
-occluder = SubResource("Occ_WC_Empty4_bot")
+[node name="LO_WC_DasanRoom_bot" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_DasanRoom_bot")
 
-[node name="LO_WC_Empty4_topL" type="LightOccluder2D" parent="Occluders"]
-occluder = SubResource("Occ_WC_Empty4_topL")
+[node name="LO_WC_DasanRoom_topL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_DasanRoom_topL")
 
-[node name="LO_WC_Empty4_topR" type="LightOccluder2D" parent="Occluders"]
-occluder = SubResource("Occ_WC_Empty4_topR")
+[node name="LO_WC_DasanRoom_topR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_DasanRoom_topR")
 
-[node name="LO_WC_Empty5_left" type="LightOccluder2D" parent="Occluders"]
-occluder = SubResource("Occ_WC_Empty5_left")
+[node name="LO_WC_CounselRoom_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_CounselRoom_left")
 
-[node name="LO_WC_Empty5_right" type="LightOccluder2D" parent="Occluders"]
-occluder = SubResource("Occ_WC_Empty5_right")
+[node name="LO_WC_CounselRoom_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_CounselRoom_right")
 
-[node name="LO_WC_Empty5_bot" type="LightOccluder2D" parent="Occluders"]
-occluder = SubResource("Occ_WC_Empty5_bot")
+[node name="LO_WC_CounselRoom_bot" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_CounselRoom_bot")
 
-[node name="LO_WC_Empty5_topL" type="LightOccluder2D" parent="Occluders"]
-occluder = SubResource("Occ_WC_Empty5_topL")
+[node name="LO_WC_CounselRoom_topL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_CounselRoom_topL")
 
-[node name="LO_WC_Empty5_topR" type="LightOccluder2D" parent="Occluders"]
-occluder = SubResource("Occ_WC_Empty5_topR")
+[node name="LO_WC_CounselRoom_topR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_CounselRoom_topR")
 
-[node name="LO_WC_Empty6_left" type="LightOccluder2D" parent="Occluders"]
-occluder = SubResource("Occ_WC_Empty6_left")
+[node name="LO_WC_PrintRoom_left" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_PrintRoom_left")
 
-[node name="LO_WC_Empty6_right" type="LightOccluder2D" parent="Occluders"]
-occluder = SubResource("Occ_WC_Empty6_right")
+[node name="LO_WC_PrintRoom_right" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_PrintRoom_right")
 
-[node name="LO_WC_Empty6_bot" type="LightOccluder2D" parent="Occluders"]
-occluder = SubResource("Occ_WC_Empty6_bot")
+[node name="LO_WC_PrintRoom_bot" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_PrintRoom_bot")
 
-[node name="LO_WC_Empty6_topL" type="LightOccluder2D" parent="Occluders"]
-occluder = SubResource("Occ_WC_Empty6_topL")
+[node name="LO_WC_PrintRoom_topL" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_PrintRoom_topL")
 
-[node name="LO_WC_Empty6_topR" type="LightOccluder2D" parent="Occluders"]
-occluder = SubResource("Occ_WC_Empty6_topR")
+[node name="LO_WC_PrintRoom_topR" type="LightOccluder2D" parent="Occluders"]
+occluder = SubResource("Occ_WC_PrintRoom_topR")
 
 [node name="LO_WC_MathRoom_left" type="LightOccluder2D" parent="Occluders"]
 occluder = SubResource("Occ_WC_MathRoom_left")
@@ -951,28 +1106,28 @@ offset_bottom = 1215.0
 text = "과학탐구부"
 horizontal_alignment = 1
 
-[node name="LEmpty4" type="Label" parent="Labels"]
+[node name="LDasanRoom" type="Label" parent="Labels"]
 offset_left = 1778.0
 offset_top = 1525.0
 offset_right = 1928.0
 offset_bottom = 1555.0
-text = "빈 방"
+text = "다산실"
 horizontal_alignment = 1
 
-[node name="LEmpty5" type="Label" parent="Labels"]
+[node name="LCounselRoom" type="Label" parent="Labels"]
 offset_left = 2114.0
 offset_top = 1525.0
 offset_right = 2264.0
 offset_bottom = 1555.0
-text = "빈 방"
+text = "상담실"
 horizontal_alignment = 1
 
-[node name="LEmpty6" type="Label" parent="Labels"]
+[node name="LPrintRoom" type="Label" parent="Labels"]
 offset_left = 2450.0
 offset_top = 1525.0
 offset_right = 2600.0
 offset_bottom = 1555.0
-text = "빈 방"
+text = "인쇄실"
 horizontal_alignment = 1
 
 
@@ -1156,49 +1311,49 @@ polygon = PackedVector2Array(510, 1080, 775.0, 1080, 775.0, 1096, 510, 1096)
 [node name="WC_HumanitiesDept_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(885.0, 1080, 1150, 1080, 1150, 1096, 885.0, 1096)
 
-[node name="WC_Empty4_left" type="CollisionPolygon2D" parent="RoomWalls"]
+[node name="WC_DasanRoom_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1700, 1400, 1716, 1400, 1716, 1680, 1700, 1680)
 
-[node name="WC_Empty4_right" type="CollisionPolygon2D" parent="RoomWalls"]
+[node name="WC_DasanRoom_right" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1990, 1400, 2006, 1400, 2006, 1680, 1990, 1680)
 
-[node name="WC_Empty4_bot" type="CollisionPolygon2D" parent="RoomWalls"]
+[node name="WC_DasanRoom_bot" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1700, 1664, 2006, 1664, 2006, 1680, 1700, 1680)
 
-[node name="WC_Empty4_topL" type="CollisionPolygon2D" parent="RoomWalls"]
+[node name="WC_DasanRoom_topL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1700, 1400, 1798.0, 1400, 1798.0, 1416, 1700, 1416)
 
-[node name="WC_Empty4_topR" type="CollisionPolygon2D" parent="RoomWalls"]
+[node name="WC_DasanRoom_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1908.0, 1400, 2006, 1400, 2006, 1416, 1908.0, 1416)
 
-[node name="WC_Empty5_left" type="CollisionPolygon2D" parent="RoomWalls"]
+[node name="WC_CounselRoom_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2036, 1400, 2052, 1400, 2052, 1680, 2036, 1680)
 
-[node name="WC_Empty5_right" type="CollisionPolygon2D" parent="RoomWalls"]
+[node name="WC_CounselRoom_right" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2326, 1400, 2342, 1400, 2342, 1680, 2326, 1680)
 
-[node name="WC_Empty5_bot" type="CollisionPolygon2D" parent="RoomWalls"]
+[node name="WC_CounselRoom_bot" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2036, 1664, 2342, 1664, 2342, 1680, 2036, 1680)
 
-[node name="WC_Empty5_topL" type="CollisionPolygon2D" parent="RoomWalls"]
+[node name="WC_CounselRoom_topL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2036, 1400, 2134.0, 1400, 2134.0, 1416, 2036, 1416)
 
-[node name="WC_Empty5_topR" type="CollisionPolygon2D" parent="RoomWalls"]
+[node name="WC_CounselRoom_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2244.0, 1400, 2342, 1400, 2342, 1416, 2244.0, 1416)
 
-[node name="WC_Empty6_left" type="CollisionPolygon2D" parent="RoomWalls"]
+[node name="WC_PrintRoom_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2372, 1400, 2388, 1400, 2388, 1680, 2372, 1680)
 
-[node name="WC_Empty6_right" type="CollisionPolygon2D" parent="RoomWalls"]
+[node name="WC_PrintRoom_right" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2662, 1400, 2678, 1400, 2678, 1680, 2662, 1680)
 
-[node name="WC_Empty6_bot" type="CollisionPolygon2D" parent="RoomWalls"]
+[node name="WC_PrintRoom_bot" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2372, 1664, 2678, 1664, 2678, 1680, 2372, 1680)
 
-[node name="WC_Empty6_topL" type="CollisionPolygon2D" parent="RoomWalls"]
+[node name="WC_PrintRoom_topL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2372, 1400, 2470.0, 1400, 2470.0, 1416, 2372, 1416)
 
-[node name="WC_Empty6_topR" type="CollisionPolygon2D" parent="RoomWalls"]
+[node name="WC_PrintRoom_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2580.0, 1400, 2678, 1400, 2678, 1416, 2580.0, 1416)
 
 [node name="WC_MathRoom_left" type="CollisionPolygon2D" parent="RoomWalls"]
@@ -1488,75 +1643,75 @@ polygon = PackedVector2Array(885.0, 1080, 1150, 1080, 1150, 1096, 885.0, 1096)
 color = Color(0.45, 0.32, 0.2, 1)
 polygon = PackedVector2Array(775.0, 1080, 885.0, 1080, 885.0, 1096, 775.0, 1096)
 
-[node name="WV_Empty4_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="WV_DasanRoom_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1700, 1400, 1716, 1400, 1716, 1680, 1700, 1680)
 
-[node name="WV_Empty4_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="WV_DasanRoom_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1990, 1400, 2006, 1400, 2006, 1680, 1990, 1680)
 
-[node name="WV_Empty4_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="WV_DasanRoom_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1700, 1664, 2006, 1664, 2006, 1680, 1700, 1680)
 
-[node name="WV_Empty4_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="WV_DasanRoom_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1700, 1400, 1798.0, 1400, 1798.0, 1416, 1700, 1416)
 
-[node name="WV_Empty4_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="WV_DasanRoom_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1908.0, 1400, 2006, 1400, 2006, 1416, 1908.0, 1416)
 
-[node name="Door_Empty4" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="Door_DasanRoom" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.32, 0.2, 1)
 polygon = PackedVector2Array(1798.0, 1400, 1908.0, 1400, 1908.0, 1416, 1798.0, 1416)
 
-[node name="WV_Empty5_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="WV_CounselRoom_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2036, 1400, 2052, 1400, 2052, 1680, 2036, 1680)
 
-[node name="WV_Empty5_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="WV_CounselRoom_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2326, 1400, 2342, 1400, 2342, 1680, 2326, 1680)
 
-[node name="WV_Empty5_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="WV_CounselRoom_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2036, 1664, 2342, 1664, 2342, 1680, 2036, 1680)
 
-[node name="WV_Empty5_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="WV_CounselRoom_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2036, 1400, 2134.0, 1400, 2134.0, 1416, 2036, 1416)
 
-[node name="WV_Empty5_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="WV_CounselRoom_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2244.0, 1400, 2342, 1400, 2342, 1416, 2244.0, 1416)
 
-[node name="Door_Empty5" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="Door_CounselRoom" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.32, 0.2, 1)
 polygon = PackedVector2Array(2134.0, 1400, 2244.0, 1400, 2244.0, 1416, 2134.0, 1416)
 
-[node name="WV_Empty6_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="WV_PrintRoom_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2372, 1400, 2388, 1400, 2388, 1680, 2372, 1680)
 
-[node name="WV_Empty6_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="WV_PrintRoom_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2662, 1400, 2678, 1400, 2678, 1680, 2662, 1680)
 
-[node name="WV_Empty6_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="WV_PrintRoom_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2372, 1664, 2678, 1664, 2678, 1680, 2372, 1680)
 
-[node name="WV_Empty6_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="WV_PrintRoom_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2372, 1400, 2470.0, 1400, 2470.0, 1416, 2372, 1416)
 
-[node name="WV_Empty6_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="WV_PrintRoom_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2580.0, 1400, 2678, 1400, 2678, 1416, 2580.0, 1416)
 
-[node name="Door_Empty6" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+[node name="Door_PrintRoom" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.32, 0.2, 1)
 polygon = PackedVector2Array(2470.0, 1400, 2580.0, 1400, 2580.0, 1416, 2470.0, 1416)
 

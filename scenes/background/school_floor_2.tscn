@@ -1,8 +1,9 @@
-[gd_scene load_steps=112 format=3]
+[gd_scene load_steps=113 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
 [ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="3_hiding"]
+[ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="4_interactable"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_stair_zone"]
 size = Vector2(240, 56)
@@ -621,21 +622,73 @@ also_remove_paths = Array[NodePath]([NodePath("../SULock"), NodePath("../WallGlo
 [node name="SDLockZone" type="CollisionShape2D" parent="SDLock"]
 shape = SubResource("RectangleShape2D_stair_zone")
 
-[node name="StairKey" type="Area2D" parent="."]
-position = Vector2(975, 1560)
-collision_layer = 0
-collision_mask = 1
-script = ExtResource("2_pickup")
-item_id = "stair_key_2"
-message = "체력단련실에서 2층 계단 열쇠를 주웠다."
-pickup_id = "stair_key_2_taken"
+[node name="YujinClue" type="Area2D" parent="."]
+position = Vector2(180, 1560)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("4_interactable")
+message = "체육관 입구 구석에 체육복 상의가 개켜져 있다. 이름표는 3학년 1반 강유진. 주머니에서 나온 쪽지 — '유진아 후배 병원 갔다더라.' 뒷면에 다른 글씨, 굵고 눌러쓴 어른 글씨. '아무도 안 도와주니까 내가 한다.'"
+prompt_text = "조사"
+grants_flag = "found_kangyujin"
 
-[node name="StairKeyVisual" type="Polygon2D" parent="StairKey"]
+[node name="YujinClueVisual" type="Polygon2D" parent="YujinClue"]
+z_index = 1
+color = Color(0.35, 0.45, 0.55, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+[node name="YujinClueZone" type="CollisionShape2D" parent="YujinClue"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="ShowerMarks" type="Area2D" parent="."]
+position = Vector2(500, 1620)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("4_interactable")
+message = "타일 바닥에 무언가 끌린 자국이 길게 남아 있다. 자국이 끝나는 벽에는 손끝으로 쓴 것 같은 글씨. — '살려'"
+prompt_text = "조사"
+grants_flag = "saw_shower_marks"
+
+[node name="ShowerMarksVisual" type="Polygon2D" parent="ShowerMarks"]
+z_index = 1
+color = Color(0.5, 0.52, 0.55, 1)
+polygon = PackedVector2Array(-16, -8, 16, -8, 16, 8, -16, 8)
+
+[node name="ShowerMarksZone" type="CollisionShape2D" parent="ShowerMarks"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="DrainKey" type="Area2D" parent="."]
+position = Vector2(720, 1620)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("4_interactable")
+message = "배수구 뚜껑이 어긋나 있다. 손을 넣어 보니 젖은 열쇠가 잡혔다. '2F 계단'."
+prompt_text = "배수구 뒤지기"
+grants_item_id = "stair_key_2"
+grants_flag = "found_drain_key"
+
+[node name="DrainKeyVisual" type="Polygon2D" parent="DrainKey"]
 z_index = 1
 color = Color(0.62, 0.55, 0.28, 1)
 polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
 
-[node name="StairKeyZone" type="CollisionShape2D" parent="StairKey"]
+[node name="DrainKeyZone" type="CollisionShape2D" parent="DrainKey"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="SeunghoClue" type="Area2D" parent="."]
+position = Vector2(1150, 250)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("4_interactable")
+message = "압수품 상자에 이름표가 붙어 있다. '2-4 백승호'. 안에는 남의 이름이 적힌 물건들이 섞여 있다. 상자 옆 지도부 수첩 — '반복. 지도 요망.' 그 뒤로 기록이 끊겼다."
+prompt_text = "조사"
+grants_flag = "found_baekseungho"
+
+[node name="SeunghoClueVisual" type="Polygon2D" parent="SeunghoClue"]
+z_index = 1
+color = Color(0.6, 0.5, 0.4, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+[node name="SeunghoClueZone" type="CollisionShape2D" parent="SeunghoClue"]
 shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="Occluders" type="Node2D" parent="."]

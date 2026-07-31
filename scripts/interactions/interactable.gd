@@ -1,9 +1,13 @@
 extends Area2D
 
+## 조사 오브젝트. E로 message를 띄우고, 필요하면 아이템·플래그를 준다.
+## 플래그는 조사 기록용 — 층 씬이 재로드돼도 무엇을 봤는지 남는다.
+
 signal interacted(player: Node)
 
 @export_multiline var message: String = ""
 @export var grants_item_id: String = ""
+@export var grants_flag: String = ""
 @export var required_item_id: String = ""
 @export_multiline var locked_message: String = "아직 열 수 없다."
 @export var prompt_text: String = "조사"
@@ -22,6 +26,7 @@ func interact(player: Node) -> void:
 			return
 
 	if game_state != null:
+		game_state.call("set_flag", grants_flag)
 		game_state.call("request_notice", message)
 
 	interacted.emit(player)
