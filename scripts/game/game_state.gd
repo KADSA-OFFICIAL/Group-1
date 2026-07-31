@@ -5,6 +5,8 @@ signal notice_requested(message: String)
 signal game_over(reason: String)
 
 @export var starting_items: Array[String] = []
+## 시작 시 미리 세워 둘 플래그. 뒤쪽 층을 바로 확인할 때(예: stairs_f4_unlocked) 에디터에서 채워 쓴다.
+@export var starting_flags: Array[String] = []
 @export var max_items: int = 5
 
 var items: Array[String] = []
@@ -21,6 +23,7 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	items = starting_items.duplicate()
+	flags = starting_flags.duplicate()
 	inventory_changed.emit(items)
 
 
