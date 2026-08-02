@@ -2604,13 +2604,12 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="TaehoNote" type="Area2D" parent="."]
 position = Vector2(2610, 1780.4)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("3_interactable")
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("2_pickup")
 message = "교구함에 쪽지가 붙어 있다. '민혁아, 과학실 기구 부수지 마. 걸리면 너만 혼나. 열쇠 여기 숨겨둘게. -태호' 쪽지 뒤에서 3층 계단 열쇠가 나왔다."
-prompt_text = "쪽지 살펴보기"
-grants_item_id = "stair_key_3"
-grants_flag = "read_taeho_note"
+item_id = "stair_key_3"
+pickup_id = "read_taeho_note"
 
 
 [node name="TaehoNoteVisual" type="Polygon2D" parent="TaehoNote"]

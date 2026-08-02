@@ -379,6 +379,30 @@ LOCKED = {1: "stair_key_1", 2: "stair_key_2", 3: "stair_key_3",
 # 현관(ExitDoor)은 바깥으로 나가는 아래쪽 정문 앞에 둬야 안내와 실제 위치가 맞는다.
 POS_OVERRIDE = {(1, "ExitDoor"): (1800, 2432)}
 
+# 열쇠를 주는 오브젝트는 층에 상관없이 "다가가면 획득"으로 통일한다(사용자 요청).
+# 원래는 4층 열쇠 2개만 pickup_item(접촉)이고 나머지는 interactable(E 필요)이라
+# 층마다 조작이 달랐다. 메시지와 플래그는 그대로 옮긴다.
+AUTO_PICKUP = {"TaehoNote", "KeyCabinet", "SpareKeyHook", "DrainKey", "JanitorSafe"}
+
+
+def to_pickup(body):
+    """interactable(E 조사) 노드를 pickup_item(접촉 획득)으로 바꾼다."""
+    if "required_item_id" in body:
+        raise SystemExit("조건부 조사 오브젝트는 접촉 획득으로 바꿀 수 없다")
+    body = body.replace('script = ExtResource("3_interactable")',
+                        'script = ExtResource("2_pickup")')
+    body = body.replace("\ngrants_item_id = ", "\nitem_id = ")
+    body = body.replace("\ngrants_flag = ", "\npickup_id = ")
+    # 접촉 감지: 플레이어 몸(레이어 1)을 이 Area2D가 감지해야 한다
+    body = body.replace("collision_layer = 2\ncollision_mask = 0",
+                        "collision_layer = 0\ncollision_mask = 1")
+    body = re.sub(r"^prompt_text = .*\n", "", body, flags=re.M)
+    # 접촉 획득은 다시 지나가기 쉬우므로 획득 기록이 없으면 층 재방문 때 중복된다.
+    if "pickup_id = " not in body:
+        node = re.search(r'\[node name="(\w+)"', body).group(1)
+        body = body.rstrip("\n") + f'\npickup_id = "{node.lower()}_taken"\n'
+    return body
+
 
 def add_story(sc, floor):
     """추출해 둔 단서 노드를 방 안에 배치. 본문은 그대로, position만 새 좌표."""
@@ -399,6 +423,8 @@ def add_story(sc, floor):
             body = re.sub(r"^position = Vector2\([^)]*\)$",
                           f"position = Vector2({n(cx)}, {n(cy)})",
                           nodes[name]["body"], count=1, flags=re.M)
+            if name in AUTO_PICKUP:
+                body = to_pickup(body)
             sc.node(body if body.endswith("\n") else body + "\n")
             for kid in nodes[name]["kids"]:
                 sc.node(kid if kid.endswith("\n") else kid + "\n")

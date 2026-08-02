@@ -1,6 +1,7 @@
-[gd_scene load_steps=142 format=3]
+[gd_scene load_steps=143 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
+[ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 [ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="5_hiding"]
 
@@ -2374,13 +2375,12 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="DrainKey" type="Area2D" parent="."]
 position = Vector2(2400, 2343.2)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("3_interactable")
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("2_pickup")
 message = "배수구 뚜껑이 어긋나 있다. 손을 넣어 보니 젖은 열쇠가 잡혔다. '2F 계단'."
-prompt_text = "배수구 뒤지기"
-grants_item_id = "stair_key_2"
-grants_flag = "found_drain_key"
+item_id = "stair_key_2"
+pickup_id = "found_drain_key"
 
 
 [node name="DrainKeyVisual" type="Polygon2D" parent="DrainKey"]

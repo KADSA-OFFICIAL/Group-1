@@ -1209,13 +1209,12 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="JanitorSafe" type="Area2D" parent="."]
 position = Vector2(2468, 2343.2)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("3_interactable")
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("2_pickup")
 message = "금고 문이 반쯤 열려 있다. 안에는 서류 봉투와 열쇠꾸러미. 현관 열쇠를 꺼냈다."
-prompt_text = "금고 열기"
-grants_item_id = "front_gate_key"
-grants_flag = "front_gate_key_taken"
+item_id = "front_gate_key"
+pickup_id = "front_gate_key_taken"
 
 
 [node name="SafeVisual" type="Polygon2D" parent="JanitorSafe"]

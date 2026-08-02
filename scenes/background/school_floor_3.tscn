@@ -1,6 +1,7 @@
-[gd_scene load_steps=147 format=3]
+[gd_scene load_steps=148 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
+[ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 [ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="5_hiding"]
 
@@ -2498,13 +2499,12 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="KeyCabinet" type="Area2D" parent="."]
 position = Vector2(1700, 342.4)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("3_interactable")
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("2_pickup")
 message = "교무실 열쇠 보관함. 고리 하나가 비어 있고, 남은 것 중에 '2F 계단' 표가 붙은 열쇠가 있다. 챙겼다."
-prompt_text = "보관함 열기"
-grants_item_id = "stair_key_2"
-grants_flag = "opened_key_cabinet"
+item_id = "stair_key_2"
+pickup_id = "opened_key_cabinet"
 
 
 [node name="KeyCabinetVisual" type="Polygon2D" parent="KeyCabinet"]
@@ -2519,13 +2519,12 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="SpareKeyHook" type="Area2D" parent="."]
 position = Vector2(1786.2, 342.4)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("3_interactable")
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("2_pickup")
 message = "보관함 옆 고리에 여벌 열쇠가 걸려 있다. '3F 계단'. 4층에서 이미 챙겼더라도, 하나 더 있어서 나쁠 것은 없다."
-prompt_text = "여벌 열쇠 챙기기"
-grants_item_id = "stair_key_3"
-
+item_id = "stair_key_3"
+pickup_id = "sparekeyhook_taken"
 
 [node name="SpareKeyHookVisual" type="Polygon2D" parent="SpareKeyHook"]
 z_index = 1
