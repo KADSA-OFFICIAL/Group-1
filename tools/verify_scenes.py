@@ -70,8 +70,18 @@ def parse_scene(path: pathlib.Path) -> list[Section]:
     return sections
 
 
+MALFORMED_NUM_RE = re.compile(r"=\s*-?\d+\.\d+\.\d", re.M)
+
+
 def check_scene(path: pathlib.Path) -> None:
     rel = str(path.relative_to(ROOT))
+
+    # 0. 깨진 실수 리터럴(예: "92.4.0") — 생성 스크립트가 소수에 ".0"을 덧붙이면 나온다.
+    #    Godot이 속성을 파싱하지 못해 노드가 조용히 사라진다(#159 라벨 미표시 사례).
+    broken = MALFORMED_NUM_RE.findall(path.read_text())
+    if broken:
+        fail(rel, f"깨진 실수 값 {len(broken)}개: {broken[:3]}…")
+
     sections = parse_scene(path)
     if not sections or sections[0].kind != "gd_scene":
         fail(rel, "gd_scene 헤더가 없다")
@@ -174,8 +184,10 @@ def check_scene(path: pathlib.Path) -> None:
             name = node.attrs.get("name", "")
             if node.attrs.get("type") != "CollisionPolygon2D":
                 continue
+            # SealCollision = 열쇠로도 열리지 않는 영구 봉인 계단(#159)
             if not (name.startswith("WC_") or name.startswith("RC_")
-                    or name.endswith("BarrierCollision") or name.endswith("DoorCollision")):
+                    or name.endswith("BarrierCollision") or name.endswith("DoorCollision")
+                    or name.endswith("SealCollision")):
                 continue
             match = POLY_RE.search(node.text)
             if match:

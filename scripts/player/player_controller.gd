@@ -66,8 +66,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 	var target := _find_interactable()
 	if target != null:
-		target.call("interact", self)
+		# 입력 소비를 interact()보다 먼저 한다. 현관(exit_door)처럼 상호작용 안에서
+		# 씬을 바꾸는 경우 호출 뒤에는 이 노드가 트리에서 빠져 get_viewport()가
+		# null이 되고 "Cannot call method 'set_input_as_handled' on a null value"로
+		# 죽는다(#159 F5에서 발견).
 		get_viewport().set_input_as_handled()
+		target.call("interact", self)
 
 
 func _find_interactable() -> Area2D:
