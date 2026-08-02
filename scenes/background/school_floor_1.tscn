@@ -1122,6 +1122,11 @@ also_remove_paths = Array[NodePath]([NodePath("../WallGlow/SUBarrierVisual")])
 [node name="SULockZone" type="CollisionShape2D" parent="SULock"]
 shape = SubResource("RectangleShape2D_stair_zone")
 
+[node name="Door_FrontGate" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 1
+color = Color(0.45, 0.32, 0.2, 1)
+polygon = PackedVector2Array(1745, 2464, 1855, 2464, 1855, 2480, 1745, 2480)
+
 [node name="PrincipalLetter" type="Area2D" parent="."]
 position = Vector2(2665, 1555.9)
 collision_layer = 2
@@ -1244,7 +1249,7 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 
 [node name="ExitDoor" type="Area2D" parent="."]
-position = Vector2(1800, 2343.2)
+position = Vector2(1800, 2432)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("4_exit")

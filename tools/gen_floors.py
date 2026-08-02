@@ -375,6 +375,11 @@ LOCKED = {1: "stair_key_1", 2: "stair_key_2", 3: "stair_key_3",
           4: "stair_key_4", 5: "stair_key_5"}
 
 
+# 특정 단서의 위치를 방 안 자동 배치 대신 직접 지정한다.
+# 현관(ExitDoor)은 바깥으로 나가는 아래쪽 정문 앞에 둬야 안내와 실제 위치가 맞는다.
+POS_OVERRIDE = {(1, "ExitDoor"): (1800, 2432)}
+
+
 def add_story(sc, floor):
     """추출해 둔 단서 노드를 방 안에 배치. 본문은 그대로, position만 새 좌표."""
     data = json.loads((pathlib.Path(__file__).parent / "story_objects.json").read_text())
@@ -386,8 +391,11 @@ def add_story(sc, floor):
         for i, name in enumerate(names):
             if name not in nodes:
                 raise SystemExit(f"floor{floor}: 단서 노드 {name}를 찾을 수 없다")
-            cx = x0 + (i + 1) * (x1 - x0) / (len(names) + 1)
-            cy = y0 + (y1 - y0) * 0.62      # 라벨(중앙)과 겹치지 않게 아래쪽
+            if (floor, name) in POS_OVERRIDE:
+                cx, cy = POS_OVERRIDE[(floor, name)]
+            else:
+                cx = x0 + (i + 1) * (x1 - x0) / (len(names) + 1)
+                cy = y0 + (y1 - y0) * 0.62  # 라벨(중앙)과 겹치지 않게 아래쪽
             body = re.sub(r"^position = Vector2\([^)]*\)$",
                           f"position = Vector2({n(cx)}, {n(cy)})",
                           nodes[name]["body"], count=1, flags=re.M)
@@ -577,6 +585,10 @@ def build_floor1():
     add_stairwell(sc, "StairA", *FLOOR1["stair"])
     add_stair_markers(sc, "StairA", *FLOOR1["stair"], floor=1)
     add_stair_locks(sc, 1, LOCKED[1], [FLOOR1["stair"]])
+    # 현관 정문 — 방 아래변(건물 바깥쪽)에 보이는 문. ExitDoor 상호작용도 이 앞이다.
+    ex0, ey1, ex1 = 1600, 2480, 2000
+    sc.poly2d("Door_FrontGate", "WallGlow/RoomWallVisuals", C_DOOR,
+              rect((ex0 + ex1) / 2 - DOOR / 2, ey1 - T, (ex0 + ex1) / 2 + DOOR / 2, ey1), z=1)
     add_story(sc, 1)
 
     add_outer(sc)
