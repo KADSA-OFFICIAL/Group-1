@@ -31,6 +31,7 @@ C_SLAB = "Color(0.1, 0.12, 0.13, 1)"
 C_STEP = "Color(0.22, 0.24, 0.28, 1)"
 C_LOCK = "Color(0.55, 0.26, 0.22, 1)"   # 잠긴 계단 배리어
 C_KEY = "Color(0.85, 0.74, 0.32, 1)"    # 열쇠
+C_SEAL = "Color(0.38, 0.38, 0.40, 1)"   # 영구 봉인된 계단(콘크리트)
 
 # ── 세로 밴드 ────────────────────────────────────────────────
 # 외벽은 두께 40이 경계선 위에 걸쳐 있으므로 안쪽 면이 EDGE. 방을 여기 딱 붙인다(#159 피드백).
@@ -365,6 +366,10 @@ PLACEMENT = {
     5: [("ArtRoom", ["Blackboard", "ArtRoomDoorLock"]),
         ("ArtStorage", ["StairKey"])],
 }
+# 영구 봉인 계단(열쇠로도 열리지 않음). 2층 하단 중앙 계단은 그 아래가 1층
+# 현관·중앙 구역이라 계단이 내려갈 자리가 없다 — 도면 구조를 지키려고 막는다.
+SEALED = {2: {1}}
+
 # 각 층 계단은 그 층 열쇠로 연다. 열쇠 획득처는 PLACEMENT 참조(한 층 위에서도 얻는다).
 LOCKED = {1: "stair_key_1", 2: "stair_key_2", 3: "stair_key_3",
           4: "stair_key_4", 5: "stair_key_5"}
@@ -392,22 +397,44 @@ def add_story(sc, floor):
 
 
 def add_stair_locks(sc, floor, key_id, stairwells):
-    """계단 입구 자물쇠. 한 층의 계단 전부를 열쇠 하나로 연다(기존 규약)."""
-    sc.node('[node name="StairLocks" type="Node2D" parent="."]\n')
+    """계단 입구 자물쇠. 한 층의 계단 전부를 열쇠 하나로 연다(기존 규약).
+    SEALED에 든 계단은 열쇠로도 열리지 않으므로, 배리어를 StairLocks 밖에 두어
+    자물쇠가 풀려도 남게 하고 자물쇠 대신 안내 문구만 붙인다."""
+    sealed = SEALED.get(floor, set())
     tags = ["SU", "SD"][:len(stairwells)]
-    visual_paths = []
-    for tag, (x0, y0, x1, y1) in zip(tags, stairwells):
-        mid = (x0 + x1) / 2
-        bar = rect(mid - DOOR, y0, mid + DOOR, y0 + T)
-        sc.node(f'[node name="{tag}Barrier" type="StaticBody2D" parent="StairLocks"]\n')
-        sc.solid(f"{tag}BarrierCollision", f"StairLocks/{tag}Barrier", bar)
-        # 시각은 WallGlow(어둠 미적용) — 열릴 때 함께 지우려고 also_remove_paths에 넣는다(#130)
-        sc.poly2d(f"{tag}BarrierVisual", "WallGlow", C_LOCK, bar, z=2)
-        visual_paths.append(f'NodePath("../WallGlow/{tag}BarrierVisual")')
+    sc.node('[node name="StairLocks" type="Node2D" parent="."]\n')
+    if sealed:
+        sc.node('[node name="SealedStairs" type="Node2D" parent="."]\n')
 
+    visual_paths = []
     for i, (tag, (x0, y0, x1, y1)) in enumerate(zip(tags, stairwells)):
         mid = (x0 + x1) / 2
-        removes = [f'NodePath("../{o}Lock")' for o in tags if o != tag] + visual_paths
+        bar = rect(mid - DOOR, y0, mid + DOOR, y0 + T)
+        if i in sealed:
+            sc.node(f'[node name="{tag}Seal" type="StaticBody2D" parent="SealedStairs"]\n')
+            sc.solid(f"{tag}SealCollision", f"SealedStairs/{tag}Seal", bar)
+            sc.poly2d(f"{tag}SealVisual", "WallGlow", C_SEAL, bar, z=2)
+        else:
+            sc.node(f'[node name="{tag}Barrier" type="StaticBody2D" parent="StairLocks"]\n')
+            sc.solid(f"{tag}BarrierCollision", f"StairLocks/{tag}Barrier", bar)
+            sc.poly2d(f"{tag}BarrierVisual", "WallGlow", C_LOCK, bar, z=2)
+            visual_paths.append(f'NodePath("../WallGlow/{tag}BarrierVisual")')
+
+    open_tags = [tg for i, tg in enumerate(tags) if i not in sealed]
+    for i, (tag, (x0, y0, x1, y1)) in enumerate(zip(tags, stairwells)):
+        mid = (x0 + x1) / 2
+        if i in sealed:
+            sc.node(
+                f'[node name="{tag}Sealed" type="Area2D" parent="."]\n'
+                f'position = Vector2({n(mid)}, {n(y0 - 24)})\n'
+                f'collision_layer = 2\ncollision_mask = 0\n'
+                f'script = ExtResource("3_interactable")\n'
+                f'message = "계단 입구가 콘크리트로 메워져 있다. 아래층으로는 통하지 않는다."\n'
+                f'prompt_text = "계단 살펴보기"\n')
+            sc.node(f'[node name="{tag}SealedZone" type="CollisionShape2D" parent="{tag}Sealed"]\n'
+                    f'shape = SubResource("RectangleShape2D_stair_zone")\n')
+            continue
+        removes = [f'NodePath("../{o}Lock")' for o in open_tags if o != tag] + visual_paths
         sc.node(
             f'[node name="{tag}Lock" type="Area2D" parent="."]\n'
             f'position = Vector2({n(mid)}, {n(y0 + T / 2)})\n'
@@ -415,7 +442,7 @@ def add_stair_locks(sc, floor, key_id, stairwells):
             f'script = ExtResource("1_locked_door")\n'
             f'required_item_id = "{key_id}"\n'
             f'locked_message = "계단 입구가 잠겨 있다. 이 층 어딘가에 열쇠가 있을 것이다."\n'
-            f'open_message = "계단 자물쇠를 열었다. 이 층의 계단을 모두 쓸 수 있다."\n'
+            f'open_message = "계단 자물쇠를 열었다."\n'
             f'barrier_path = NodePath("../StairLocks")\n'
             f'prompt_text = "계단 열기"\n'
             f'door_id = "stairs_f{floor}_unlocked"\n'
@@ -494,7 +521,8 @@ def build_common(fl, spec):
     add_stairwell(sc, "StairA", *STAIR_A)
     add_stairwell(sc, "StairB", *STAIR_B)
     add_stair_markers(sc, "StairA", *STAIR_A, floor=fl)
-    add_stair_markers(sc, "StairB", *STAIR_B, floor=fl)
+    if 1 not in SEALED.get(fl, set()):
+        add_stair_markers(sc, "StairB", *STAIR_B, floor=fl)
     if fl in LOCKED:
         add_stair_locks(sc, fl, LOCKED[fl], [STAIR_A, STAIR_B])
 

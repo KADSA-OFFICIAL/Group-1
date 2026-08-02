@@ -184,8 +184,10 @@ def check_scene(path: pathlib.Path) -> None:
             name = node.attrs.get("name", "")
             if node.attrs.get("type") != "CollisionPolygon2D":
                 continue
+            # SealCollision = 열쇠로도 열리지 않는 영구 봉인 계단(#159)
             if not (name.startswith("WC_") or name.startswith("RC_")
-                    or name.endswith("BarrierCollision") or name.endswith("DoorCollision")):
+                    or name.endswith("BarrierCollision") or name.endswith("DoorCollision")
+                    or name.endswith("SealCollision")):
                 continue
             match = POLY_RE.search(node.text)
             if match:
