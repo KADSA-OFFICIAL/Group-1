@@ -8,8 +8,12 @@ extends CharacterBody2D
 ## 층이 어긋나면(혹시 모를 가드) 무작위 지점 순찰로 폴백.
 ## 활성/비활성·격자 재생성은 floor_manager가 sync_floor로 제어한다.
 
-@export var patrol_speed: float = 110.0
-@export var chase_speed: float = 220.0
+# 플레이어는 320. 추격은 그보다 확실히 느려야 도망칠 여지가 남는다.
+# #115에서 260이 너무 빨라 220으로 낮췄고, 새 맵이 넓어져(#159) 압박이
+# 약해진 만큼 그 사이로 올렸다(220 → 240 → 250, 추격 = 플레이어의 78%).
+# 여기가 사실상 상한이다 — 260부터는 직선 도주로 못 벗어나 #115처럼 된다.
+@export var patrol_speed: float = 130.0
+@export var chase_speed: float = 250.0
 # 플레이어가 수위를 알아볼 수 있는 거리. 플레이어 PointLight2D가 512×512 방사
 # 그라디언트(텍스처 반경 256) × texture_scale 1.3 ≈ 333px까지 비춘다.
 # 카메라(zoom 1.25, 1600×900)의 가시 반경은 360px이라 이 범위는 항상 화면 안이다.
@@ -34,10 +38,11 @@ const BODY_HALF_HEIGHT := 15.0
 # 평행선을 1px 안쪽으로 넣어 "붙어서 걷는 것"이 막힘으로 뒤집히지 않게 한다.
 const BODY_PROBE_MARGIN := 1.0
 
-# 격자: 층 씬은 모두 2800×1800.
+# 격자: 층 씬 크기에서 매번 계산한다. 예전엔 2800×1800 고정이라 맵이 커지자
+# (#159로 3400×2500) 격자가 왼쪽 위만 덮어 바깥 구역이 통째로 경로탐색에서
+# 빠졌다 — 1층 현관·수위실 띠(y 2120~2480)가 격자 밖이었다.
 const CELL := 25.0
-const GRID_WIDTH := 112
-const GRID_HEIGHT := 72
+const GRID_FALLBACK := Vector2i(136, 100)
 const PATH_LOOKAHEAD := 12      # 경로 다듬기에서 앞쪽 몇 지점까지 시야를 볼지
 const FAR_SPAWN_RATIO := 0.6    # 스폰 후보: 플레이어에게서 최대 거리의 이 비율 이상인 칸
 
@@ -50,6 +55,7 @@ var player_floor: int = -1
 var debug_draw: bool = false
 
 var astar_grid := AStarGrid2D.new()
+var grid_size: Vector2i = GRID_FALLBACK
 var grid_ready: bool = false
 var walkable_cells: Array[Vector2i] = []
 var corridor_cells: Array[Vector2i] = []   # 순찰은 복도만 돈다(방 폴리곤 외부)
@@ -96,8 +102,9 @@ func _apply_active(active: bool) -> void:
 # ── 격자 ─────────────────────────────────────────────────────────
 
 func _rebuild_grid(floor_root: Node) -> void:
+	grid_size = _grid_size_for(floor_root)
 	astar_grid.clear()
-	astar_grid.region = Rect2i(0, 0, GRID_WIDTH, GRID_HEIGHT)
+	astar_grid.region = Rect2i(0, 0, grid_size.x, grid_size.y)
 	astar_grid.cell_size = Vector2(CELL, CELL)
 	astar_grid.offset = Vector2(CELL, CELL) * 0.5   # 경로 지점이 칸 중심에 오게
 	astar_grid.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_ONLY_IF_NO_OBSTACLES
@@ -112,15 +119,15 @@ func _rebuild_grid(floor_root: Node) -> void:
 			BODY_HALF_WIDTH, BODY_HALF_HEIGHT)
 		var min_cell := _cell_of(grown.position)
 		var max_cell := _cell_of(grown.end)
-		for cell_x in range(maxi(min_cell.x, 0), mini(max_cell.x, GRID_WIDTH - 1) + 1):
-			for cell_y in range(maxi(min_cell.y, 0), mini(max_cell.y, GRID_HEIGHT - 1) + 1):
+		for cell_x in range(maxi(min_cell.x, 0), mini(max_cell.x, grid_size.x - 1) + 1):
+			for cell_y in range(maxi(min_cell.y, 0), mini(max_cell.y, grid_size.y - 1) + 1):
 				var cell := Vector2i(cell_x, cell_y)
 				if grown.has_point(_cell_center(cell)):
 					astar_grid.set_point_solid(cell, true)
 
 	walkable_cells.clear()
-	for cell_x in GRID_WIDTH:
-		for cell_y in GRID_HEIGHT:
+	for cell_x in grid_size.x:
+		for cell_y in grid_size.y:
 			var cell := Vector2i(cell_x, cell_y)
 			if not astar_grid.is_point_solid(cell):
 				walkable_cells.append(cell)
@@ -143,6 +150,17 @@ func _rebuild_grid(floor_root: Node) -> void:
 
 	# 경로탐색과 순찰 목표가 모두 준비된 뒤에 사용 가능으로 표시한다.
 	grid_ready = not walkable_cells.is_empty()
+
+
+## 층 씬의 Floor 폴리곤에서 맵 크기를 읽어 격자 칸 수를 정한다.
+func _grid_size_for(floor_root: Node) -> Vector2i:
+	var floor_node := floor_root.get_node_or_null("Floor") as Polygon2D
+	if floor_node == null or floor_node.polygon.size() == 0:
+		return GRID_FALLBACK
+	var extent := Vector2.ZERO
+	for point in floor_node.polygon:
+		extent = extent.max(floor_node.to_global(point))
+	return Vector2i(int(ceil(extent.x / CELL)), int(ceil(extent.y / CELL)))
 
 
 ## 층 씬의 Rooms 아래 방 폴리곤 영역(순찰에서 제외할 실내)을 모은다.
@@ -194,8 +212,8 @@ func _cell_center(cell: Vector2i) -> Vector2:
 ## (플레이어가 벽에 붙어 있으면 그 칸이 막힌 것으로 표시돼 A*가 실패한다)
 func _nearest_free_cell(point: Vector2) -> Vector2i:
 	var cell := _cell_of(point)
-	cell.x = clampi(cell.x, 0, GRID_WIDTH - 1)
-	cell.y = clampi(cell.y, 0, GRID_HEIGHT - 1)
+	cell.x = clampi(cell.x, 0, grid_size.x - 1)
+	cell.y = clampi(cell.y, 0, grid_size.y - 1)
 	if not astar_grid.is_point_solid(cell):
 		return cell
 
@@ -208,7 +226,7 @@ func _nearest_free_cell(point: Vector2) -> Vector2i:
 					continue   # 테두리만 검사
 				var probe := Vector2i(cell.x + offset_x, cell.y + offset_y)
 				if probe.x < 0 or probe.y < 0 \
-						or probe.x >= GRID_WIDTH or probe.y >= GRID_HEIGHT:
+						or probe.x >= grid_size.x or probe.y >= grid_size.y:
 					continue
 				if astar_grid.is_point_solid(probe):
 					continue

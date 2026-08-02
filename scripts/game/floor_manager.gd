@@ -1,8 +1,13 @@
 extends Node2D
 
 ## 계단 반쪽(위층/아래층)을 끝까지 걸어가면 층을 전환한다.
-## 전제: 계단실 위치·분할 좌표가 전 층 동일(수직 정렬).
 ## 왼쪽 반 = 위층(N+1), 오른쪽 반 = 아래층(N-1).
+##
+## 계단실 좌표는 더 이상 전 층 동일이 아니다(#159 손도면 개편) — 1층은 계단이
+## 한 곳뿐이고 위치도 다르다. 그래서 층별 계단실 사각형 STAIRS를 두고,
+## 트리거 존·도착 지점을 사각형에서 계산한다. 값은 tools/gen_floors.py의
+## STAIR_A / STAIR_B / FLOOR1["stair"]와 일치해야 하며,
+## tools/verify_stairs.py가 씬과 대조해 어긋나면 실패한다.
 
 const FLOOR_SCENES := {
 	1: "res://scenes/background/school_floor_1.tscn",
@@ -17,13 +22,42 @@ const START_FLOOR := 4
 # 시작 층은 안전 구간 — 기획서상 수위는 3층부터 활동한다.
 const JANITOR_FREE_FLOOR := 4
 
-# 전환 트리거 존: 각 계단실 반쪽의 안쪽 끝 (인덱스 0=좌상단 계단, 1=중앙 하단 계단)
-const UP_ZONES := [Rect2(136, 930, 196, 54), Rect2(1196, 1610, 166, 54)]
-const DOWN_ZONES := [Rect2(348, 930, 196, 54), Rect2(1378, 1610, 166, 54)]
-# 도착 지점: 계단실 입구 바로 앞 복도 (입구가 잠겨 있어도 갇히지 않도록 계단실 밖)
-# 올라가면 입구 오른쪽 앞, 내려가면 입구 왼쪽 앞에서 등장
-const ARRIVE_AFTER_UP := [Vector2(399, 692), Vector2(1429, 1372)]
-const ARRIVE_AFTER_DOWN := [Vector2(281, 692), Vector2(1311, 1372)]
+# 층별 계단실 사각형. 인덱스 0 = 위쪽(좌측) 계단, 1 = 하단 중앙 계단.
+# 1층은 도면상 계단이 한 곳뿐이라 목록 길이가 1이다.
+const STAIR_A := Rect2(300, 720, 440, 280)
+const STAIR_B := Rect2(1450, 2120, 440, 320)
+const STAIRS := {
+	1: [Rect2(220, 2120, 440, 320)],
+	2: [STAIR_A, STAIR_B],
+	3: [STAIR_A, STAIR_B],
+	4: [STAIR_A, STAIR_B],
+	5: [STAIR_A, STAIR_B],
+}
+
+const WALL_T := 16.0     # 계단실 벽 두께
+const RAIL_HALF := 8.0   # 가운데 분할 난간 반두께
+const ZONE_H := 54.0     # 트리거 존 높이(계단 안쪽 끝)
+const ARRIVE_DY := 28.0  # 도착 지점: 입구 바로 앞 복도(계단실 밖)
+const ARRIVE_DX := 59.0  # 올라오면 입구 오른쪽, 내려오면 왼쪽으로 비켜 등장
+
+
+func _stair_zone(r: Rect2, up: bool) -> Rect2:
+	var mid := r.position.x + r.size.x / 2.0
+	var y_end := r.position.y + r.size.y - WALL_T
+	if up:
+		var x0 := r.position.x + WALL_T
+		return Rect2(x0, y_end - ZONE_H, (mid - RAIL_HALF) - x0, ZONE_H)
+	var x1 := r.position.x + r.size.x - WALL_T
+	return Rect2(mid + RAIL_HALF, y_end - ZONE_H, x1 - (mid + RAIL_HALF), ZONE_H)
+
+
+## 도착 지점은 "목표 층"의 계단실 기준으로 잡는다. 층마다 계단 수가 달라
+## (1층은 1곳) 인덱스가 없으면 마지막 계단으로 떨어진다.
+func _arrive_on(target: int, index: int, up: bool) -> Vector2:
+	var list: Array = STAIRS[target]
+	var r: Rect2 = list[min(index, list.size() - 1)]
+	var mid := r.position.x + r.size.x / 2.0
+	return Vector2(mid + (ARRIVE_DX if up else -ARRIVE_DX), r.position.y - ARRIVE_DY)
 
 var current_floor: int = START_FLOOR
 var changing_floor: bool = false
@@ -92,15 +126,15 @@ func _physics_process(_delta: float) -> void:
 		return
 
 	var pos := player.position
+	var stairs: Array = STAIRS[current_floor]
 
-	for i in UP_ZONES.size():
-		if UP_ZONES[i].has_point(pos) and current_floor < MAX_FLOOR:
-			_change_floor(current_floor + 1, ARRIVE_AFTER_UP[i])
+	for i in stairs.size():
+		var r: Rect2 = stairs[i]
+		if current_floor < MAX_FLOOR and _stair_zone(r, true).has_point(pos):
+			_change_floor(current_floor + 1, _arrive_on(current_floor + 1, i, true))
 			return
-
-	for i in DOWN_ZONES.size():
-		if DOWN_ZONES[i].has_point(pos) and current_floor > MIN_FLOOR:
-			_change_floor(current_floor - 1, ARRIVE_AFTER_DOWN[i])
+		if current_floor > MIN_FLOOR and _stair_zone(r, false).has_point(pos):
+			_change_floor(current_floor - 1, _arrive_on(current_floor - 1, i, false))
 			return
 
 
