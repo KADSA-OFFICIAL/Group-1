@@ -242,13 +242,13 @@ polygon = PackedVector2Array(3290, 1076.2, 3380, 1099.6, 3380, 1115.6, 3290, 109
 polygon = PackedVector2Array(3090, 1288.2, 3380, 1363.6, 3380, 1379.6, 3090, 1304.2)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_RC_StairA_L"]
-polygon = PackedVector2Array(300, 720, 316, 720, 316, 1020, 300, 1020)
+polygon = PackedVector2Array(300, 720, 316, 720, 316, 1000, 300, 1000)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_RC_StairA_R"]
-polygon = PackedVector2Array(724, 720, 740, 720, 740, 1020, 724, 1020)
+polygon = PackedVector2Array(724, 720, 740, 720, 740, 1000, 724, 1000)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_RC_StairA_F"]
-polygon = PackedVector2Array(300, 1004, 740, 1004, 740, 1020, 300, 1020)
+polygon = PackedVector2Array(300, 984, 740, 984, 740, 1000, 300, 1000)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_RC_StairA_EL"]
 polygon = PackedVector2Array(300, 720, 410, 720, 410, 736, 300, 736)
@@ -257,7 +257,7 @@ polygon = PackedVector2Array(300, 720, 410, 720, 410, 736, 300, 736)
 polygon = PackedVector2Array(630, 720, 740, 720, 740, 736, 630, 736)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_RC_StairA_M"]
-polygon = PackedVector2Array(512, 736, 528, 736, 528, 1004, 512, 1004)
+polygon = PackedVector2Array(512, 736, 528, 736, 528, 984, 512, 984)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_RC_StairB_L"]
 polygon = PackedVector2Array(1450, 2120, 1466, 2120, 1466, 2440, 1450, 2440)
@@ -1522,53 +1522,53 @@ polygon = PackedVector2Array(3090, 1288.2, 3380, 1363.6, 3380, 1379.6, 3090, 130
 
 [node name="Slab_StairA" type="Polygon2D" parent="Stairwells"]
 color = Color(0.1, 0.12, 0.13, 1)
-polygon = PackedVector2Array(300, 720, 740, 720, 740, 1020, 300, 1020)
+polygon = PackedVector2Array(300, 720, 740, 720, 740, 1000, 300, 1000)
 
 [node name="Step_StairA_1" type="Polygon2D" parent="Stairwells"]
 color = Color(0.22, 0.24, 0.28, 1)
-polygon = PackedVector2Array(326, 978, 714, 978, 714, 992, 326, 992)
+polygon = PackedVector2Array(326, 958, 714, 958, 714, 972, 326, 972)
 
 [node name="Step_StairA_2" type="Polygon2D" parent="Stairwells"]
 color = Color(0.22, 0.24, 0.28, 1)
-polygon = PackedVector2Array(326, 952, 714, 952, 714, 966, 326, 966)
+polygon = PackedVector2Array(326, 932, 714, 932, 714, 946, 326, 946)
 
 [node name="Step_StairA_3" type="Polygon2D" parent="Stairwells"]
 color = Color(0.22, 0.24, 0.28, 1)
-polygon = PackedVector2Array(326, 926, 714, 926, 714, 940, 326, 940)
+polygon = PackedVector2Array(326, 906, 714, 906, 714, 920, 326, 920)
 
 [node name="Step_StairA_4" type="Polygon2D" parent="Stairwells"]
 color = Color(0.22, 0.24, 0.28, 1)
-polygon = PackedVector2Array(326, 900, 714, 900, 714, 914, 326, 914)
+polygon = PackedVector2Array(326, 880, 714, 880, 714, 894, 326, 894)
 
 [node name="RC_StairA_L" type="CollisionPolygon2D" parent="StairWalls"]
-polygon = PackedVector2Array(300, 720, 316, 720, 316, 1020, 300, 1020)
+polygon = PackedVector2Array(300, 720, 316, 720, 316, 1000, 300, 1000)
 
 [node name="LO_RC_StairA_L" type="LightOccluder2D" parent="StairWalls"]
 occluder = SubResource("Occ_RC_StairA_L")
 
 [node name="Rail_StairA_L" type="Polygon2D" parent="WallGlow"]
 color = Color(0.45, 0.48, 0.55, 1)
-polygon = PackedVector2Array(300, 720, 316, 720, 316, 1020, 300, 1020)
+polygon = PackedVector2Array(300, 720, 316, 720, 316, 1000, 300, 1000)
 
 [node name="RC_StairA_R" type="CollisionPolygon2D" parent="StairWalls"]
-polygon = PackedVector2Array(724, 720, 740, 720, 740, 1020, 724, 1020)
+polygon = PackedVector2Array(724, 720, 740, 720, 740, 1000, 724, 1000)
 
 [node name="LO_RC_StairA_R" type="LightOccluder2D" parent="StairWalls"]
 occluder = SubResource("Occ_RC_StairA_R")
 
 [node name="Rail_StairA_R" type="Polygon2D" parent="WallGlow"]
 color = Color(0.45, 0.48, 0.55, 1)
-polygon = PackedVector2Array(724, 720, 740, 720, 740, 1020, 724, 1020)
+polygon = PackedVector2Array(724, 720, 740, 720, 740, 1000, 724, 1000)
 
 [node name="RC_StairA_F" type="CollisionPolygon2D" parent="StairWalls"]
-polygon = PackedVector2Array(300, 1004, 740, 1004, 740, 1020, 300, 1020)
+polygon = PackedVector2Array(300, 984, 740, 984, 740, 1000, 300, 1000)
 
 [node name="LO_RC_StairA_F" type="LightOccluder2D" parent="StairWalls"]
 occluder = SubResource("Occ_RC_StairA_F")
 
 [node name="Rail_StairA_F" type="Polygon2D" parent="WallGlow"]
 color = Color(0.45, 0.48, 0.55, 1)
-polygon = PackedVector2Array(300, 1004, 740, 1004, 740, 1020, 300, 1020)
+polygon = PackedVector2Array(300, 984, 740, 984, 740, 1000, 300, 1000)
 
 [node name="RC_StairA_EL" type="CollisionPolygon2D" parent="StairWalls"]
 polygon = PackedVector2Array(300, 720, 410, 720, 410, 736, 300, 736)
@@ -1591,14 +1591,14 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(630, 720, 740, 720, 740, 736, 630, 736)
 
 [node name="RC_StairA_M" type="CollisionPolygon2D" parent="StairWalls"]
-polygon = PackedVector2Array(512, 736, 528, 736, 528, 1004, 512, 1004)
+polygon = PackedVector2Array(512, 736, 528, 736, 528, 984, 512, 984)
 
 [node name="LO_RC_StairA_M" type="LightOccluder2D" parent="StairWalls"]
 occluder = SubResource("Occ_RC_StairA_M")
 
 [node name="Rail_StairA_M" type="Polygon2D" parent="WallGlow"]
 color = Color(0.45, 0.48, 0.55, 1)
-polygon = PackedVector2Array(512, 736, 528, 736, 528, 1004, 512, 1004)
+polygon = PackedVector2Array(512, 736, 528, 736, 528, 984, 512, 984)
 
 [node name="Slab_StairB" type="Polygon2D" parent="Stairwells"]
 color = Color(0.1, 0.12, 0.13, 1)
