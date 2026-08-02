@@ -204,7 +204,7 @@ follow_viewport_enabled = true
 
 [node name="Stairwells" type="Node2D" parent="."]
 
-[node name="Labels" type="Node2D" parent="."]
+[node name="Labels" type="Node2D" parent="WallGlow"]
 
 [node name="RoomWalls" type="StaticBody2D" parent="."]
 
@@ -214,13 +214,15 @@ follow_viewport_enabled = true
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(20, 1020, 460, 1020, 460, 1500, 20, 1500)
 
-[node name="L_Class1" type="Label" parent="Labels"]
-offset_left = 140.0
-offset_top = 1246.0
-offset_right = 340.0
-offset_bottom = 1274.0
-theme_override_colors/font_color = Color(0.55, 0.57, 0.62, 1)
-theme_override_font_sizes/font_size = 20
+[node name="L_Class1" type="Label" parent="WallGlow/Labels"]
+offset_left = 130.0
+offset_top = 1244.0
+offset_right = 350.0
+offset_bottom = 1276.0
+theme_override_colors/font_color = Color(0.78, 0.81, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
 text = "교실1"
 horizontal_alignment = 1
 
@@ -283,13 +285,15 @@ polygon = PackedVector2Array(444, 1020, 460, 1020, 460, 1500, 444, 1500)
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(490, 1020, 810, 1020, 810, 1500, 490, 1500)
 
-[node name="L_Class2" type="Label" parent="Labels"]
-offset_left = 550.0
-offset_top = 1246.0
-offset_right = 750.0
-offset_bottom = 1274.0
-theme_override_colors/font_color = Color(0.55, 0.57, 0.62, 1)
-theme_override_font_sizes/font_size = 20
+[node name="L_Class2" type="Label" parent="WallGlow/Labels"]
+offset_left = 540.0
+offset_top = 1244.0
+offset_right = 760.0
+offset_bottom = 1276.0
+theme_override_colors/font_color = Color(0.78, 0.81, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
 text = "교실2"
 horizontal_alignment = 1
 
@@ -352,13 +356,15 @@ polygon = PackedVector2Array(794, 1020, 810, 1020, 810, 1500, 794, 1500)
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(840, 1020, 1360, 1020, 1360, 1500, 840, 1500)
 
-[node name="L_Class3" type="Label" parent="Labels"]
-offset_left = 1000.0
-offset_top = 1246.0
-offset_right = 1200.0
-offset_bottom = 1274.0
-theme_override_colors/font_color = Color(0.55, 0.57, 0.62, 1)
-theme_override_font_sizes/font_size = 20
+[node name="L_Class3" type="Label" parent="WallGlow/Labels"]
+offset_left = 990.0
+offset_top = 1244.0
+offset_right = 1210.0
+offset_bottom = 1276.0
+theme_override_colors/font_color = Color(0.78, 0.81, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
 text = "교실3"
 horizontal_alignment = 1
 
@@ -421,13 +427,15 @@ polygon = PackedVector2Array(1344, 1020, 1360, 1020, 1360, 1500, 1344, 1500)
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(1390, 1020, 1920, 1020, 1920, 1500, 1390, 1500)
 
-[node name="L_YardExit" type="Label" parent="Labels"]
-offset_left = 1555.0
-offset_top = 1246.0
-offset_right = 1755.0
-offset_bottom = 1274.0
-theme_override_colors/font_color = Color(0.55, 0.57, 0.62, 1)
-theme_override_font_sizes/font_size = 20
+[node name="L_YardExit" type="Label" parent="WallGlow/Labels"]
+offset_left = 1545.0
+offset_top = 1244.0
+offset_right = 1765.0
+offset_bottom = 1276.0
+theme_override_colors/font_color = Color(0.78, 0.81, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
 text = "운동장 출입구"
 horizontal_alignment = 1
 
@@ -475,13 +483,15 @@ polygon = PackedVector2Array(1904, 1020, 1920, 1020, 1920, 1500, 1904, 1500)
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(900, 2120, 1160, 2120, 1160, 2370, 900, 2370)
 
-[node name="L_MensRoom1" type="Label" parent="Labels"]
-offset_left = 930.0
-offset_top = 2231.0
-offset_right = 1130.0
-offset_bottom = 2259.0
-theme_override_colors/font_color = Color(0.55, 0.57, 0.62, 1)
-theme_override_font_sizes/font_size = 20
+[node name="L_MensRoom1" type="Label" parent="WallGlow/Labels"]
+offset_left = 920.0
+offset_top = 2229.0
+offset_right = 1140.0
+offset_bottom = 2261.0
+theme_override_colors/font_color = Color(0.78, 0.81, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
 text = "남자 화장실"
 horizontal_alignment = 1
 
@@ -544,13 +554,15 @@ polygon = PackedVector2Array(1144, 2120, 1160, 2120, 1160, 2370, 1144, 2370)
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(1190, 2120, 1450, 2120, 1450, 2370, 1190, 2370)
 
-[node name="L_WomensRoom1" type="Label" parent="Labels"]
-offset_left = 1220.0
-offset_top = 2231.0
-offset_right = 1420.0
-offset_bottom = 2259.0
-theme_override_colors/font_color = Color(0.55, 0.57, 0.62, 1)
-theme_override_font_sizes/font_size = 20
+[node name="L_WomensRoom1" type="Label" parent="WallGlow/Labels"]
+offset_left = 1210.0
+offset_top = 2229.0
+offset_right = 1430.0
+offset_bottom = 2261.0
+theme_override_colors/font_color = Color(0.78, 0.81, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
 text = "여자 화장실"
 horizontal_alignment = 1
 
@@ -613,13 +625,15 @@ polygon = PackedVector2Array(1434, 2120, 1450, 2120, 1450, 2370, 1434, 2370)
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(1600, 2120, 2000, 2120, 2000, 2480, 1600, 2480)
 
-[node name="L_Entrance" type="Label" parent="Labels"]
-offset_left = 1700.0
-offset_top = 2286.0
-offset_right = 1900.0
-offset_bottom = 2314.0
-theme_override_colors/font_color = Color(0.55, 0.57, 0.62, 1)
-theme_override_font_sizes/font_size = 20
+[node name="L_Entrance" type="Label" parent="WallGlow/Labels"]
+offset_left = 1690.0
+offset_top = 2284.0
+offset_right = 1910.0
+offset_bottom = 2316.0
+theme_override_colors/font_color = Color(0.78, 0.81, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
 text = "현관"
 horizontal_alignment = 1
 
@@ -682,13 +696,15 @@ polygon = PackedVector2Array(1984, 2120, 2000, 2120, 2000, 2480, 1984, 2480)
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(2100, 2120, 2560, 2120, 2560, 2480, 2100, 2480)
 
-[node name="L_JanitorRoom" type="Label" parent="Labels"]
-offset_left = 2230.0
-offset_top = 2286.0
-offset_right = 2430.0
-offset_bottom = 2314.0
-theme_override_colors/font_color = Color(0.55, 0.57, 0.62, 1)
-theme_override_font_sizes/font_size = 20
+[node name="L_JanitorRoom" type="Label" parent="WallGlow/Labels"]
+offset_left = 2220.0
+offset_top = 2284.0
+offset_right = 2440.0
+offset_bottom = 2316.0
+theme_override_colors/font_color = Color(0.78, 0.81, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
 text = "수위실"
 horizontal_alignment = 1
 
@@ -751,13 +767,15 @@ polygon = PackedVector2Array(2544, 2120, 2560, 2120, 2560, 2480, 2544, 2480)
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(2620, 2120, 2960, 2120, 2960, 2370, 2620, 2370)
 
-[node name="L_Storage1" type="Label" parent="Labels"]
-offset_left = 2690.0
-offset_top = 2231.0
-offset_right = 2890.0
-offset_bottom = 2259.0
-theme_override_colors/font_color = Color(0.55, 0.57, 0.62, 1)
-theme_override_font_sizes/font_size = 20
+[node name="L_Storage1" type="Label" parent="WallGlow/Labels"]
+offset_left = 2680.0
+offset_top = 2229.0
+offset_right = 2900.0
+offset_bottom = 2261.0
+theme_override_colors/font_color = Color(0.78, 0.81, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
 text = "창고"
 horizontal_alignment = 1
 
@@ -820,13 +838,15 @@ polygon = PackedVector2Array(2944, 2120, 2960, 2120, 2960, 2370, 2944, 2370)
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(3000, 2120, 3380, 2120, 3380, 2370, 3000, 2370)
 
-[node name="L_Storage2" type="Label" parent="Labels"]
-offset_left = 3090.0
-offset_top = 2231.0
-offset_right = 3290.0
-offset_bottom = 2259.0
-theme_override_colors/font_color = Color(0.55, 0.57, 0.62, 1)
-theme_override_font_sizes/font_size = 20
+[node name="L_Storage2" type="Label" parent="WallGlow/Labels"]
+offset_left = 3080.0
+offset_top = 2229.0
+offset_right = 3300.0
+offset_bottom = 2261.0
+theme_override_colors/font_color = Color(0.78, 0.81, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
 text = "창고"
 horizontal_alignment = 1
 
@@ -889,13 +909,15 @@ polygon = PackedVector2Array(3364, 2120, 3380, 2120, 3380, 2370, 3364, 2370)
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(1950, 1027.8, 3380, 1399.6, 3380, 1879.6, 1950, 1507.8)
 
-[node name="L_StaffRoom" type="Label" parent="Labels"]
-offset_left = 2565.0
-offset_top = 1439.7.0
-offset_right = 2765.0
-offset_bottom = 1467.7.0
-theme_override_colors/font_color = Color(0.55, 0.57, 0.62, 1)
-theme_override_font_sizes/font_size = 20
+[node name="L_StaffRoom" type="Label" parent="WallGlow/Labels"]
+offset_left = 2555.0
+offset_top = 1437.7
+offset_right = 2775.0
+offset_bottom = 1469.7
+theme_override_colors/font_color = Color(0.78, 0.81, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
 text = "교무실"
 horizontal_alignment = 1
 

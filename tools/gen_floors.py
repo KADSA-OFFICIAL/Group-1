@@ -176,11 +176,16 @@ class Scene:
         self.poly2d(f"WV_{key}", "WallGlow/RoomWallVisuals", C_WALL, polygon)
 
     def label(self, name, text, cx, cy):
-        self.node(f'[node name="L_{name}" type="Label" parent="Labels"]\n'
-                  f'offset_left = {n(cx - 100)}.0\noffset_top = {n(cy - 14)}.0\n'
-                  f'offset_right = {n(cx + 100)}.0\noffset_bottom = {n(cy + 14)}.0\n'
-                  f'theme_override_colors/font_color = Color(0.55, 0.57, 0.62, 1)\n'
-                  f'theme_override_font_sizes/font_size = 20\n'
+        # 주의: offset은 실수 하나여야 한다. 예전엔 f"{n(v)}.0" 이라 폭이 소수인 층에서
+        # "92.4.0" 같은 깨진 값이 나왔다(#159 라벨 미표시 원인).
+        # 부모는 WallGlow — 어둠(CanvasModulate) 곱연산을 받지 않아야 읽힌다(#117·#130과 동일).
+        self.node(f'[node name="L_{name}" type="Label" parent="WallGlow/Labels"]\n'
+                  f'offset_left = {cx - 110:.1f}\noffset_top = {cy - 16:.1f}\n'
+                  f'offset_right = {cx + 110:.1f}\noffset_bottom = {cy + 16:.1f}\n'
+                  f'theme_override_colors/font_color = Color(0.78, 0.81, 0.88, 1)\n'
+                  f'theme_override_colors/font_outline_color = Color(0, 0, 0, 1)\n'
+                  f'theme_override_constants/outline_size = 4\n'
+                  f'theme_override_font_sizes/font_size = 22\n'
                   f'text = "{text}"\nhorizontal_alignment = 1\n')
 
     def render(self, ext):
@@ -307,7 +312,7 @@ def build_common(fl, spec):
     sc.node('[node name="RoomWallVisuals" type="Node2D" parent="WallGlow"]\n')
     sc.node('[node name="Rooms" type="Node2D" parent="."]\n')
     sc.node('[node name="Stairwells" type="Node2D" parent="."]\n')
-    sc.node('[node name="Labels" type="Node2D" parent="."]\n')
+    sc.node('[node name="Labels" type="Node2D" parent="WallGlow"]\n')
     sc.node('[node name="RoomWalls" type="StaticBody2D" parent="."]\n')
     sc.node('[node name="StairWalls" type="StaticBody2D" parent="."]\n')
 
@@ -362,7 +367,7 @@ def build_floor1():
     sc.node('[node name="RoomWallVisuals" type="Node2D" parent="WallGlow"]\n')
     sc.node('[node name="Rooms" type="Node2D" parent="."]\n')
     sc.node('[node name="Stairwells" type="Node2D" parent="."]\n')
-    sc.node('[node name="Labels" type="Node2D" parent="."]\n')
+    sc.node('[node name="Labels" type="Node2D" parent="WallGlow"]\n')
     sc.node('[node name="RoomWalls" type="StaticBody2D" parent="."]\n')
     sc.node('[node name="StairWalls" type="StaticBody2D" parent="."]\n')
 
