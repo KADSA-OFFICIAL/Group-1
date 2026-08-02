@@ -1,4 +1,4 @@
-[gd_scene load_steps=72 format=3]
+[gd_scene load_steps=107 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
@@ -203,6 +203,111 @@ polygon = PackedVector2Array(432, 2136, 448, 2136, 448, 2424, 432, 2424)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_SUBarrierCollision"]
 polygon = PackedVector2Array(330, 2120, 550, 2120, 550, 2136, 330, 2136)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Floor1North"]
+polygon = PackedVector2Array(0, 1004, 3400, 1004, 3400, 1020, 0, 1020)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN0"]
+polygon = PackedVector2Array(0, 0, 100, 0, 100, 1004, 0, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN1"]
+polygon = PackedVector2Array(100, 0, 200, 0, 200, 1004, 100, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN2"]
+polygon = PackedVector2Array(200, 0, 300, 0, 300, 1004, 200, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN3"]
+polygon = PackedVector2Array(300, 0, 400, 0, 400, 1004, 300, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN4"]
+polygon = PackedVector2Array(400, 0, 500, 0, 500, 1004, 400, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN5"]
+polygon = PackedVector2Array(500, 0, 600, 0, 600, 1004, 500, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN6"]
+polygon = PackedVector2Array(600, 0, 700, 0, 700, 1004, 600, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN7"]
+polygon = PackedVector2Array(700, 0, 800, 0, 800, 1004, 700, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN8"]
+polygon = PackedVector2Array(800, 0, 900, 0, 900, 1004, 800, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN9"]
+polygon = PackedVector2Array(900, 0, 1000, 0, 1000, 1004, 900, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN10"]
+polygon = PackedVector2Array(1000, 0, 1100, 0, 1100, 1004, 1000, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN11"]
+polygon = PackedVector2Array(1100, 0, 1200, 0, 1200, 1004, 1100, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN12"]
+polygon = PackedVector2Array(1200, 0, 1300, 0, 1300, 1004, 1200, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN13"]
+polygon = PackedVector2Array(1300, 0, 1400, 0, 1400, 1004, 1300, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN14"]
+polygon = PackedVector2Array(1400, 0, 1500, 0, 1500, 1004, 1400, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN15"]
+polygon = PackedVector2Array(1500, 0, 1600, 0, 1600, 1004, 1500, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN16"]
+polygon = PackedVector2Array(1600, 0, 1700, 0, 1700, 1004, 1600, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN17"]
+polygon = PackedVector2Array(1700, 0, 1800, 0, 1800, 1004, 1700, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN18"]
+polygon = PackedVector2Array(1800, 0, 1900, 0, 1900, 1004, 1800, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN19"]
+polygon = PackedVector2Array(1900, 0, 2000, 0, 2000, 1004, 1900, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN20"]
+polygon = PackedVector2Array(2000, 0, 2100, 0, 2100, 1004, 2000, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN21"]
+polygon = PackedVector2Array(2100, 0, 2200, 0, 2200, 1004, 2100, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN22"]
+polygon = PackedVector2Array(2200, 0, 2300, 0, 2300, 1004, 2200, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN23"]
+polygon = PackedVector2Array(2300, 0, 2400, 0, 2400, 1004, 2300, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN24"]
+polygon = PackedVector2Array(2400, 0, 2500, 0, 2500, 1004, 2400, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN25"]
+polygon = PackedVector2Array(2500, 0, 2600, 0, 2600, 1004, 2500, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN26"]
+polygon = PackedVector2Array(2600, 0, 2700, 0, 2700, 1004, 2600, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN27"]
+polygon = PackedVector2Array(2700, 0, 2800, 0, 2800, 1004, 2700, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN28"]
+polygon = PackedVector2Array(2800, 0, 2900, 0, 2900, 1004, 2800, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN29"]
+polygon = PackedVector2Array(2900, 0, 3000, 0, 3000, 1004, 2900, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN30"]
+polygon = PackedVector2Array(3000, 0, 3100, 0, 3100, 1004, 3000, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN31"]
+polygon = PackedVector2Array(3100, 0, 3200, 0, 3200, 1004, 3100, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN32"]
+polygon = PackedVector2Array(3200, 0, 3300, 0, 3300, 1004, 3200, 1004)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidFillN33"]
+polygon = PackedVector2Array(3300, 0, 3400, 0, 3400, 1004, 3300, 1004)
 
 
 [node name="SchoolFloor" type="Node2D"]
@@ -1121,6 +1226,220 @@ also_remove_paths = Array[NodePath]([NodePath("../WallGlow/SUBarrierVisual")])
 
 [node name="SULockZone" type="CollisionShape2D" parent="SULock"]
 shape = SubResource("RectangleShape2D_stair_zone")
+
+[node name="WC_Floor1North" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(0, 1004, 3400, 1004, 3400, 1020, 0, 1020)
+
+[node name="LO_WC_Floor1North" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_Floor1North")
+
+[node name="WV_Floor1North" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.45, 0.48, 0.55, 1)
+polygon = PackedVector2Array(0, 1004, 3400, 1004, 3400, 1020, 0, 1020)
+
+[node name="WC_VoidFillN0" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(0, 0, 100, 0, 100, 1004, 0, 1004)
+
+[node name="LO_WC_VoidFillN0" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN0")
+
+[node name="WC_VoidFillN1" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(100, 0, 200, 0, 200, 1004, 100, 1004)
+
+[node name="LO_WC_VoidFillN1" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN1")
+
+[node name="WC_VoidFillN2" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(200, 0, 300, 0, 300, 1004, 200, 1004)
+
+[node name="LO_WC_VoidFillN2" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN2")
+
+[node name="WC_VoidFillN3" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(300, 0, 400, 0, 400, 1004, 300, 1004)
+
+[node name="LO_WC_VoidFillN3" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN3")
+
+[node name="WC_VoidFillN4" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(400, 0, 500, 0, 500, 1004, 400, 1004)
+
+[node name="LO_WC_VoidFillN4" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN4")
+
+[node name="WC_VoidFillN5" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(500, 0, 600, 0, 600, 1004, 500, 1004)
+
+[node name="LO_WC_VoidFillN5" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN5")
+
+[node name="WC_VoidFillN6" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(600, 0, 700, 0, 700, 1004, 600, 1004)
+
+[node name="LO_WC_VoidFillN6" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN6")
+
+[node name="WC_VoidFillN7" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(700, 0, 800, 0, 800, 1004, 700, 1004)
+
+[node name="LO_WC_VoidFillN7" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN7")
+
+[node name="WC_VoidFillN8" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(800, 0, 900, 0, 900, 1004, 800, 1004)
+
+[node name="LO_WC_VoidFillN8" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN8")
+
+[node name="WC_VoidFillN9" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(900, 0, 1000, 0, 1000, 1004, 900, 1004)
+
+[node name="LO_WC_VoidFillN9" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN9")
+
+[node name="WC_VoidFillN10" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1000, 0, 1100, 0, 1100, 1004, 1000, 1004)
+
+[node name="LO_WC_VoidFillN10" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN10")
+
+[node name="WC_VoidFillN11" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1100, 0, 1200, 0, 1200, 1004, 1100, 1004)
+
+[node name="LO_WC_VoidFillN11" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN11")
+
+[node name="WC_VoidFillN12" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1200, 0, 1300, 0, 1300, 1004, 1200, 1004)
+
+[node name="LO_WC_VoidFillN12" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN12")
+
+[node name="WC_VoidFillN13" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1300, 0, 1400, 0, 1400, 1004, 1300, 1004)
+
+[node name="LO_WC_VoidFillN13" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN13")
+
+[node name="WC_VoidFillN14" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1400, 0, 1500, 0, 1500, 1004, 1400, 1004)
+
+[node name="LO_WC_VoidFillN14" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN14")
+
+[node name="WC_VoidFillN15" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1500, 0, 1600, 0, 1600, 1004, 1500, 1004)
+
+[node name="LO_WC_VoidFillN15" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN15")
+
+[node name="WC_VoidFillN16" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1600, 0, 1700, 0, 1700, 1004, 1600, 1004)
+
+[node name="LO_WC_VoidFillN16" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN16")
+
+[node name="WC_VoidFillN17" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1700, 0, 1800, 0, 1800, 1004, 1700, 1004)
+
+[node name="LO_WC_VoidFillN17" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN17")
+
+[node name="WC_VoidFillN18" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1800, 0, 1900, 0, 1900, 1004, 1800, 1004)
+
+[node name="LO_WC_VoidFillN18" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN18")
+
+[node name="WC_VoidFillN19" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1900, 0, 2000, 0, 2000, 1004, 1900, 1004)
+
+[node name="LO_WC_VoidFillN19" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN19")
+
+[node name="WC_VoidFillN20" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2000, 0, 2100, 0, 2100, 1004, 2000, 1004)
+
+[node name="LO_WC_VoidFillN20" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN20")
+
+[node name="WC_VoidFillN21" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2100, 0, 2200, 0, 2200, 1004, 2100, 1004)
+
+[node name="LO_WC_VoidFillN21" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN21")
+
+[node name="WC_VoidFillN22" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2200, 0, 2300, 0, 2300, 1004, 2200, 1004)
+
+[node name="LO_WC_VoidFillN22" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN22")
+
+[node name="WC_VoidFillN23" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2300, 0, 2400, 0, 2400, 1004, 2300, 1004)
+
+[node name="LO_WC_VoidFillN23" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN23")
+
+[node name="WC_VoidFillN24" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2400, 0, 2500, 0, 2500, 1004, 2400, 1004)
+
+[node name="LO_WC_VoidFillN24" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN24")
+
+[node name="WC_VoidFillN25" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2500, 0, 2600, 0, 2600, 1004, 2500, 1004)
+
+[node name="LO_WC_VoidFillN25" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN25")
+
+[node name="WC_VoidFillN26" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2600, 0, 2700, 0, 2700, 1004, 2600, 1004)
+
+[node name="LO_WC_VoidFillN26" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN26")
+
+[node name="WC_VoidFillN27" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2700, 0, 2800, 0, 2800, 1004, 2700, 1004)
+
+[node name="LO_WC_VoidFillN27" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN27")
+
+[node name="WC_VoidFillN28" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2800, 0, 2900, 0, 2900, 1004, 2800, 1004)
+
+[node name="LO_WC_VoidFillN28" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN28")
+
+[node name="WC_VoidFillN29" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2900, 0, 3000, 0, 3000, 1004, 2900, 1004)
+
+[node name="LO_WC_VoidFillN29" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN29")
+
+[node name="WC_VoidFillN30" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(3000, 0, 3100, 0, 3100, 1004, 3000, 1004)
+
+[node name="LO_WC_VoidFillN30" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN30")
+
+[node name="WC_VoidFillN31" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(3100, 0, 3200, 0, 3200, 1004, 3100, 1004)
+
+[node name="LO_WC_VoidFillN31" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN31")
+
+[node name="WC_VoidFillN32" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(3200, 0, 3300, 0, 3300, 1004, 3200, 1004)
+
+[node name="LO_WC_VoidFillN32" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN32")
+
+[node name="WC_VoidFillN33" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(3300, 0, 3400, 0, 3400, 1004, 3300, 1004)
+
+[node name="LO_WC_VoidFillN33" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_VoidFillN33")
 
 [node name="Door_FrontGate" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1

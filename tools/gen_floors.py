@@ -569,6 +569,11 @@ def build_common(fl, spec):
     sc.wall("VoidBotL", rect(0, VOID_Y1 - T, BRIDGE_X0, VOID_Y1))
     sc.wall("VoidBotR", rect(BRIDGE_X1, VOID_Y1 - T, W, VOID_Y1))
 
+    # 공백 구역 내부를 메워 통행 후보에서 뺀다(수위 스폰 방지)
+    fill_void(sc, "VoidFillL", 0, BRIDGE_X0 - T, lambda x: MID_Y1 + T, VOID_Y1 - T)
+    fill_void(sc, "VoidFillR", BRIDGE_X1 + T, W,
+              lambda x: slope_y(x, MID_Y1) + T, VOID_Y1 - T)
+
     # 중앙다리 — 좌·우 벽
     sc.wall("BridgeL", rect(BRIDGE_X0 - T, BRIDGE_Y0, BRIDGE_X0, BRIDGE_Y1))
     sc.wall("BridgeR", rect(BRIDGE_X1, BRIDGE_Y0, BRIDGE_X1 + T, BRIDGE_Y1))
@@ -611,6 +616,11 @@ def build_floor1():
     add_stairwell(sc, "StairA", *FLOOR1["stair"])
     add_stair_markers(sc, "StairA", *FLOOR1["stair"], floor=1)
     add_stair_locks(sc, 1, LOCKED[1], [FLOOR1["stair"]])
+    # 1층 건물은 도면상 아래쪽 절반뿐이다. 북쪽 빈 구역에 경계벽을 세우고
+    # 안쪽을 메워, 플레이어가 들어가지도 수위가 스폰되지도 않게 한다.
+    sc.wall("Floor1North", rect(0, 1004, W, 1020))
+    fill_void(sc, "VoidFillN", 0, W, lambda x: 0.0, 1004)
+
     # 현관 정문 — 방 아래변(건물 바깥쪽)에 보이는 문. ExitDoor 상호작용도 이 앞이다.
     ex0, ey1, ex1 = 1600, 2480, 2000
     sc.poly2d("Door_FrontGate", "WallGlow/RoomWallVisuals", C_DOOR,
@@ -619,6 +629,24 @@ def build_floor1():
 
     add_outer(sc)
     return sc
+
+
+def fill_void(sc, key, x0, x1, top_fn, y_bottom, step=100):
+    """건물 밖 구역을 실체(충돌+광원차단)로 메운다.
+
+    벽으로 둘러싸기만 하면 그 안쪽 칸이 여전히 "통행 가능"으로 잡혀서,
+    수위 스폰 후보(corridor_cells)에 들어간다 → 플레이어가 닿을 수 없는
+    빈 구역에 수위가 나타나 영영 안 보인다(#159 F5: 1층에 수위 미등장).
+    사선 경계는 좁은 세로 띠로 나눠 채운다."""
+    x = x0
+    i = 0
+    while x < x1:
+        right = min(x + step, x1)
+        top = max(top_fn(x), top_fn(right))
+        if y_bottom - top > 1.0:
+            sc.solid(f"WC_{key}{i}", "RoomWalls", rect(x, top, right, y_bottom))
+            i += 1
+        x = right
 
 
 def add_outer(sc):
