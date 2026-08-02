@@ -27,6 +27,8 @@ C_WALL = "Color(0.45, 0.48, 0.55, 1)"
 C_DOOR = "Color(0.45, 0.32, 0.2, 1)"
 C_SLAB = "Color(0.1, 0.12, 0.13, 1)"
 C_STEP = "Color(0.22, 0.24, 0.28, 1)"
+C_LOCK = "Color(0.55, 0.26, 0.22, 1)"   # 잠긴 계단 배리어
+C_KEY = "Color(0.85, 0.74, 0.32, 1)"    # 열쇠
 
 # ── 세로 밴드 ────────────────────────────────────────────────
 # 외벽은 두께 40이 경계선 위에 걸쳐 있으므로 안쪽 면이 EDGE. 방을 여기 딱 붙인다(#159 피드백).
@@ -305,6 +307,71 @@ def add_stair_markers(sc, name, x0, y0, x1, y1, floor):
         sc.label(f"{name}_{tag}", f"{target}층", cx, cy + 58)
 
 
+EXT_LOCKED_DOOR = ('[ext_resource type="Script" '
+                   'path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]')
+EXT_PICKUP = ('[ext_resource type="Script" '
+              'path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]')
+
+# 기획서(구글 독스) 기준 열쇠 배치. 기획서가 지정한 방이 새 도면 맵에 없으면
+# 임의 배치하지 않고 비워 둔다(사용자 지시 2026-08-02) — MISSING_ROOMS 참조.
+KEYS = {
+    4: [("StairKey4", "stair_key_4", 370, 1730,
+         "다산실 서랍에서 4층 계단 열쇠를 주웠다.")],
+}
+# 열쇠를 실제로 놓을 수 있는 층만 계단을 잠근다. 열쇠가 없는 층을 잠그면 진행이 막힌다.
+LOCKED = {4: "stair_key_4"}
+
+
+def add_stair_locks(sc, floor, key_id, stairwells):
+    """계단 입구 자물쇠. 한 층의 계단 전부를 열쇠 하나로 연다(기존 규약)."""
+    sc.node('[node name="StairLocks" type="Node2D" parent="."]\n')
+    tags = ["SU", "SD"]
+    visual_paths = []
+    for tag, (x0, y0, x1, y1) in zip(tags, stairwells):
+        mid = (x0 + x1) / 2
+        bar = rect(mid - DOOR, y0, mid + DOOR, y0 + T)
+        sc.node(f'[node name="{tag}Barrier" type="StaticBody2D" parent="StairLocks"]\n')
+        sc.solid(f"{tag}BarrierCollision", f"StairLocks/{tag}Barrier", bar)
+        # 시각은 WallGlow(어둠 미적용) — 열릴 때 함께 지우려고 also_remove_paths에 넣는다(#130)
+        sc.poly2d(f"{tag}BarrierVisual", "WallGlow", C_LOCK, bar, z=2)
+        visual_paths.append(f'NodePath("../WallGlow/{tag}BarrierVisual")')
+
+    for i, (tag, (x0, y0, x1, y1)) in enumerate(zip(tags, stairwells)):
+        mid = (x0 + x1) / 2
+        other = tags[1 - i]
+        removes = [f'NodePath("../{other}Lock")'] + visual_paths
+        sc.node(
+            f'[node name="{tag}Lock" type="Area2D" parent="."]\n'
+            f'position = Vector2({n(mid)}, {n(y0 + T / 2)})\n'
+            f'collision_layer = 2\ncollision_mask = 0\n'
+            f'script = ExtResource("1_locked_door")\n'
+            f'required_item_id = "{key_id}"\n'
+            f'locked_message = "계단 입구가 잠겨 있다. 이 층 어딘가에 열쇠가 있을 것이다."\n'
+            f'open_message = "계단 자물쇠를 열었다. 이 층의 계단을 모두 쓸 수 있다."\n'
+            f'barrier_path = NodePath("../StairLocks")\n'
+            f'prompt_text = "계단 열기"\n'
+            f'door_id = "stairs_f{floor}_unlocked"\n'
+            f'consume_key = true\n'
+            f'also_remove_paths = Array[NodePath]([{", ".join(removes)}])\n')
+        sc.node(f'[node name="{tag}LockZone" type="CollisionShape2D" parent="{tag}Lock"]\n'
+                f'shape = SubResource("RectangleShape2D_stair_zone")\n')
+
+
+def add_keys(sc, floor):
+    for name, item_id, x, y, msg in KEYS.get(floor, []):
+        sc.node(f'[node name="{name}" type="Area2D" parent="."]\n'
+                f'position = Vector2({n(x)}, {n(y)})\n'
+                f'collision_layer = 0\ncollision_mask = 1\n'
+                f'script = ExtResource("2_pickup")\n'
+                f'item_id = "{item_id}"\nmessage = "{msg}"\n'
+                f'pickup_id = "{item_id}_taken"\n')
+        sc.node(f'[node name="{name}Visual" type="Polygon2D" parent="{name}"]\n'
+                f'z_index = 2\ncolor = {C_KEY}\n'
+                f'polygon = {rect(-11, -5, 11, 5)}\n')
+        sc.node(f'[node name="{name}Zone" type="CollisionShape2D" parent="{name}"]\n'
+                f'shape = SubResource("RectangleShape2D_key_zone")\n')
+
+
 def add_stairwell(sc, name, x0, y0, x1, y1):
     """계단실: 바닥 + 계단 단 + 난간(좌·우·앞) + 가운데 분할 난간."""
     sc.poly2d(f"Slab_{name}", "Stairwells", C_SLAB, rect(x0, y0, x1, y1))
@@ -328,6 +395,10 @@ def build_common(fl, spec):
     sc = Scene()
     sc.rect_shapes = [("RectangleShape2D_wall_h", f"Vector2({W}, 40)"),
                       ("RectangleShape2D_wall_v", f"Vector2(40, {H})")]
+    if fl in LOCKED:
+        sc.rect_shapes.append(("RectangleShape2D_stair_zone", "Vector2(240, 56)"))
+    if KEYS.get(fl):
+        sc.rect_shapes.append(("RectangleShape2D_key_zone", "Vector2(48, 48)"))
 
     sc.node('[node name="SchoolFloor" type="Node2D"]\n')
     sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, W, H))
@@ -357,6 +428,9 @@ def build_common(fl, spec):
     add_stairwell(sc, "StairB", *STAIR_B)
     add_stair_markers(sc, "StairA", *STAIR_A, floor=fl)
     add_stair_markers(sc, "StairB", *STAIR_B, floor=fl)
+    if fl in LOCKED:
+        add_stair_locks(sc, fl, LOCKED[fl], [STAIR_A, STAIR_B])
+    add_keys(sc, fl)
 
     # 공백 구역(건물 밖) 봉인 — 중앙다리 폭만 열어 둔다.
     # 위 경계: 왼쪽은 수평, 오른쪽은 중간 띠와 같은 기울기.
@@ -426,7 +500,12 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 if __name__ == "__main__":
     for fl in (1, 2, 3, 4, 5):
         sc = build_floor1() if fl == 1 else build_common(fl, LAYOUT[fl])
-        text = sc.render([])
+        ext = []
+        if fl in LOCKED:
+            ext.append(EXT_LOCKED_DOOR)
+        if KEYS.get(fl):
+            ext.append(EXT_PICKUP)
+        text = sc.render(ext)
         path = ROOT / f"scenes/background/school_floor_{fl}.tscn"
         path.write_text(text)
         print(f"OK floor{fl}: 노드 {len(sc.nodes)}개, 차단체 {len(sc.subs)}개")

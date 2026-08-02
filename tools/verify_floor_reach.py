@@ -24,7 +24,10 @@ def parse(path):
         name, ntype, parent, nums = m.group(1), m.group(2), m.group(3), m.group(4)
         pts = [float(v) for v in nums.split(",")]
         poly = list(zip(pts[0::2], pts[1::2]))
-        if ntype == "CollisionPolygon2D" and (name.startswith("WC_") or name.startswith("RC_")):
+        # 벽(WC_/RC_)뿐 아니라 계단 자물쇠 배리어(SUBarrierCollision 등) 같은
+        # 모든 정적 충돌 폴리곤을 막힌 것으로 본다. 접두사만 보면 배리어를 놓쳐
+        # "잠긴 계단도 도달 가능"으로 잘못 통과한다(#159 P3에서 발견).
+        if ntype == "CollisionPolygon2D":
             walls.append(poly)
         elif ntype == "Polygon2D" and parent == "Rooms":
             rooms[name] = poly
