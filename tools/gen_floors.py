@@ -41,12 +41,15 @@ SOUTH_Y0, SOUTH_Y1 = 1520, 1940      # 남쪽 특별실동(위 복도 1400~1520)
 BOT_Y0, BOT_Y1 = 2120, 2480          # 하단 띠 — 아래쪽 외벽에 밀착
 STAIR_B = (1450, 2120, 1890, 2440)   # 중앙 하단 계단실 (2~5층 동일)
 
-# 북쪽 교실 8칸: 좌우 외벽에 밀착해 EDGE~W-EDGE를 꽉 채운다 (폭 392, 간격 32)
-NORTH_W, NORTH_GAP = 392, 32
+# 북쪽 교실: 칸 수에 맞춰 폭을 자동 계산해 EDGE~W-EDGE를 꽉 채운다.
+# pitch = (span+gap)/count 로 두면 마지막 칸 오른쪽 끝이 정확히 W-EDGE에 떨어진다.
+NORTH_GAP = 32
 
-def north_x(i):
-    x0 = EDGE + i * (NORTH_W + NORTH_GAP)
-    return x0, x0 + NORTH_W
+def north_x(i, count):
+    span = W - 2 * EDGE
+    pitch = (span + NORTH_GAP) / count
+    x0 = EDGE + i * pitch
+    return x0, x0 + pitch - NORTH_GAP
 
 # 사선 우측 동: x가 늘면 y가 SLOPE만큼 내려간다
 SLOPE = 0.26
@@ -61,7 +64,7 @@ def slope_y(x, base):
 # 라벨이 None이면 막힌 공간(문 없음·라벨 없음)
 LAYOUT = {
     4: {
-        "north": ["1반", "2반", "3반", "3학년부", "4반", "5반", "6반", "7반"],
+        "north": ["1반", "2반", "3반", "3학년부", "4반", "5반", "6반", "7반", "8반"],
         "south_left": [("Dasan7", "다산7실", 20, 720), ("CreativeDept", "창의체험부", 750, 1640)],
         "south_right": [("ComputerRoom", "컴퓨터실", 1920, 2400),
                         ("Storage2", "창고", 2430, 2790),
@@ -77,7 +80,7 @@ LAYOUT = {
         "bottom_left": [("CareerRoom", "진로실", 20, 1200)],
     },
     2: {
-        "north": ["1반", "2반", "3반", "1학년부", "4반", "5반", "6반", "7반"],
+        "north": ["1반", "2반", "3반", "1학년부", "4반", "5반", "6반", "7반", "8반"],
         "south_left": [("PEStorage", "체육창고", 20, 720), ("PEDept", "체육건강부", 750, 1640)],
         "south_right": [("EduRoom", "교육실", 1920, 2400),
                         ("Storage2", "창고", 2430, 2790),
@@ -310,7 +313,7 @@ def build_common(fl, spec):
 
     # 북쪽 교실 8칸 (문은 아래변)
     for i, nm in enumerate(spec["north"]):
-        x0, x1 = north_x(i)
+        x0, x1 = north_x(i, len(spec["north"]))
         add_room(sc, f"North{i+1}", nm, x0, NORTH_Y0, x1, NORTH_Y1, "bottom")
 
     # 중간 띠 좌 — 문은 북쪽 복도(위)로 낸다
