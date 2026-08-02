@@ -1594,6 +1594,40 @@ occluder = SubResource("Occ_RC_StairB_M")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1662, 2136, 1678, 2136, 1678, 2424, 1662, 2424)
 
+[node name="Arrow_StairA_Dn" type="Polygon2D" parent="WallGlow"]
+z_index = 2
+color = Color(0.55, 0.8, 0.85, 1)
+polygon = PackedVector2Array(630, 850, 653.4, 808.4, 606.6, 808.4)
+
+[node name="L_StairA_Dn" type="Label" parent="WallGlow/Labels"]
+offset_left = 520.0
+offset_top = 866.0
+offset_right = 740.0
+offset_bottom = 898.0
+theme_override_colors/font_color = Color(0.78, 0.81, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
+text = "4층"
+horizontal_alignment = 1
+
+[node name="Arrow_StairB_Dn" type="Polygon2D" parent="WallGlow"]
+z_index = 2
+color = Color(0.55, 0.8, 0.85, 1)
+polygon = PackedVector2Array(1780, 2250, 1803.4, 2208.4, 1756.6, 2208.4)
+
+[node name="L_StairB_Dn" type="Label" parent="WallGlow/Labels"]
+offset_left = 1670.0
+offset_top = 2266.0
+offset_right = 1890.0
+offset_bottom = 2298.0
+theme_override_colors/font_color = Color(0.78, 0.81, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
+text = "4층"
+horizontal_alignment = 1
+
 [node name="WC_VoidTopL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(0, 1000, 1670, 1000, 1670, 1016, 0, 1016)
 

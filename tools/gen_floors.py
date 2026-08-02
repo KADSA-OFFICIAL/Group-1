@@ -281,6 +281,30 @@ def add_sloped_room(sc, key, label, x0, x1, base_top, base_bot, door="bottom"):
         sc.wall(f"{key}_bot", poly((x0, by0 - T), (x1, by1 - T), (x1, by1), (x0, by0)))
 
 
+# 본편에서 오갈 수 있는 층 범위 — floor_manager.gd의 MIN_FLOOR/MAX_FLOOR와 맞춘다.
+MIN_FLOOR, MAX_FLOOR = 1, 4
+C_ARROW = "Color(0.55, 0.8, 0.85, 1)"
+
+
+def add_stair_markers(sc, name, x0, y0, x1, y1, floor):
+    """계단실 반쪽마다 방향 표시: 왼쪽=위층 ▲ / 오른쪽=아래층 ▼ (기존 규약).
+    본편에서 갈 수 없는 방향(4층에서 위, 1층에서 아래)은 표시하지 않는다."""
+    mid = (x0 + x1) / 2
+    cy = y0 + 104
+    s = 26
+    for cx, target, up in (((x0 + mid) / 2, floor + 1, True),
+                           ((mid + x1) / 2, floor - 1, False)):
+        if not (MIN_FLOOR <= target <= MAX_FLOOR):
+            continue
+        tag = "Up" if up else "Dn"
+        if up:
+            tri = poly((cx, cy - s), (cx + s * 0.9, cy + s * 0.6), (cx - s * 0.9, cy + s * 0.6))
+        else:
+            tri = poly((cx, cy + s), (cx + s * 0.9, cy - s * 0.6), (cx - s * 0.9, cy - s * 0.6))
+        sc.poly2d(f"Arrow_{name}_{tag}", "WallGlow", C_ARROW, tri, z=2)
+        sc.label(f"{name}_{tag}", f"{target}층", cx, cy + 58)
+
+
 def add_stairwell(sc, name, x0, y0, x1, y1):
     """계단실: 바닥 + 계단 단 + 난간(좌·우·앞) + 가운데 분할 난간."""
     sc.poly2d(f"Slab_{name}", "Stairwells", C_SLAB, rect(x0, y0, x1, y1))
@@ -331,6 +355,8 @@ def build_common(fl, spec):
     # 계단실 2곳
     add_stairwell(sc, "StairA", *STAIR_A)
     add_stairwell(sc, "StairB", *STAIR_B)
+    add_stair_markers(sc, "StairA", *STAIR_A, floor=fl)
+    add_stair_markers(sc, "StairB", *STAIR_B, floor=fl)
 
     # 공백 구역(건물 밖) 봉인 — 중앙다리 폭만 열어 둔다.
     # 위 경계: 왼쪽은 수평, 오른쪽은 중간 띠와 같은 기울기.
@@ -377,6 +403,7 @@ def build_floor1():
     sx0, sy0, sx1, sy1 = FLOOR1["staff"]
     add_sloped_room(sc, "StaffRoom", "교무실", sx0, sx1, sy0, sy1, "bottom")
     add_stairwell(sc, "StairA", *FLOOR1["stair"])
+    add_stair_markers(sc, "StairA", *FLOOR1["stair"], floor=1)
 
     add_outer(sc)
     return sc

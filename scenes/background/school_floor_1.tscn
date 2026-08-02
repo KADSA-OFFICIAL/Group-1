@@ -1056,6 +1056,23 @@ occluder = SubResource("Occ_RC_StairA_M")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(432, 2136, 448, 2136, 448, 2424, 432, 2424)
 
+[node name="Arrow_StairA_Up" type="Polygon2D" parent="WallGlow"]
+z_index = 2
+color = Color(0.55, 0.8, 0.85, 1)
+polygon = PackedVector2Array(330, 2198, 353.4, 2239.6, 306.6, 2239.6)
+
+[node name="L_StairA_Up" type="Label" parent="WallGlow/Labels"]
+offset_left = 220.0
+offset_top = 2266.0
+offset_right = 440.0
+offset_bottom = 2298.0
+theme_override_colors/font_color = Color(0.78, 0.81, 0.88, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 22
+text = "2층"
+horizontal_alignment = 1
+
 [node name="Walls" type="StaticBody2D" parent="."]
 
 [node name="TopWall" type="CollisionShape2D" parent="Walls"]
