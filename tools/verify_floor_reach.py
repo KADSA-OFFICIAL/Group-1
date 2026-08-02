@@ -117,11 +117,35 @@ def flood(blocked, cols, rows, start):
     return seen
 
 
+def check_camera(sizes):
+    """플레이어 카메라 한계가 맵 캔버스와 맞는지. 어긋나면 맵 끝에서 카메라가
+    따라오지 않는다(#159에서 옛 2800×1800 값이 남아 발생)."""
+    text = (ROOT / "scenes/player/player.tscn").read_text()
+    lim = {}
+    for key in ("limit_left", "limit_top", "limit_right", "limit_bottom"):
+        m = re.search(rf"^{key} = (-?\d+)", text, re.M)
+        if m:
+            lim[key] = int(m.group(1))
+    if len(lim) != 4:
+        print("   ✗ player.tscn에서 카메라 limit_*를 찾지 못했다")
+        return 1
+    bad = 0
+    for w, h in set(sizes):
+        if (lim["limit_left"], lim["limit_top"]) != (0, 0) \
+                or lim["limit_right"] != int(w) or lim["limit_bottom"] != int(h):
+            print(f"   ✗ 카메라 한계 {lim['limit_left']},{lim['limit_top']}~"
+                  f"{lim['limit_right']},{lim['limit_bottom']} ≠ 맵 0,0~{int(w)},{int(h)}")
+            bad += 1
+    return bad
+
+
 def main():
     bad = 0
+    sizes = []
     for fl in (1, 2, 3, 4, 5):
         path = ROOT / f"scenes/background/school_floor_{fl}.tscn"
         walls, rooms, (w, h) = parse(path)
+        sizes.append((w, h))
         blocked, cols, rows = build_grid(walls, w, h)
         # 시작: 북쪽 복도 한가운데(1층은 상단 복도)
         start = (200, 700) if fl != 1 else (200, 1700)
@@ -138,6 +162,7 @@ def main():
                 print(f"   ✗ {name}: 막혀 있어야 하는데 도달됨"); bad += 1
             elif not want_closed and not reach:
                 print(f"   ✗ {name}: 도달 불가"); bad += 1
+    bad += check_camera(sizes)
     print("\n문제 없음" if bad == 0 else f"\n문제 {bad}건")
     return 1 if bad else 0
 
