@@ -1,11 +1,23 @@
-[gd_scene load_steps=134 format=3]
+[gd_scene load_steps=142 format=3]
 
+[ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
+[ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
+[ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="5_hiding"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(3400, 40)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_v"]
 size = Vector2(40, 2500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_stair_zone"]
+size = Vector2(240, 56)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_key_zone"]
+size = Vector2(48, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door_zone"]
+size = Vector2(140, 60)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_WC_North1_top"]
 polygon = PackedVector2Array(20, 20, 364.9, 20, 364.9, 36, 20, 36)
@@ -276,6 +288,12 @@ polygon = PackedVector2Array(1780, 2120, 1890, 2120, 1890, 2136, 1780, 2136)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_RC_StairB_M"]
 polygon = PackedVector2Array(1662, 2136, 1678, 2136, 1678, 2424, 1662, 2424)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_SUBarrierCollision"]
+polygon = PackedVector2Array(410, 720, 630, 720, 630, 736, 410, 736)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_SDBarrierCollision"]
+polygon = PackedVector2Array(1560, 2120, 1780, 2120, 1780, 2136, 1560, 2136)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidTopL"]
 polygon = PackedVector2Array(0, 1000, 1670, 1000, 1670, 1016, 0, 1016)
@@ -1733,6 +1751,68 @@ theme_override_font_sizes/font_size = 22
 text = "1층"
 horizontal_alignment = 1
 
+[node name="StairLocks" type="Node2D" parent="."]
+
+[node name="SUBarrier" type="StaticBody2D" parent="StairLocks"]
+
+[node name="SUBarrierCollision" type="CollisionPolygon2D" parent="StairLocks/SUBarrier"]
+polygon = PackedVector2Array(410, 720, 630, 720, 630, 736, 410, 736)
+
+[node name="LO_SUBarrierCollision" type="LightOccluder2D" parent="StairLocks/SUBarrier"]
+occluder = SubResource("Occ_SUBarrierCollision")
+
+[node name="SUBarrierVisual" type="Polygon2D" parent="WallGlow"]
+z_index = 2
+color = Color(0.55, 0.26, 0.22, 1)
+polygon = PackedVector2Array(410, 720, 630, 720, 630, 736, 410, 736)
+
+[node name="SDBarrier" type="StaticBody2D" parent="StairLocks"]
+
+[node name="SDBarrierCollision" type="CollisionPolygon2D" parent="StairLocks/SDBarrier"]
+polygon = PackedVector2Array(1560, 2120, 1780, 2120, 1780, 2136, 1560, 2136)
+
+[node name="LO_SDBarrierCollision" type="LightOccluder2D" parent="StairLocks/SDBarrier"]
+occluder = SubResource("Occ_SDBarrierCollision")
+
+[node name="SDBarrierVisual" type="Polygon2D" parent="WallGlow"]
+z_index = 2
+color = Color(0.55, 0.26, 0.22, 1)
+polygon = PackedVector2Array(1560, 2120, 1780, 2120, 1780, 2136, 1560, 2136)
+
+[node name="SULock" type="Area2D" parent="."]
+position = Vector2(520, 728)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_locked_door")
+required_item_id = "stair_key_2"
+locked_message = "계단 입구가 잠겨 있다. 이 층 어딘가에 열쇠가 있을 것이다."
+open_message = "계단 자물쇠를 열었다. 이 층의 계단을 모두 쓸 수 있다."
+barrier_path = NodePath("../StairLocks")
+prompt_text = "계단 열기"
+door_id = "stairs_f2_unlocked"
+consume_key = true
+also_remove_paths = Array[NodePath]([NodePath("../SDLock"), NodePath("../WallGlow/SUBarrierVisual"), NodePath("../WallGlow/SDBarrierVisual")])
+
+[node name="SULockZone" type="CollisionShape2D" parent="SULock"]
+shape = SubResource("RectangleShape2D_stair_zone")
+
+[node name="SDLock" type="Area2D" parent="."]
+position = Vector2(1670, 2128)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("1_locked_door")
+required_item_id = "stair_key_2"
+locked_message = "계단 입구가 잠겨 있다. 이 층 어딘가에 열쇠가 있을 것이다."
+open_message = "계단 자물쇠를 열었다. 이 층의 계단을 모두 쓸 수 있다."
+barrier_path = NodePath("../StairLocks")
+prompt_text = "계단 열기"
+door_id = "stairs_f2_unlocked"
+consume_key = true
+also_remove_paths = Array[NodePath]([NodePath("../SULock"), NodePath("../WallGlow/SUBarrierVisual"), NodePath("../WallGlow/SDBarrierVisual")])
+
+[node name="SDLockZone" type="CollisionShape2D" parent="SDLock"]
+shape = SubResource("RectangleShape2D_stair_zone")
+
 [node name="WC_VoidTopL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(0, 1000, 1670, 1000, 1670, 1016, 0, 1016)
 
@@ -2289,6 +2369,143 @@ occluder = SubResource("Occ_WC_WomensRoomB_right")
 [node name="WV_WomensRoomB_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2804, 2120, 2820, 2120, 2820, 2480, 2804, 2480)
+
+[node name="YujinClue" type="Area2D" parent="."]
+position = Vector2(370, 1780.4)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "체육관 입구 구석에 체육복 상의가 개켜져 있다. 이름표는 3학년 1반 강유진. 주머니에서 나온 쪽지 — '유진아 후배 병원 갔다더라.' 뒷면에 다른 글씨, 굵고 눌러쓴 어른 글씨. '아무도 안 도와주니까 내가 한다.'"
+prompt_text = "조사"
+grants_flag = "found_kangyujin"
+
+
+[node name="YujinClueVisual" type="Polygon2D" parent="YujinClue"]
+z_index = 1
+color = Color(0.35, 0.45, 0.55, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+
+[node name="YujinClueZone" type="CollisionShape2D" parent="YujinClue"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+
+[node name="ShowerMarks" type="Area2D" parent="."]
+position = Vector2(2335, 2343.2)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "타일 바닥에 무언가 끌린 자국이 길게 남아 있다. 자국이 끝나는 벽에는 손끝으로 쓴 것 같은 글씨. — '살려'"
+prompt_text = "조사"
+grants_flag = "saw_shower_marks"
+
+
+[node name="ShowerMarksVisual" type="Polygon2D" parent="ShowerMarks"]
+z_index = 1
+color = Color(0.5, 0.52, 0.55, 1)
+polygon = PackedVector2Array(-16, -8, 16, -8, 16, 8, -16, 8)
+
+
+[node name="ShowerMarksZone" type="CollisionShape2D" parent="ShowerMarks"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+
+[node name="DrainKey" type="Area2D" parent="."]
+position = Vector2(2400, 2343.2)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "배수구 뚜껑이 어긋나 있다. 손을 넣어 보니 젖은 열쇠가 잡혔다. '2F 계단'."
+prompt_text = "배수구 뒤지기"
+grants_item_id = "stair_key_2"
+grants_flag = "found_drain_key"
+
+
+[node name="DrainKeyVisual" type="Polygon2D" parent="DrainKey"]
+z_index = 1
+color = Color(0.62, 0.55, 0.28, 1)
+polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
+
+
+[node name="DrainKeyZone" type="CollisionShape2D" parent="DrainKey"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+
+[node name="HideShower" type="Area2D" parent="."]
+position = Vector2(2465, 2343.2)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("5_hiding")
+prompt_text = "샤워칸에 숨기"
+message = "샤워칸 커튼 뒤. 마른 배수구에서 쇠 냄새가 올라온다."
+
+
+[node name="HideShowerVisual" type="Polygon2D" parent="HideShower"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+
+[node name="HideShowerZone" type="CollisionShape2D" parent="HideShower"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="SeunghoClue" type="Area2D" parent="."]
+position = Vector2(2160, 1780.4)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "압수품 상자에 이름표가 붙어 있다. '2-4 백승호'. 안에는 남의 이름이 적힌 물건들이 섞여 있다. 상자 옆 지도부 수첩 — '반복. 지도 요망.' 그 뒤로 기록이 끊겼다."
+prompt_text = "조사"
+grants_flag = "found_baekseungho"
+
+
+[node name="SeunghoClueVisual" type="Polygon2D" parent="SeunghoClue"]
+z_index = 1
+color = Color(0.6, 0.5, 0.4, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+
+[node name="SeunghoClueZone" type="CollisionShape2D" parent="SeunghoClue"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+
+[node name="HideClass1" type="Area2D" parent="."]
+position = Vector2(192.4, 342.4)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("5_hiding")
+prompt_text = "사물함에 숨기"
+message = "누군가의 사물함. 안쪽에 이름표가 떨어져 있다."
+
+
+[node name="HideClass1Visual" type="Polygon2D" parent="HideClass1"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+
+[node name="HideClass1Zone" type="CollisionShape2D" parent="HideClass1"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+
+[node name="HideClass6" type="Area2D" parent="."]
+position = Vector2(2453.8, 342.4)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("5_hiding")
+prompt_text = "사물함에 숨기"
+message = "문이 헐거운 사물함. 몸을 웅크리고 숨을 참았다."
+
+
+[node name="HideClass6Visual" type="Polygon2D" parent="HideClass6"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+
+[node name="HideClass6Zone" type="CollisionShape2D" parent="HideClass6"]
+shape = SubResource("RectangleShape2D_key_zone")
+
 
 [node name="Walls" type="StaticBody2D" parent="."]
 

@@ -1,7 +1,8 @@
-[gd_scene load_steps=145 format=3]
+[gd_scene load_steps=147 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
+[ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(3400, 40)
@@ -14,6 +15,9 @@ size = Vector2(240, 56)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_key_zone"]
 size = Vector2(48, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door_zone"]
+size = Vector2(140, 60)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_WC_North1_top"]
 polygon = PackedVector2Array(20, 20, 364.9, 20, 364.9, 36, 20, 36)
@@ -1790,23 +1794,6 @@ also_remove_paths = Array[NodePath]([NodePath("../SULock"), NodePath("../WallGlo
 [node name="SDLockZone" type="CollisionShape2D" parent="SDLock"]
 shape = SubResource("RectangleShape2D_stair_zone")
 
-[node name="StairKey4" type="Area2D" parent="."]
-position = Vector2(370, 1730)
-collision_layer = 0
-collision_mask = 1
-script = ExtResource("2_pickup")
-item_id = "stair_key_4"
-message = "다산실 서랍에서 4층 계단 열쇠를 주웠다."
-pickup_id = "stair_key_4_taken"
-
-[node name="StairKey4Visual" type="Polygon2D" parent="StairKey4"]
-z_index = 2
-color = Color(0.85, 0.74, 0.32, 1)
-polygon = PackedVector2Array(-11, -5, 11, -5, 11, 5, -11, 5)
-
-[node name="StairKey4Zone" type="CollisionShape2D" parent="StairKey4"]
-shape = SubResource("RectangleShape2D_key_zone")
-
 [node name="WC_VoidTopL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(0, 1000, 1670, 1000, 1670, 1016, 0, 1016)
 
@@ -2434,6 +2421,207 @@ occluder = SubResource("Occ_WC_WomensRoomB_right")
 [node name="WV_WomensRoomB_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2804, 2120, 2820, 2120, 2820, 2480, 2804, 2480)
+
+[node name="DasanStairKey" type="Area2D" parent="."]
+position = Vector2(253.3, 1780.4)
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("2_pickup")
+item_id = "stair_key_4"
+message = "다산실 사물함 위에서 4층 계단 열쇠를 주웠다."
+pickup_id = "stair_key_4_dasan_taken"
+
+
+[node name="DasanStairKeyVisual" type="Polygon2D" parent="DasanStairKey"]
+z_index = 1
+color = Color(0.62, 0.55, 0.28, 1)
+polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
+
+
+[node name="DasanStairKeyZone" type="CollisionShape2D" parent="DasanStairKey"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+
+[node name="FriendNote" type="Area2D" parent="."]
+position = Vector2(486.7, 1780.4)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "책상 위에 접힌 쪽지. '하람아, 은수 때린 거 수위 아저씨가 봤다더라.' 뒷면에 다른 글씨로 — '나 안 때렸어. 쓰러지길래 잡은 건데.'"
+prompt_text = "조사"
+grants_flag = "found_songharam"
+
+
+[node name="FriendNoteVisual" type="Polygon2D" parent="FriendNote"]
+z_index = 1
+color = Color(0.72, 0.7, 0.62, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+
+[node name="FriendNoteZone" type="CollisionShape2D" parent="FriendNote"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+
+[node name="CounselRecord" type="Area2D" parent="."]
+position = Vector2(1046.7, 1780.4)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "상담기록부가 펼쳐져 있다. 2학년 박시우 — 7회차. 마지막 장에 학교 회신이 붙어 있다. '가해 학생 특정 어려움. 추가 조치 없음.'"
+prompt_text = "조사"
+grants_flag = "read_siwoo_counseling"
+
+
+[node name="CounselRecordVisual" type="Polygon2D" parent="CounselRecord"]
+z_index = 1
+color = Color(0.72, 0.7, 0.62, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+
+[node name="CounselRecordZone" type="CollisionShape2D" parent="CounselRecord"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+
+[node name="SiwooPainting" type="Area2D" parent="."]
+position = Vector2(1343.3, 1780.4)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "벽에 걸린 액자. 구석에 작게 적힌 서명 — 박시우. 나무 그늘 아래에 붓끝으로 눌러 쓴 작은 글씨가 있다. — 도와줘."
+prompt_text = "그림 보기"
+grants_flag = "read_siwoo_painting"
+
+
+[node name="SiwooPaintingVisual" type="Polygon2D" parent="SiwooPainting"]
+z_index = 1
+color = Color(0.35, 0.3, 0.45, 1)
+polygon = PackedVector2Array(-14, -12, 14, -12, 14, 12, -14, 12)
+
+
+[node name="SiwooPaintingZone" type="CollisionShape2D" parent="SiwooPainting"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+
+[node name="CrisisManual" type="Area2D" parent="."]
+position = Vector2(3006.7, 1780.4)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "인쇄기 옆에 시험 인쇄물이 남아 있다. '학생 사망 사고 대응 매뉴얼 — 언론 차단, 유가족 합의 우선, 재학생 동요 최소화.'"
+prompt_text = "조사"
+grants_flag = "read_crisis_manual"
+
+
+[node name="CrisisManualVisual" type="Polygon2D" parent="CrisisManual"]
+z_index = 1
+color = Color(0.72, 0.7, 0.62, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+
+[node name="CrisisManualZone" type="CollisionShape2D" parent="CrisisManual"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+
+[node name="InkCan" type="Area2D" parent="."]
+position = Vector2(3193.3, 1780.4)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "인쇄기 아래 잉크통. 뚜껑이 헐겁다. 챙겨 두면 쓸 데가 있을지도 모른다."
+prompt_text = "잉크통 챙기기"
+grants_item_id = "ink_can"
+
+
+[node name="InkCanVisual" type="Polygon2D" parent="InkCan"]
+z_index = 1
+color = Color(0.2, 0.2, 0.28, 1)
+polygon = PackedVector2Array(-10, -12, 10, -12, 10, 12, -10, 12)
+
+
+[node name="InkCanZone" type="CollisionShape2D" parent="InkCan"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+
+[node name="StairKey" type="Area2D" parent="."]
+position = Vector2(2080, 1780.4)
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("2_pickup")
+item_id = "stair_key_4"
+message = "과학 실험실에서 4층 계단 열쇠를 주웠다."
+pickup_id = "stair_key_4_taken"
+
+
+[node name="StairKeyVisual" type="Polygon2D" parent="StairKey"]
+z_index = 1
+color = Color(0.62, 0.55, 0.28, 1)
+polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
+
+
+[node name="StairKeyZone" type="CollisionShape2D" parent="StairKey"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+
+[node name="ScienceClue" type="Area2D" parent="."]
+position = Vector2(2240, 1780.4)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "깨진 비커가 치워지지 않은 채로 있다. 그 아래 가정통신문 뒷면에 눌러쓴 글씨 — '집에서 맞고 학교서 혼나고. 그럼 나는 어디로 가.' 이름 칸: 2학년 2반 조민혁."
+prompt_text = "조사"
+grants_flag = "found_jominhyuk"
+
+
+[node name="ScienceClueVisual" type="Polygon2D" parent="ScienceClue"]
+z_index = 1
+color = Color(0.55, 0.62, 0.6, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+
+[node name="ScienceClueZone" type="CollisionShape2D" parent="ScienceClue"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+
+[node name="HistoryClue" type="Area2D" parent="."]
+position = Vector2(610, 2343.2)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "10년 전 졸업앨범. 2학년 박시우의 사진 위에 검은 테두리가 그려져 있다. 사이에 끼워진 신문 스크랩 — '교내 추락 사고로 학생 1명 사망'."
+prompt_text = "조사"
+grants_flag = "read_siwoo_past"
+
+
+[node name="HistoryClueVisual" type="Polygon2D" parent="HistoryClue"]
+z_index = 1
+color = Color(0.6, 0.5, 0.4, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+
+[node name="HistoryClueZone" type="CollisionShape2D" parent="HistoryClue"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+
+[node name="TaehoNote" type="Area2D" parent="."]
+position = Vector2(2610, 1780.4)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "교구함에 쪽지가 붙어 있다. '민혁아, 과학실 기구 부수지 마. 걸리면 너만 혼나. 열쇠 여기 숨겨둘게. -태호' 쪽지 뒤에서 3층 계단 열쇠가 나왔다."
+prompt_text = "쪽지 살펴보기"
+grants_item_id = "stair_key_3"
+grants_flag = "read_taeho_note"
+
+
+[node name="TaehoNoteVisual" type="Polygon2D" parent="TaehoNote"]
+z_index = 1
+color = Color(0.72, 0.7, 0.62, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+
+[node name="TaehoNoteZone" type="CollisionShape2D" parent="TaehoNote"]
+shape = SubResource("RectangleShape2D_key_zone")
+
 
 [node name="Walls" type="StaticBody2D" parent="."]
 

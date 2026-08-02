@@ -16,6 +16,8 @@
 P1 범위: 지오메트리만. 계단 자물쇠·열쇠·단서 오브젝트는 P3에서 얹는다.
 """
 import pathlib
+import re
+import json
 
 T = 16          # 벽 두께
 DOOR = 110      # 문 틈 폭
@@ -151,6 +153,7 @@ class Scene:
         self.subs = []      # (id, polygon)
         self.nodes = []     # 텍스트 블록
         self.rect_shapes = []
+        self.rooms = {}
 
     def occ(self, oid, polygon):
         self.subs.append((oid, polygon))
@@ -207,6 +210,7 @@ class Scene:
 
 def add_room(sc, key, label, x0, y0, x1, y1, door):
     """축정렬 방: 바닥 + 사방 벽(+문 틈). door in {top,bottom,left,right,None}."""
+    sc.rooms[key] = (x0, y0, x1, y1)
     sc.poly2d(key, "Rooms", C_ROOM, rect(x0, y0, x1, y1))
     if label:
         sc.label(key, label, (x0 + x1) / 2, (y0 + y1) / 2)
@@ -249,6 +253,7 @@ def add_sloped_room(sc, key, label, x0, x1, base_top, base_bot, door="bottom"):
     """사선 방: 위·아래 변이 SLOPE만큼 기운 평행사변형(#159 사용자 결정)."""
     ty0, ty1 = slope_y(x0, base_top), slope_y(x1, base_top)
     by0, by1 = slope_y(x0, base_bot), slope_y(x1, base_bot)
+    sc.rooms[key] = (x0, min(ty0, ty1), x1, max(by0, by1))
     sc.poly2d(key, "Rooms", C_ROOM, poly((x0, ty0), (x1, ty1), (x1, by1), (x0, by0)))
     if label:
         sc.label(key, label, (x0 + x1) / 2, (slope_y((x0 + x1) / 2, base_top)
@@ -307,25 +312,89 @@ def add_stair_markers(sc, name, x0, y0, x1, y1, floor):
         sc.label(f"{name}_{tag}", f"{target}층", cx, cy + 58)
 
 
+SCRIPTS = {
+    "1_locked_door": "res://scripts/interactions/locked_door.gd",
+    "2_pickup": "res://scripts/interactions/pickup_item.gd",
+    "3_interactable": "res://scripts/interactions/interactable.gd",
+    "4_exit": "res://scripts/interactions/exit_door.gd",
+    "5_hiding": "res://scripts/interactions/hiding_spot.gd",
+}
+
+
+def text_of(sc):
+    return "".join(sc.nodes)
+
+
+def ext_for(body):
+    """실제로 참조된 스크립트만 ext_resource로 선언한다(미사용 선언 방지)."""
+    return [f'[ext_resource type="Script" path="{path}" id="{rid}"]'
+            for rid, path in SCRIPTS.items() if f'ExtResource("{rid}")' in body]
+
+
 EXT_LOCKED_DOOR = ('[ext_resource type="Script" '
                    'path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]')
 EXT_PICKUP = ('[ext_resource type="Script" '
               'path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]')
 
-# 기획서(구글 독스) 기준 열쇠 배치. 기획서가 지정한 방이 새 도면 맵에 없으면
-# 임의 배치하지 않고 비워 둔다(사용자 지시 2026-08-02) — MISSING_ROOMS 참조.
-KEYS = {
-    4: [("StairKey4", "stair_key_4", 370, 1730,
-         "다산실 서랍에서 4층 계단 열쇠를 주웠다.")],
+# ── 진행 요소 배치 (#159 P3 / #161 선택지 3: 기획서를 새 맵에 맞게 개정) ──
+# 단서 노드의 본문(플래그·메시지·스크립트)은 tools/story_objects.json에 main에서
+# 추출해 두고 위치만 새 방으로 옮긴다. 플래그 ID를 유지해야 엔딩 판정이 깨지지 않는다.
+# 기획서의 방이 새 도면에 없어 대체한 곳은 주석에 원래 방을 적는다.
+PLACEMENT = {
+    4: [("Dasan7", ["DasanStairKey", "FriendNote"]),              # 다산실
+        ("CreativeDept", ["CounselRecord", "SiwooPainting"]),     # ← 상담실
+        ("InfoDept", ["CrisisManual", "InkCan"]),                 # ← 인쇄실
+        ("ComputerRoom", ["StairKey", "ScienceClue"]),            # ← 과학 실험실
+        ("Dasan6", ["HistoryClue"]),                              # ← 역사자료실
+        ("Storage2", ["TaehoNote"])],                             # ← 수학교구실
+    3: [("North4", ["NayeonClue"]),                               # 생활지도부 ← 방송실
+        ("North5", ["JanitorWarning", "KeyCabinet", "SpareKeyHook"]),  # 2학년부 ← 교무실
+        ("CareerRoom", ["ReportFlyer"]),                          # 진로실 ← 학생회실
+        ("North2", ["HideClass2"]), ("North7", ["HideClass5"]),
+        ("Storage2", ["HideBroadcastRoom"])],
+    2: [("PEStorage", ["YujinClue"]),                             # 체육창고 ← 체육관 입구
+        ("MensRoomB", ["ShowerMarks", "DrainKey", "HideShower"]), # 화장실 ← 샤워실
+        ("EduRoom", ["SeunghoClue"]),                             # 교육실 ← 2층 교무실
+        ("North1", ["HideClass1"]), ("North7", ["HideClass6"])],
+    1: [("StaffRoom", ["PrincipalLetter"]),                       # 교무실 ← 교장실
+        ("JanitorRoom", ["PhotoWall", "StudentCards", "JanitorNotebook", "JanitorSafe"]),
+        ("Storage1", ["StairKey"]),                               # 창고 ← 행정실
+        ("Entrance", ["ExitDoor"]),
+        ("Class1", ["HideClass1_1"]), ("Class3", ["HideMusicRoom"]),
+        ("Storage2", ["HideEmptyRoom"])],
+    5: [("ArtRoom", ["Blackboard", "ArtRoomDoorLock"]),
+        ("ArtStorage", ["StairKey"])],
 }
-# 열쇠를 실제로 놓을 수 있는 층만 계단을 잠근다. 열쇠가 없는 층을 잠그면 진행이 막힌다.
-LOCKED = {4: "stair_key_4"}
+# 각 층 계단은 그 층 열쇠로 연다. 열쇠 획득처는 PLACEMENT 참조(한 층 위에서도 얻는다).
+LOCKED = {1: "stair_key_1", 2: "stair_key_2", 3: "stair_key_3",
+          4: "stair_key_4", 5: "stair_key_5"}
+
+
+def add_story(sc, floor):
+    """추출해 둔 단서 노드를 방 안에 배치. 본문은 그대로, position만 새 좌표."""
+    data = json.loads((pathlib.Path(__file__).parent / "story_objects.json").read_text())
+    nodes = data[str(floor)]
+    for room_key, names in PLACEMENT.get(floor, []):
+        if room_key not in sc.rooms:
+            raise SystemExit(f"floor{floor}: 배치 대상 방 {room_key}가 없다")
+        x0, y0, x1, y1 = sc.rooms[room_key]
+        for i, name in enumerate(names):
+            if name not in nodes:
+                raise SystemExit(f"floor{floor}: 단서 노드 {name}를 찾을 수 없다")
+            cx = x0 + (i + 1) * (x1 - x0) / (len(names) + 1)
+            cy = y0 + (y1 - y0) * 0.62      # 라벨(중앙)과 겹치지 않게 아래쪽
+            body = re.sub(r"^position = Vector2\([^)]*\)$",
+                          f"position = Vector2({n(cx)}, {n(cy)})",
+                          nodes[name]["body"], count=1, flags=re.M)
+            sc.node(body if body.endswith("\n") else body + "\n")
+            for kid in nodes[name]["kids"]:
+                sc.node(kid if kid.endswith("\n") else kid + "\n")
 
 
 def add_stair_locks(sc, floor, key_id, stairwells):
     """계단 입구 자물쇠. 한 층의 계단 전부를 열쇠 하나로 연다(기존 규약)."""
     sc.node('[node name="StairLocks" type="Node2D" parent="."]\n')
-    tags = ["SU", "SD"]
+    tags = ["SU", "SD"][:len(stairwells)]
     visual_paths = []
     for tag, (x0, y0, x1, y1) in zip(tags, stairwells):
         mid = (x0 + x1) / 2
@@ -338,8 +407,7 @@ def add_stair_locks(sc, floor, key_id, stairwells):
 
     for i, (tag, (x0, y0, x1, y1)) in enumerate(zip(tags, stairwells)):
         mid = (x0 + x1) / 2
-        other = tags[1 - i]
-        removes = [f'NodePath("../{other}Lock")'] + visual_paths
+        removes = [f'NodePath("../{o}Lock")' for o in tags if o != tag] + visual_paths
         sc.node(
             f'[node name="{tag}Lock" type="Area2D" parent="."]\n'
             f'position = Vector2({n(mid)}, {n(y0 + T / 2)})\n'
@@ -395,10 +463,9 @@ def build_common(fl, spec):
     sc = Scene()
     sc.rect_shapes = [("RectangleShape2D_wall_h", f"Vector2({W}, 40)"),
                       ("RectangleShape2D_wall_v", f"Vector2(40, {H})")]
-    if fl in LOCKED:
-        sc.rect_shapes.append(("RectangleShape2D_stair_zone", "Vector2(240, 56)"))
-    if KEYS.get(fl):
-        sc.rect_shapes.append(("RectangleShape2D_key_zone", "Vector2(48, 48)"))
+    sc.rect_shapes += [("RectangleShape2D_stair_zone", "Vector2(240, 56)"),
+                       ("RectangleShape2D_key_zone", "Vector2(48, 48)"),
+                       ("RectangleShape2D_door_zone", "Vector2(140, 60)")]
 
     sc.node('[node name="SchoolFloor" type="Node2D"]\n')
     sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, W, H))
@@ -430,7 +497,6 @@ def build_common(fl, spec):
     add_stair_markers(sc, "StairB", *STAIR_B, floor=fl)
     if fl in LOCKED:
         add_stair_locks(sc, fl, LOCKED[fl], [STAIR_A, STAIR_B])
-    add_keys(sc, fl)
 
     # 공백 구역(건물 밖) 봉인 — 중앙다리 폭만 열어 둔다.
     # 위 경계: 왼쪽은 수평, 오른쪽은 중간 띠와 같은 기울기.
@@ -452,6 +518,7 @@ def build_common(fl, spec):
     for key, lb, x0, x1 in spec["bottom_left"] + BOTTOM_RIGHT:
         add_room(sc, key, lb, x0, BOT_Y0, x1, BOT_Y1, "top")
 
+    add_story(sc, fl)
     add_outer(sc)
     return sc
 
@@ -459,7 +526,10 @@ def build_common(fl, spec):
 def build_floor1():
     sc = Scene()
     sc.rect_shapes = [("RectangleShape2D_wall_h", f"Vector2({W}, 40)"),
-                      ("RectangleShape2D_wall_v", f"Vector2(40, {H})")]
+                      ("RectangleShape2D_wall_v", f"Vector2(40, {H})"),
+                      ("RectangleShape2D_stair_zone", "Vector2(240, 56)"),
+                      ("RectangleShape2D_key_zone", "Vector2(48, 48)"),
+                      ("RectangleShape2D_door_zone", "Vector2(140, 60)")]
     sc.node('[node name="SchoolFloor" type="Node2D"]\n')
     sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, W, H))
     sc.node('[node name="WallGlow" type="CanvasLayer" parent="."]\n'
@@ -478,6 +548,8 @@ def build_floor1():
     add_sloped_room(sc, "StaffRoom", "교무실", sx0, sx1, sy0, sy1, "bottom")
     add_stairwell(sc, "StairA", *FLOOR1["stair"])
     add_stair_markers(sc, "StairA", *FLOOR1["stair"], floor=1)
+    add_stair_locks(sc, 1, LOCKED[1], [FLOOR1["stair"]])
+    add_story(sc, 1)
 
     add_outer(sc)
     return sc
@@ -500,12 +572,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 if __name__ == "__main__":
     for fl in (1, 2, 3, 4, 5):
         sc = build_floor1() if fl == 1 else build_common(fl, LAYOUT[fl])
-        ext = []
-        if fl in LOCKED:
-            ext.append(EXT_LOCKED_DOOR)
-        if KEYS.get(fl):
-            ext.append(EXT_PICKUP)
-        text = sc.render(ext)
+        text = sc.render(ext_for(text_of(sc)))
         path = ROOT / f"scenes/background/school_floor_{fl}.tscn"
         path.write_text(text)
         print(f"OK floor{fl}: 노드 {len(sc.nodes)}개, 차단체 {len(sc.subs)}개")
