@@ -8,8 +8,11 @@ extends CharacterBody2D
 ## 층이 어긋나면(혹시 모를 가드) 무작위 지점 순찰로 폴백.
 ## 활성/비활성·격자 재생성은 floor_manager가 sync_floor로 제어한다.
 
-@export var patrol_speed: float = 110.0
-@export var chase_speed: float = 220.0
+# 플레이어는 320. 추격은 그보다 확실히 느려야 도망칠 여지가 남는다.
+# #115에서 260이 너무 빨라 220으로 낮췄고, 새 맵이 넓어져(#159) 압박이
+# 약해진 만큼 그 사이값으로 조금만 올린다(추격 = 플레이어의 75%).
+@export var patrol_speed: float = 120.0
+@export var chase_speed: float = 240.0
 # 플레이어가 수위를 알아볼 수 있는 거리. 플레이어 PointLight2D가 512×512 방사
 # 그라디언트(텍스처 반경 256) × texture_scale 1.3 ≈ 333px까지 비춘다.
 # 카메라(zoom 1.25, 1600×900)의 가시 반경은 360px이라 이 범위는 항상 화면 안이다.
