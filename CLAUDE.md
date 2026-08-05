@@ -6,7 +6,8 @@
 
 2D 탑다운 공포 방탈출, Godot 4.6. 주인공 이설이 국어책을 가지러 밤의 학교에 들어가 실종 사건의 진실과 마주친다.
 적대자는 괴물이 아니라 **수위 박종태** — 10년 전 딸 박시우가 학교폭력 후 투신했고 학교가 무대응하자 스스로 '심판'을 집행한다. 실종 학생 5명 중 일부는 오해로 지목됐다는 것이 주제.
-시나리오 문서(현행): https://docs.google.com/document/d/1c8rXO7bLU_HvOPKYClmRSG2P97Vloo7maXblYMaQ70E
+시나리오 전문: `docs/story.md` (구글 문서 사본 — 대사·지문 원문 + 구현이 기획서와 갈라진 지점 정리).
+원본: https://docs.google.com/document/d/1c8rXO7bLU_HvOPKYClmRSG2P97Vloo7maXblYMaQ70E — 원본이 바뀌면 사본도 갱신할 것.
 전체 스펙과 4단계 작업 계획은 GitHub 이슈 #137(epic)에 기록돼 있다 — 스토리 작업 전에 먼저 읽을 것.
 
 ### 씬 흐름
