@@ -28,6 +28,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate→art_room→cabinet
 - 상호작용(E): `scripts/interactions/` — interactable(조사), locked_door(열쇠 문), pickup_item(접촉 획득), exit_door(현관 탈출→엔딩). Area2D는 collision_layer 2, prompt_text로 "[E] …" 안내 표시.
 - 조명: main의 CanvasModulate + 플레이어 PointLight2D(shadow_enabled) — 벽 차단체 때문에 벽 너머는 보이지 않음. 문·창문 틈으로만 빛이 샘.
 - UI: R 인벤토리 패널(5슬롯), 좌상단 HUD(목표/소지품)+층 표시, 하단 알림(game_state.request_notice).
+- 수위(#141): 4층은 안전 구간(`floor_manager.JANITOR_FREE_FLOOR`), 3·2·1층에서 활동. 순찰은 층 씬의 `Door_*`에서 뽑은 **문 앞 대기 지점을 최근접 이웃으로 이은 고정 루트를 왕복**하고, 문마다 1.8초 멈춰 방을 확인한다. 들리는 거리(720px) 안에서만 혼잣말·열쇠 소리, 420px 안이면 발소리를 하단 알림으로 낸다. 발각(접촉 30px) → 체포 게임 오버. 루트 점검은 `tools/verify_janitor_route.py`.
 
 ### 진행 요소 위치
 
@@ -36,7 +37,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate→art_room→cabinet
 - 단서 오브젝트(#159/#161 선택지3로 새 맵에 맞게 개정 — **플래그 ID는 그대로**): 4층 다산7실(하람 메모)·창의체험부(시우 상담기록·그림)·정보부실(대응 매뉴얼·잉크통)·컴퓨터실(조민혁)·다산6실(졸업앨범), 3층 생활지도부(임나연)·2학년부(종태 기록·열쇠 보관함)·진로실(전단), 2층 체육창고(강유진)·하단 남자화장실(끌린 자국)·교육실(백승호), 1층 교무실(교장 편지)·수위실(사진벽·학생증·공책·금고).
 - 단서 본문(메시지·플래그·스크립트)은 `tools/story_objects.json`에 있고 `gen_floors.py`의 `PLACEMENT`가 방만 지정한다. 방을 옮기려면 PLACEMENT만 고치면 된다.
 - 엔딩은 "방과 후" 1종(러닝타임 축소, 2026-07-28 사용자 결정) — 현관에서 분기 판정이 없다. 단서 플래그는 조사 기록용이며 진행을 막지 않는다. 신고 선택지·숨은 엔딩·재조사는 넣지 않는다.
-- 미구현(진행 예정): 수위 순찰 규칙 조정(#141), 잉크통 사용 효과. 옥상 씬은 계획 없음.
+- 미구현(진행 예정): 잉크통 사용 효과. 옥상 씬은 계획 없음.
 
 ### 개발 시 주의
 
@@ -104,6 +105,8 @@ main_menu → intro(프롤로그 컷신: street→back_gate→art_room→cabinet
 - 씬이나 스크립트를 고쳤으면 **푸시 전에 `python3 tools/verify_scenes.py`를 실행**합니다.
   load_steps, 리소스 참조, 노드 부모 경로, 형제 이름 중복, 스크립트 $NodePath,
   벽 충돌↔광원 차단체 1:1을 검사합니다(Godot 불필요, 수초).
+- 수위 순찰·문 배치를 건드렸으면 `python3 tools/verify_janitor_route.py`
+  (문 앞 대기 지점이 벽에 안 박히는지·계단에서 닿는지·루트가 맵을 가로지르지 않는지).
 - 기하·좌표를 바꿨으면 해당 이슈에 맞는 임시 검증 스크립트로 대조합니다.
 - 플레이어 입력, UI, 충돌, 게임 흐름 확인은 사용자의 수동 F5에 의존합니다.
 - 푸시하면 GitHub Actions(`.github/workflows/ci.yml`)가 정적 검사와 함께

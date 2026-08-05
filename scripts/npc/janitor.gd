@@ -5,8 +5,15 @@ extends CharacterBody2D
 ## 부풀려 격자에 표시하므로 문·방 안까지 경로가 나온다(복도 웨이포인트로는
 ## 문을 지나는 경로를 표현할 수 없어 방 안 플레이어를 추적하지 못했다).
 ## 추적: 몸통이 지나갈 직선이 트이면 직진, 아니면 A* 경로를 따라간다.
-## 층이 어긋나면(혹시 모를 가드) 무작위 지점 순찰로 폴백.
 ## 활성/비활성·격자 재생성은 floor_manager가 sync_floor로 제어한다.
+##
+## 순찰(#141): 무작위 배회가 아니라 층 씬의 문(Door_*)을 이어 만든 고정 루트를
+## 돌고, 문 앞에 서면 잠시 멈춰 방을 확인한다. 기획서 5장 "정해진 순찰 루트를
+## 돌며 가끔 각 방을 확인한다"에 맞춘 것이다. 문을 하나도 못 찾은 층에서는
+## 예전의 무작위 복도 배회로 폴백한다.
+## 플레이어는 발소리·열쇠 소리·혼잣말(하단 알림)로 수위의 위치를 가늠한다 —
+## 벽 너머는 보이지 않으므로 소리가 유일한 단서다.
+## 수위가 도는 층은 floor_manager의 JANITOR_FREE_FLOOR로 정한다(4층은 안전 구간).
 
 # 플레이어는 320. 추격은 그보다 확실히 느려야 도망칠 여지가 남는다.
 # #115에서 260이 너무 빨라 220으로 낮췄고, 새 맵이 넓어져(#159) 압박이
@@ -46,6 +53,29 @@ const GRID_FALLBACK := Vector2i(136, 100)
 const PATH_LOOKAHEAD := 12      # 경로 다듬기에서 앞쪽 몇 지점까지 시야를 볼지
 const FAR_SPAWN_RATIO := 0.6    # 스폰 후보: 플레이어에게서 최대 거리의 이 비율 이상인 칸
 
+# ── 순찰 루트 (#141) ─────────────────────────────────────────────
+# 문 앞 대기 지점은 문에서 복도 쪽으로 이만큼 물러난 곳. 문틀에 붙여 세우면
+# 몸통이 벽에 끼어 도착 판정이 나지 않는다(몸통 반높이 15 + 벽 반두께 8 여유).
+const DOOR_APPROACH := 46.0
+const ROUTE_ARRIVE := 16.0      # 문 앞 도착 판정. 순찰은 정밀할 필요가 없어 넉넉히 잡는다
+const INSPECT_SECONDS := 1.8    # 문 앞에 멈춰 방을 확인하는 시간
+
+# ── 소리 단서 (#141) ─────────────────────────────────────────────
+# 하단 알림으로 존재감을 전한다. 화면 밖·벽 너머의 수위를 플레이어가 감지할
+# 유일한 수단이다. 알림은 서로를 덮어쓰므로(hud.gd의 notice_token) 쿨다운을
+# 넉넉히 줘서 단서 조사 안내 문구를 밀어내지 않게 한다.
+const EARSHOT := 720.0          # 열쇠 소리·혼잣말이 들리는 거리
+const FOOTSTEP_RANGE := 420.0   # 이 안이면 발소리로 더 급하게 알린다
+const MUTTER_COOLDOWN := 15.0
+const SOUND_COOLDOWN := 9.0
+
+const MUTTERS := [
+	"…오늘도 아무도 없지.",
+	"시우야, 아빠 순찰 중이야.",
+	"이 학교는 내가 지킨다…",
+	"다 끝나면 올라갈게.",
+]
+
 var player: CharacterBody2D = null
 var my_floor: int = -1
 var player_floor: int = -1
@@ -62,6 +92,9 @@ var corridor_cells: Array[Vector2i] = []   # 순찰은 복도만 돈다(방 폴�
 
 # 플레이어 시야에 연속으로 노출된 시간. reveal_delay를 넘기면 추적이 시작된다.
 var seen_time: float = 0.0
+# 이번 프레임에 보이는가. 소리 단서가 같은 판정을 또 쓰기 때문에 레이캐스트를
+# 프레임당 한 번만 쏘도록 _update_awareness의 결과를 남겨 둔다.
+var seen_now: bool = false
 # 추적 유지 잔여 시간. 보이는 동안 계속 갱신되고, 시야를 잃으면 줄어든다.
 var chase_hold: float = 0.0
 
@@ -69,6 +102,23 @@ var path_points: PackedVector2Array = PackedVector2Array()
 var patrol_target: Vector2 = Vector2.ZERO
 var repath_timer: float = 0.0
 var stuck_time: float = 0.0
+
+# 순찰 루트: route[i] = 문 앞 대기 지점, route_doors[i] = 그 문의 중심(확인할 때
+# 바라보는 방향). 두 배열은 항상 같은 길이다.
+var route: Array[Vector2] = []
+var route_doors: Array[Vector2] = []
+var route_index: int = 0
+var route_step: int = 1        # 왕복 방향(+1 정방향 / -1 역방향)
+var inspect_timer: float = 0.0
+
+var mutter_cooldown: float = 0.0
+var sound_cooldown: float = 0.0
+# 발각 대사는 추적이 시작될 때 한 번만. 시야가 끊겼다 붙을 때마다 다시 외치면
+# 알림이 도배된다.
+var announced_chase: bool = false
+var announced_catch: bool = false
+
+var _game_state: Node = null
 
 @onready var body: Polygon2D = $Body
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
@@ -95,6 +145,13 @@ func _apply_active(active: bool) -> void:
 	visible = active
 	set_physics_process(active)
 	collision_shape.set_deferred("disabled", not active)
+	# 층을 벗어나면 대사·소리 상태를 초기화한다. 그러지 않으면 다음 층에 내려간
+	# 직후 쿨다운이 남아 첫 접근을 소리로 알리지 못한다.
+	inspect_timer = 0.0
+	mutter_cooldown = 0.0
+	sound_cooldown = 0.0
+	announced_chase = false
+	announced_catch = false
 	if active and player != null:
 		_spawn_away_from(player.position)
 
@@ -148,8 +205,104 @@ func _rebuild_grid(floor_root: Node) -> void:
 	if corridor_cells.is_empty():
 		corridor_cells = walkable_cells.duplicate()
 
+	_build_route(floor_root)
+
 	# 경로탐색과 순찰 목표가 모두 준비된 뒤에 사용 가능으로 표시한다.
 	grid_ready = not walkable_cells.is_empty()
+
+
+## 층 씬의 문에서 고정 순찰 루트를 만든다(#141).
+## 문 시각 노드는 WallGlow/RoomWallVisuals/Door_<방이름>, 대응하는 방 폴리곤은
+## Rooms/<방이름>이다(tools/gen_floors.py가 이 규약으로 생성한다).
+## 순서는 씬 순서의 첫 문에서 시작하는 최근접 이웃 — 씬 순서가 고정이라
+## 층마다 항상 같은 루트가 나온다("정해진 순찰 루트").
+func _build_route(floor_root: Node) -> void:
+	route.clear()
+	route_doors.clear()
+	route_index = 0
+	route_step = 1
+
+	var visuals := floor_root.get_node_or_null("WallGlow/RoomWallVisuals")
+	var rooms := floor_root.get_node_or_null("Rooms")
+	if visuals == null or rooms == null:
+		return
+
+	var stops: Array[Vector2] = []
+	var doors: Array[Vector2] = []
+	for child in visuals.get_children():
+		if not String(child.name).begins_with("Door_"):
+			continue
+		var door_polygon := child as Polygon2D
+		if door_polygon == null or door_polygon.polygon.size() == 0:
+			continue
+		var room := rooms.get_node_or_null(String(child.name).trim_prefix("Door_")) as Polygon2D
+		if room == null or room.polygon.size() == 0:
+			continue
+
+		var door_rect := _polygon_rect(door_polygon)
+		var door_center := door_rect.position + door_rect.size * 0.5
+		var stop := door_center + _outward(door_rect, _polygon_rect(room)) * DOOR_APPROACH
+		# 봉인된 방·건물 밖으로 밀려난 문은 대기 지점이 벽 안에 들어간다 — 건너뛴다.
+		if not _is_free_point(stop):
+			continue
+		stops.append(stop)
+		doors.append(door_center)
+
+	if stops.is_empty():
+		return
+
+	# 최근접 이웃으로 이어 붙인다. 씬 순서 그대로 돌면 맵을 가로질러 왔다 갔다
+	# 하는 루트가 나와 순찰로 보이지 않는다.
+	var remaining: Array[int] = []
+	for i in stops.size():
+		remaining.append(i)
+
+	var current: int = remaining[0]
+	remaining.remove_at(0)
+	route.append(stops[current])
+	route_doors.append(doors[current])
+	while not remaining.is_empty():
+		var best_slot := 0
+		var best_distance := INF
+		for slot in remaining.size():
+			var distance: float = stops[remaining[slot]].distance_squared_to(stops[current])
+			if distance < best_distance:
+				best_distance = distance
+				best_slot = slot
+		current = remaining[best_slot]
+		remaining.remove_at(best_slot)
+		route.append(stops[current])
+		route_doors.append(doors[current])
+
+
+## 문이 붙은 벽면의 바깥 방향(복도 쪽). 문은 방 경계에 놓인 납작한 사각형이라
+## 긴 변의 축이 벽면의 축이고, 짧은 축의 부호가 방 중심 반대편을 가리킨다.
+func _outward(door_rect: Rect2, room_rect: Rect2) -> Vector2:
+	var door_center := door_rect.position + door_rect.size * 0.5
+	var room_center := room_rect.position + room_rect.size * 0.5
+	if door_rect.size.x >= door_rect.size.y:
+		return Vector2(0.0, 1.0 if door_center.y >= room_center.y else -1.0)
+	return Vector2(1.0 if door_center.x >= room_center.x else -1.0, 0.0)
+
+
+## 격자 안이고 몸통이 들어갈 수 있는 지점인가(_nearest_free_cell과 달리 보정하지
+## 않는다 — 대기 지점은 "거기 설 수 있는가"가 그대로 조건이다).
+func _is_free_point(point: Vector2) -> bool:
+	var cell := _cell_of(point)
+	if cell.x < 0 or cell.y < 0 or cell.x >= grid_size.x or cell.y >= grid_size.y:
+		return false
+	return not astar_grid.is_point_solid(cell)
+
+
+## Polygon2D의 점들을 감싸는 전역 좌표 사각형.
+## 문(WallGlow 아래)과 방(Rooms 아래)은 부모가 다르지만, CanvasLayer는 CanvasItem이
+## 아니라 to_global 체인에 끼지 않고 층 씬 루트도 원점에 있어 둘 다 맵 좌표로 나온다.
+func _polygon_rect(node: Polygon2D) -> Rect2:
+	var polygon := node.polygon
+	var rect := Rect2(node.to_global(polygon[0]), Vector2.ZERO)
+	for i in range(1, polygon.size()):
+		rect = rect.expand(node.to_global(polygon[i]))
+	return rect
 
 
 ## 층 씬의 Floor 폴리곤에서 맵 크기를 읽어 격자 칸 수를 정한다.
@@ -170,14 +323,9 @@ func _collect_room_rects(floor_root: Node, out: Array[Rect2]) -> void:
 		return
 	for child in rooms.get_children():
 		if child is Polygon2D:
-			var polygon := (child as Polygon2D).polygon
-			if polygon.size() == 0:
+			if (child as Polygon2D).polygon.size() == 0:
 				continue
-			var node_2d := child as Node2D
-			var rect := Rect2(node_2d.to_global(polygon[0]), Vector2.ZERO)
-			for i in range(1, polygon.size()):
-				rect = rect.expand(node_2d.to_global(polygon[i]))
-			out.append(rect)
+			out.append(_polygon_rect(child as Polygon2D))
 
 
 ## 층 씬에서 StaticBody2D 하위 충돌 도형만 모은다(Area2D 상호작용 존은 제외).
@@ -263,6 +411,26 @@ func _spawn_away_from(player_position: Vector2) -> void:
 	stuck_time = 0.0
 	seen_time = 0.0
 	chase_hold = 0.0
+	_snap_route_to_position()
+
+
+## 스폰 지점에서 가장 가까운 문부터 루트를 시작한다. 항상 route[0]부터 돌면
+## 층에 진입할 때마다 맵 반대편으로 먼저 걸어가는 모습이 된다.
+func _snap_route_to_position() -> void:
+	inspect_timer = 0.0
+	if route.is_empty():
+		return
+
+	var best := 0
+	var best_distance := INF
+	for i in route.size():
+		var distance := route[i].distance_squared_to(position)
+		if distance < best_distance:
+			best_distance = distance
+			best = i
+	route_index = best
+	route_step = 1
+	patrol_target = route[route_index]
 
 
 # ── 이동 ─────────────────────────────────────────────────────────
@@ -270,9 +438,17 @@ func _spawn_away_from(player_position: Vector2) -> void:
 func _physics_process(delta: float) -> void:
 	_update_awareness(delta)
 
+	mutter_cooldown = maxf(mutter_cooldown - delta, 0.0)
+	sound_cooldown = maxf(sound_cooldown - delta, 0.0)
+
 	if _is_chasing():
+		if not announced_chase:
+			announced_chase = true
+			_say("수위가 걸음을 멈추고 이쪽을 본다. \"…누구야?\"")
 		_move_chase(delta)
 	else:
+		announced_chase = false
+		_update_sound_cues()
 		_move_patrol(delta)
 
 	if debug_draw:
@@ -286,9 +462,11 @@ func _update_awareness(delta: float) -> void:
 	if player != null and player.get("is_hiding") == true:
 		seen_time = 0.0
 		chase_hold = 0.0
+		seen_now = false
 		return
 
-	if _can_be_seen():
+	seen_now = _can_be_seen()
+	if seen_now:
 		seen_time += delta
 		# 이미 추적 중이면 재확인에 유예를 다시 요구하지 않는다 — 유예는 최초
 		# 발각에만 적용된다. 그러지 않으면 시야를 끊었다 다시 보일 때마다
@@ -343,6 +521,10 @@ func _move_chase(delta: float) -> void:
 ## 붙잡힘 통보. 접촉 상태가 유지되는 동안 매 프레임 불리지만
 ## game_state가 첫 호출만 통과시키므로 여기서 따로 가드하지 않는다.
 func _catch_player() -> void:
+	if not announced_catch:
+		announced_catch = true
+		_say("손전등 불빛이 얼굴을 비춘다. \"학생이네. 나와. 같이 수위실로 가자.\"")
+
 	var game_state = get_tree().get_first_node_in_group("game_state")
 	if game_state != null:
 		game_state.call("trigger_game_over", "caught")
@@ -363,20 +545,125 @@ func _move_patrol(delta: float) -> void:
 	if not grid_ready:
 		return
 
+	if route.is_empty():
+		_move_wander(delta)   # 문을 못 찾은 층 폴백(#141 이전 동작)
+		return
+
+	if inspect_timer > 0.0:
+		_hold_at_door(delta)
+		return
+
+	if position.distance_to(patrol_target) <= ROUTE_ARRIVE:
+		_begin_inspection()
+		return
+
+	# 문 앞까지 못 가는 경우(가구 배치·봉인 등으로 길이 막힘)엔 그 문을 포기하고
+	# 다음 문으로 넘어간다. 붙잡고 있으면 순찰이 그 자리에서 멈춘다.
+	if stuck_time >= STUCK_SECONDS:
+		stuck_time = 0.0
+		_advance_route()
+		return
+
+	repath_timer -= delta
+	if repath_timer <= 0.0:
+		repath_timer = REPATH_SECONDS
+		path_points = astar_grid.get_point_path(
+			_nearest_free_cell(position), _nearest_free_cell(patrol_target))
+
+	_step_toward(_next_point(patrol_target), patrol_speed, delta)
+
+
+## 문 앞에 도착 — 멈춰서 방 안을 확인한다.
+func _begin_inspection() -> void:
+	inspect_timer = INSPECT_SECONDS
+	velocity = Vector2.ZERO
+	path_points = PackedVector2Array()
+	stuck_time = 0.0
+	_notice_inspection()
+
+
+## 확인하는 동안은 제자리에서 문 쪽을 바라본다. move_and_slide를 계속 부르는
+## 것은 플레이어가 밀고 들어와도 겹쳐 서지 않게 하려는 것이다.
+func _hold_at_door(delta: float) -> void:
+	velocity = Vector2.ZERO
+	move_and_slide()
+
+	var facing := position.direction_to(route_doors[route_index])
+	if facing != Vector2.ZERO:
+		body.rotation = facing.angle() - Vector2.UP.angle()
+
+	inspect_timer -= delta
+	if inspect_timer <= 0.0:
+		_advance_route()
+
+
+## 다음 문으로. 순환이 아니라 왕복이다 — 끝 문에서 첫 문으로 돌아가는 순환
+## 루트는 맵을 가로지르는 긴 구간을 만든다(1층에서 3000px, 23초를 아무 방도
+## 안 들르고 걷는다). 끝에 닿으면 방향을 뒤집어 왔던 복도를 되짚는다.
+func _advance_route() -> void:
+	inspect_timer = 0.0
+	if route.is_empty():
+		return
+
+	if route_index + route_step < 0 or route_index + route_step >= route.size():
+		route_step = -route_step
+	route_index = clampi(route_index + route_step, 0, route.size() - 1)
+	patrol_target = route[route_index]
+	path_points = PackedVector2Array()
+	repath_timer = 0.0
+
+
+## 문 정보를 못 얻은 층에서의 예전 순찰 — 무작위 복도 지점을 오간다.
+func _move_wander(delta: float) -> void:
 	repath_timer -= delta
 	if path_points.is_empty() or stuck_time >= STUCK_SECONDS \
 			or position.distance_to(patrol_target) <= ARRIVE_DISTANCE:
 		stuck_time = 0.0
 		repath_timer = REPATH_SECONDS
-		_pick_patrol_target()
+		patrol_target = _cell_center(corridor_cells.pick_random())
+		path_points = astar_grid.get_point_path(
+			_nearest_free_cell(position), _nearest_free_cell(patrol_target))
 
 	_step_toward(_next_point(patrol_target), patrol_speed, delta)
 
 
-func _pick_patrol_target() -> void:
-	patrol_target = _cell_center(corridor_cells.pick_random())
-	path_points = astar_grid.get_point_path(
-		_nearest_free_cell(position), _nearest_free_cell(patrol_target))
+# ── 소리 단서·혼잣말 (#141) ──────────────────────────────────────
+
+func _say(text: String) -> void:
+	if _game_state == null or not is_instance_valid(_game_state):
+		_game_state = get_tree().get_first_node_in_group("game_state")
+	if _game_state != null:
+		_game_state.call("request_notice", text)
+
+
+## 같은 층에 있다는 것을 소리로 알린다. 이미 보이는 중이면 알리지 않는다 —
+## 화면에 있는 것을 글로 또 말할 필요가 없고, 소리 단서는 벽 너머에서 의미가 있다.
+func _update_sound_cues() -> void:
+	if player == null or sound_cooldown > 0.0 or seen_now:
+		return
+
+	var distance := position.distance_to(player.position)
+	if distance <= FOOTSTEP_RANGE:
+		sound_cooldown = SOUND_COOLDOWN
+		_say("발소리. 복도 저쪽에서. 느릿느릿.")
+	elif distance <= EARSHOT:
+		sound_cooldown = SOUND_COOLDOWN
+		_say("— 찰랑. 열쇠꾸러미 소리. 가까워지고 있다.")
+
+
+## 방을 확인할 때의 연출. 들리는 거리 안에서만 나온다.
+## 혼잣말이 쿨다운이면 문 여는 소리로 대신해, 가까이 있는데 아무 기척도 없는
+## 구간이 생기지 않게 한다.
+func _notice_inspection() -> void:
+	if player == null or position.distance_to(player.position) > EARSHOT:
+		return
+
+	if mutter_cooldown <= 0.0:
+		mutter_cooldown = MUTTER_COOLDOWN
+		_say("수위의 중얼거림이 들린다. \"%s\"" % MUTTERS.pick_random())
+	elif sound_cooldown <= 0.0:
+		sound_cooldown = SOUND_COOLDOWN
+		_say("문이 열리는 소리. 수위가 방을 확인하고 있다.")
 
 
 ## 경로 다듬기: 시야가 트인 가장 먼 지점으로 건너뛴다(격자 계단 현상 완화).
@@ -474,14 +761,26 @@ func _draw() -> void:
 		# 보이는 중이면 발각까지 남은 시간을, 아니면 순찰임을 보여준다.
 		if seen_time > 0.0:
 			mode = "발각까지 %.2f" % maxf(reveal_delay - seen_time, 0.0)
+		elif inspect_timer > 0.0:
+			mode = "방 확인 %.1f" % inspect_timer
+		elif route.is_empty():
+			mode = "배회"
 		else:
-			mode = "순찰"
+			mode = "순찰 %d/%d" % [route_index + 1, route.size()]
 	else:
 		if not path_points.is_empty():
 			mode = "경로(%d)" % path_points.size()
 		# 시야를 잃고 유지 시간으로 쫓는 중이면 남은 시간을 덧붙인다.
 		if not _can_be_seen():
 			mode += " 유지%.2f" % chase_hold
+
+	# 순찰 루트 — 다음 목표는 채운 원, 나머지 문 앞 지점은 테두리만
+	for i in route.size():
+		var stop := to_local(route[i])
+		if i == route_index:
+			draw_circle(stop, 7.0, Color(1.0, 0.6, 0.2, 0.85))
+		else:
+			draw_arc(stop, 5.0, 0.0, TAU, 12, Color(1.0, 0.6, 0.2, 0.35), 1.5)
 
 	# A* 경로 — 첫 선분은 자기 위치(로컬 원점)에서
 	var previous := Vector2.ZERO
