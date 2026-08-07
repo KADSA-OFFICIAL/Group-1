@@ -69,6 +69,9 @@ const FOOTSTEP_RANGE := 420.0   # 이 안이면 발소리로 더 급하게 알�
 const MUTTER_COOLDOWN := 15.0
 const SOUND_COOLDOWN := 9.0
 
+# 잉크를 뒤집어쓴 동안의 몸 색. 왜 멈춰 있는지 한눈에 보이게 한다(#169).
+const BLIND_BODY_COLOR := Color(0.2, 0.2, 0.3, 1.0)
+
 const MUTTERS := [
 	"…오늘도 아무도 없지.",
 	"시우야, 아빠 순찰 중이야.",
@@ -120,11 +123,22 @@ var announced_catch: bool = false
 
 var _game_state: Node = null
 
+# 잉크를 뒤집어써 앞을 못 보는 남은 시간(#169). 0보다 크면 추적·순찰·접촉
+# 판정이 전부 멈춘다.
+var blind_timer: float = 0.0
+var _body_color: Color = Color.WHITE
+
 @onready var body: Polygon2D = $Body
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 
 
+func _enter_tree() -> void:
+	# 잉크통(#169)이 터진 자리에서 수위를 찾을 때 쓴다.
+	add_to_group("janitor")
+
+
 func _ready() -> void:
+	_body_color = body.color
 	_apply_active(false)
 
 
@@ -152,6 +166,10 @@ func _apply_active(active: bool) -> void:
 	sound_cooldown = 0.0
 	announced_chase = false
 	announced_catch = false
+	# 스턴(#169)도 층을 넘기지 않는다 — 3층에서 맞고 2층으로 내려가면 그 층의
+	# 수위는 멀쩡해야 한다(같은 노드를 층마다 재사용한다).
+	blind_timer = 0.0
+	body.color = _body_color
 	if active and player != null:
 		_spawn_away_from(player.position)
 
@@ -436,6 +454,10 @@ func _snap_route_to_position() -> void:
 # ── 이동 ─────────────────────────────────────────────────────────
 
 func _physics_process(delta: float) -> void:
+	if blind_timer > 0.0:
+		_hold_blinded(delta)
+		return
+
 	_update_awareness(delta)
 
 	mutter_cooldown = maxf(mutter_cooldown - delta, 0.0)
@@ -450,6 +472,45 @@ func _physics_process(delta: float) -> void:
 		announced_chase = false
 		_update_sound_cues()
 		_move_patrol(delta)
+
+	if debug_draw:
+		queue_redraw()
+
+
+# ── 잉크통 스턴 (#169) ───────────────────────────────────────────
+
+## 잉크를 뒤집어썼다. 추적을 끊고 제자리에 세운다.
+## ink_projectile.gd가 터진 자리에서 호출한다.
+func blind(seconds: float) -> void:
+	# 겹쳐 맞아도 시간이 누적되지는 않는다 — 잉크통은 하나뿐이라 실제로는
+	# 일어나지 않지만, 더 긴 쪽을 남기는 편이 예측하기 쉽다.
+	blind_timer = maxf(blind_timer, seconds)
+
+	seen_time = 0.0
+	chase_hold = 0.0
+	seen_now = false
+	inspect_timer = 0.0
+	path_points = PackedVector2Array()
+	velocity = Vector2.ZERO
+	announced_chase = false
+	body.color = BLIND_BODY_COLOR
+
+	_say("잉크가 수위의 얼굴을 덮쳤다. \"으윽— 뭐야, 뭐야 이거!\"")
+
+
+## 스턴 동안은 제자리에 선다. move_and_slide를 계속 부르는 것은 플레이어가
+## 밀고 들어와도 겹쳐 서지 않게 하려는 것이다. 발각·접촉 판정은 아예 돌지
+## 않으므로 이 사이에 옆을 지나가도 붙잡히지 않는다.
+func _hold_blinded(delta: float) -> void:
+	velocity = Vector2.ZERO
+	move_and_slide()
+
+	blind_timer -= delta
+	if blind_timer <= 0.0:
+		blind_timer = 0.0
+		body.color = _body_color
+		repath_timer = 0.0
+		_say("수위가 눈을 문지르며 다시 걷기 시작한다.")
 
 	if debug_draw:
 		queue_redraw()
@@ -757,7 +818,9 @@ func _draw() -> void:
 		return
 
 	var mode := "직진"
-	if not _is_chasing():
+	if blind_timer > 0.0:
+		mode = "실명 %.1f" % blind_timer
+	elif not _is_chasing():
 		# 보이는 중이면 발각까지 남은 시간을, 아니면 순찰임을 보여준다.
 		if seen_time > 0.0:
 			mode = "발각까지 %.2f" % maxf(reveal_delay - seen_time, 0.0)

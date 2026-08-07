@@ -271,7 +271,7 @@
    ]
   },
   "InkCan": {
-   "body": "[node name=\"InkCan\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(2620, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"인쇄기 아래 잉크통. 뚜껑이 헐겁다. 챙겨 두면 쓸 데가 있을지도 모른다.\"\nprompt_text = \"잉크통 챙기기\"\ngrants_item_id = \"ink_can\"\n\n",
+   "body": "[node name=\"InkCan\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(2620, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"인쇄기 아래 잉크통. 뚜껑이 헐겁다.\\n이걸 뒤집어쓰면 잠깐은 아무것도 못 보겠지. [Q] 키로 던질 수 있다.\"\nprompt_text = \"잉크통 챙기기\"\ngrants_item_id = \"ink_can\"\n\n",
    "kids": [
     "[node name=\"InkCanVisual\" type=\"Polygon2D\" parent=\"InkCan\"]\nz_index = 1\ncolor = Color(0.2, 0.2, 0.28, 1)\npolygon = PackedVector2Array(-10, -12, 10, -12, 10, 12, -10, 12)\n\n",
     "[node name=\"InkCanZone\" type=\"CollisionShape2D\" parent=\"InkCan\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"

@@ -2,6 +2,11 @@ extends CanvasLayer
 
 @export var notice_seconds: float = 3.0
 
+## 인벤토리 슬롯에 조작 키를 덧붙일 아이템(#169).
+const USABLE_ITEM_KEYS := {
+	"ink_can": "[Q] 던지기",
+}
+
 @onready var objective_label: Label = $Root/TopLeft/Margin/TextRows/ObjectiveLabel
 @onready var inventory_label: Label = $Root/TopLeft/Margin/TextRows/InventoryLabel
 @onready var notice_label: Label = $Root/NoticePanel/Margin/NoticeLabel
@@ -69,11 +74,18 @@ func _refresh_inventory_panel() -> void:
 	inventory_title.text = "소지품 (%d/%d)" % [current_items.size(), max_items]
 
 	# 슬롯에 아이템 이름 표시 (아이템 이미지는 추후 교체 예정)
+	# 쓸 수 있는 아이템은 조작 키를 같이 적는다 — 획득 시 안내는 3초 뒤 사라지지만
+	# 정작 필요한 순간은 한참 뒤라, R로 다시 확인할 수 있어야 한다(#169).
 	for i in slot_labels.size():
-		if i < current_items.size():
-			slot_labels[i].text = _get_item_display_name(current_items[i])
-		else:
+		if i >= current_items.size():
 			slot_labels[i].text = ""
+			continue
+
+		var item_id := current_items[i]
+		var label := _get_item_display_name(item_id)
+		if item_id in USABLE_ITEM_KEYS:
+			label += "\n" + USABLE_ITEM_KEYS[item_id]
+		slot_labels[i].text = label
 
 
 func show_notice(text: String) -> void:
@@ -98,5 +110,7 @@ func _get_item_display_name(item_id: String) -> String:
 			return "국어책"
 		"front_gate_key":
 			return "현관 열쇠"
+		"ink_can":
+			return "잉크통"
 		_:
 			return item_id
