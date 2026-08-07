@@ -8,6 +8,12 @@ extends CharacterBody2D
 const HIDDEN_LIGHT_ENERGY := 0.5
 const HIDDEN_PROMPT := "나오기"
 
+## 잉크통 던지기(#169). 손에서 조금 앞에 놓고 던져야 벽에 붙어 있을 때
+## 자기 발밑에서 터지지 않는다.
+const INK_ITEM_ID := "ink_can"
+const INK_PROJECTILE := preload("res://scenes/items/ink_projectile.tscn")
+const INK_SPAWN_OFFSET := 24.0
+
 @onready var body: Polygon2D = $Body
 @onready var interaction_area: Area2D = $InteractionArea
 @onready var interact_prompt: Label = $InteractPrompt
@@ -54,6 +60,11 @@ func _physics_process(_delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("throw_ink"):
+		if _throw_ink():
+			get_viewport().set_input_as_handled()
+		return
+
 	if not event.is_action_pressed("interact"):
 		return
 
@@ -72,6 +83,29 @@ func _unhandled_input(event: InputEvent) -> void:
 		# 죽는다(#159 F5에서 발견).
 		get_viewport().set_input_as_handled()
 		target.call("interact", self)
+
+
+## 잉크통을 바라보는 방향으로 던진다(#169). 던졌으면 true.
+## 없는데 눌렀을 때 알림을 띄우면 Q를 누를 때마다 하단이 도배되므로 조용히 무시한다.
+func _throw_ink() -> bool:
+	if is_hiding:
+		return false
+
+	var game_state = get_tree().get_first_node_in_group("game_state")
+	if game_state == null or not game_state.call("has_item", INK_ITEM_ID):
+		return false
+
+	game_state.call("remove_item", INK_ITEM_ID)
+
+	var projectile := INK_PROJECTILE.instantiate()
+	# 층 씬이 아니라 조립 씬(main)에 붙인다 — 층 씬은 층을 옮길 때 통째로
+	# 교체되므로 거기 붙이면 전환 중에 같이 사라진다.
+	get_parent().add_child(projectile)
+	projectile.call("launch",
+		position + facing_direction * INK_SPAWN_OFFSET, facing_direction)
+
+	game_state.call("request_notice", "잉크통을 던졌다.")
+	return true
 
 
 func _find_interactable() -> Area2D:

@@ -26,6 +26,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate→art_room→cabinet
 - 계단: 가운데 난간으로 반 분할(왼쪽=위층▲, 오른쪽=아래층▼, 방향 표지+목적지 층 번호 표시). 층마다 계단 위치·개수가 다르므로 `floor_manager.gd`의 **층별 `STAIRS` 사각형**에서 트리거 존·도착점을 계산한다(고정 상수 아님). 입구는 층별 열쇠 `stair_key_N`으로 개방(소모형, 그 층 계단 전부 개방).
 - 상태 영속: `scripts/game/game_state.gd` — 인벤토리(최대 5개), 플래그(set_flag/has_flag)로 문 개방·아이템 획득 기록(층 씬이 재로드돼도 유지).
 - 상호작용(E): `scripts/interactions/` — interactable(조사), locked_door(열쇠 문), pickup_item(접촉 획득), exit_door(현관 탈출→엔딩). Area2D는 collision_layer 2, prompt_text로 "[E] …" 안내 표시.
+- 잉크통(#169): 4층 정보부실에서 얻는 `ink_can`을 **Q**로 바라보는 방향에 던진다(1회용). `scenes/items/ink_projectile.tscn`이 레이캐스트로 벽을 확인하며 날아가다 터지고, 반경 120px 안의 수위를 5초간 멈춘다(`janitor.blind()` — 추적·접촉 판정 정지, 층을 옮기면 해제). 쓸 수 있는 아이템의 조작 키는 `hud.gd`의 `USABLE_ITEM_KEYS`에 적어 R 패널에 표시한다.
 - 조명: main의 CanvasModulate + 플레이어 PointLight2D(shadow_enabled) — 벽 차단체 때문에 벽 너머는 보이지 않음. 문·창문 틈으로만 빛이 샘.
 - UI: R 인벤토리 패널(5슬롯), 좌상단 HUD(목표/소지품)+층 표시, 하단 알림(game_state.request_notice).
 - 수위(#141): 4층은 안전 구간(`floor_manager.JANITOR_FREE_FLOOR`), 3·2·1층에서 활동. 순찰은 층 씬의 `Door_*`에서 뽑은 **문 앞 대기 지점을 최근접 이웃으로 이은 고정 루트를 왕복**하고, 문마다 1.8초 멈춰 방을 확인한다. 들리는 거리(720px) 안에서만 혼잣말·열쇠 소리, 420px 안이면 발소리를 하단 알림으로 낸다. 발각(접촉 30px) → 체포 게임 오버. 루트 점검은 `tools/verify_janitor_route.py`.
@@ -37,7 +38,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate→art_room→cabinet
 - 단서 오브젝트(#159/#161 선택지3로 새 맵에 맞게 개정 — **플래그 ID는 그대로**): 4층 다산7실(하람 메모)·창의체험부(시우 상담기록·그림)·정보부실(대응 매뉴얼·잉크통)·컴퓨터실(조민혁)·다산6실(졸업앨범), 3층 생활지도부(임나연)·2학년부(종태 기록·열쇠 보관함)·진로실(전단), 2층 체육창고(강유진)·하단 남자화장실(끌린 자국)·교육실(백승호), 1층 교무실(교장 편지)·수위실(사진벽·학생증·공책·금고).
 - 단서 본문(메시지·플래그·스크립트)은 `tools/story_objects.json`에 있고 `gen_floors.py`의 `PLACEMENT`가 방만 지정한다. 방을 옮기려면 PLACEMENT만 고치면 된다.
 - 엔딩은 "방과 후" 1종(러닝타임 축소, 2026-07-28 사용자 결정) — 현관에서 분기 판정이 없다. 단서 플래그는 조사 기록용이며 진행을 막지 않는다. 신고 선택지·숨은 엔딩·재조사는 넣지 않는다.
-- 미구현(진행 예정): 잉크통 사용 효과. 옥상 씬은 계획 없음.
+- 새 기획서 기준 스토리 작업(#137 1~4단계)은 전부 끝났다. 옥상 씬은 계획 없음.
 
 ### 개발 시 주의
 

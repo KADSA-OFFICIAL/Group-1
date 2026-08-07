@@ -668,5 +668,9 @@ if __name__ == "__main__":
         sc = build_floor1() if fl == 1 else build_common(fl, LAYOUT[fl])
         text = sc.render(ext_for(text_of(sc)))
         path = ROOT / f"scenes/background/school_floor_{fl}.tscn"
-        path.write_text(text)
+        # write_text 기본값은 플랫폼 로케일·줄바꿈을 따른다. Windows에서 돌리면
+        # cp949로 쓰려다 한글에서 죽고, 살아남아도 전 파일이 CRLF가 되어
+        # 한 줄만 고쳐도 5개 층이 통째로 바뀐 것처럼 보인다(#169).
+        with open(path, "w", encoding="utf-8", newline="\n") as out:
+            out.write(text)
         print(f"OK floor{fl}: 노드 {len(sc.nodes)}개, 차단체 {len(sc.subs)}개")
