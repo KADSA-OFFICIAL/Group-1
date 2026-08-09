@@ -155,8 +155,7 @@ class Scene:
         self.nodes = []     # 텍스트 블록
         self.rect_shapes = []
         self.rooms = {}
-        self.use_wall_material = False
-        self.use_floor_material = False
+
 
     def occ(self, oid, polygon):
         self.subs.append((oid, polygon))
@@ -164,17 +163,10 @@ class Scene:
     def node(self, text):
         self.nodes.append(text)
 
-    def poly2d(self, name, parent, color, polygon, z=None, material=None):
-        """material: None | "wall" | "floor" — 해당 ShaderMaterial을 물린다."""
+    def poly2d(self, name, parent, color, polygon, z=None):
         z_line = f"z_index = {z}\n" if z is not None else ""
-        mat_id = {"wall": WALL_MAT, "floor": FLOOR_MAT}.get(material)
-        mat_line = f'material = SubResource("{mat_id}")\n' if mat_id else ""
-        if material == "wall":
-            self.use_wall_material = True
-        elif material == "floor":
-            self.use_floor_material = True
         self.node(f'[node name="{name}" type="Polygon2D" parent="{parent}"]\n'
-                  f'{mat_line}{z_line}color = {color}\npolygon = {polygon}\n')
+                  f'{z_line}color = {color}\npolygon = {polygon}\n')
 
     def solid(self, key, parent_body, polygon):
         """충돌 + 광원차단 한 쌍 (시각은 별도로 추가)."""
@@ -188,7 +180,7 @@ class Scene:
     def wall(self, key, polygon, body="RoomWalls"):
         """벽 3종 세트: 충돌 WC_ + 시각 WV_(WallGlow) + 광원차단 LO_WC_."""
         self.solid(f"WC_{key}", body, polygon)
-        self.poly2d(f"WV_{key}", "WallGlow/RoomWallVisuals", C_WALL, polygon, material="wall")
+        self.poly2d(f"WV_{key}", "WallGlow/RoomWallVisuals", C_WALL, polygon)
 
     def label(self, name, text, cx, cy):
         # 주의: offset은 실수 하나여야 한다. 예전엔 f"{n(v)}.0" 이라 폭이 소수인 층에서
@@ -205,17 +197,10 @@ class Scene:
 
     def render(self, ext):
         steps = len(ext) + len(self.subs) + len(self.rect_shapes) + 1
-        steps += int(self.use_wall_material) + int(self.use_floor_material)
         out = [f"[gd_scene load_steps={steps} format=3]\n"]
         for e in ext:
             out.append(e)
         out.append("")
-        if self.use_wall_material:
-            out.append(f'[sub_resource type="ShaderMaterial" id="{WALL_MAT}"]\n'
-                       f'shader = ExtResource("9_wallpixel")\n')
-        if self.use_floor_material:
-            out.append(f'[sub_resource type="ShaderMaterial" id="{FLOOR_MAT}"]\n'
-                       f'shader = ExtResource("10_tilefloor")\n')
         for sid, size in self.rect_shapes:
             out.append(f'[sub_resource type="RectangleShape2D" id="{sid}"]\nsize = {size}\n')
         for oid, p in self.subs:
@@ -228,7 +213,7 @@ class Scene:
 def add_room(sc, key, label, x0, y0, x1, y1, door):
     """축정렬 방: 바닥 + 사방 벽(+문 틈). door in {top,bottom,left,right,None}."""
     sc.rooms[key] = (x0, y0, x1, y1)
-    sc.poly2d(key, "Rooms", C_ROOM, rect(x0, y0, x1, y1), material="floor")
+    sc.poly2d(key, "Rooms", C_ROOM, rect(x0, y0, x1, y1))
     if label:
         sc.label(key, label, (x0 + x1) / 2, (y0 + y1) / 2)
 
@@ -271,7 +256,7 @@ def add_sloped_room(sc, key, label, x0, x1, base_top, base_bot, door="bottom"):
     ty0, ty1 = slope_y(x0, base_top), slope_y(x1, base_top)
     by0, by1 = slope_y(x0, base_bot), slope_y(x1, base_bot)
     sc.rooms[key] = (x0, min(ty0, ty1), x1, max(by0, by1))
-    sc.poly2d(key, "Rooms", C_ROOM, poly((x0, ty0), (x1, ty1), (x1, by1), (x0, by0)), material="floor")
+    sc.poly2d(key, "Rooms", C_ROOM, poly((x0, ty0), (x1, ty1), (x1, by1), (x0, by0)))
     if label:
         sc.label(key, label, (x0 + x1) / 2, (slope_y((x0 + x1) / 2, base_top)
                                              + slope_y((x0 + x1) / 2, base_bot)) / 2)
@@ -329,12 +314,6 @@ def add_stair_markers(sc, name, x0, y0, x1, y1, floor):
         sc.label(f"{name}_{tag}", f"{target}층", cx, cy + 58)
 
 
-# 벽 전용 8비트 셰이더 — 벽 시각(WV_*/Rail_*)에만 물린다(#172)
-WALL_SHADER = "res://scenes/shaders/wall_pixel.gdshader"
-WALL_MAT = "ShaderMaterial_wallpixel"
-FLOOR_SHADER = "res://scenes/shaders/tile_floor.gdshader"
-FLOOR_MAT = "ShaderMaterial_tilefloor"
-
 SCRIPTS = {
     "1_locked_door": "res://scripts/interactions/locked_door.gd",
     "2_pickup": "res://scripts/interactions/pickup_item.gd",
@@ -353,11 +332,6 @@ def ext_for(sc):
     body = text_of(sc)
     out = [f'[ext_resource type="Script" path="{path}" id="{rid}"]'
            for rid, path in SCRIPTS.items() if f'ExtResource("{rid}")' in body]
-    # 셰이더 참조는 노드가 아니라 ShaderMaterial sub_resource 안에 있다 — 플래그로 판단
-    if sc.use_wall_material:
-        out.append(f'[ext_resource type="Shader" path="{WALL_SHADER}" id="9_wallpixel"]')
-    if sc.use_floor_material:
-        out.append(f'[ext_resource type="Shader" path="{FLOOR_SHADER}" id="10_tilefloor"]')
     return out
 
 
@@ -546,7 +520,7 @@ def add_stairwell(sc, name, x0, y0, x1, y1):
         (f"RC_{name}_M", rect(mid - T / 2, y0 + T, mid + T / 2, y1 - T)),
     ]:
         sc.solid(key, "StairWalls", p)
-        sc.poly2d(f"Rail_{name}_{key.split('_')[-1]}", "WallGlow", C_WALL, p, material="wall")
+        sc.poly2d(f"Rail_{name}_{key.split('_')[-1]}", "WallGlow", C_WALL, p)
 
 
 def build_common(fl, spec):
@@ -558,7 +532,7 @@ def build_common(fl, spec):
                        ("RectangleShape2D_door_zone", "Vector2(140, 60)")]
 
     sc.node('[node name="SchoolFloor" type="Node2D"]\n')
-    sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, W, H), material="floor")
+    sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, W, H))
     sc.node('[node name="WallGlow" type="CanvasLayer" parent="."]\n'
             'layer = 1\nfollow_viewport_enabled = true\n')
     sc.node('[node name="RoomWallVisuals" type="Node2D" parent="WallGlow"]\n')
@@ -627,7 +601,7 @@ def build_floor1():
                       ("RectangleShape2D_key_zone", "Vector2(48, 48)"),
                       ("RectangleShape2D_door_zone", "Vector2(140, 60)")]
     sc.node('[node name="SchoolFloor" type="Node2D"]\n')
-    sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, W, H), material="floor")
+    sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, W, H))
     sc.node('[node name="WallGlow" type="CanvasLayer" parent="."]\n'
             'layer = 1\nfollow_viewport_enabled = true\n')
     sc.node('[node name="RoomWallVisuals" type="Node2D" parent="WallGlow"]\n')
