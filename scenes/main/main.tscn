@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/background/school_floor_4.tscn" id="1_floor"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -8,13 +8,6 @@
 [ext_resource type="PackedScene" path="res://scenes/npc/janitor.tscn" id="6_janitor"]
 [ext_resource type="Texture2D" path="res://scenes/main/wall_fade_mask.tres" id="7_fade_mask"]
 [ext_resource type="Script" path="res://scripts/game/wall_fade_mask.gd" id="8_fade_mask"]
-[ext_resource type="Shader" path="res://scenes/shaders/pixel_8bit.gdshader" id="9_pixel"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_pixel"]
-shader = ExtResource("9_pixel")
-shader_parameter/pixel_size = 8.0
-shader_parameter/levels = 4.0
-shader_parameter/dither_strength = 1.0
 
 [node name="Main" type="Node2D"]
 script = ExtResource("3_floor_manager")
@@ -39,30 +32,12 @@ scale = Vector2(7, 7)
 texture = ExtResource("7_fade_mask")
 script = ExtResource("8_fade_mask")
 
-[node name="Retro" type="CanvasLayer" parent="."]
-layer = 2
-
-[node name="Grab" type="BackBufferCopy" parent="Retro"]
-copy_mode = 2
-rect = Rect2(-10000, -10000, 20000, 20000)
-
-[node name="Pixelate" type="ColorRect" parent="Retro"]
-material = SubResource("ShaderMaterial_pixel")
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-
 [node name="GameState" type="Node" parent="."]
 script = ExtResource("4_game_state")
 
 [node name="HUD" parent="." instance=ExtResource("5_hud")]
-layer = 3
 
 [node name="UI" type="CanvasLayer" parent="."]
-layer = 3
 
 [node name="FloorLabel" type="Label" parent="UI"]
 offset_left = 16.0

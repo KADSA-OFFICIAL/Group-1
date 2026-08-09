@@ -155,6 +155,7 @@ class Scene:
         self.nodes = []     # 텍스트 블록
         self.rect_shapes = []
         self.rooms = {}
+        self.use_wall_material = False
 
     def occ(self, oid, polygon):
         self.subs.append((oid, polygon))
@@ -162,10 +163,13 @@ class Scene:
     def node(self, text):
         self.nodes.append(text)
 
-    def poly2d(self, name, parent, color, polygon, z=None):
+    def poly2d(self, name, parent, color, polygon, z=None, material=False):
         z_line = f"z_index = {z}\n" if z is not None else ""
+        mat_line = f'material = SubResource("{WALL_MAT}")\n' if material else ""
+        if material:
+            self.use_wall_material = True
         self.node(f'[node name="{name}" type="Polygon2D" parent="{parent}"]\n'
-                  f'{z_line}color = {color}\npolygon = {polygon}\n')
+                  f'{mat_line}{z_line}color = {color}\npolygon = {polygon}\n')
 
     def solid(self, key, parent_body, polygon):
         """충돌 + 광원차단 한 쌍 (시각은 별도로 추가)."""
@@ -179,7 +183,7 @@ class Scene:
     def wall(self, key, polygon, body="RoomWalls"):
         """벽 3종 세트: 충돌 WC_ + 시각 WV_(WallGlow) + 광원차단 LO_WC_."""
         self.solid(f"WC_{key}", body, polygon)
-        self.poly2d(f"WV_{key}", "WallGlow/RoomWallVisuals", C_WALL, polygon)
+        self.poly2d(f"WV_{key}", "WallGlow/RoomWallVisuals", C_WALL, polygon, material=True)
 
     def label(self, name, text, cx, cy):
         # 주의: offset은 실수 하나여야 한다. 예전엔 f"{n(v)}.0" 이라 폭이 소수인 층에서
@@ -196,10 +200,15 @@ class Scene:
 
     def render(self, ext):
         steps = len(ext) + len(self.subs) + len(self.rect_shapes) + 1
+        if self.use_wall_material:
+            steps += 1
         out = [f"[gd_scene load_steps={steps} format=3]\n"]
         for e in ext:
             out.append(e)
         out.append("")
+        if self.use_wall_material:
+            out.append(f'[sub_resource type="ShaderMaterial" id="{WALL_MAT}"]\n'
+                       f'shader = ExtResource("9_wall8bit")\n')
         for sid, size in self.rect_shapes:
             out.append(f'[sub_resource type="RectangleShape2D" id="{sid}"]\nsize = {size}\n')
         for oid, p in self.subs:
@@ -313,6 +322,9 @@ def add_stair_markers(sc, name, x0, y0, x1, y1, floor):
         sc.label(f"{name}_{tag}", f"{target}층", cx, cy + 58)
 
 
+WALL_SHADER = "res://scenes/shaders/wall_8bit.gdshader"
+WALL_MAT = "ShaderMaterial_wall8bit"
+
 SCRIPTS = {
     "1_locked_door": "res://scripts/interactions/locked_door.gd",
     "2_pickup": "res://scripts/interactions/pickup_item.gd",
@@ -326,10 +338,18 @@ def text_of(sc):
     return "".join(sc.nodes)
 
 
-def ext_for(body):
-    """실제로 참조된 스크립트만 ext_resource로 선언한다(미사용 선언 방지)."""
-    return [f'[ext_resource type="Script" path="{path}" id="{rid}"]'
-            for rid, path in SCRIPTS.items() if f'ExtResource("{rid}")' in body]
+def ext_for(sc):
+    """실제로 참조된 리소스만 ext_resource로 선언한다(미사용 선언 방지).
+
+    셰이더 참조는 노드가 아니라 ShaderMaterial sub_resource 안에 있으므로
+    노드 텍스트를 훑으면 잡히지 않는다 — 플래그로 판단한다.
+    """
+    body = text_of(sc)
+    out = [f'[ext_resource type="Script" path="{path}" id="{rid}"]'
+           for rid, path in SCRIPTS.items() if f'ExtResource("{rid}")' in body]
+    if sc.use_wall_material:
+        out.append(f'[ext_resource type="Shader" path="{WALL_SHADER}" id="9_wall8bit"]')
+    return out
 
 
 EXT_LOCKED_DOOR = ('[ext_resource type="Script" '
@@ -517,7 +537,7 @@ def add_stairwell(sc, name, x0, y0, x1, y1):
         (f"RC_{name}_M", rect(mid - T / 2, y0 + T, mid + T / 2, y1 - T)),
     ]:
         sc.solid(key, "StairWalls", p)
-        sc.poly2d(f"Rail_{name}_{key.split('_')[-1]}", "WallGlow", C_WALL, p)
+        sc.poly2d(f"Rail_{name}_{key.split('_')[-1]}", "WallGlow", C_WALL, p, material=True)
 
 
 def build_common(fl, spec):
@@ -666,7 +686,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 if __name__ == "__main__":
     for fl in (1, 2, 3, 4, 5):
         sc = build_floor1() if fl == 1 else build_common(fl, LAYOUT[fl])
-        text = sc.render(ext_for(text_of(sc)))
+        text = sc.render(ext_for(sc))
         path = ROOT / f"scenes/background/school_floor_{fl}.tscn"
         path.write_text(text)
         print(f"OK floor{fl}: 노드 {len(sc.nodes)}개, 차단체 {len(sc.subs)}개")
