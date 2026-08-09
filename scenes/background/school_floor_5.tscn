@@ -1,12 +1,16 @@
-[gd_scene load_steps=175 format=3]
+[gd_scene load_steps=177 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 [ext_resource type="Shader" path="res://scenes/shaders/wall_pixel.gdshader" id="9_wallpixel"]
+[ext_resource type="Shader" path="res://scenes/shaders/tile_floor.gdshader" id="10_tilefloor"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_wallpixel"]
 shader = ExtResource("9_wallpixel")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tilefloor"]
+shader = ExtResource("10_tilefloor")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(3400, 40)
@@ -519,6 +523,7 @@ polygon = PackedVector2Array(2804, 2120, 2820, 2120, 2820, 2480, 2804, 2480)
 [node name="SchoolFloor" type="Node2D"]
 
 [node name="Floor" type="Polygon2D" parent="."]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.14, 0.14, 0.16, 1)
 polygon = PackedVector2Array(0, 0, 3400, 0, 3400, 2500, 0, 2500)
 
@@ -539,6 +544,7 @@ follow_viewport_enabled = true
 [node name="StairWalls" type="StaticBody2D" parent="."]
 
 [node name="North1" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(20, 20, 412, 20, 412, 540, 20, 540)
 
@@ -615,6 +621,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(396, 20, 412, 20, 412, 540, 396, 540)
 
 [node name="North2" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(444, 20, 836, 20, 836, 540, 444, 540)
 
@@ -691,6 +698,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(820, 20, 836, 20, 836, 540, 820, 540)
 
 [node name="North3" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(868, 20, 1260, 20, 1260, 540, 868, 540)
 
@@ -767,6 +775,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1244, 20, 1260, 20, 1260, 540, 1244, 540)
 
 [node name="North4" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(1292, 20, 1684, 20, 1684, 540, 1292, 540)
 
@@ -843,6 +852,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1668, 20, 1684, 20, 1684, 540, 1668, 540)
 
 [node name="North5" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(1716, 20, 2108, 20, 2108, 540, 1716, 540)
 
@@ -919,6 +929,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2092, 20, 2108, 20, 2108, 540, 2092, 540)
 
 [node name="North6" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(2140, 20, 2532, 20, 2532, 540, 2140, 540)
 
@@ -995,6 +1006,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2516, 20, 2532, 20, 2532, 540, 2516, 540)
 
 [node name="North7" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(2564, 20, 2956, 20, 2956, 540, 2564, 540)
 
@@ -1071,6 +1083,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2940, 20, 2956, 20, 2956, 540, 2940, 540)
 
 [node name="North8" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(2988, 20, 3380, 20, 3380, 540, 2988, 540)
 
@@ -1147,6 +1160,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(3364, 20, 3380, 20, 3380, 540, 3364, 540)
 
 [node name="MensRoomL" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(800, 720, 1060, 720, 1060, 1000, 800, 1000)
 
@@ -1223,6 +1237,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1044, 720, 1060, 720, 1060, 1000, 1044, 1000)
 
 [node name="WomensRoomL" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(1090, 720, 1350, 720, 1350, 1000, 1090, 1000)
 
@@ -1299,6 +1314,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1334, 720, 1350, 720, 1350, 1000, 1334, 1000)
 
 [node name="BlockedL" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(1380, 720, 1640, 720, 1640, 1000, 1380, 1000)
 
@@ -1347,6 +1363,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1624, 720, 1640, 720, 1640, 1000, 1624, 1000)
 
 [node name="StorageR" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(1920, 720, 2280, 813.6, 2280, 1093.6, 1920, 1000)
 
@@ -1423,6 +1440,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1920, 984, 2280, 1077.6, 2280, 1093.6, 1920, 1000)
 
 [node name="BlockedR" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(2310, 821.4, 2790, 946.2, 2790, 1226.2, 2310, 1101.4)
 
@@ -1471,6 +1489,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2310, 1085.4, 2790, 1210.2, 2790, 1226.2, 2310, 1101.4)
 
 [node name="MensRoomR" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(2820, 954, 3060, 1016.4, 3060, 1296.4, 2820, 1234)
 
@@ -1547,6 +1566,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2820, 1218, 3060, 1280.4, 3060, 1296.4, 2820, 1234)
 
 [node name="WomensRoomR" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(3090, 1024.2, 3380, 1099.6, 3380, 1379.6, 3090, 1304.2)
 
@@ -2143,6 +2163,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1890, 1000, 1906, 1000, 1906, 1400, 1890, 1400)
 
 [node name="ArtRoom" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(20, 1520, 720, 1520, 720, 1940, 20, 1940)
 
@@ -2219,6 +2240,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(704, 1520, 720, 1520, 720, 1940, 704, 1940)
 
 [node name="MusicPrep" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(750, 1520, 1640, 1520, 1640, 1940, 750, 1940)
 
@@ -2295,6 +2317,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1624, 1520, 1640, 1520, 1640, 1940, 1624, 1940)
 
 [node name="AVRoom" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(1920, 1520, 2400, 1520, 2400, 1940, 1920, 1940)
 
@@ -2371,6 +2394,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2384, 1520, 2400, 1520, 2400, 1940, 2384, 1940)
 
 [node name="Storage2" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(2430, 1520, 2790, 1520, 2790, 1940, 2430, 1940)
 
@@ -2447,6 +2471,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2774, 1520, 2790, 1520, 2790, 1940, 2774, 1940)
 
 [node name="EmptyClass" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(2820, 1520, 3380, 1520, 3380, 1940, 2820, 1940)
 
@@ -2523,6 +2548,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(3364, 1520, 3380, 1520, 3380, 1940, 3364, 1940)
 
 [node name="ArtStorage" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(20, 2120, 1200, 2120, 1200, 2480, 20, 2480)
 
@@ -2599,6 +2625,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1184, 2120, 1200, 2120, 1200, 2480, 1184, 2480)
 
 [node name="MensRoomB" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(2270, 2120, 2530, 2120, 2530, 2480, 2270, 2480)
 
@@ -2675,6 +2702,7 @@ color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2514, 2120, 2530, 2120, 2530, 2480, 2514, 2480)
 
 [node name="WomensRoomB" type="Polygon2D" parent="Rooms"]
+material = SubResource("ShaderMaterial_tilefloor")
 color = Color(0.1, 0.11, 0.12, 1)
 polygon = PackedVector2Array(2560, 2120, 2820, 2120, 2820, 2480, 2560, 2480)
 
