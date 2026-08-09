@@ -12,8 +12,8 @@
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_pixel"]
 shader = ExtResource("9_pixel")
-shader_parameter/pixel_size = 4.0
-shader_parameter/levels = 6.0
+shader_parameter/pixel_size = 8.0
+shader_parameter/levels = 4.0
 shader_parameter/dither_strength = 1.0
 
 [node name="Main" type="Node2D"]
@@ -41,6 +41,10 @@ script = ExtResource("8_fade_mask")
 
 [node name="Retro" type="CanvasLayer" parent="."]
 layer = 2
+
+[node name="Grab" type="BackBufferCopy" parent="Retro"]
+copy_mode = 2
+rect = Rect2(-10000, -10000, 20000, 20000)
 
 [node name="Pixelate" type="ColorRect" parent="Retro"]
 material = SubResource("ShaderMaterial_pixel")
