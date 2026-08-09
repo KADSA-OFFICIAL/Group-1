@@ -63,9 +63,9 @@ var current_floor: int = START_FLOOR
 var changing_floor: bool = false
 
 # 월드는 저해상도 SubViewport 안에서 그려진다(#172) — 경로가 한 단계 깊다.
-@onready var world: SubViewport = $PixelView/World
-@onready var player: CharacterBody2D = $PixelView/World/Player
-@onready var janitor: CharacterBody2D = $PixelView/World/Janitor
+@onready var world: SubViewport = $PixelLayer/PixelView/World
+@onready var player: CharacterBody2D = $PixelLayer/PixelView/World/Player
+@onready var janitor: CharacterBody2D = $PixelLayer/PixelView/World/Janitor
 @onready var floor_label: Label = $UI/FloorLabel
 @onready var fade_rect: ColorRect = $UI/FadeRect
 
