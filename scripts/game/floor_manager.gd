@@ -62,8 +62,10 @@ func _arrive_on(target: int, index: int, up: bool) -> Vector2:
 var current_floor: int = START_FLOOR
 var changing_floor: bool = false
 
-@onready var player: CharacterBody2D = $Player
-@onready var janitor: CharacterBody2D = $Janitor
+# 월드는 저해상도 SubViewport 안에서 그려진다(#172) — 경로가 한 단계 깊다.
+@onready var world: SubViewport = $PixelView/World
+@onready var player: CharacterBody2D = $PixelView/World/Player
+@onready var janitor: CharacterBody2D = $PixelView/World/Janitor
 @onready var floor_label: Label = $UI/FloorLabel
 @onready var fade_rect: ColorRect = $UI/FadeRect
 
@@ -85,7 +87,8 @@ func _ready() -> void:
 		game_state.connect("game_over", _on_game_over)
 
 	_update_floor_label()
-	janitor.sync_floor(current_floor != JANITOR_FREE_FLOOR, current_floor, player, $Background)
+	janitor.sync_floor(current_floor != JANITOR_FREE_FLOOR, current_floor, player,
+		world.get_node("Background"))
 	fade_rect.color.a = 1.0
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 0.0, FADE_IN_SECONDS)
@@ -150,14 +153,14 @@ func _change_floor(target: int, arrive: Vector2) -> void:
 
 
 func _swap_floor(target: int, arrive: Vector2) -> void:
-	var old_background: Node = $Background
+	var old_background: Node = world.get_node("Background")
 	var next_background: Node2D = load(FLOOR_SCENES[target]).instantiate()
 	var background_index := old_background.get_index()
 
 	old_background.name = "BackgroundOld"
 	next_background.name = "Background"
-	add_child(next_background)
-	move_child(next_background, background_index)
+	world.add_child(next_background)
+	world.move_child(next_background, background_index)
 	old_background.queue_free()
 
 	player.position = arrive

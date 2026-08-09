@@ -12,22 +12,37 @@
 [node name="Main" type="Node2D"]
 script = ExtResource("3_floor_manager")
 
-[node name="Darkness" type="CanvasModulate" parent="."]
+[node name="PixelView" type="SubViewportContainer" parent="."]
+texture_filter = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+stretch = true
+stretch_shrink = 4
+
+[node name="World" type="SubViewport" parent="PixelView"]
+handle_input_locally = false
+render_target_update_mode = 4
+
+[node name="Darkness" type="CanvasModulate" parent="PixelView/World"]
 color = Color(0.1, 0.1, 0.13, 1)
 
-[node name="Background" parent="." instance=ExtResource("1_floor")]
+[node name="Background" parent="PixelView/World" instance=ExtResource("1_floor")]
 
-[node name="Janitor" parent="." instance=ExtResource("6_janitor")]
+[node name="Janitor" parent="PixelView/World" instance=ExtResource("6_janitor")]
 position = Vector2(1700, 640)
 
-[node name="Player" parent="." instance=ExtResource("2_player")]
+[node name="Player" parent="PixelView/World" instance=ExtResource("2_player")]
 position = Vector2(579, 692)
 
-[node name="WallFade" type="CanvasLayer" parent="."]
+[node name="WallFade" type="CanvasLayer" parent="PixelView/World"]
 layer = 1
 follow_viewport_enabled = true
 
-[node name="Mask" type="Sprite2D" parent="WallFade"]
+[node name="Mask" type="Sprite2D" parent="PixelView/World/WallFade"]
 scale = Vector2(7, 7)
 texture = ExtResource("7_fade_mask")
 script = ExtResource("8_fade_mask")
