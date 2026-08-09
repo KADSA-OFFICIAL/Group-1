@@ -1,8 +1,12 @@
-[gd_scene load_steps=178 format=3]
+[gd_scene load_steps=180 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
+[ext_resource type="Shader" path="res://scenes/shaders/wall_pixel.gdshader" id="9_wallpixel"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_wallpixel"]
+shader = ExtResource("9_wallpixel")
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(3400, 40)
@@ -572,6 +576,7 @@ polygon = PackedVector2Array(20, 20, 364.9, 20, 364.9, 36, 20, 36)
 occluder = SubResource("Occ_WC_North1_top")
 
 [node name="WV_North1_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(20, 20, 364.9, 20, 364.9, 36, 20, 36)
 
@@ -582,6 +587,7 @@ polygon = PackedVector2Array(20, 524, 137.4, 524, 137.4, 540, 20, 540)
 occluder = SubResource("Occ_WC_North1_botL")
 
 [node name="WV_North1_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(20, 524, 137.4, 524, 137.4, 540, 20, 540)
 
@@ -592,6 +598,7 @@ polygon = PackedVector2Array(247.4, 524, 364.9, 524, 364.9, 540, 247.4, 540)
 occluder = SubResource("Occ_WC_North1_botR")
 
 [node name="WV_North1_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(247.4, 524, 364.9, 524, 364.9, 540, 247.4, 540)
 
@@ -607,6 +614,7 @@ polygon = PackedVector2Array(20, 20, 36, 20, 36, 540, 20, 540)
 occluder = SubResource("Occ_WC_North1_left")
 
 [node name="WV_North1_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(20, 20, 36, 20, 36, 540, 20, 540)
 
@@ -617,6 +625,7 @@ polygon = PackedVector2Array(348.9, 20, 364.9, 20, 364.9, 540, 348.9, 540)
 occluder = SubResource("Occ_WC_North1_right")
 
 [node name="WV_North1_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(348.9, 20, 364.9, 20, 364.9, 540, 348.9, 540)
 
@@ -643,6 +652,7 @@ polygon = PackedVector2Array(396.9, 20, 741.8, 20, 741.8, 36, 396.9, 36)
 occluder = SubResource("Occ_WC_North2_top")
 
 [node name="WV_North2_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(396.9, 20, 741.8, 20, 741.8, 36, 396.9, 36)
 
@@ -653,6 +663,7 @@ polygon = PackedVector2Array(396.9, 524, 514.3, 524, 514.3, 540, 396.9, 540)
 occluder = SubResource("Occ_WC_North2_botL")
 
 [node name="WV_North2_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(396.9, 524, 514.3, 524, 514.3, 540, 396.9, 540)
 
@@ -663,6 +674,7 @@ polygon = PackedVector2Array(624.3, 524, 741.8, 524, 741.8, 540, 624.3, 540)
 occluder = SubResource("Occ_WC_North2_botR")
 
 [node name="WV_North2_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(624.3, 524, 741.8, 524, 741.8, 540, 624.3, 540)
 
@@ -678,6 +690,7 @@ polygon = PackedVector2Array(396.9, 20, 412.9, 20, 412.9, 540, 396.9, 540)
 occluder = SubResource("Occ_WC_North2_left")
 
 [node name="WV_North2_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(396.9, 20, 412.9, 20, 412.9, 540, 396.9, 540)
 
@@ -688,6 +701,7 @@ polygon = PackedVector2Array(725.8, 20, 741.8, 20, 741.8, 540, 725.8, 540)
 occluder = SubResource("Occ_WC_North2_right")
 
 [node name="WV_North2_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(725.8, 20, 741.8, 20, 741.8, 540, 725.8, 540)
 
@@ -714,6 +728,7 @@ polygon = PackedVector2Array(773.8, 20, 1118.7, 20, 1118.7, 36, 773.8, 36)
 occluder = SubResource("Occ_WC_North3_top")
 
 [node name="WV_North3_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(773.8, 20, 1118.7, 20, 1118.7, 36, 773.8, 36)
 
@@ -724,6 +739,7 @@ polygon = PackedVector2Array(773.8, 524, 891.2, 524, 891.2, 540, 773.8, 540)
 occluder = SubResource("Occ_WC_North3_botL")
 
 [node name="WV_North3_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(773.8, 524, 891.2, 524, 891.2, 540, 773.8, 540)
 
@@ -734,6 +750,7 @@ polygon = PackedVector2Array(1001.2, 524, 1118.7, 524, 1118.7, 540, 1001.2, 540)
 occluder = SubResource("Occ_WC_North3_botR")
 
 [node name="WV_North3_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1001.2, 524, 1118.7, 524, 1118.7, 540, 1001.2, 540)
 
@@ -749,6 +766,7 @@ polygon = PackedVector2Array(773.8, 20, 789.8, 20, 789.8, 540, 773.8, 540)
 occluder = SubResource("Occ_WC_North3_left")
 
 [node name="WV_North3_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(773.8, 20, 789.8, 20, 789.8, 540, 773.8, 540)
 
@@ -759,6 +777,7 @@ polygon = PackedVector2Array(1102.7, 20, 1118.7, 20, 1118.7, 540, 1102.7, 540)
 occluder = SubResource("Occ_WC_North3_right")
 
 [node name="WV_North3_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1102.7, 20, 1118.7, 20, 1118.7, 540, 1102.7, 540)
 
@@ -785,6 +804,7 @@ polygon = PackedVector2Array(1150.7, 20, 1495.6, 20, 1495.6, 36, 1150.7, 36)
 occluder = SubResource("Occ_WC_North4_top")
 
 [node name="WV_North4_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1150.7, 20, 1495.6, 20, 1495.6, 36, 1150.7, 36)
 
@@ -795,6 +815,7 @@ polygon = PackedVector2Array(1150.7, 524, 1268.1, 524, 1268.1, 540, 1150.7, 540)
 occluder = SubResource("Occ_WC_North4_botL")
 
 [node name="WV_North4_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1150.7, 524, 1268.1, 524, 1268.1, 540, 1150.7, 540)
 
@@ -805,6 +826,7 @@ polygon = PackedVector2Array(1378.1, 524, 1495.6, 524, 1495.6, 540, 1378.1, 540)
 occluder = SubResource("Occ_WC_North4_botR")
 
 [node name="WV_North4_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1378.1, 524, 1495.6, 524, 1495.6, 540, 1378.1, 540)
 
@@ -820,6 +842,7 @@ polygon = PackedVector2Array(1150.7, 20, 1166.7, 20, 1166.7, 540, 1150.7, 540)
 occluder = SubResource("Occ_WC_North4_left")
 
 [node name="WV_North4_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1150.7, 20, 1166.7, 20, 1166.7, 540, 1150.7, 540)
 
@@ -830,6 +853,7 @@ polygon = PackedVector2Array(1479.6, 20, 1495.6, 20, 1495.6, 540, 1479.6, 540)
 occluder = SubResource("Occ_WC_North4_right")
 
 [node name="WV_North4_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1479.6, 20, 1495.6, 20, 1495.6, 540, 1479.6, 540)
 
@@ -856,6 +880,7 @@ polygon = PackedVector2Array(1527.6, 20, 1872.4, 20, 1872.4, 36, 1527.6, 36)
 occluder = SubResource("Occ_WC_North5_top")
 
 [node name="WV_North5_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1527.6, 20, 1872.4, 20, 1872.4, 36, 1527.6, 36)
 
@@ -866,6 +891,7 @@ polygon = PackedVector2Array(1527.6, 524, 1645, 524, 1645, 540, 1527.6, 540)
 occluder = SubResource("Occ_WC_North5_botL")
 
 [node name="WV_North5_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1527.6, 524, 1645, 524, 1645, 540, 1527.6, 540)
 
@@ -876,6 +902,7 @@ polygon = PackedVector2Array(1755, 524, 1872.4, 524, 1872.4, 540, 1755, 540)
 occluder = SubResource("Occ_WC_North5_botR")
 
 [node name="WV_North5_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1755, 524, 1872.4, 524, 1872.4, 540, 1755, 540)
 
@@ -891,6 +918,7 @@ polygon = PackedVector2Array(1527.6, 20, 1543.6, 20, 1543.6, 540, 1527.6, 540)
 occluder = SubResource("Occ_WC_North5_left")
 
 [node name="WV_North5_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1527.6, 20, 1543.6, 20, 1543.6, 540, 1527.6, 540)
 
@@ -901,6 +929,7 @@ polygon = PackedVector2Array(1856.4, 20, 1872.4, 20, 1872.4, 540, 1856.4, 540)
 occluder = SubResource("Occ_WC_North5_right")
 
 [node name="WV_North5_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1856.4, 20, 1872.4, 20, 1872.4, 540, 1856.4, 540)
 
@@ -927,6 +956,7 @@ polygon = PackedVector2Array(1904.4, 20, 2249.3, 20, 2249.3, 36, 1904.4, 36)
 occluder = SubResource("Occ_WC_North6_top")
 
 [node name="WV_North6_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1904.4, 20, 2249.3, 20, 2249.3, 36, 1904.4, 36)
 
@@ -937,6 +967,7 @@ polygon = PackedVector2Array(1904.4, 524, 2021.9, 524, 2021.9, 540, 1904.4, 540)
 occluder = SubResource("Occ_WC_North6_botL")
 
 [node name="WV_North6_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1904.4, 524, 2021.9, 524, 2021.9, 540, 1904.4, 540)
 
@@ -947,6 +978,7 @@ polygon = PackedVector2Array(2131.9, 524, 2249.3, 524, 2249.3, 540, 2131.9, 540)
 occluder = SubResource("Occ_WC_North6_botR")
 
 [node name="WV_North6_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2131.9, 524, 2249.3, 524, 2249.3, 540, 2131.9, 540)
 
@@ -962,6 +994,7 @@ polygon = PackedVector2Array(1904.4, 20, 1920.4, 20, 1920.4, 540, 1904.4, 540)
 occluder = SubResource("Occ_WC_North6_left")
 
 [node name="WV_North6_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1904.4, 20, 1920.4, 20, 1920.4, 540, 1904.4, 540)
 
@@ -972,6 +1005,7 @@ polygon = PackedVector2Array(2233.3, 20, 2249.3, 20, 2249.3, 540, 2233.3, 540)
 occluder = SubResource("Occ_WC_North6_right")
 
 [node name="WV_North6_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2233.3, 20, 2249.3, 20, 2249.3, 540, 2233.3, 540)
 
@@ -998,6 +1032,7 @@ polygon = PackedVector2Array(2281.3, 20, 2626.2, 20, 2626.2, 36, 2281.3, 36)
 occluder = SubResource("Occ_WC_North7_top")
 
 [node name="WV_North7_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2281.3, 20, 2626.2, 20, 2626.2, 36, 2281.3, 36)
 
@@ -1008,6 +1043,7 @@ polygon = PackedVector2Array(2281.3, 524, 2398.8, 524, 2398.8, 540, 2281.3, 540)
 occluder = SubResource("Occ_WC_North7_botL")
 
 [node name="WV_North7_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2281.3, 524, 2398.8, 524, 2398.8, 540, 2281.3, 540)
 
@@ -1018,6 +1054,7 @@ polygon = PackedVector2Array(2508.8, 524, 2626.2, 524, 2626.2, 540, 2508.8, 540)
 occluder = SubResource("Occ_WC_North7_botR")
 
 [node name="WV_North7_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2508.8, 524, 2626.2, 524, 2626.2, 540, 2508.8, 540)
 
@@ -1033,6 +1070,7 @@ polygon = PackedVector2Array(2281.3, 20, 2297.3, 20, 2297.3, 540, 2281.3, 540)
 occluder = SubResource("Occ_WC_North7_left")
 
 [node name="WV_North7_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2281.3, 20, 2297.3, 20, 2297.3, 540, 2281.3, 540)
 
@@ -1043,6 +1081,7 @@ polygon = PackedVector2Array(2610.2, 20, 2626.2, 20, 2626.2, 540, 2610.2, 540)
 occluder = SubResource("Occ_WC_North7_right")
 
 [node name="WV_North7_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2610.2, 20, 2626.2, 20, 2626.2, 540, 2610.2, 540)
 
@@ -1069,6 +1108,7 @@ polygon = PackedVector2Array(2658.2, 20, 3003.1, 20, 3003.1, 36, 2658.2, 36)
 occluder = SubResource("Occ_WC_North8_top")
 
 [node name="WV_North8_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2658.2, 20, 3003.1, 20, 3003.1, 36, 2658.2, 36)
 
@@ -1079,6 +1119,7 @@ polygon = PackedVector2Array(2658.2, 524, 2775.7, 524, 2775.7, 540, 2658.2, 540)
 occluder = SubResource("Occ_WC_North8_botL")
 
 [node name="WV_North8_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2658.2, 524, 2775.7, 524, 2775.7, 540, 2658.2, 540)
 
@@ -1089,6 +1130,7 @@ polygon = PackedVector2Array(2885.7, 524, 3003.1, 524, 3003.1, 540, 2885.7, 540)
 occluder = SubResource("Occ_WC_North8_botR")
 
 [node name="WV_North8_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2885.7, 524, 3003.1, 524, 3003.1, 540, 2885.7, 540)
 
@@ -1104,6 +1146,7 @@ polygon = PackedVector2Array(2658.2, 20, 2674.2, 20, 2674.2, 540, 2658.2, 540)
 occluder = SubResource("Occ_WC_North8_left")
 
 [node name="WV_North8_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2658.2, 20, 2674.2, 20, 2674.2, 540, 2658.2, 540)
 
@@ -1114,6 +1157,7 @@ polygon = PackedVector2Array(2987.1, 20, 3003.1, 20, 3003.1, 540, 2987.1, 540)
 occluder = SubResource("Occ_WC_North8_right")
 
 [node name="WV_North8_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2987.1, 20, 3003.1, 20, 3003.1, 540, 2987.1, 540)
 
@@ -1140,6 +1184,7 @@ polygon = PackedVector2Array(3035.1, 20, 3380, 20, 3380, 36, 3035.1, 36)
 occluder = SubResource("Occ_WC_North9_top")
 
 [node name="WV_North9_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(3035.1, 20, 3380, 20, 3380, 36, 3035.1, 36)
 
@@ -1150,6 +1195,7 @@ polygon = PackedVector2Array(3035.1, 524, 3152.6, 524, 3152.6, 540, 3035.1, 540)
 occluder = SubResource("Occ_WC_North9_botL")
 
 [node name="WV_North9_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(3035.1, 524, 3152.6, 524, 3152.6, 540, 3035.1, 540)
 
@@ -1160,6 +1206,7 @@ polygon = PackedVector2Array(3262.6, 524, 3380, 524, 3380, 540, 3262.6, 540)
 occluder = SubResource("Occ_WC_North9_botR")
 
 [node name="WV_North9_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(3262.6, 524, 3380, 524, 3380, 540, 3262.6, 540)
 
@@ -1175,6 +1222,7 @@ polygon = PackedVector2Array(3035.1, 20, 3051.1, 20, 3051.1, 540, 3035.1, 540)
 occluder = SubResource("Occ_WC_North9_left")
 
 [node name="WV_North9_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(3035.1, 20, 3051.1, 20, 3051.1, 540, 3035.1, 540)
 
@@ -1185,6 +1233,7 @@ polygon = PackedVector2Array(3364, 20, 3380, 20, 3380, 540, 3364, 540)
 occluder = SubResource("Occ_WC_North9_right")
 
 [node name="WV_North9_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(3364, 20, 3380, 20, 3380, 540, 3364, 540)
 
@@ -1211,6 +1260,7 @@ polygon = PackedVector2Array(800, 720, 875, 720, 875, 736, 800, 736)
 occluder = SubResource("Occ_WC_MensRoomL_topL")
 
 [node name="WV_MensRoomL_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(800, 720, 875, 720, 875, 736, 800, 736)
 
@@ -1221,6 +1271,7 @@ polygon = PackedVector2Array(985, 720, 1060, 720, 1060, 736, 985, 736)
 occluder = SubResource("Occ_WC_MensRoomL_topR")
 
 [node name="WV_MensRoomL_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(985, 720, 1060, 720, 1060, 736, 985, 736)
 
@@ -1236,6 +1287,7 @@ polygon = PackedVector2Array(800, 984, 1060, 984, 1060, 1000, 800, 1000)
 occluder = SubResource("Occ_WC_MensRoomL_bot")
 
 [node name="WV_MensRoomL_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(800, 984, 1060, 984, 1060, 1000, 800, 1000)
 
@@ -1246,6 +1298,7 @@ polygon = PackedVector2Array(800, 720, 816, 720, 816, 1000, 800, 1000)
 occluder = SubResource("Occ_WC_MensRoomL_left")
 
 [node name="WV_MensRoomL_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(800, 720, 816, 720, 816, 1000, 800, 1000)
 
@@ -1256,6 +1309,7 @@ polygon = PackedVector2Array(1044, 720, 1060, 720, 1060, 1000, 1044, 1000)
 occluder = SubResource("Occ_WC_MensRoomL_right")
 
 [node name="WV_MensRoomL_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1044, 720, 1060, 720, 1060, 1000, 1044, 1000)
 
@@ -1282,6 +1336,7 @@ polygon = PackedVector2Array(1090, 720, 1165, 720, 1165, 736, 1090, 736)
 occluder = SubResource("Occ_WC_WomensRoomL_topL")
 
 [node name="WV_WomensRoomL_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1090, 720, 1165, 720, 1165, 736, 1090, 736)
 
@@ -1292,6 +1347,7 @@ polygon = PackedVector2Array(1275, 720, 1350, 720, 1350, 736, 1275, 736)
 occluder = SubResource("Occ_WC_WomensRoomL_topR")
 
 [node name="WV_WomensRoomL_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1275, 720, 1350, 720, 1350, 736, 1275, 736)
 
@@ -1307,6 +1363,7 @@ polygon = PackedVector2Array(1090, 984, 1350, 984, 1350, 1000, 1090, 1000)
 occluder = SubResource("Occ_WC_WomensRoomL_bot")
 
 [node name="WV_WomensRoomL_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1090, 984, 1350, 984, 1350, 1000, 1090, 1000)
 
@@ -1317,6 +1374,7 @@ polygon = PackedVector2Array(1090, 720, 1106, 720, 1106, 1000, 1090, 1000)
 occluder = SubResource("Occ_WC_WomensRoomL_left")
 
 [node name="WV_WomensRoomL_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1090, 720, 1106, 720, 1106, 1000, 1090, 1000)
 
@@ -1327,6 +1385,7 @@ polygon = PackedVector2Array(1334, 720, 1350, 720, 1350, 1000, 1334, 1000)
 occluder = SubResource("Occ_WC_WomensRoomL_right")
 
 [node name="WV_WomensRoomL_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1334, 720, 1350, 720, 1350, 1000, 1334, 1000)
 
@@ -1341,6 +1400,7 @@ polygon = PackedVector2Array(1380, 720, 1640, 720, 1640, 736, 1380, 736)
 occluder = SubResource("Occ_WC_BlockedL_top")
 
 [node name="WV_BlockedL_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1380, 720, 1640, 720, 1640, 736, 1380, 736)
 
@@ -1351,6 +1411,7 @@ polygon = PackedVector2Array(1380, 984, 1640, 984, 1640, 1000, 1380, 1000)
 occluder = SubResource("Occ_WC_BlockedL_bot")
 
 [node name="WV_BlockedL_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1380, 984, 1640, 984, 1640, 1000, 1380, 1000)
 
@@ -1361,6 +1422,7 @@ polygon = PackedVector2Array(1380, 720, 1396, 720, 1396, 1000, 1380, 1000)
 occluder = SubResource("Occ_WC_BlockedL_left")
 
 [node name="WV_BlockedL_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1380, 720, 1396, 720, 1396, 1000, 1380, 1000)
 
@@ -1371,6 +1433,7 @@ polygon = PackedVector2Array(1624, 720, 1640, 720, 1640, 1000, 1624, 1000)
 occluder = SubResource("Occ_WC_BlockedL_right")
 
 [node name="WV_BlockedL_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1624, 720, 1640, 720, 1640, 1000, 1624, 1000)
 
@@ -1397,6 +1460,7 @@ polygon = PackedVector2Array(1920, 720, 1936, 720, 1936, 1000, 1920, 1000)
 occluder = SubResource("Occ_WC_StorageR_left")
 
 [node name="WV_StorageR_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1920, 720, 1936, 720, 1936, 1000, 1920, 1000)
 
@@ -1407,6 +1471,7 @@ polygon = PackedVector2Array(2264, 813.6, 2280, 813.6, 2280, 1093.6, 2264, 1093.
 occluder = SubResource("Occ_WC_StorageR_right")
 
 [node name="WV_StorageR_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2264, 813.6, 2280, 813.6, 2280, 1093.6, 2264, 1093.6)
 
@@ -1417,6 +1482,7 @@ polygon = PackedVector2Array(1920, 720, 2045, 752.5, 2045, 768.5, 1920, 736)
 occluder = SubResource("Occ_WC_StorageR_topL")
 
 [node name="WV_StorageR_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1920, 720, 2045, 752.5, 2045, 768.5, 1920, 736)
 
@@ -1427,6 +1493,7 @@ polygon = PackedVector2Array(2155, 781.1, 2280, 813.6, 2280, 829.6, 2155, 797.1)
 occluder = SubResource("Occ_WC_StorageR_topR")
 
 [node name="WV_StorageR_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2155, 781.1, 2280, 813.6, 2280, 829.6, 2155, 797.1)
 
@@ -1442,6 +1509,7 @@ polygon = PackedVector2Array(1920, 984, 2280, 1077.6, 2280, 1093.6, 1920, 1000)
 occluder = SubResource("Occ_WC_StorageR_bot")
 
 [node name="WV_StorageR_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1920, 984, 2280, 1077.6, 2280, 1093.6, 1920, 1000)
 
@@ -1456,6 +1524,7 @@ polygon = PackedVector2Array(2310, 821.4, 2326, 821.4, 2326, 1101.4, 2310, 1101.
 occluder = SubResource("Occ_WC_BlockedR_left")
 
 [node name="WV_BlockedR_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2310, 821.4, 2326, 821.4, 2326, 1101.4, 2310, 1101.4)
 
@@ -1466,6 +1535,7 @@ polygon = PackedVector2Array(2774, 946.2, 2790, 946.2, 2790, 1226.2, 2774, 1226.
 occluder = SubResource("Occ_WC_BlockedR_right")
 
 [node name="WV_BlockedR_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2774, 946.2, 2790, 946.2, 2790, 1226.2, 2774, 1226.2)
 
@@ -1476,6 +1546,7 @@ polygon = PackedVector2Array(2310, 821.4, 2790, 946.2, 2790, 962.2, 2310, 837.4)
 occluder = SubResource("Occ_WC_BlockedR_top")
 
 [node name="WV_BlockedR_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2310, 821.4, 2790, 946.2, 2790, 962.2, 2310, 837.4)
 
@@ -1486,6 +1557,7 @@ polygon = PackedVector2Array(2310, 1085.4, 2790, 1210.2, 2790, 1226.2, 2310, 110
 occluder = SubResource("Occ_WC_BlockedR_bot")
 
 [node name="WV_BlockedR_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2310, 1085.4, 2790, 1210.2, 2790, 1226.2, 2310, 1101.4)
 
@@ -1512,6 +1584,7 @@ polygon = PackedVector2Array(2820, 954, 2836, 954, 2836, 1234, 2820, 1234)
 occluder = SubResource("Occ_WC_MensRoomR_left")
 
 [node name="WV_MensRoomR_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2820, 954, 2836, 954, 2836, 1234, 2820, 1234)
 
@@ -1522,6 +1595,7 @@ polygon = PackedVector2Array(3044, 1016.4, 3060, 1016.4, 3060, 1296.4, 3044, 129
 occluder = SubResource("Occ_WC_MensRoomR_right")
 
 [node name="WV_MensRoomR_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(3044, 1016.4, 3060, 1016.4, 3060, 1296.4, 3044, 1296.4)
 
@@ -1532,6 +1606,7 @@ polygon = PackedVector2Array(2820, 954, 2885, 970.9, 2885, 986.9, 2820, 970)
 occluder = SubResource("Occ_WC_MensRoomR_topL")
 
 [node name="WV_MensRoomR_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2820, 954, 2885, 970.9, 2885, 986.9, 2820, 970)
 
@@ -1542,6 +1617,7 @@ polygon = PackedVector2Array(2995, 999.5, 3060, 1016.4, 3060, 1032.4, 2995, 1015
 occluder = SubResource("Occ_WC_MensRoomR_topR")
 
 [node name="WV_MensRoomR_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2995, 999.5, 3060, 1016.4, 3060, 1032.4, 2995, 1015.5)
 
@@ -1557,6 +1633,7 @@ polygon = PackedVector2Array(2820, 1218, 3060, 1280.4, 3060, 1296.4, 2820, 1234)
 occluder = SubResource("Occ_WC_MensRoomR_bot")
 
 [node name="WV_MensRoomR_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2820, 1218, 3060, 1280.4, 3060, 1296.4, 2820, 1234)
 
@@ -1583,6 +1660,7 @@ polygon = PackedVector2Array(3090, 1024.2, 3106, 1024.2, 3106, 1304.2, 3090, 130
 occluder = SubResource("Occ_WC_WomensRoomR_left")
 
 [node name="WV_WomensRoomR_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(3090, 1024.2, 3106, 1024.2, 3106, 1304.2, 3090, 1304.2)
 
@@ -1593,6 +1671,7 @@ polygon = PackedVector2Array(3364, 1099.6, 3380, 1099.6, 3380, 1379.6, 3364, 137
 occluder = SubResource("Occ_WC_WomensRoomR_right")
 
 [node name="WV_WomensRoomR_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(3364, 1099.6, 3380, 1099.6, 3380, 1379.6, 3364, 1379.6)
 
@@ -1603,6 +1682,7 @@ polygon = PackedVector2Array(3090, 1024.2, 3180, 1047.6, 3180, 1063.6, 3090, 104
 occluder = SubResource("Occ_WC_WomensRoomR_topL")
 
 [node name="WV_WomensRoomR_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(3090, 1024.2, 3180, 1047.6, 3180, 1063.6, 3090, 1040.2)
 
@@ -1613,6 +1693,7 @@ polygon = PackedVector2Array(3290, 1076.2, 3380, 1099.6, 3380, 1115.6, 3290, 109
 occluder = SubResource("Occ_WC_WomensRoomR_topR")
 
 [node name="WV_WomensRoomR_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(3290, 1076.2, 3380, 1099.6, 3380, 1115.6, 3290, 1092.2)
 
@@ -1628,6 +1709,7 @@ polygon = PackedVector2Array(3090, 1288.2, 3380, 1363.6, 3380, 1379.6, 3090, 130
 occluder = SubResource("Occ_WC_WomensRoomR_bot")
 
 [node name="WV_WomensRoomR_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(3090, 1288.2, 3380, 1363.6, 3380, 1379.6, 3090, 1304.2)
 
@@ -1658,6 +1740,7 @@ polygon = PackedVector2Array(300, 720, 316, 720, 316, 1000, 300, 1000)
 occluder = SubResource("Occ_RC_StairA_L")
 
 [node name="Rail_StairA_L" type="Polygon2D" parent="WallGlow"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(300, 720, 316, 720, 316, 1000, 300, 1000)
 
@@ -1668,6 +1751,7 @@ polygon = PackedVector2Array(724, 720, 740, 720, 740, 1000, 724, 1000)
 occluder = SubResource("Occ_RC_StairA_R")
 
 [node name="Rail_StairA_R" type="Polygon2D" parent="WallGlow"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(724, 720, 740, 720, 740, 1000, 724, 1000)
 
@@ -1678,6 +1762,7 @@ polygon = PackedVector2Array(300, 984, 740, 984, 740, 1000, 300, 1000)
 occluder = SubResource("Occ_RC_StairA_F")
 
 [node name="Rail_StairA_F" type="Polygon2D" parent="WallGlow"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(300, 984, 740, 984, 740, 1000, 300, 1000)
 
@@ -1688,6 +1773,7 @@ polygon = PackedVector2Array(300, 720, 410, 720, 410, 736, 300, 736)
 occluder = SubResource("Occ_RC_StairA_EL")
 
 [node name="Rail_StairA_EL" type="Polygon2D" parent="WallGlow"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(300, 720, 410, 720, 410, 736, 300, 736)
 
@@ -1698,6 +1784,7 @@ polygon = PackedVector2Array(630, 720, 740, 720, 740, 736, 630, 736)
 occluder = SubResource("Occ_RC_StairA_ER")
 
 [node name="Rail_StairA_ER" type="Polygon2D" parent="WallGlow"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(630, 720, 740, 720, 740, 736, 630, 736)
 
@@ -1708,6 +1795,7 @@ polygon = PackedVector2Array(512, 736, 528, 736, 528, 984, 512, 984)
 occluder = SubResource("Occ_RC_StairA_M")
 
 [node name="Rail_StairA_M" type="Polygon2D" parent="WallGlow"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(512, 736, 528, 736, 528, 984, 512, 984)
 
@@ -1738,6 +1826,7 @@ polygon = PackedVector2Array(1450, 2120, 1466, 2120, 1466, 2440, 1450, 2440)
 occluder = SubResource("Occ_RC_StairB_L")
 
 [node name="Rail_StairB_L" type="Polygon2D" parent="WallGlow"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1450, 2120, 1466, 2120, 1466, 2440, 1450, 2440)
 
@@ -1748,6 +1837,7 @@ polygon = PackedVector2Array(1874, 2120, 1890, 2120, 1890, 2440, 1874, 2440)
 occluder = SubResource("Occ_RC_StairB_R")
 
 [node name="Rail_StairB_R" type="Polygon2D" parent="WallGlow"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1874, 2120, 1890, 2120, 1890, 2440, 1874, 2440)
 
@@ -1758,6 +1848,7 @@ polygon = PackedVector2Array(1450, 2424, 1890, 2424, 1890, 2440, 1450, 2440)
 occluder = SubResource("Occ_RC_StairB_F")
 
 [node name="Rail_StairB_F" type="Polygon2D" parent="WallGlow"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1450, 2424, 1890, 2424, 1890, 2440, 1450, 2440)
 
@@ -1768,6 +1859,7 @@ polygon = PackedVector2Array(1450, 2120, 1560, 2120, 1560, 2136, 1450, 2136)
 occluder = SubResource("Occ_RC_StairB_EL")
 
 [node name="Rail_StairB_EL" type="Polygon2D" parent="WallGlow"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1450, 2120, 1560, 2120, 1560, 2136, 1450, 2136)
 
@@ -1778,6 +1870,7 @@ polygon = PackedVector2Array(1780, 2120, 1890, 2120, 1890, 2136, 1780, 2136)
 occluder = SubResource("Occ_RC_StairB_ER")
 
 [node name="Rail_StairB_ER" type="Polygon2D" parent="WallGlow"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1780, 2120, 1890, 2120, 1890, 2136, 1780, 2136)
 
@@ -1788,6 +1881,7 @@ polygon = PackedVector2Array(1662, 2136, 1678, 2136, 1678, 2424, 1662, 2424)
 occluder = SubResource("Occ_RC_StairB_M")
 
 [node name="Rail_StairB_M" type="Polygon2D" parent="WallGlow"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1662, 2136, 1678, 2136, 1678, 2424, 1662, 2424)
 
@@ -1894,6 +1988,7 @@ polygon = PackedVector2Array(0, 1000, 1670, 1000, 1670, 1016, 0, 1016)
 occluder = SubResource("Occ_WC_VoidTopL")
 
 [node name="WV_VoidTopL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(0, 1000, 1670, 1000, 1670, 1016, 0, 1016)
 
@@ -1904,6 +1999,7 @@ polygon = PackedVector2Array(1890, 992.2, 3400, 1384.8, 3400, 1400.8, 1890, 1008
 occluder = SubResource("Occ_WC_VoidTopR")
 
 [node name="WV_VoidTopR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1890, 992.2, 3400, 1384.8, 3400, 1400.8, 1890, 1008.2)
 
@@ -1914,6 +2010,7 @@ polygon = PackedVector2Array(0, 1384, 1670, 1384, 1670, 1400, 0, 1400)
 occluder = SubResource("Occ_WC_VoidBotL")
 
 [node name="WV_VoidBotL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(0, 1384, 1670, 1384, 1670, 1400, 0, 1400)
 
@@ -1924,6 +2021,7 @@ polygon = PackedVector2Array(1890, 1384, 3400, 1384, 3400, 1400, 1890, 1400)
 occluder = SubResource("Occ_WC_VoidBotR")
 
 [node name="WV_VoidBotR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1890, 1384, 3400, 1384, 3400, 1400, 1890, 1400)
 
@@ -2120,6 +2218,7 @@ polygon = PackedVector2Array(1654, 1000, 1670, 1000, 1670, 1400, 1654, 1400)
 occluder = SubResource("Occ_WC_BridgeL")
 
 [node name="WV_BridgeL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1654, 1000, 1670, 1000, 1670, 1400, 1654, 1400)
 
@@ -2130,6 +2229,7 @@ polygon = PackedVector2Array(1890, 1000, 1906, 1000, 1906, 1400, 1890, 1400)
 occluder = SubResource("Occ_WC_BridgeR")
 
 [node name="WV_BridgeR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1890, 1000, 1906, 1000, 1906, 1400, 1890, 1400)
 
@@ -2156,6 +2256,7 @@ polygon = PackedVector2Array(20, 1520, 315, 1520, 315, 1536, 20, 1536)
 occluder = SubResource("Occ_WC_Dasan7_topL")
 
 [node name="WV_Dasan7_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(20, 1520, 315, 1520, 315, 1536, 20, 1536)
 
@@ -2166,6 +2267,7 @@ polygon = PackedVector2Array(425, 1520, 720, 1520, 720, 1536, 425, 1536)
 occluder = SubResource("Occ_WC_Dasan7_topR")
 
 [node name="WV_Dasan7_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(425, 1520, 720, 1520, 720, 1536, 425, 1536)
 
@@ -2181,6 +2283,7 @@ polygon = PackedVector2Array(20, 1924, 720, 1924, 720, 1940, 20, 1940)
 occluder = SubResource("Occ_WC_Dasan7_bot")
 
 [node name="WV_Dasan7_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(20, 1924, 720, 1924, 720, 1940, 20, 1940)
 
@@ -2191,6 +2294,7 @@ polygon = PackedVector2Array(20, 1520, 36, 1520, 36, 1940, 20, 1940)
 occluder = SubResource("Occ_WC_Dasan7_left")
 
 [node name="WV_Dasan7_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(20, 1520, 36, 1520, 36, 1940, 20, 1940)
 
@@ -2201,6 +2305,7 @@ polygon = PackedVector2Array(704, 1520, 720, 1520, 720, 1940, 704, 1940)
 occluder = SubResource("Occ_WC_Dasan7_right")
 
 [node name="WV_Dasan7_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(704, 1520, 720, 1520, 720, 1940, 704, 1940)
 
@@ -2227,6 +2332,7 @@ polygon = PackedVector2Array(750, 1520, 1140, 1520, 1140, 1536, 750, 1536)
 occluder = SubResource("Occ_WC_CreativeDept_topL")
 
 [node name="WV_CreativeDept_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(750, 1520, 1140, 1520, 1140, 1536, 750, 1536)
 
@@ -2237,6 +2343,7 @@ polygon = PackedVector2Array(1250, 1520, 1640, 1520, 1640, 1536, 1250, 1536)
 occluder = SubResource("Occ_WC_CreativeDept_topR")
 
 [node name="WV_CreativeDept_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1250, 1520, 1640, 1520, 1640, 1536, 1250, 1536)
 
@@ -2252,6 +2359,7 @@ polygon = PackedVector2Array(750, 1924, 1640, 1924, 1640, 1940, 750, 1940)
 occluder = SubResource("Occ_WC_CreativeDept_bot")
 
 [node name="WV_CreativeDept_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(750, 1924, 1640, 1924, 1640, 1940, 750, 1940)
 
@@ -2262,6 +2370,7 @@ polygon = PackedVector2Array(750, 1520, 766, 1520, 766, 1940, 750, 1940)
 occluder = SubResource("Occ_WC_CreativeDept_left")
 
 [node name="WV_CreativeDept_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(750, 1520, 766, 1520, 766, 1940, 750, 1940)
 
@@ -2272,6 +2381,7 @@ polygon = PackedVector2Array(1624, 1520, 1640, 1520, 1640, 1940, 1624, 1940)
 occluder = SubResource("Occ_WC_CreativeDept_right")
 
 [node name="WV_CreativeDept_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1624, 1520, 1640, 1520, 1640, 1940, 1624, 1940)
 
@@ -2298,6 +2408,7 @@ polygon = PackedVector2Array(1920, 1520, 2105, 1520, 2105, 1536, 1920, 1536)
 occluder = SubResource("Occ_WC_ComputerRoom_topL")
 
 [node name="WV_ComputerRoom_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1920, 1520, 2105, 1520, 2105, 1536, 1920, 1536)
 
@@ -2308,6 +2419,7 @@ polygon = PackedVector2Array(2215, 1520, 2400, 1520, 2400, 1536, 2215, 1536)
 occluder = SubResource("Occ_WC_ComputerRoom_topR")
 
 [node name="WV_ComputerRoom_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2215, 1520, 2400, 1520, 2400, 1536, 2215, 1536)
 
@@ -2323,6 +2435,7 @@ polygon = PackedVector2Array(1920, 1924, 2400, 1924, 2400, 1940, 1920, 1940)
 occluder = SubResource("Occ_WC_ComputerRoom_bot")
 
 [node name="WV_ComputerRoom_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1920, 1924, 2400, 1924, 2400, 1940, 1920, 1940)
 
@@ -2333,6 +2446,7 @@ polygon = PackedVector2Array(1920, 1520, 1936, 1520, 1936, 1940, 1920, 1940)
 occluder = SubResource("Occ_WC_ComputerRoom_left")
 
 [node name="WV_ComputerRoom_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1920, 1520, 1936, 1520, 1936, 1940, 1920, 1940)
 
@@ -2343,6 +2457,7 @@ polygon = PackedVector2Array(2384, 1520, 2400, 1520, 2400, 1940, 2384, 1940)
 occluder = SubResource("Occ_WC_ComputerRoom_right")
 
 [node name="WV_ComputerRoom_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2384, 1520, 2400, 1520, 2400, 1940, 2384, 1940)
 
@@ -2369,6 +2484,7 @@ polygon = PackedVector2Array(2430, 1520, 2555, 1520, 2555, 1536, 2430, 1536)
 occluder = SubResource("Occ_WC_Storage2_topL")
 
 [node name="WV_Storage2_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2430, 1520, 2555, 1520, 2555, 1536, 2430, 1536)
 
@@ -2379,6 +2495,7 @@ polygon = PackedVector2Array(2665, 1520, 2790, 1520, 2790, 1536, 2665, 1536)
 occluder = SubResource("Occ_WC_Storage2_topR")
 
 [node name="WV_Storage2_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2665, 1520, 2790, 1520, 2790, 1536, 2665, 1536)
 
@@ -2394,6 +2511,7 @@ polygon = PackedVector2Array(2430, 1924, 2790, 1924, 2790, 1940, 2430, 1940)
 occluder = SubResource("Occ_WC_Storage2_bot")
 
 [node name="WV_Storage2_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2430, 1924, 2790, 1924, 2790, 1940, 2430, 1940)
 
@@ -2404,6 +2522,7 @@ polygon = PackedVector2Array(2430, 1520, 2446, 1520, 2446, 1940, 2430, 1940)
 occluder = SubResource("Occ_WC_Storage2_left")
 
 [node name="WV_Storage2_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2430, 1520, 2446, 1520, 2446, 1940, 2430, 1940)
 
@@ -2414,6 +2533,7 @@ polygon = PackedVector2Array(2774, 1520, 2790, 1520, 2790, 1940, 2774, 1940)
 occluder = SubResource("Occ_WC_Storage2_right")
 
 [node name="WV_Storage2_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2774, 1520, 2790, 1520, 2790, 1940, 2774, 1940)
 
@@ -2440,6 +2560,7 @@ polygon = PackedVector2Array(2820, 1520, 3045, 1520, 3045, 1536, 2820, 1536)
 occluder = SubResource("Occ_WC_InfoDept_topL")
 
 [node name="WV_InfoDept_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2820, 1520, 3045, 1520, 3045, 1536, 2820, 1536)
 
@@ -2450,6 +2571,7 @@ polygon = PackedVector2Array(3155, 1520, 3380, 1520, 3380, 1536, 3155, 1536)
 occluder = SubResource("Occ_WC_InfoDept_topR")
 
 [node name="WV_InfoDept_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(3155, 1520, 3380, 1520, 3380, 1536, 3155, 1536)
 
@@ -2465,6 +2587,7 @@ polygon = PackedVector2Array(2820, 1924, 3380, 1924, 3380, 1940, 2820, 1940)
 occluder = SubResource("Occ_WC_InfoDept_bot")
 
 [node name="WV_InfoDept_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2820, 1924, 3380, 1924, 3380, 1940, 2820, 1940)
 
@@ -2475,6 +2598,7 @@ polygon = PackedVector2Array(2820, 1520, 2836, 1520, 2836, 1940, 2820, 1940)
 occluder = SubResource("Occ_WC_InfoDept_left")
 
 [node name="WV_InfoDept_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2820, 1520, 2836, 1520, 2836, 1940, 2820, 1940)
 
@@ -2485,6 +2609,7 @@ polygon = PackedVector2Array(3364, 1520, 3380, 1520, 3380, 1940, 3364, 1940)
 occluder = SubResource("Occ_WC_InfoDept_right")
 
 [node name="WV_InfoDept_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(3364, 1520, 3380, 1520, 3380, 1940, 3364, 1940)
 
@@ -2511,6 +2636,7 @@ polygon = PackedVector2Array(20, 2120, 555, 2120, 555, 2136, 20, 2136)
 occluder = SubResource("Occ_WC_Dasan6_topL")
 
 [node name="WV_Dasan6_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(20, 2120, 555, 2120, 555, 2136, 20, 2136)
 
@@ -2521,6 +2647,7 @@ polygon = PackedVector2Array(665, 2120, 1200, 2120, 1200, 2136, 665, 2136)
 occluder = SubResource("Occ_WC_Dasan6_topR")
 
 [node name="WV_Dasan6_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(665, 2120, 1200, 2120, 1200, 2136, 665, 2136)
 
@@ -2536,6 +2663,7 @@ polygon = PackedVector2Array(20, 2464, 1200, 2464, 1200, 2480, 20, 2480)
 occluder = SubResource("Occ_WC_Dasan6_bot")
 
 [node name="WV_Dasan6_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(20, 2464, 1200, 2464, 1200, 2480, 20, 2480)
 
@@ -2546,6 +2674,7 @@ polygon = PackedVector2Array(20, 2120, 36, 2120, 36, 2480, 20, 2480)
 occluder = SubResource("Occ_WC_Dasan6_left")
 
 [node name="WV_Dasan6_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(20, 2120, 36, 2120, 36, 2480, 20, 2480)
 
@@ -2556,6 +2685,7 @@ polygon = PackedVector2Array(1184, 2120, 1200, 2120, 1200, 2480, 1184, 2480)
 occluder = SubResource("Occ_WC_Dasan6_right")
 
 [node name="WV_Dasan6_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(1184, 2120, 1200, 2120, 1200, 2480, 1184, 2480)
 
@@ -2582,6 +2712,7 @@ polygon = PackedVector2Array(2270, 2120, 2345, 2120, 2345, 2136, 2270, 2136)
 occluder = SubResource("Occ_WC_MensRoomB_topL")
 
 [node name="WV_MensRoomB_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2270, 2120, 2345, 2120, 2345, 2136, 2270, 2136)
 
@@ -2592,6 +2723,7 @@ polygon = PackedVector2Array(2455, 2120, 2530, 2120, 2530, 2136, 2455, 2136)
 occluder = SubResource("Occ_WC_MensRoomB_topR")
 
 [node name="WV_MensRoomB_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2455, 2120, 2530, 2120, 2530, 2136, 2455, 2136)
 
@@ -2607,6 +2739,7 @@ polygon = PackedVector2Array(2270, 2464, 2530, 2464, 2530, 2480, 2270, 2480)
 occluder = SubResource("Occ_WC_MensRoomB_bot")
 
 [node name="WV_MensRoomB_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2270, 2464, 2530, 2464, 2530, 2480, 2270, 2480)
 
@@ -2617,6 +2750,7 @@ polygon = PackedVector2Array(2270, 2120, 2286, 2120, 2286, 2480, 2270, 2480)
 occluder = SubResource("Occ_WC_MensRoomB_left")
 
 [node name="WV_MensRoomB_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2270, 2120, 2286, 2120, 2286, 2480, 2270, 2480)
 
@@ -2627,6 +2761,7 @@ polygon = PackedVector2Array(2514, 2120, 2530, 2120, 2530, 2480, 2514, 2480)
 occluder = SubResource("Occ_WC_MensRoomB_right")
 
 [node name="WV_MensRoomB_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2514, 2120, 2530, 2120, 2530, 2480, 2514, 2480)
 
@@ -2653,6 +2788,7 @@ polygon = PackedVector2Array(2560, 2120, 2635, 2120, 2635, 2136, 2560, 2136)
 occluder = SubResource("Occ_WC_WomensRoomB_topL")
 
 [node name="WV_WomensRoomB_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2560, 2120, 2635, 2120, 2635, 2136, 2560, 2136)
 
@@ -2663,6 +2799,7 @@ polygon = PackedVector2Array(2745, 2120, 2820, 2120, 2820, 2136, 2745, 2136)
 occluder = SubResource("Occ_WC_WomensRoomB_topR")
 
 [node name="WV_WomensRoomB_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2745, 2120, 2820, 2120, 2820, 2136, 2745, 2136)
 
@@ -2678,6 +2815,7 @@ polygon = PackedVector2Array(2560, 2464, 2820, 2464, 2820, 2480, 2560, 2480)
 occluder = SubResource("Occ_WC_WomensRoomB_bot")
 
 [node name="WV_WomensRoomB_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2560, 2464, 2820, 2464, 2820, 2480, 2560, 2480)
 
@@ -2688,6 +2826,7 @@ polygon = PackedVector2Array(2560, 2120, 2576, 2120, 2576, 2480, 2560, 2480)
 occluder = SubResource("Occ_WC_WomensRoomB_left")
 
 [node name="WV_WomensRoomB_left" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2560, 2120, 2576, 2120, 2576, 2480, 2560, 2480)
 
@@ -2698,6 +2837,7 @@ polygon = PackedVector2Array(2804, 2120, 2820, 2120, 2820, 2480, 2804, 2480)
 occluder = SubResource("Occ_WC_WomensRoomB_right")
 
 [node name="WV_WomensRoomB_right" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+material = SubResource("ShaderMaterial_wallpixel")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2804, 2120, 2820, 2120, 2820, 2480, 2804, 2480)
 
