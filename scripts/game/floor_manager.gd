@@ -85,6 +85,7 @@ func _ready() -> void:
 		game_state.connect("game_over", _on_game_over)
 
 	_update_floor_label()
+	Sfx.start_music()
 	janitor.sync_floor(current_floor != JANITOR_FREE_FLOOR, current_floor, player, $Background)
 	fade_rect.color.a = 1.0
 	var tween := create_tween()
@@ -105,6 +106,7 @@ func _on_game_over(reason: String) -> void:
 		return
 	game_over_active = true
 	changing_floor = true   # 계단 트리거 검사 정지
+	Sfx.stop_music()
 
 	# 플레이어는 이동(_physics_process)과 E 상호작용(_unhandled_input)을 모두 끊고,
 	# 수위는 붙잡은 자리에 그대로 세워 둔다.

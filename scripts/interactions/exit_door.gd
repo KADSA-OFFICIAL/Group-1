@@ -17,5 +17,6 @@ func interact(_player: Node) -> void:
 		return
 
 	# autoload라 씬이 바뀌어도 소리는 끊기지 않는다.
+	Sfx.stop_music()
 	Sfx.play(&"escape")
 	get_tree().change_scene_to_file(ending_scene_path)
