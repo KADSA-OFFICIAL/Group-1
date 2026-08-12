@@ -72,6 +72,15 @@ const SOUND_COOLDOWN := 9.0
 # 잉크를 뒤집어쓴 동안의 몸 색. 왜 멈춰 있는지 한눈에 보이게 한다(#169).
 const BLIND_BODY_COLOR := Color(0.2, 0.2, 0.3, 1.0)
 
+# ── 발소리·열쇠 소리 (#9) ────────────────────────────────────────
+# 하단 알림 텍스트(위 EARSHOT/FOOTSTEP_RANGE)는 그대로 두고 소리를 더한다.
+# 소리는 AudioStreamPlayer2D의 거리 감쇠로 위치를 알려 주고, 텍스트는 소리를
+# 못 듣는 상황에서도 단서가 남게 한다.
+const STEP_INTERVAL_PATROL := 0.52   # 느릿느릿(기획서 5장)
+const STEP_INTERVAL_CHASE := 0.30
+const STEPS_PER_JINGLE := 4          # 몇 걸음마다 열쇠꾸러미가 찰랑이는가
+const MOVING_SPEED_EPSILON := 10.0   # 이보다 느리면 멈춘 것으로 본다
+
 const MUTTERS := [
 	"…오늘도 아무도 없지.",
 	"시우야, 아빠 순찰 중이야.",
@@ -128,8 +137,14 @@ var _game_state: Node = null
 var blind_timer: float = 0.0
 var _body_color: Color = Color.WHITE
 
+var step_timer: float = 0.0
+var step_count: int = 0
+
 @onready var body: Polygon2D = $Body
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
+@onready var step_sound: AudioStreamPlayer2D = $StepSound
+@onready var key_sound: AudioStreamPlayer2D = $KeySound
+@onready var door_sound: AudioStreamPlayer2D = $DoorSound
 
 
 func _enter_tree() -> void:
@@ -463,18 +478,42 @@ func _physics_process(delta: float) -> void:
 	mutter_cooldown = maxf(mutter_cooldown - delta, 0.0)
 	sound_cooldown = maxf(sound_cooldown - delta, 0.0)
 
-	if _is_chasing():
+	var chasing := _is_chasing()
+	if chasing:
 		if not announced_chase:
 			announced_chase = true
 			_say("수위가 걸음을 멈추고 이쪽을 본다. \"…누구야?\"")
+			Sfx.play(&"spotted")
 		_move_chase(delta)
 	else:
 		announced_chase = false
 		_update_sound_cues()
 		_move_patrol(delta)
 
+	_update_footsteps(delta, chasing)
+
 	if debug_draw:
 		queue_redraw()
+
+
+## 걸을 때만 발소리를 낸다. 방 확인·스턴처럼 멈춰 있을 때는 조용해야
+## 플레이어가 "지금 어디 서 있구나"를 소리로 읽을 수 있다.
+func _update_footsteps(delta: float, chasing: bool) -> void:
+	if velocity.length() < MOVING_SPEED_EPSILON:
+		# 멈추면 다음 걸음이 바로 나도록 타이머를 채워 둔다.
+		step_timer = STEP_INTERVAL_PATROL
+		return
+
+	step_timer -= delta
+	if step_timer > 0.0:
+		return
+
+	step_timer = STEP_INTERVAL_CHASE if chasing else STEP_INTERVAL_PATROL
+	step_sound.play()
+
+	step_count += 1
+	if step_count % STEPS_PER_JINGLE == 0:
+		key_sound.play()
 
 
 # ── 잉크통 스턴 (#169) ───────────────────────────────────────────
@@ -585,6 +624,7 @@ func _catch_player() -> void:
 	if not announced_catch:
 		announced_catch = true
 		_say("손전등 불빛이 얼굴을 비춘다. \"학생이네. 나와. 같이 수위실로 가자.\"")
+		Sfx.play(&"caught")
 
 	var game_state = get_tree().get_first_node_in_group("game_state")
 	if game_state != null:
@@ -640,6 +680,7 @@ func _begin_inspection() -> void:
 	velocity = Vector2.ZERO
 	path_points = PackedVector2Array()
 	stuck_time = 0.0
+	door_sound.play()
 	_notice_inspection()
 
 

@@ -49,6 +49,7 @@ func _leave(scene_path: String) -> void:
 		return
 	leaving = true
 
+	Sfx.play(&"ui_click")
 	retry_button.disabled = true
 	title_button.disabled = true
 
