@@ -141,6 +141,8 @@ func _physics_process(_delta: float) -> void:
 func _change_floor(target: int, arrive: Vector2) -> void:
 	changing_floor = true
 
+	Sfx.play(&"stairs")
+
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 1.0, FLOOR_FADE_OUT_SECONDS)
 	tween.tween_callback(_swap_floor.bind(target, arrive))

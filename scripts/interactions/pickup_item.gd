@@ -25,9 +25,11 @@ func _on_body_entered(body: Node) -> void:
 	if game_state != null:
 		if not item_id.is_empty() and not game_state.call("add_item", item_id):
 			game_state.call("request_notice", "가방이 가득 차서 주울 수 없다.")
+			Sfx.play(&"door_locked")
 			return
 		if not pickup_id.is_empty():
 			game_state.call("set_flag", pickup_id)
 		game_state.call("request_notice", message)
+		Sfx.play(&"pickup")
 
 	queue_free()

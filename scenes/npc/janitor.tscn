@@ -1,6 +1,9 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/npc/janitor.gd" id="1_janitor_script"]
+[ext_resource type="AudioStream" path="res://assets/audio/janitor_step.wav" id="2_step"]
+[ext_resource type="AudioStream" path="res://assets/audio/keys.wav" id="3_keys"]
+[ext_resource type="AudioStream" path="res://assets/audio/door_open.wav" id="4_door"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_janitor"]
 radius = 9.0
@@ -16,3 +19,21 @@ polygon = PackedVector2Array(0, -20, 11, -7, 8, 16, -8, 16, -11, -7)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CapsuleShape2D_janitor")
+
+[node name="StepSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("2_step")
+volume_db = -4.0
+max_distance = 900.0
+attenuation = 1.6
+
+[node name="KeySound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("3_keys")
+volume_db = -7.0
+max_distance = 1100.0
+attenuation = 1.2
+
+[node name="DoorSound" type="AudioStreamPlayer2D" parent="."]
+stream = ExtResource("4_door")
+volume_db = -6.0
+max_distance = 1000.0
+attenuation = 1.4

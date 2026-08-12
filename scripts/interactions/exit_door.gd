@@ -13,6 +13,9 @@ func interact(_player: Node) -> void:
 
 	if game_state != null and not required_item_id.is_empty() and not game_state.call("has_item", required_item_id):
 		game_state.call("request_notice", locked_message)
+		Sfx.play(&"door_locked")
 		return
 
+	# autoload라 씬이 바뀌어도 소리는 끊기지 않는다.
+	Sfx.play(&"escape")
 	get_tree().change_scene_to_file(ending_scene_path)

@@ -16,6 +16,7 @@ func interact(player: Node) -> void:
 		return
 
 	player.call("set_hiding", true)
+	Sfx.play(&"hide_in")
 
 	var game_state = get_tree().get_first_node_in_group("game_state")
 	if game_state != null:
