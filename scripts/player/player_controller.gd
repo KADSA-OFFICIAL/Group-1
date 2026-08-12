@@ -72,6 +72,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	# 나올 수 있어야 한다(갇힘 방지).
 	if is_hiding:
 		set_hiding(false)
+		Sfx.play(&"hide_out")
 		get_viewport().set_input_as_handled()
 		return
 
@@ -105,6 +106,7 @@ func _throw_ink() -> bool:
 		position + facing_direction * INK_SPAWN_OFFSET, facing_direction)
 
 	game_state.call("request_notice", "잉크통을 던졌다.")
+	Sfx.play(&"ink_throw")
 	return true
 
 

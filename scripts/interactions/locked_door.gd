@@ -25,6 +25,7 @@ func interact(_player: Node) -> void:
 
 	if game_state != null and not required_item_id.is_empty() and not game_state.call("has_item", required_item_id):
 		game_state.call("request_notice", locked_message)
+		Sfx.play(&"door_locked")
 		return
 
 	if game_state != null:
@@ -34,6 +35,7 @@ func interact(_player: Node) -> void:
 			game_state.call("set_flag", door_id)
 		game_state.call("request_notice", open_message)
 
+	Sfx.play(&"door_open")
 	_open()
 
 

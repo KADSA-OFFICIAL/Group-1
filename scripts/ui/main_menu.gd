@@ -16,6 +16,7 @@ func _ready() -> void:
 
 
 func _on_start_pressed() -> void:
+	Sfx.play(&"ui_click")
 	start_button.disabled = true
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 1.0, fade_seconds)

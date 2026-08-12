@@ -63,6 +63,7 @@ func _land(at: Vector2) -> void:
 	position = at
 	can.visible = false
 	splash.visible = true
+	Sfx.play(&"ink_splash")
 
 	_splash_on_janitor()
 

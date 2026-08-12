@@ -29,6 +29,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate→art_room→cabinet
 - 잉크통(#169): 4층 정보부실에서 얻는 `ink_can`을 **Q**로 바라보는 방향에 던진다(1회용). `scenes/items/ink_projectile.tscn`이 레이캐스트로 벽을 확인하며 날아가다 터지고, 반경 120px 안의 수위를 5초간 멈춘다(`janitor.blind()` — 추적·접촉 판정 정지, 층을 옮기면 해제). 쓸 수 있는 아이템의 조작 키는 `hud.gd`의 `USABLE_ITEM_KEYS`에 적어 R 패널에 표시한다.
 - 조명: main의 CanvasModulate + 플레이어 PointLight2D(shadow_enabled) — 벽 차단체 때문에 벽 너머는 보이지 않음. 문·창문 틈으로만 빛이 샘.
 - UI: R 인벤토리 패널(5슬롯), 좌상단 HUD(목표/소지품)+층 표시, 하단 알림(game_state.request_notice).
+- 사운드(#9): 에셋을 받아오지 않고 **`tools/gen_sfx.py`가 8비트 톤으로 합성**해 `assets/audio/*.wav`로 커밋한다(표준 라이브러리만, 고정 시드라 재생성해도 바이트가 같다). 톤을 바꾸려면 그 스크립트의 `build_all()` 숫자를 고치고 다시 돌린다. 비위치 효과음은 autoload `Sfx`(`scripts/game/sound_manager.gd`)의 `Sfx.play(&"id")`, 위치가 정보인 소리(수위 발소리·열쇠·문)는 `janitor.tscn`의 AudioStreamPlayer2D가 낸다. **하단 알림 텍스트는 소리와 병행**한다 — 소리를 못 듣는 상황에서도 단서가 남아야 한다. 오디오 버스는 Master 하나뿐이고 음량은 `sound_manager.gd`의 `VOLUMES`에서 맞춘다.
 - 수위(#141): 4층은 안전 구간(`floor_manager.JANITOR_FREE_FLOOR`), 3·2·1층에서 활동. 순찰은 층 씬의 `Door_*`에서 뽑은 **문 앞 대기 지점을 최근접 이웃으로 이은 고정 루트를 왕복**하고, 문마다 1.8초 멈춰 방을 확인한다. 들리는 거리(720px) 안에서만 혼잣말·열쇠 소리, 420px 안이면 발소리를 하단 알림으로 낸다. 발각(접촉 30px) → 체포 게임 오버. 루트 점검은 `tools/verify_janitor_route.py`.
 
 ### 진행 요소 위치
@@ -106,6 +107,8 @@ main_menu → intro(프롤로그 컷신: street→back_gate→art_room→cabinet
 - 씬이나 스크립트를 고쳤으면 **푸시 전에 `python3 tools/verify_scenes.py`를 실행**합니다.
   load_steps, 리소스 참조, 노드 부모 경로, 형제 이름 중복, 스크립트 $NodePath,
   벽 충돌↔광원 차단체 1:1을 검사합니다(Godot 불필요, 수초).
+- 효과음을 고쳤으면 `python3 tools/gen_sfx.py`로 재생성합니다(길이·피크·DC 오프셋을
+  스스로 검사하고, 결정론적이라 톤을 안 바꿨으면 diff가 나오지 않습니다).
 - 수위 순찰·문 배치를 건드렸으면 `python3 tools/verify_janitor_route.py`
   (문 앞 대기 지점이 벽에 안 박히는지·계단에서 닿는지·루트가 맵을 가로지르지 않는지).
 - 기하·좌표를 바꿨으면 해당 이슈에 맞는 임시 검증 스크립트로 대조합니다.

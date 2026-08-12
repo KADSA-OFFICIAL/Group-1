@@ -18,15 +18,20 @@ func interact(player: Node) -> void:
 
 	if game_state != null and not required_item_id.is_empty() and not game_state.call("has_item", required_item_id):
 		game_state.call("request_notice", locked_message)
+		Sfx.play(&"door_locked")
 		return
 
 	if game_state != null and not grants_item_id.is_empty():
 		if not game_state.call("add_item", grants_item_id):
 			game_state.call("request_notice", "가방이 가득 차서 가져갈 수 없다.")
+			Sfx.play(&"door_locked")
 			return
 
 	if game_state != null:
 		game_state.call("set_flag", grants_flag)
 		game_state.call("request_notice", message)
+
+	# 아이템을 준 조사는 획득음, 읽기만 하는 조사는 조사음.
+	Sfx.play(&"pickup" if not grants_item_id.is_empty() else &"investigate")
 
 	interacted.emit(player)
