@@ -185,6 +185,7 @@ func _apply_active(active: bool) -> void:
 	# 수위는 멀쩡해야 한다(같은 노드를 층마다 재사용한다).
 	blind_timer = 0.0
 	body.color = _body_color
+	Sfx.set_chasing(false)
 	if active and player != null:
 		_spawn_away_from(player.position)
 
@@ -470,6 +471,7 @@ func _snap_route_to_position() -> void:
 
 func _physics_process(delta: float) -> void:
 	if blind_timer > 0.0:
+		Sfx.set_chasing(false)
 		_hold_blinded(delta)
 		return
 
@@ -491,6 +493,7 @@ func _physics_process(delta: float) -> void:
 		_move_patrol(delta)
 
 	_update_footsteps(delta, chasing)
+	Sfx.set_chasing(chasing)
 
 	if debug_draw:
 		queue_redraw()
