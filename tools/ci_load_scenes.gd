@@ -65,9 +65,13 @@ func _autoload_names() -> Array[String]:
 	return names
 
 
-## 씬에 붙지 않은 스크립트까지 포함해 전부 컴파일해 본다. 컴파일에 실패한
-## 스크립트는 load()가 null을 돌려준다 — 씬만 검사하면 스크립트가 빠진 채
-## 인스턴스화가 성공해 버리므로 이 검사가 따로 필요하다.
+## 씬에 붙지 않은 스크립트까지 포함해 전부 컴파일해 본다. 씬만 검사하면
+## 스크립트가 빠진 채로 인스턴스화가 성공해 버리므로 이 검사가 따로 필요하다.
+##
+## null 검사만으로는 부족하다 — 파스 오류가 난 스크립트도 load()는
+## "Failed to load script ... Parse error"를 찍은 뒤 **null이 아닌** 무효
+## GDScript를 돌려준다(CI run 31898238404에서 확인). 유효성은
+## can_instantiate()로 본다(GDScript::can_instantiate은 컴파일 성공 여부다).
 func _check_scripts() -> Array[String]:
 	var failed: Array[String] = []
 	var paths := _collect(SCRIPTS_DIR, ".gd")
@@ -83,6 +87,12 @@ func _check_scripts() -> Array[String]:
 			printerr("SCRIPT LOAD FAILED: ", path)
 			failed.append(path)
 			continue
+
+		if not (compiled as GDScript).can_instantiate():
+			printerr("SCRIPT LOAD FAILED (컴파일 실패): ", path)
+			failed.append(path)
+			continue
+
 		print("  ok  ", path)
 
 	print("스크립트 %d개 검사, 실패 %d개" % [paths.size(), failed.size()])
