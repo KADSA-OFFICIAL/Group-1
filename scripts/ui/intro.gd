@@ -2,14 +2,16 @@ extends Control
 
 ## 게임 시작 전 프롤로그 컷신 (기획서: street → back_gate → art_room → cabinet → next_room).
 ## 마지막에 창문으로 외벽을 타고 4층으로 내려가 본편(@game)이 시작된다.
-## 대사는 하단 대화창에 한 글자씩 출력, E/Enter로 진행. 배경 이미지는 추후 추가.
+## 대사는 하단 자막(scenes/ui/subtitle_dialogue.tscn)에 한 글자씩 출력, E/Enter로 진행.
+## 배경 이미지는 추후 추가.
 ## 장면 노드는 choice(분기)도 지원한다 — 신고 선택지 등 후속 이슈에서 사용.
 
 @export_file("*.tscn") var game_scene_path: String = "res://scenes/main/main.tscn"
 @export_file("*.tscn") var title_scene_path: String = "res://scenes/ui/main_menu.tscn"
 
-# 장면 노드: caption, lines([화자, 대사]), 그리고 next(다음 장면 키) 또는
+# 장면 노드: caption, lines([화자, 대사] 또는 [화자, 대사, 감정]), 그리고 next(다음 장면 키) 또는
 # choice({prompt, options: [[라벨, 다음 키]]}). 특수 키: @game(게임 시작), @title(타이틀 복귀)
+# 화자가 빈 문자열이면 지문·독백으로 표시된다. 감정 태그는 subtitle_dialogue.gd의 EMOTIONS 참고.
 const SCRIPT_NODES: Dictionary = {
 	"street": {
 		"caption": "— 밤 10시 20분, 학원에서 집으로 —",
@@ -54,7 +56,7 @@ const SCRIPT_NODES: Dictionary = {
 			["", "철컥. 미술실 문이 잠겼다. 발소리가 멀어진다."],
 			["", "숨을 내쉬고 나서야, 발밑에 뭔가 밟히는 걸 알았다. 플라스틱 카드."],
 			["", "학생증. 1학년 3반 송하람. 뉴스에서 들은 이름이다."],
-			["이설", "왜 없어진 학생 학생증이 미술실 캐비넷에 있는 거야?"],
+			["이설", "왜 없어진 학생 학생증이 미술실 캐비넷에 있는 거야?", "suspicion"],
 		],
 		"next": "next_room",
 	},
@@ -65,7 +67,7 @@ const SCRIPT_NODES: Dictionary = {
 			["", "책상 위에 비닐봉투 몇 개. 손전등을 비춰 본다."],
 			["", "교복 단추, 이름표, 머리끈, 볼펜. 학생 소지품이다. 하나가 아니다. 여러 명 것이다."],
 			["", "벽에는 날짜가 적혀 있었다. 3월 14일. 5월 22일. 8월 9일. 11월 3일. 1월 18일."],
-			["이설", "…뉴스에서 들은 실종 시기랑 같아."],
+			["이설", "…뉴스에서 들은 실종 시기랑 같아.", "suspicion"],
 			["", "복도에서 다시 발소리. 이번엔 이쪽으로 오고 있다."],
 			["이설", "(창문…!)"],
 			["", "이설은 창문을 열고 외벽 난간으로 몸을 내밀었다. 발밑은 5층 높이."],
@@ -78,11 +80,9 @@ const START_NODE := "street"
 const SCENE_FADE_SECONDS := 0.5
 const SCENE_FADE_IN_SECONDS := 1.7  # 장면 전환 시 새 장면이 드러나는 페이드인
 const CHOICE_FADE_SECONDS := 0.4    # 선택창 등장 페이드인
-const TYPING_SECONDS_PER_CHAR := 0.05
 
 @onready var scene_caption: Label = $SceneCaption
-@onready var name_label: Label = $DialogueBox/Margin/Rows/NameLabel
-@onready var text_label: Label = $DialogueBox/Margin/Rows/TextLabel
+@onready var dialogue: SubtitleDialogue = $Dialogue
 @onready var fade_rect: ColorRect = $FadeRect
 @onready var choice_panel: PanelContainer = $ChoicePanel
 @onready var choice_box: VBoxContainer = $ChoicePanel/Margin/ChoiceBox
@@ -93,13 +93,12 @@ var line_index: int = -1
 var transitioning: bool = false
 var finished: bool = false
 var choosing: bool = false
-var typing: bool = false
-var typing_tween: Tween
 
 
 func _ready() -> void:
 	fade_rect.color.a = 1.0
 	choice_panel.visible = false
+	dialogue.apply_font(scene_caption)
 	_apply_scene()
 
 	var tween := create_tween()
@@ -113,13 +112,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not (event.is_action_pressed("interact") or event.is_action_pressed("ui_accept")):
 		return
 
-	if typing:
-		# 타이핑 중이면 남은 글자를 즉시 전부 표시
-		if typing_tween != null:
-			typing_tween.kill()
-		text_label.visible_characters = -1
-		typing = false
-	else:
+	# 타이핑 중이면 먼저 남은 글자를 즉시 전부 표시하고, 아니면 다음 줄로
+	if not dialogue.skip_typing():
 		_next_line()
 
 	get_viewport().set_input_as_handled()
@@ -128,8 +122,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func _apply_scene() -> void:
 	var node: Dictionary = SCRIPT_NODES[current_node]
 	scene_caption.text = node["caption"]
-	name_label.text = ""
-	text_label.text = ""
+	dialogue.clear()
 
 
 func _next_line() -> void:
@@ -141,21 +134,9 @@ func _next_line() -> void:
 		_end_of_node(node)
 		return
 
-	name_label.text = lines[line_index][0]
-	text_label.text = lines[line_index][1]
-
-	# 타이핑 효과: 왼쪽부터 한 글자씩 출력
-	text_label.visible_characters = 0
-	typing = true
-
-	var total_chars := text_label.get_total_character_count()
-	if total_chars == 0:
-		total_chars = text_label.text.length()
-
-	typing_tween = create_tween()
-	typing_tween.tween_property(text_label, "visible_characters", total_chars, total_chars * TYPING_SECONDS_PER_CHAR)
-	typing_tween.tween_callback(func() -> void:
-		typing = false)
+	var line: Array = lines[line_index]
+	var emotion: String = line[2] if line.size() > 2 else ""
+	dialogue.show_line(line[0], line[1], emotion)
 
 
 func _end_of_node(node: Dictionary) -> void:

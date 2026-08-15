@@ -1,12 +1,14 @@
 extends Control
 
 ## 엔딩 컷신(#139) — 기획서의 "방과 후" 한 종류. 현관을 열고 나오면 여기로 넘어온다.
-## 장면마다 자막(caption)을 바꾸고 대사를 한 글자씩 출력한다 — 진행 방식은 프롤로그(intro.gd)와 같다.
+## 장면마다 자막(caption)을 바꾸고 대사를 한 글자씩 출력한다 — 표시와 진행 방식은 프롤로그(intro.gd)와
+## 같은 하단 자막(scenes/ui/subtitle_dialogue.tscn)을 쓴다.
 ## 신고 선택지·숨은 엔딩은 러닝타임을 줄이기 위해 넣지 않는다(사용자 결정 2026-07-28).
 
 @export_file("*.tscn") var title_scene_path: String = "res://scenes/ui/main_menu.tscn"
 
-# 장면: caption과 lines([화자, 대사]). 순서대로 재생하고 마지막에 타이틀로 돌아간다.
+# 장면: caption과 lines([화자, 대사] 또는 [화자, 대사, 감정]). 화자가 빈 문자열이면 지문·독백으로
+# 표시된다. 순서대로 재생하고 마지막에 타이틀로 돌아간다.
 const SCENES: Array = [
 	{
 		"caption": "— 학교 현관 —",
@@ -40,23 +42,20 @@ const SCENES: Array = [
 
 const SCENE_FADE_SECONDS := 0.6
 const SCENE_FADE_IN_SECONDS := 1.4
-const TYPING_SECONDS_PER_CHAR := 0.05
 
 @onready var scene_caption: Label = $SceneCaption
-@onready var name_label: Label = $DialogueBox/Margin/Rows/NameLabel
-@onready var text_label: Label = $DialogueBox/Margin/Rows/TextLabel
+@onready var dialogue: SubtitleDialogue = $Dialogue
 @onready var fade_rect: ColorRect = $FadeRect
 
 var scene_index: int = 0
 var line_index: int = -1
 var transitioning: bool = false
 var finished: bool = false
-var typing: bool = false
-var typing_tween: Tween
 
 
 func _ready() -> void:
 	fade_rect.color.a = 1.0
+	dialogue.apply_font(scene_caption)
 	_apply_scene()
 
 	var tween := create_tween()
@@ -70,13 +69,8 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not (event.is_action_pressed("interact") or event.is_action_pressed("ui_accept")):
 		return
 
-	if typing:
-		# 타이핑 중이면 남은 글자를 즉시 전부 표시
-		if typing_tween != null:
-			typing_tween.kill()
-		text_label.visible_characters = -1
-		typing = false
-	else:
+	# 타이핑 중이면 먼저 남은 글자를 즉시 전부 표시하고, 아니면 다음 줄로
+	if not dialogue.skip_typing():
 		_next_line()
 
 	get_viewport().set_input_as_handled()
@@ -84,8 +78,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _apply_scene() -> void:
 	scene_caption.text = SCENES[scene_index]["caption"]
-	name_label.text = ""
-	text_label.text = ""
+	dialogue.clear()
 
 
 func _next_line() -> void:
@@ -96,20 +89,9 @@ func _next_line() -> void:
 		_next_scene()
 		return
 
-	name_label.text = lines[line_index][0]
-	text_label.text = lines[line_index][1]
-
-	text_label.visible_characters = 0
-	typing = true
-
-	var total_chars := text_label.get_total_character_count()
-	if total_chars == 0:
-		total_chars = text_label.text.length()
-
-	typing_tween = create_tween()
-	typing_tween.tween_property(text_label, "visible_characters", total_chars, total_chars * TYPING_SECONDS_PER_CHAR)
-	typing_tween.tween_callback(func() -> void:
-		typing = false)
+	var line: Array = lines[line_index]
+	var emotion: String = line[2] if line.size() > 2 else ""
+	dialogue.show_line(line[0], line[1], emotion)
 
 
 func _next_scene() -> void:
