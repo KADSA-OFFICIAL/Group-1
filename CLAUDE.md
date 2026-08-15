@@ -117,6 +117,10 @@ main_menu → intro(프롤로그 컷신: street→back_gate→art_room→cabinet
 - 플레이어 입력, UI, 충돌, 게임 흐름 확인은 사용자의 수동 F5에 의존합니다.
 - 푸시하면 GitHub Actions(`.github/workflows/ci.yml`)가 정적 검사와 함께
   Godot 4.6 헤드리스 임포트·전체 씬 로드를 실행합니다. 결과는 `gh pr checks <번호>`로 확인합니다.
+  씬 로드는 `tools/ci_load_scenes.gd`가 맡고 씬뿐 아니라 `scripts/` 아래 `.gd`도 전부
+  컴파일해 봅니다. 이 스크립트는 **`_init()`이 아니라 `_initialize()`에서 돌아야 합니다**(#183) —
+  `--script`로 넘긴 MainLoop는 autoload(`Sfx`) 등록보다 먼저 만들어져서, `_init()`에서
+  로드하면 `Sfx` 참조 스크립트가 전부 컴파일에 실패합니다(그래도 씬 로드는 성공해 검사가 통과함).
 
 PR 본문에는 실제로 확인한 내용을 기록합니다.
 
