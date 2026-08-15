@@ -71,10 +71,13 @@ jobs:
           set -o pipefail
           ~/godot-bin/godot --headless --script res://tools/ci_load_scenes.gd 2>&1 | tee /tmp/load.log
 
-      - name: 로드 로그의 씬 오류 검사
+      - name: 로드 로그의 씬·스크립트 오류 검사
         run: |
-          if grep -nE "LOAD FAILED|INSTANTIATE FAILED|NOT A PackedScene|Failed loading resource|Cannot get node" /tmp/load.log; then
-            echo "::error::씬 로드 오류가 발견됐다"
+          # 스크립트 패턴(SCRIPT ERROR 등)은 임포트 로그에서만 보던 것을 여기에도 건다.
+          # 씬은 스크립트가 컴파일에 실패해도 그 스크립트만 빠진 채 로드에 성공하므로,
+          # 로더의 종료 코드만으로는 컴파일 오류를 놓친다 (#183).
+          if grep -nE "LOAD FAILED|INSTANTIATE FAILED|NOT A PackedScene|Failed loading resource|Cannot get node|AUTOLOAD MISSING|SCRIPT LOAD FAILED|SCRIPT ERROR|Parse Error|Failed to load script|Invalid call|error at line" /tmp/load.log; then
+            echo "::error::씬 로드 중 씬 또는 스크립트 오류가 발견됐다"
             exit 1
           fi
-          echo "씬 로드 오류 없음"
+          echo "씬·스크립트 오류 없음"
