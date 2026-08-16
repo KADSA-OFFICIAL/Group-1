@@ -5,6 +5,8 @@ extends Control
 ## Claude Design 시안 "2D 공포 게임 대화 상자 / TURN 5"를 880x495 → 1600x900(배율 1.8182)으로
 ## 환산했다. 아래 상수 주석의 괄호 안 숫자가 시안 원본 값이다.
 ## 컷신(intro.tscn, ending.tscn)이 이 씬을 인스턴스해 show_line()으로 대사를 흘린다.
+## 본편 HUD(hud.tscn)도 같은 씬을 써서 하단 알림을 낸다(#193) — 컷신과 달리 화면을
+## 가리면 안 되므로 shade_alpha로 그라디언트만 옅게 깐다.
 ## 화자가 빈 문자열이면 지문·독백으로 보고, 이름 줄 없이 더 좁고 어둡게 표시한다 —
 ## 화자 있는 대사와의 구분은 오직 위치·크기·밝기로만 한다.
 
@@ -43,6 +45,10 @@ const EMOTIONS: Dictionary = {
 const FONT: FontFile = preload("res://assets/fonts/NotoSansKR-VF.ttf")
 const WGHT_TAG := 0x77676874  # OpenType 가변 축 'wght'
 
+## 하단 그라디언트 농도. 컷신은 1.0(시안 그대로), 본편 HUD는 게임 화면을 덜 가리게 낮춘다.
+@export_range(0.0, 1.0, 0.05) var shade_alpha: float = 1.0
+
+@onready var shade: TextureRect = $Shade
 @onready var lines_box: VBoxContainer = $Lines
 @onready var name_label: Label = $Lines/NameLabel
 @onready var text_label: Label = $Lines/TextLabel
@@ -50,8 +56,13 @@ const WGHT_TAG := 0x77676874  # OpenType 가변 축 'wght'
 var typing: bool = false
 var typing_tween: Tween
 
+## 마지막 show_line()의 타이핑 소요 시간(초). 넘기는 입력이 없는 본편에서
+## "타이핑이 끝나기 전에 자막이 사라지는" 일이 없도록 HUD가 표시 시간을 여기서 잰다.
+var last_typing_seconds: float = 0.0
+
 
 func _ready() -> void:
+	shade.modulate.a = shade_alpha
 	name_label.add_theme_font_override("font", _weighted_font(NAME_WEIGHT, NAME_GLYPH_SPACING))
 	name_label.add_theme_font_size_override("font_size", NAME_FONT_SIZE)
 	text_label.add_theme_font_override("font", _weighted_font(TEXT_WEIGHT, 0))
@@ -119,6 +130,7 @@ func _start_typing(emotion: String) -> void:
 		total_chars = text_label.text.length()
 
 	var seconds := total_chars * TYPING_SECONDS_PER_CHAR * _typing_scale(emotion)
+	last_typing_seconds = seconds
 	typing_tween = create_tween()
 	typing_tween.tween_property(text_label, "visible_characters", total_chars, seconds)
 	typing_tween.tween_callback(func() -> void:

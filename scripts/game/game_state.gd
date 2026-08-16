@@ -2,6 +2,9 @@ extends Node
 
 signal inventory_changed(items: Array[String])
 signal notice_requested(message: String)
+## 화자가 있는 대사(#193). 지문인 notice_requested와 나뉘어 있어야 HUD가
+## 프롤로그와 같은 두 가지 자막 배치 중 하나를 고를 수 있다.
+signal speech_requested(speaker: String, message: String, emotion: String)
 signal game_over(reason: String)
 
 @export var starting_items: Array[String] = []
@@ -63,6 +66,14 @@ func request_notice(message: String) -> void:
 		return
 
 	notice_requested.emit(message)
+
+
+## 화자 이름이 붙는 대사를 띄운다. emotion은 subtitle_dialogue.gd의 EMOTIONS 키.
+func request_speech(speaker: String, message: String, emotion: String = "") -> void:
+	if message.is_empty():
+		return
+
+	speech_requested.emit(speaker, message, emotion)
 
 
 ## 런이 실패로 끝났음을 알린다(붙잡힘 등). 접촉 판정은 매 프레임 들어오므로
