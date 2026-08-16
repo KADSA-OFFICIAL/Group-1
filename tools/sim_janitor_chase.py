@@ -29,7 +29,7 @@ import re
 import sys
 
 DT = 1.0 / 60.0
-CHASE_SPEED = 220.0
+CHASE_SPEED = 320.0     # janitor.gd chase_speed (#202: 플레이어와 동일)
 ARRIVE = 6.0
 STUCK_SECONDS = 0.6
 PROGRESS_RATIO = 0.3
@@ -39,10 +39,12 @@ HALF_W, HALF_H, PROBE_MARGIN = 9.0, 15.0, 1.0
 CELL = 25.0
 GRID_W, GRID_H = 112, 72
 LOOKAHEAD = 12
-PATROL_SPEED = 110.0
+PATROL_SPEED = 130.0
 SIGHT_RANGE = 320.0     # 플레이어 손전등이 닿는 거리
 REVEAL_DELAY = 1.0      # 시야 노출 후 추적 시작까지
 LOSE_SIGHT = 1.5        # 시야 상실 후 추적 유지
+PLAYER_SPEED = 320.0    # player_controller.gd speed
+PLAYER_HALF_W, PLAYER_HALF_H = 8.0, 13.0   # 플레이어 캡슐(radius 8, height 26)
 
 # 교체 전 구현(웨이포인트 8노드 + direct_block_time) — 비교 기준
 OLD_WAYPOINTS = {
@@ -678,6 +680,141 @@ def check_awareness() -> bool:
     return ok
 
 
+def body_blocked_size(pos, rects, hw, hh) -> bool:
+    x0, y0 = pos[0] - hw, pos[1] - hh
+    x1, y1 = pos[0] + hw, pos[1] + hh
+    return any(x0 < r[2] and r[0] < x1 and y0 < r[3] and r[1] < y1 for r in rects)
+
+
+def move_and_slide_size(pos, vel, rects, hw, hh):
+    nx = pos[0] + vel[0] * DT
+    if body_blocked_size((nx, pos[1]), rects, hw, hh):
+        nx = pos[0]
+    ny = pos[1] + vel[1] * DT
+    if body_blocked_size((nx, ny), rects, hw, hh):
+        ny = pos[1]
+    return (nx, ny)
+
+
+def run_flee(jpos, ppos, rects, solid, chase_speed, seconds=20.0):
+    """플레이어가 수위 반대 방향으로 계속 달아날 때의 결말.
+
+    'caught'(접촉=게임 오버) / 'escaped'(수위가 시야를 잃고 추적 해제) / 'ongoing'.
+    주의: 플레이어는 모퉁이를 활용하지 않고 단순히 반대 방향으로만 달린다.
+    실제 플레이어보다 불리한 모델이지만, 두 속도에 같은 편향이라 비교는 유효하다.
+    """
+    # 이미 발각되어 추격이 시작된 상태에서 출발한다. 0초부터 도주시키면 1초
+    # 발각 유예가 끝나기 전에 시야를 벗어나 수위가 교전에 들어가지도 못한다 —
+    # 여기서 묻는 것은 "추격이 시작된 뒤 달리기만으로 벗어날 수 있는가"다.
+    path, repath, stuck, seen, hold = [], 0.0, 0.0, REVEAL_DELAY, LOSE_SIGHT
+    engaged = True
+    for frame in range(int(seconds / DT)):
+        if can_be_seen(jpos, ppos, rects):
+            seen += DT
+            if seen >= REVEAL_DELAY or hold > 0.0:
+                hold = LOSE_SIGHT
+        else:
+            seen = 0.0
+            hold = max(hold - DT, 0.0)
+        chasing = hold > 0.0
+        if chasing:
+            engaged = True
+        elif engaged:
+            return "escaped", frame * DT
+
+        if chasing:
+            if math.dist(jpos, ppos) <= CONTACT:
+                return "caught", frame * DT
+            repath -= DT
+            if repath <= 0.0 or stuck >= STUCK_SECONDS:
+                repath, stuck = REPATH, 0.0
+                if clear_line(jpos, ppos, rects):
+                    path = []
+                else:
+                    path = astar(solid, nearest_free(solid, jpos),
+                                 nearest_free(solid, ppos))
+            target, path = next_point(jpos, path, rects, ppos)
+            length = math.dist(jpos, target)
+            if length > 1e-9:
+                d = ((target[0] - jpos[0]) / length, (target[1] - jpos[1]) / length)
+                before = jpos
+                jpos = move_and_slide(jpos, (d[0] * chase_speed, d[1] * chase_speed),
+                                      rects)
+                adv = (jpos[0] - before[0]) * d[0] + (jpos[1] - before[1]) * d[1]
+                stuck = stuck + DT if adv < chase_speed * DT * PROGRESS_RATIO else 0.0
+
+        ppos = _flee_step(ppos, jpos, rects)
+    return "ongoing", seconds
+
+
+def _flee_step(ppos, jpos, rects):
+    """벽을 감안해 달아나는 플레이어 한 걸음.
+
+    정반대 방향으로만 달리면 대부분 즉시 벽에 박혀 지오메트리가 결과를 지배한다.
+    반대 방향 ±90° 안에서 한 걸음 시뮬레이션해 가장 멀어지는 쪽을 고른다
+    — 모퉁이를 활용하는 플레이어에 가깝다.
+    """
+    gap = math.dist(ppos, jpos)
+    if gap < 1e-9:
+        return ppos
+    away = ((ppos[0] - jpos[0]) / gap, (ppos[1] - jpos[1]) / gap)
+    best, best_gap = ppos, -1.0
+    for degrees in range(-90, 91, 15):
+        angle = math.radians(degrees)
+        cos_a, sin_a = math.cos(angle), math.sin(angle)
+        d = (away[0] * cos_a - away[1] * sin_a, away[0] * sin_a + away[1] * cos_a)
+        nxt = move_and_slide_size(ppos, (d[0] * PLAYER_SPEED, d[1] * PLAYER_SPEED),
+                                  rects, PLAYER_HALF_W, PLAYER_HALF_H)
+        widened = math.dist(nxt, jpos)
+        if widened > best_gap:
+            best_gap, best = widened, nxt
+    return best
+
+
+def check_flee(floor: int, seed: int = 5) -> bool:
+    """도주하는 플레이어 기준으로 추격 속도별 결말 비교(#202)."""
+    rects = load_blockers(floor)
+    solid = build_grid(rects)
+    random.seed(seed)
+    spots = [(x, y) for x in range(60, 2760, 50) for y in range(60, 1760, 50)
+             if not body_blocked((x, y), rects)]
+    random.shuffle(spots)
+
+    pairs = []
+    for jpos in spots:
+        near = [p for p in spots
+                if 140 <= math.dist(jpos, p) <= 260 and clear_ray(jpos, p, rects)]
+        if near:
+            pairs.append((jpos, random.choice(near)))
+            if len(pairs) >= 60:
+                break
+
+    print(f"\n=== {floor}층 · 도주하는 플레이어(속도 {PLAYER_SPEED:.0f}) 결말 (#202) ===")
+    print(f"    시작 시 수위가 보이는 위치 {len(pairs)}쌍, 각 20초")
+    rows = []
+    for speed in (250.0, 320.0):
+        tally = {"caught": 0, "escaped": 0, "ongoing": 0}
+        catch_times = []
+        for jpos, ppos in pairs:
+            outcome, when = run_flee(jpos, ppos, rects, solid, speed)
+            tally[outcome] += 1
+            if outcome == "caught":
+                catch_times.append(when)
+        avg = sum(catch_times) / len(catch_times) if catch_times else float("nan")
+        rows.append((speed, tally, avg))
+        label = "현재 250" if speed == 250.0 else "변경 320(플레이어와 동일)"
+        print(f"  {label:<24} 붙잡힘 {tally['caught']:>2}  "
+              f"뿌리침 {tally['escaped']:>2}  20초내 미결 {tally['ongoing']:>2}"
+              + (f"  평균 붙잡기 {avg:.1f}s" if catch_times else ""))
+    # 느린 쪽이 더 잘 뿌리쳐져야 모델이 속도를 반영하고 있다는 뜻
+    slower_escapes = rows[0][1]["escaped"]
+    equal_escapes = rows[1][1]["escaped"]
+    ok = slower_escapes > equal_escapes
+    print(f"  → 250에서 뿌리침 {slower_escapes}건 > 320에서 {equal_escapes}건: "
+          f"{'OK (속도가 결과를 가름)' if ok else 'FAIL(모델이 속도를 반영 못 함)'}")
+    return ok
+
+
 def load_room_rects(floor: int) -> list[tuple[float, float, float, float]]:
     """층 씬 Rooms 아래 방 폴리곤 영역(순찰 제외 대상)."""
     text = (ROOT / f"scenes/background/school_floor_{floor}.tscn").read_text()
@@ -699,6 +836,8 @@ def main() -> int:
     for floor in floors:
         ok = check_sight_gate(floor) and ok
     ok = check_awareness() and ok
+    for floor in floors:
+        ok = check_flee(floor) and ok
     print("\n전체:", "PASS" if ok else "FAIL")
     return 0 if ok else 1
 
