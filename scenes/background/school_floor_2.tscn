@@ -2748,6 +2748,38 @@ polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
 shape = SubResource("RectangleShape2D_key_zone")
 
 
+[node name="HideEduRoom" type="Area2D" parent="."]
+position = Vector2(2080, 1646)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("5_hiding")
+prompt_text = "사물함에 숨기"
+message = "교육실 사물함. 문틈으로 복도가 가늘게 보인다."
+
+[node name="HideEduRoomVisual" type="Polygon2D" parent="HideEduRoom"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+[node name="HideEduRoomZone" type="CollisionShape2D" parent="HideEduRoom"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="HidePEDept" type="Area2D" parent="."]
+position = Vector2(1343.3, 1646)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("5_hiding")
+prompt_text = "장비함에 숨기"
+message = "체육 장비함. 공 사이에 몸을 밀어 넣었다."
+
+[node name="HidePEDeptVisual" type="Polygon2D" parent="HidePEDept"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+[node name="HidePEDeptZone" type="CollisionShape2D" parent="HidePEDept"]
+shape = SubResource("RectangleShape2D_key_zone")
+
 [node name="Walls" type="StaticBody2D" parent="."]
 
 [node name="TopWall" type="CollisionShape2D" parent="Walls"]
