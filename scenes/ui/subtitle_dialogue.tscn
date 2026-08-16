@@ -1,0 +1,80 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/subtitle_dialogue.gd" id="1_subtitle_script"]
+
+[sub_resource type="Gradient" id="Gradient_shade"]
+offsets = PackedFloat32Array(0, 0.3, 1)
+colors = PackedColorArray(0.0156863, 0.0196078, 0.027451, 0.97, 0.0156863, 0.0196078, 0.027451, 0.97, 0.0156863, 0.0196078, 0.027451, 0)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_shade"]
+gradient = SubResource("Gradient_shade")
+width = 8
+height = 512
+fill_from = Vector2(0, 1)
+fill_to = Vector2(0, 0)
+
+[node name="SubtitleDialogue" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1_subtitle_script")
+
+[node name="Shade" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -509.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+texture = SubResource("GradientTexture2D_shade")
+expand_mode = 1
+
+[node name="Lines" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 138.0
+offset_top = -520.0
+offset_right = -138.0
+offset_bottom = -102.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_constants/separation = 29
+alignment = 2
+
+[node name="NameLabel" type="Label" parent="Lines"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.624, 0.698, 0.682, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.95)
+theme_override_constants/outline_size = 4
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 4
+theme_override_constants/shadow_outline_size = 8
+theme_override_font_sizes/font_size = 20
+text = ""
+
+[node name="TextLabel" type="Label" parent="Lines"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.918, 0.933, 0.914, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.95)
+theme_override_constants/line_spacing = 20
+theme_override_constants/outline_size = 4
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 4
+theme_override_constants/shadow_outline_size = 12
+theme_override_font_sizes/font_size = 33
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 3
