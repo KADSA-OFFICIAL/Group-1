@@ -382,7 +382,8 @@ POS_OVERRIDE = {(1, "ExitDoor"): (1800, 2432)}
 # 열쇠를 주는 오브젝트는 층에 상관없이 "다가가면 획득"으로 통일한다(사용자 요청).
 # 원래는 4층 열쇠 2개만 pickup_item(접촉)이고 나머지는 interactable(E 필요)이라
 # 층마다 조작이 달랐다. 메시지와 플래그는 그대로 옮긴다.
-AUTO_PICKUP = {"TaehoNote", "KeyCabinet", "SpareKeyHook", "DrainKey", "JanitorSafe"}
+# KeyCabinet은 #207에서 열쇠 지급을 뗐으므로 여기 들어가지 않는다(E 조사 단서).
+AUTO_PICKUP = {"TaehoNote", "SpareKeyHook", "DrainKey", "JanitorSafe"}
 
 
 def to_pickup(body):
