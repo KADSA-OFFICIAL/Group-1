@@ -2778,12 +2778,12 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="KeyCabinet" type="Area2D" parent="."]
 position = Vector2(1700, 342.4)
-collision_layer = 0
-collision_mask = 1
-script = ExtResource("2_pickup")
-message = "교무실 열쇠 보관함. 고리 하나가 비어 있고, 남은 것 중에 '2F 계단' 표가 붙은 열쇠가 있다. 챙겼다."
-item_id = "stair_key_2"
-pickup_id = "opened_key_cabinet"
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "교무실 열쇠 보관함. '2F 계단' 고리에는 열쇠 대신 점검표가 걸려 있다. — '2층 남자화장실 배수구 막힘. 확인 요망. -박'"
+prompt_text = "보관함 열기"
+grants_flag = "opened_key_cabinet"
 
 
 [node name="KeyCabinetVisual" type="Polygon2D" parent="KeyCabinet"]
