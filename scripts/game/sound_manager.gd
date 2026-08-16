@@ -100,12 +100,25 @@ func play(id: StringName) -> void:
 	if stream == null:
 		return
 
-	var player := _players[_next_voice]
-	_next_voice = (_next_voice + 1) % _players.size()
-
+	var player := _free_voice()
 	player.stream = stream
 	player.volume_db = VOLUMES.get(String(id), -4.0)
 	player.play()
+
+
+## 놀고 있는 보이스를 먼저 쓴다. 재생 중인 플레이어에 stream을 갈아 끼우면
+## 그 자리에서 파형이 잘려 딸깍 소리가 나기 때문이다. 여덟 개가 전부 울리는
+## 중이면 그때만 순번이 돌아온 것을 끊는다.
+func _free_voice() -> AudioStreamPlayer:
+	for offset in _players.size():
+		var index := (_next_voice + offset) % _players.size()
+		if not _players[index].playing:
+			_next_voice = (index + 1) % _players.size()
+			return _players[index]
+
+	var oldest := _players[_next_voice]
+	_next_voice = (_next_voice + 1) % _players.size()
+	return oldest
 
 
 # ── 앰비언트·추격 BGM (#176) ─────────────────────────────────────
