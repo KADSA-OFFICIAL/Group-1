@@ -81,6 +81,9 @@ const STEP_INTERVAL_CHASE := 0.30
 const STEPS_PER_JINGLE := 4          # 몇 걸음마다 열쇠꾸러미가 찰랑이는가
 const MOVING_SPEED_EPSILON := 10.0   # 이보다 느리면 멈춘 것으로 본다
 
+# 자막에 붙는 화자 이름. 프롤로그(intro.gd)의 표기와 같아야 한다.
+const SPEAKER_NAME := "수위"
+
 const MUTTERS := [
 	"…오늘도 아무도 없지.",
 	"시우야, 아빠 순찰 중이야.",
@@ -483,7 +486,7 @@ func _physics_process(delta: float) -> void:
 	if chasing:
 		if not announced_chase:
 			announced_chase = true
-			_say("수위가 걸음을 멈추고 이쪽을 본다. \"…누구야?\"")
+			_say_line("…누구야?")
 			Sfx.play(&"spotted")
 		_move_chase(delta)
 	else:
@@ -536,7 +539,7 @@ func blind(seconds: float) -> void:
 	announced_chase = false
 	body.color = BLIND_BODY_COLOR
 
-	_say("잉크가 수위의 얼굴을 덮쳤다. \"으윽— 뭐야, 뭐야 이거!\"")
+	_say_line("으윽— 뭐야, 뭐야 이거!")
 
 
 ## 스턴 동안은 제자리에 선다. move_and_slide를 계속 부르는 것은 플레이어가
@@ -625,7 +628,7 @@ func _move_chase(delta: float) -> void:
 func _catch_player() -> void:
 	if not announced_catch:
 		announced_catch = true
-		_say("손전등 불빛이 얼굴을 비춘다. \"학생이네. 나와. 같이 수위실로 가자.\"")
+		_say_line("학생이네. 나와. 같이 수위실로 가자.")
 		Sfx.play(&"caught")
 
 	var game_state = get_tree().get_first_node_in_group("game_state")
@@ -734,10 +737,21 @@ func _move_wander(delta: float) -> void:
 # ── 소리 단서·혼잣말 (#141) ──────────────────────────────────────
 
 func _say(text: String) -> void:
+	if _refresh_game_state():
+		_game_state.call("request_notice", text)
+
+
+## 수위가 입으로 내는 말. 지문(_say)과 달리 화자 이름이 붙은 자막으로 나간다(#193) —
+## 프롤로그에서 수위 대사가 나오는 모양과 같아야 한다.
+func _say_line(text: String) -> void:
+	if _refresh_game_state():
+		_game_state.call("request_speech", SPEAKER_NAME, text, "")
+
+
+func _refresh_game_state() -> bool:
 	if _game_state == null or not is_instance_valid(_game_state):
 		_game_state = get_tree().get_first_node_in_group("game_state")
-	if _game_state != null:
-		_game_state.call("request_notice", text)
+	return _game_state != null
 
 
 ## 같은 층에 있다는 것을 소리로 알린다. 이미 보이는 중이면 알리지 않는다 —
@@ -764,7 +778,7 @@ func _notice_inspection() -> void:
 
 	if mutter_cooldown <= 0.0:
 		mutter_cooldown = MUTTER_COOLDOWN
-		_say("수위의 중얼거림이 들린다. \"%s\"" % MUTTERS.pick_random())
+		_say_line(MUTTERS.pick_random())
 	elif sound_cooldown <= 0.0:
 		sound_cooldown = SOUND_COOLDOWN
 		_say("문이 열리는 소리. 수위가 방을 확인하고 있다.")
