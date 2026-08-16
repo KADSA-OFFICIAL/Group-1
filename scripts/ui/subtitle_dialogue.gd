@@ -10,6 +10,10 @@ extends Control
 ## 화자가 빈 문자열이면 지문·독백으로 보고, 이름 줄 없이 더 좁고 어둡게 표시한다 —
 ## 화자 있는 대사와의 구분은 오직 위치·크기·밝기로만 한다.
 
+## 한 줄이 끝까지 찍혔을 때(또는 넘기기·비우기로 타이핑이 끝났을 때) 울린다.
+## 붙잡힘 연출처럼 "대사를 다 보여준 뒤에" 진행해야 하는 쪽이 이걸 기다린다(#199).
+signal typing_finished
+
 const TYPING_SECONDS_PER_CHAR := 0.05
 
 # 화자 있는 대사
@@ -99,6 +103,7 @@ func skip_typing() -> bool:
 		typing_tween.kill()
 	text_label.visible_characters = -1
 	typing = false
+	typing_finished.emit()
 	return true
 
 
@@ -106,7 +111,10 @@ func skip_typing() -> bool:
 func clear() -> void:
 	if typing_tween != null:
 		typing_tween.kill()
-	typing = false
+	# 기다리던 쪽이 영영 깨어나지 못하는 일이 없도록, 도중에 비워도 신호는 낸다.
+	if typing:
+		typing = false
+		typing_finished.emit()
 	name_label.text = ""
 	text_label.text = ""
 	visible = false
@@ -134,7 +142,8 @@ func _start_typing(emotion: String) -> void:
 	typing_tween = create_tween()
 	typing_tween.tween_property(text_label, "visible_characters", total_chars, seconds)
 	typing_tween.tween_callback(func() -> void:
-		typing = false)
+		typing = false
+		typing_finished.emit())
 
 
 func _name_color(emotion: String) -> Color:

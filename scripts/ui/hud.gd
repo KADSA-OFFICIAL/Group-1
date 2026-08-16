@@ -102,6 +102,13 @@ func show_speech(speaker: String, text: String, emotion: String = "") -> void:
 	_show_subtitle(speaker, text, emotion)
 
 
+## 지금 찍히는 중인 자막이 끝날 때까지 기다린다. 이미 끝났으면 바로 돌아온다.
+## 붙잡힘 연출이 대사를 자르지 않도록 floor_manager가 쓴다(#199).
+func await_subtitle() -> void:
+	if is_instance_valid(subtitle) and subtitle.typing:
+		await subtitle.typing_finished
+
+
 func _show_subtitle(speaker: String, text: String, emotion: String) -> void:
 	notice_token += 1
 	var current_token := notice_token
