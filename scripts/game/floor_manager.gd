@@ -66,6 +66,7 @@ var changing_floor: bool = false
 @onready var janitor: CharacterBody2D = $Janitor
 @onready var floor_label: Label = $UI/FloorLabel
 @onready var fade_rect: ColorRect = $UI/FadeRect
+@onready var hud: CanvasLayer = $HUD
 
 const FADE_IN_SECONDS := 1.5
 const FLOOR_FADE_OUT_SECONDS := 0.25
@@ -75,6 +76,8 @@ const START_HINT := "4층 복도. 계단으로 내려가야 한다. 이 층 어�
 # 붙잡힌 순간을 잠깐 보여준 뒤 실패 화면으로 넘어간다(수위가 마주보는 연출).
 const GAME_OVER_SCENE := "res://scenes/ui/game_over.tscn"
 const GAME_OVER_FADE_SECONDS := 1.2
+## 붙잡힘 대사가 다 찍힌 뒤 페이드를 시작하기까지 두는 시간(#199).
+const GAME_OVER_LINE_HOLD := 0.5
 
 var game_over_active: bool = false
 
@@ -99,8 +102,9 @@ func _show_start_hint() -> void:
 		game_state.call("request_notice", START_HINT)
 
 
-## 붙잡힘 → 조작 정지 후 실패 화면. game_state가 중복 발동을 막지만,
-## 층 전환 페이드와 겹치면 트윈이 서로 알파를 다투므로 여기서도 가드한다.
+## 붙잡힘 → 조작 정지 → 마지막 대사를 다 보여준 뒤 실패 화면.
+## game_state가 중복 발동을 막지만, 층 전환 페이드와 겹치면 트윈이 서로 알파를
+## 다투므로 여기서도 가드한다.
 func _on_game_over(reason: String) -> void:
 	if game_over_active:
 		return
@@ -116,6 +120,13 @@ func _on_game_over(reason: String) -> void:
 	janitor.set_physics_process(false)
 
 	GameOverScreen.pending_reason = reason
+
+	# 수위의 마지막 대사가 자막에 다 찍힐 때까지 기다린다 — 페이드를 바로 걸면
+	# 문장이 절반쯤 나온 채로 화면이 어두워진다(#199). 이미 다 찍혔으면
+	# await_subtitle()이 곧바로 돌아오고 아래 유예만 적용된다.
+	if hud.has_method("await_subtitle"):
+		await hud.await_subtitle()
+	await get_tree().create_timer(GAME_OVER_LINE_HOLD).timeout
 
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 1.0, GAME_OVER_FADE_SECONDS)
