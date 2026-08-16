@@ -2891,38 +2891,6 @@ polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
 [node name="HideBroadcastRoomZone" type="CollisionShape2D" parent="HideBroadcastRoom"]
 shape = SubResource("RectangleShape2D_key_zone")
 
-[node name="HideScienceLab1" type="Area2D" parent="."]
-position = Vector2(2080, 1646)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("5_hiding")
-prompt_text = "약품장에 숨기"
-message = "약품장 아래 칸. 시큼한 냄새에 숨이 막힌다."
-
-[node name="HideScienceLab1Visual" type="Polygon2D" parent="HideScienceLab1"]
-z_index = 1
-color = Color(0.3, 0.32, 0.38, 1)
-polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
-
-[node name="HideScienceLab1Zone" type="CollisionShape2D" parent="HideScienceLab1"]
-shape = SubResource("RectangleShape2D_key_zone")
-
-[node name="HideCareerDept" type="Area2D" parent="."]
-position = Vector2(1343.3, 1646)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("5_hiding")
-prompt_text = "서류함에 숨기"
-message = "서류함 뒤 빈 공간. 파일 더미에 등을 붙였다."
-
-[node name="HideCareerDeptVisual" type="Polygon2D" parent="HideCareerDept"]
-z_index = 1
-color = Color(0.3, 0.32, 0.38, 1)
-polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
-
-[node name="HideCareerDeptZone" type="CollisionShape2D" parent="HideCareerDept"]
-shape = SubResource("RectangleShape2D_key_zone")
-
 [node name="Walls" type="StaticBody2D" parent="."]
 
 [node name="TopWall" type="CollisionShape2D" parent="Walls"]
