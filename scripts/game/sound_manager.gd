@@ -13,20 +13,21 @@ const SFX_DIR := "res://assets/audio/"
 
 ## 소리별 음량(dB). 합성 단계에서도 크기를 맞췄지만, 실제로 섞어 보면
 ## 스팅어가 조사음을 잡아먹는 식의 불균형이 남는다 — 최종 조정은 여기서 한다.
+## 전체가 크다는 확인을 받아 서로의 균형은 두고 일괄 6dB(진폭 절반) 내렸다(#196).
 const VOLUMES := {
-	"investigate": -6.0,
-	"pickup": -4.0,
-	"door_locked": -5.0,
-	"door_open": -6.0,
-	"hide_in": -5.0,
-	"hide_out": -5.0,
-	"stairs": -7.0,
-	"ink_throw": -4.0,
-	"ink_splash": -2.0,
-	"spotted": -1.0,
-	"caught": 0.0,
-	"escape": -2.0,
-	"ui_click": -8.0,
+	"investigate": -12.0,
+	"pickup": -10.0,
+	"door_locked": -11.0,
+	"door_open": -12.0,
+	"hide_in": -11.0,
+	"hide_out": -11.0,
+	"stairs": -13.0,
+	"ink_throw": -10.0,
+	"ink_splash": -8.0,
+	"spotted": -7.0,
+	"caught": -6.0,
+	"escape": -8.0,
+	"ui_click": -14.0,
 }
 
 ## 동시 발음 수. 이보다 많이 겹치면 가장 오래된 것을 끊는다. 조사·획득이
@@ -102,7 +103,7 @@ func play(id: StringName) -> void:
 
 	var player := _free_voice()
 	player.stream = stream
-	player.volume_db = VOLUMES.get(String(id), -4.0)
+	player.volume_db = VOLUMES.get(String(id), -10.0)
 	player.play()
 
 
