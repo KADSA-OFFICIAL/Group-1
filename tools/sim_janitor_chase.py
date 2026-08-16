@@ -29,7 +29,7 @@ import re
 import sys
 
 DT = 1.0 / 60.0
-CHASE_SPEED = 320.0     # janitor.gd chase_speed (#202: 플레이어와 동일)
+CHASE_SPEED = 290.0     # janitor.gd chase_speed (#202)
 ARRIVE = 6.0
 STUCK_SECONDS = 0.6
 PROGRESS_RATIO = 0.3
@@ -792,7 +792,7 @@ def check_flee(floor: int, seed: int = 5) -> bool:
     print(f"\n=== {floor}층 · 도주하는 플레이어(속도 {PLAYER_SPEED:.0f}) 결말 (#202) ===")
     print(f"    시작 시 수위가 보이는 위치 {len(pairs)}쌍, 각 20초")
     rows = []
-    for speed in (250.0, 320.0):
+    for speed in (250.0, 290.0, 320.0):
         tally = {"caught": 0, "escaped": 0, "ongoing": 0}
         catch_times = []
         for jpos, ppos in pairs:
@@ -802,15 +802,17 @@ def check_flee(floor: int, seed: int = 5) -> bool:
                 catch_times.append(when)
         avg = sum(catch_times) / len(catch_times) if catch_times else float("nan")
         rows.append((speed, tally, avg))
-        label = "현재 250" if speed == 250.0 else "변경 320(플레이어와 동일)"
+        label = {250.0: "이전 250",
+                 290.0: "현재 290 (채택)",
+                 320.0: "320 (플레이어와 동일)"}[speed]
         print(f"  {label:<24} 붙잡힘 {tally['caught']:>2}  "
               f"뿌리침 {tally['escaped']:>2}  20초내 미결 {tally['ongoing']:>2}"
               + (f"  평균 붙잡기 {avg:.1f}s" if catch_times else ""))
-    # 느린 쪽이 더 잘 뿌리쳐져야 모델이 속도를 반영하고 있다는 뜻
-    slower_escapes = rows[0][1]["escaped"]
-    equal_escapes = rows[1][1]["escaped"]
-    ok = slower_escapes > equal_escapes
-    print(f"  → 250에서 뿌리침 {slower_escapes}건 > 320에서 {equal_escapes}건: "
+    # 속도가 오를수록 뿌리침이 줄어야 모델이 속도를 반영하고 있다는 뜻
+    escapes = [(speed, tally["escaped"]) for speed, tally, _ in rows]
+    ok = all(escapes[i][1] >= escapes[i + 1][1] for i in range(len(escapes) - 1))
+    trend = " ≥ ".join(f"{int(s)}:{e}건" for s, e in escapes)
+    print(f"  → 속도↑ 일수록 뿌리침↓ ({trend}): "
           f"{'OK (속도가 결과를 가름)' if ok else 'FAIL(모델이 속도를 반영 못 함)'}")
     return ok
 
