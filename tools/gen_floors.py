@@ -405,6 +405,50 @@ def to_pickup(body):
     return body
 
 
+# 추가 은신처(#172 후속): 층마다 두 곳씩 더 둔다. 기존 은신처는
+# story_objects.json에서 오고, 여기 있는 것은 새로 만드는 것이다.
+# 방 안 위쪽(0.3 지점)에 놓아 단서 오브젝트(0.62 지점)와 겹치지 않게 한다.
+EXTRA_HIDING = {
+    4: [("HideInfoDept", "InfoDept", "사물함에 숨기",
+         "정보부실 사물함. 종이 냄새와 먼지 사이에 몸을 접었다."),
+        ("HideDasan6", "Dasan6", "청소함에 숨기",
+         "청소함 안. 대걸레 자루가 어깨를 누른다.")],
+    3: [("HideScienceLab1", "ScienceLab1", "약품장에 숨기",
+         "약품장 아래 칸. 시큼한 냄새에 숨이 막힌다."),
+        ("HideCareerDept", "CareerDept", "서류함에 숨기",
+         "서류함 뒤 빈 공간. 파일 더미에 등을 붙였다.")],
+    2: [("HideEduRoom", "EduRoom", "사물함에 숨기",
+         "교육실 사물함. 문틈으로 복도가 가늘게 보인다."),
+        ("HidePEDept", "PEDept", "장비함에 숨기",
+         "체육 장비함. 공 사이에 몸을 밀어 넣었다.")],
+    1: [("HideStorage1", "Storage1", "적재함에 숨기",
+         "창고 적재함 뒤. 먼지가 목을 긁는다."),
+        ("HideWomensRoom1", "WomensRoom1", "칸에 숨기",
+         "화장실 칸 안. 문고리를 안에서 붙잡았다.")],
+}
+
+
+def add_hiding(sc, floor):
+    """은신처 Area2D + 캐비닛 시각 + 상호작용 존을 방 안에 만든다."""
+    spots = EXTRA_HIDING.get(floor, [])
+    for i, (name, room_key, prompt, message) in enumerate(spots):
+        if room_key not in sc.rooms:
+            raise SystemExit(f"floor{floor}: 은신처 대상 방 {room_key}가 없다")
+        x0, y0, x1, y1 = sc.rooms[room_key]
+        cx = x0 + (i + 1) * (x1 - x0) / (len(spots) + 1)
+        cy = y0 + (y1 - y0) * 0.30
+        sc.node(f'[node name="{name}" type="Area2D" parent="."]\n'
+                f'position = Vector2({n(cx)}, {n(cy)})\n'
+                f'collision_layer = 2\ncollision_mask = 0\n'
+                f'script = ExtResource("5_hiding")\n'
+                f'prompt_text = "{prompt}"\nmessage = "{message}"\n')
+        sc.node(f'[node name="{name}Visual" type="Polygon2D" parent="{name}"]\n'
+                f'z_index = 1\ncolor = Color(0.3, 0.32, 0.38, 1)\n'
+                f'polygon = {rect(-18, -26, 18, 26)}\n')
+        sc.node(f'[node name="{name}Zone" type="CollisionShape2D" parent="{name}"]\n'
+                f'shape = SubResource("RectangleShape2D_key_zone")\n')
+
+
 def add_story(sc, floor):
     """추출해 둔 단서 노드를 방 안에 배치. 본문은 그대로, position만 새 좌표."""
     data = json.loads((pathlib.Path(__file__).parent / "story_objects.json").read_text())
@@ -587,6 +631,7 @@ def build_common(fl, spec):
         add_room(sc, key, lb, x0, BOT_Y0, x1, BOT_Y1, "top")
 
     add_story(sc, fl)
+    add_hiding(sc, fl)
     add_outer(sc)
     return sc
 
@@ -627,6 +672,7 @@ def build_floor1():
     sc.poly2d("Door_FrontGate", "WallGlow/RoomWallVisuals", C_DOOR,
               rect((ex0 + ex1) / 2 - DOOR / 2, ey1 - T, (ex0 + ex1) / 2 + DOOR / 2, ey1), z=1)
     add_story(sc, 1)
+    add_hiding(sc, 1)
 
     add_outer(sc)
     return sc

@@ -1,8 +1,9 @@
-[gd_scene load_steps=178 format=3]
+[gd_scene load_steps=179 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
+[ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="5_hiding"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(3400, 40)
@@ -2900,6 +2901,38 @@ polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
 [node name="TaehoNoteZone" type="CollisionShape2D" parent="TaehoNote"]
 shape = SubResource("RectangleShape2D_key_zone")
 
+
+[node name="HideInfoDept" type="Area2D" parent="."]
+position = Vector2(3006.7, 1646)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("5_hiding")
+prompt_text = "사물함에 숨기"
+message = "정보부실 사물함. 종이 냄새와 먼지 사이에 몸을 접었다."
+
+[node name="HideInfoDeptVisual" type="Polygon2D" parent="HideInfoDept"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+[node name="HideInfoDeptZone" type="CollisionShape2D" parent="HideInfoDept"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="HideDasan6" type="Area2D" parent="."]
+position = Vector2(806.7, 2228)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("5_hiding")
+prompt_text = "청소함에 숨기"
+message = "청소함 안. 대걸레 자루가 어깨를 누른다."
+
+[node name="HideDasan6Visual" type="Polygon2D" parent="HideDasan6"]
+z_index = 1
+color = Color(0.3, 0.32, 0.38, 1)
+polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+
+[node name="HideDasan6Zone" type="CollisionShape2D" parent="HideDasan6"]
+shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="Walls" type="StaticBody2D" parent="."]
 
