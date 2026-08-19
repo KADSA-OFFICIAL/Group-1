@@ -2782,7 +2782,7 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 
 [node name="KeyCabinet" type="Area2D" parent="."]
-position = Vector2(1700, 342.4)
+position = Vector2(1560, 54)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
@@ -2802,7 +2802,7 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 
 [node name="SpareKeyHook" type="Area2D" parent="."]
-position = Vector2(1793.3, 342.4)
+position = Vector2(1620, 50)
 collision_layer = 0
 collision_mask = 1
 script = ExtResource("2_pickup")
@@ -4161,32 +4161,32 @@ color = Color(0.29, 0.23, 0.17, 1)
 polygon = PackedVector2Array(1407.7, 429, 1465.3, 429, 1465.3, 469, 1407.7, 469)
 
 [node name="PC_North5_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1590, 91, 1686, 91, 1686, 131, 1590, 131)
+polygon = PackedVector2Array(1719.3, 91, 1815.3, 91, 1815.3, 131, 1719.3, 131)
 
 [node name="PV_North5_0" type="Polygon2D" parent="Props"]
 color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(1590, 91, 1686, 91, 1686, 131, 1590, 131)
+polygon = PackedVector2Array(1719.3, 91, 1815.3, 91, 1815.3, 131, 1719.3, 131)
 
 [node name="PC_North5_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1590, 155, 1686, 155, 1686, 195, 1590, 195)
+polygon = PackedVector2Array(1719.3, 155, 1815.3, 155, 1815.3, 195, 1719.3, 195)
 
 [node name="PV_North5_1" type="Polygon2D" parent="Props"]
 color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(1590, 155, 1686, 155, 1686, 195, 1590, 195)
+polygon = PackedVector2Array(1719.3, 155, 1815.3, 155, 1815.3, 195, 1719.3, 195)
 
 [node name="PC_North5_2" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1714, 91, 1810, 91, 1810, 131, 1714, 131)
+polygon = PackedVector2Array(1781, 365, 1838.7, 365, 1838.7, 405, 1781, 405)
 
 [node name="PV_North5_2" type="Polygon2D" parent="Props"]
 color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(1714, 91, 1810, 91, 1810, 131, 1714, 131)
+polygon = PackedVector2Array(1781, 365, 1838.7, 365, 1838.7, 405, 1781, 405)
 
 [node name="PC_North5_3" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1714, 155, 1810, 155, 1810, 195, 1714, 195)
+polygon = PackedVector2Array(1781, 429, 1838.7, 429, 1838.7, 469, 1781, 469)
 
 [node name="PV_North5_3" type="Polygon2D" parent="Props"]
 color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(1714, 155, 1810, 155, 1810, 195, 1714, 195)
+polygon = PackedVector2Array(1781, 429, 1838.7, 429, 1838.7, 469, 1781, 469)
 
 [node name="PD_North6_board" type="Polygon2D" parent="Props"]
 color = Color(0.13, 0.19, 0.16, 1)
