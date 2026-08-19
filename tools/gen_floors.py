@@ -379,7 +379,36 @@ LOCKED = {1: "stair_key_1", 2: "stair_key_2", 3: "stair_key_3",
 
 # 특정 단서의 위치를 방 안 자동 배치 대신 직접 지정한다.
 # 현관(ExitDoor)은 바깥으로 나가는 아래쪽 정문 앞에 둬야 안내와 실제 위치가 맞는다.
-POS_OVERRIDE = {(1, "ExitDoor"): (1800, 2432)}
+POS_OVERRIDE = {
+    (1, "ExitDoor"): (1800, 2432),
+    # 4층 창의체험부(750,1520)~(1640,1940) — 자동 배치는 방 한가운데라 대사와 어긋났다(#215).
+    # 액자는 "벽에 걸린" 것이므로 아래쪽 벽 안쪽에 붙이고,
+    # 상담기록부는 아래에 깐 책상 위(FURNITURE의 DeskCreativeDept)에 올린다.
+    (4, "SiwooPainting"): (1350, 1906),
+    (4, "CounselRecord"): (1045, 1752),
+    # 3층 2학년부(1527.6,20)~(1872.4,540), 내벽 안쪽 (1543.6,36)~(1856.4,524).
+    # 자동 배치는 방 한가운데 = 아래변 문(x 1645~1755) 정면이라 벽걸이 보관함이
+    # 허공에 떠 보이고 통행도 막았다(#227). 위쪽 벽 왼쪽 구석에 붙이고,
+    # "보관함 옆 고리"인 SpareKeyHook을 같은 벽면 오른쪽에 나란히 둔다.
+    (3, "KeyCabinet"): (1560, 54),
+    (3, "SpareKeyHook"): (1620, 50),
+}
+
+# 방 안 가구(시각 전용). 충돌은 넣지 않는다 — 통행·수위 경로탐색·도달성 검사에
+# 영향을 주기 때문. 단서보다 먼저 그려서 아래에 깔린다.
+FURNITURE = {
+    4: [("DeskCreativeDept", 960, 1720, 1130, 1800)],
+}
+C_DESK = "Color(0.34, 0.27, 0.2, 1)"
+
+
+def add_furniture(sc, floor):
+    items = FURNITURE.get(floor, [])
+    if not items:
+        return
+    sc.node('[node name="Furniture" type="Node2D" parent="."]\n')
+    for name, x0, y0, x1, y1 in items:
+        sc.poly2d(name, "Furniture", C_DESK, rect(x0, y0, x1, y1))
 
 # 열쇠를 주는 오브젝트는 층에 상관없이 "다가가면 획득"으로 통일한다(사용자 요청).
 # 원래는 4층 열쇠 2개만 pickup_item(접촉)이고 나머지는 interactable(E 필요)이라
@@ -633,6 +662,7 @@ def build_common(fl, spec):
     for key, lb, x0, x1 in spec["bottom_left"] + BOTTOM_RIGHT:
         add_room(sc, key, lb, x0, BOT_Y0, x1, BOT_Y1, "top")
 
+    add_furniture(sc, fl)
     add_story(sc, fl)
     add_hiding(sc, fl)
     add_outer(sc)
@@ -674,6 +704,7 @@ def build_floor1():
     ex0, ey1, ex1 = 1600, 2480, 2000
     sc.poly2d("Door_FrontGate", "WallGlow/RoomWallVisuals", C_DOOR,
               rect((ex0 + ex1) / 2 - DOOR / 2, ey1 - T, (ex0 + ex1) / 2 + DOOR / 2, ey1), z=1)
+    add_furniture(sc, 1)
     add_story(sc, 1)
     add_hiding(sc, 1)
 
