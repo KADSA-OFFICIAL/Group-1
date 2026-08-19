@@ -2708,7 +2708,7 @@ collision_layer = 0
 collision_mask = 1
 script = ExtResource("2_pickup")
 item_id = "stair_key_4"
-message = "다산실 사물함 위에서 4층 계단 열쇠를 주웠다."
+message = "다산7실 사물함 위에서 4층 계단 열쇠를 주웠다."
 pickup_id = "stair_key_4_dasan_taken"
 
 
@@ -2822,28 +2822,8 @@ polygon = PackedVector2Array(-10, -12, 10, -12, 10, 12, -10, 12)
 shape = SubResource("RectangleShape2D_key_zone")
 
 
-[node name="StairKey" type="Area2D" parent="."]
-position = Vector2(2080, 1780.4)
-collision_layer = 0
-collision_mask = 1
-script = ExtResource("2_pickup")
-item_id = "stair_key_4"
-message = "과학 실험실에서 4층 계단 열쇠를 주웠다."
-pickup_id = "stair_key_4_taken"
-
-
-[node name="StairKeyVisual" type="Polygon2D" parent="StairKey"]
-z_index = 1
-color = Color(0.62, 0.55, 0.28, 1)
-polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
-
-
-[node name="StairKeyZone" type="CollisionShape2D" parent="StairKey"]
-shape = SubResource("RectangleShape2D_key_zone")
-
-
 [node name="ScienceClue" type="Area2D" parent="."]
-position = Vector2(2240, 1780.4)
+position = Vector2(2160, 1780.4)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
@@ -2884,12 +2864,12 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="TaehoNote" type="Area2D" parent="."]
 position = Vector2(2610, 1780.4)
-collision_layer = 0
-collision_mask = 1
-script = ExtResource("2_pickup")
-message = "교구함에 쪽지가 붙어 있다. '민혁아, 과학실 기구 부수지 마. 걸리면 너만 혼나. 열쇠 여기 숨겨둘게. -태호' 쪽지 뒤에서 3층 계단 열쇠가 나왔다."
-item_id = "stair_key_3"
-pickup_id = "read_taeho_note"
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "교구함에 쪽지가 붙어 있다. '민혁아, 과학실 기구 부수지 마. 걸리면 너만 혼나. 열쇠 여기 숨겨둘게. -태호' 쪽지를 들춰 보니 못만 남아 있다. 누가 먼저 걷어 간 모양이다."
+prompt_text = "쪽지 살펴보기"
+grants_flag = "read_taeho_note"
 
 
 [node name="TaehoNoteVisual" type="Polygon2D" parent="TaehoNote"]
