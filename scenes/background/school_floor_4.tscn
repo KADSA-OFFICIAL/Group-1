@@ -2701,6 +2701,12 @@ occluder = SubResource("Occ_WC_WomensRoomB_right")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2804, 2120, 2820, 2120, 2820, 2480, 2804, 2480)
 
+[node name="Furniture" type="Node2D" parent="."]
+
+[node name="DeskCreativeDept" type="Polygon2D" parent="Furniture"]
+color = Color(0.34, 0.27, 0.2, 1)
+polygon = PackedVector2Array(960, 1720, 1130, 1720, 1130, 1800, 960, 1800)
+
 [node name="DasanStairKey" type="Area2D" parent="."]
 position = Vector2(253.3, 1780.4)
 collision_layer = 0
@@ -2742,7 +2748,7 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 
 [node name="CounselRecord" type="Area2D" parent="."]
-position = Vector2(1046.7, 1780.4)
+position = Vector2(1045, 1752)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
@@ -2762,7 +2768,7 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 
 [node name="SiwooPainting" type="Area2D" parent="."]
-position = Vector2(1343.3, 1780.4)
+position = Vector2(1350, 1906)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
