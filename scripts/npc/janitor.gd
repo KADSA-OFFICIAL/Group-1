@@ -367,7 +367,12 @@ func _collect_room_rects(floor_root: Node, out: Array[Rect2]) -> void:
 ## 층 씬에서 StaticBody2D 하위 충돌 도형만 모은다(Area2D 상호작용 존은 제외).
 func _collect_blockers(node: Node, out: Array[Rect2]) -> void:
 	for child in node.get_children():
-		if child.get_parent() is StaticBody2D:
+		# SDPanel* = 미닫이 교실문. 수위가 다가가면 열리므로 격자에서는 늘
+		# 열린 것으로 둔다. 막힌 것으로 세면 순찰 루트가 교실 앞에서 끊긴다
+		# (tools/verify_janitor_route.py도 같은 이름 규칙을 쓴다).
+		var body := child.get_parent() as Node
+		var is_door := body != null and body.name.begins_with("SDPanel")
+		if child.get_parent() is StaticBody2D and not is_door:
 			if child is CollisionPolygon2D:
 				var polygon := (child as CollisionPolygon2D).polygon
 				if polygon.size() > 0:

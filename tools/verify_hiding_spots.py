@@ -80,6 +80,10 @@ def load_blockers(floor: int) -> list[tuple[float, float, float, float]]:
         kind, parent, body = match.group(2), match.group(3) or "", match.group(4)
         if parent.split("/")[-1] not in static_bodies:
             continue
+        # 미닫이 교실문은 다가가면 열린다 — 막힌 것으로 보면 교실 안 은신처가
+        # 전부 도달 불가로 잡힌다(같은 이름 규칙: sliding_door.gd 주석 참조).
+        if "SDPanel" in parent:
+            continue
         if kind == "CollisionPolygon2D":
             poly = re.search(r'polygon = PackedVector2Array\(([^)]*)\)', body)
             if not poly:
