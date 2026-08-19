@@ -7771,26 +7771,28 @@ polygon = PackedVector2Array(1116.5, 2088, 1174.5, 2088, 1174.5, 2120, 1116.5, 2
 [node name="SlideDoor_North1" type="Node2D" parent="."]
 script = ExtResource("6_sliding")
 travel = 55
+left_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North1_L")
+right_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North1_R")
 
 [node name="SDPanelL" type="StaticBody2D" parent="SlideDoor_North1"]
 
 [node name="Shape" type="CollisionPolygon2D" parent="SlideDoor_North1/SDPanelL"]
 polygon = PackedVector2Array(175, 527, 230, 527, 230, 537, 175, 537)
 
-[node name="Visual" type="Polygon2D" parent="SlideDoor_North1/SDPanelL"]
+[node name="SDVis_North1_L" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 2
-color = Color(0.52, 0.38, 0.24, 1)
-polygon = PackedVector2Array(175, 527, 230, 527, 230, 537, 175, 537)
+color = Color(0.66, 0.58, 0.44, 1)
+polygon = PackedVector2Array(175, 524, 230, 524, 230, 540, 175, 540)
 
 [node name="SDPanelR" type="StaticBody2D" parent="SlideDoor_North1"]
 
 [node name="Shape" type="CollisionPolygon2D" parent="SlideDoor_North1/SDPanelR"]
 polygon = PackedVector2Array(230, 527, 285, 527, 285, 537, 230, 537)
 
-[node name="Visual" type="Polygon2D" parent="SlideDoor_North1/SDPanelR"]
+[node name="SDVis_North1_R" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 2
-color = Color(0.52, 0.38, 0.24, 1)
-polygon = PackedVector2Array(230, 527, 285, 527, 285, 537, 230, 537)
+color = Color(0.66, 0.58, 0.44, 1)
+polygon = PackedVector2Array(230, 524, 285, 524, 285, 540, 230, 540)
 
 [node name="Zone" type="Area2D" parent="SlideDoor_North1"]
 collision_layer = 0
@@ -7803,26 +7805,28 @@ shape = SubResource("RectangleShape2D_door_zone")
 [node name="SlideDoor_North2" type="Node2D" parent="."]
 script = ExtResource("6_sliding")
 travel = 55
+left_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North2_L")
+right_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North2_R")
 
 [node name="SDPanelL" type="StaticBody2D" parent="SlideDoor_North2"]
 
 [node name="Shape" type="CollisionPolygon2D" parent="SlideDoor_North2/SDPanelL"]
 polygon = PackedVector2Array(595, 527, 650, 527, 650, 537, 595, 537)
 
-[node name="Visual" type="Polygon2D" parent="SlideDoor_North2/SDPanelL"]
+[node name="SDVis_North2_L" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 2
-color = Color(0.52, 0.38, 0.24, 1)
-polygon = PackedVector2Array(595, 527, 650, 527, 650, 537, 595, 537)
+color = Color(0.66, 0.58, 0.44, 1)
+polygon = PackedVector2Array(595, 524, 650, 524, 650, 540, 595, 540)
 
 [node name="SDPanelR" type="StaticBody2D" parent="SlideDoor_North2"]
 
 [node name="Shape" type="CollisionPolygon2D" parent="SlideDoor_North2/SDPanelR"]
 polygon = PackedVector2Array(650, 527, 705, 527, 705, 537, 650, 537)
 
-[node name="Visual" type="Polygon2D" parent="SlideDoor_North2/SDPanelR"]
+[node name="SDVis_North2_R" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 2
-color = Color(0.52, 0.38, 0.24, 1)
-polygon = PackedVector2Array(650, 527, 705, 527, 705, 537, 650, 537)
+color = Color(0.66, 0.58, 0.44, 1)
+polygon = PackedVector2Array(650, 524, 705, 524, 705, 540, 650, 540)
 
 [node name="Zone" type="Area2D" parent="SlideDoor_North2"]
 collision_layer = 0
@@ -7835,26 +7839,28 @@ shape = SubResource("RectangleShape2D_door_zone")
 [node name="SlideDoor_North3" type="Node2D" parent="."]
 script = ExtResource("6_sliding")
 travel = 55
+left_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North3_L")
+right_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North3_R")
 
 [node name="SDPanelL" type="StaticBody2D" parent="SlideDoor_North3"]
 
 [node name="Shape" type="CollisionPolygon2D" parent="SlideDoor_North3/SDPanelL"]
 polygon = PackedVector2Array(1015, 527, 1070, 527, 1070, 537, 1015, 537)
 
-[node name="Visual" type="Polygon2D" parent="SlideDoor_North3/SDPanelL"]
+[node name="SDVis_North3_L" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 2
-color = Color(0.52, 0.38, 0.24, 1)
-polygon = PackedVector2Array(1015, 527, 1070, 527, 1070, 537, 1015, 537)
+color = Color(0.66, 0.58, 0.44, 1)
+polygon = PackedVector2Array(1015, 524, 1070, 524, 1070, 540, 1015, 540)
 
 [node name="SDPanelR" type="StaticBody2D" parent="SlideDoor_North3"]
 
 [node name="Shape" type="CollisionPolygon2D" parent="SlideDoor_North3/SDPanelR"]
 polygon = PackedVector2Array(1070, 527, 1125, 527, 1125, 537, 1070, 537)
 
-[node name="Visual" type="Polygon2D" parent="SlideDoor_North3/SDPanelR"]
+[node name="SDVis_North3_R" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 2
-color = Color(0.52, 0.38, 0.24, 1)
-polygon = PackedVector2Array(1070, 527, 1125, 527, 1125, 537, 1070, 537)
+color = Color(0.66, 0.58, 0.44, 1)
+polygon = PackedVector2Array(1070, 524, 1125, 524, 1125, 540, 1070, 540)
 
 [node name="Zone" type="Area2D" parent="SlideDoor_North3"]
 collision_layer = 0
@@ -7867,26 +7873,28 @@ shape = SubResource("RectangleShape2D_door_zone")
 [node name="SlideDoor_North5" type="Node2D" parent="."]
 script = ExtResource("6_sliding")
 travel = 55
+left_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North5_L")
+right_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North5_R")
 
 [node name="SDPanelL" type="StaticBody2D" parent="SlideDoor_North5"]
 
 [node name="Shape" type="CollisionPolygon2D" parent="SlideDoor_North5/SDPanelL"]
 polygon = PackedVector2Array(1855, 527, 1910, 527, 1910, 537, 1855, 537)
 
-[node name="Visual" type="Polygon2D" parent="SlideDoor_North5/SDPanelL"]
+[node name="SDVis_North5_L" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 2
-color = Color(0.52, 0.38, 0.24, 1)
-polygon = PackedVector2Array(1855, 527, 1910, 527, 1910, 537, 1855, 537)
+color = Color(0.66, 0.58, 0.44, 1)
+polygon = PackedVector2Array(1855, 524, 1910, 524, 1910, 540, 1855, 540)
 
 [node name="SDPanelR" type="StaticBody2D" parent="SlideDoor_North5"]
 
 [node name="Shape" type="CollisionPolygon2D" parent="SlideDoor_North5/SDPanelR"]
 polygon = PackedVector2Array(1910, 527, 1965, 527, 1965, 537, 1910, 537)
 
-[node name="Visual" type="Polygon2D" parent="SlideDoor_North5/SDPanelR"]
+[node name="SDVis_North5_R" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 2
-color = Color(0.52, 0.38, 0.24, 1)
-polygon = PackedVector2Array(1910, 527, 1965, 527, 1965, 537, 1910, 537)
+color = Color(0.66, 0.58, 0.44, 1)
+polygon = PackedVector2Array(1910, 524, 1965, 524, 1965, 540, 1910, 540)
 
 [node name="Zone" type="Area2D" parent="SlideDoor_North5"]
 collision_layer = 0
@@ -7899,26 +7907,28 @@ shape = SubResource("RectangleShape2D_door_zone")
 [node name="SlideDoor_North6" type="Node2D" parent="."]
 script = ExtResource("6_sliding")
 travel = 55
+left_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North6_L")
+right_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North6_R")
 
 [node name="SDPanelL" type="StaticBody2D" parent="SlideDoor_North6"]
 
 [node name="Shape" type="CollisionPolygon2D" parent="SlideDoor_North6/SDPanelL"]
 polygon = PackedVector2Array(2275, 527, 2330, 527, 2330, 537, 2275, 537)
 
-[node name="Visual" type="Polygon2D" parent="SlideDoor_North6/SDPanelL"]
+[node name="SDVis_North6_L" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 2
-color = Color(0.52, 0.38, 0.24, 1)
-polygon = PackedVector2Array(2275, 527, 2330, 527, 2330, 537, 2275, 537)
+color = Color(0.66, 0.58, 0.44, 1)
+polygon = PackedVector2Array(2275, 524, 2330, 524, 2330, 540, 2275, 540)
 
 [node name="SDPanelR" type="StaticBody2D" parent="SlideDoor_North6"]
 
 [node name="Shape" type="CollisionPolygon2D" parent="SlideDoor_North6/SDPanelR"]
 polygon = PackedVector2Array(2330, 527, 2385, 527, 2385, 537, 2330, 537)
 
-[node name="Visual" type="Polygon2D" parent="SlideDoor_North6/SDPanelR"]
+[node name="SDVis_North6_R" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 2
-color = Color(0.52, 0.38, 0.24, 1)
-polygon = PackedVector2Array(2330, 527, 2385, 527, 2385, 537, 2330, 537)
+color = Color(0.66, 0.58, 0.44, 1)
+polygon = PackedVector2Array(2330, 524, 2385, 524, 2385, 540, 2330, 540)
 
 [node name="Zone" type="Area2D" parent="SlideDoor_North6"]
 collision_layer = 0
@@ -7931,26 +7941,28 @@ shape = SubResource("RectangleShape2D_door_zone")
 [node name="SlideDoor_North7" type="Node2D" parent="."]
 script = ExtResource("6_sliding")
 travel = 55
+left_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North7_L")
+right_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North7_R")
 
 [node name="SDPanelL" type="StaticBody2D" parent="SlideDoor_North7"]
 
 [node name="Shape" type="CollisionPolygon2D" parent="SlideDoor_North7/SDPanelL"]
 polygon = PackedVector2Array(2695, 527, 2750, 527, 2750, 537, 2695, 537)
 
-[node name="Visual" type="Polygon2D" parent="SlideDoor_North7/SDPanelL"]
+[node name="SDVis_North7_L" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 2
-color = Color(0.52, 0.38, 0.24, 1)
-polygon = PackedVector2Array(2695, 527, 2750, 527, 2750, 537, 2695, 537)
+color = Color(0.66, 0.58, 0.44, 1)
+polygon = PackedVector2Array(2695, 524, 2750, 524, 2750, 540, 2695, 540)
 
 [node name="SDPanelR" type="StaticBody2D" parent="SlideDoor_North7"]
 
 [node name="Shape" type="CollisionPolygon2D" parent="SlideDoor_North7/SDPanelR"]
 polygon = PackedVector2Array(2750, 527, 2805, 527, 2805, 537, 2750, 537)
 
-[node name="Visual" type="Polygon2D" parent="SlideDoor_North7/SDPanelR"]
+[node name="SDVis_North7_R" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 2
-color = Color(0.52, 0.38, 0.24, 1)
-polygon = PackedVector2Array(2750, 527, 2805, 527, 2805, 537, 2750, 537)
+color = Color(0.66, 0.58, 0.44, 1)
+polygon = PackedVector2Array(2750, 524, 2805, 524, 2805, 540, 2750, 540)
 
 [node name="Zone" type="Area2D" parent="SlideDoor_North7"]
 collision_layer = 0
@@ -7963,26 +7975,28 @@ shape = SubResource("RectangleShape2D_door_zone")
 [node name="SlideDoor_North8" type="Node2D" parent="."]
 script = ExtResource("6_sliding")
 travel = 55
+left_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North8_L")
+right_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North8_R")
 
 [node name="SDPanelL" type="StaticBody2D" parent="SlideDoor_North8"]
 
 [node name="Shape" type="CollisionPolygon2D" parent="SlideDoor_North8/SDPanelL"]
 polygon = PackedVector2Array(3115, 527, 3170, 527, 3170, 537, 3115, 537)
 
-[node name="Visual" type="Polygon2D" parent="SlideDoor_North8/SDPanelL"]
+[node name="SDVis_North8_L" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 2
-color = Color(0.52, 0.38, 0.24, 1)
-polygon = PackedVector2Array(3115, 527, 3170, 527, 3170, 537, 3115, 537)
+color = Color(0.66, 0.58, 0.44, 1)
+polygon = PackedVector2Array(3115, 524, 3170, 524, 3170, 540, 3115, 540)
 
 [node name="SDPanelR" type="StaticBody2D" parent="SlideDoor_North8"]
 
 [node name="Shape" type="CollisionPolygon2D" parent="SlideDoor_North8/SDPanelR"]
 polygon = PackedVector2Array(3170, 527, 3225, 527, 3225, 537, 3170, 537)
 
-[node name="Visual" type="Polygon2D" parent="SlideDoor_North8/SDPanelR"]
+[node name="SDVis_North8_R" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 2
-color = Color(0.52, 0.38, 0.24, 1)
-polygon = PackedVector2Array(3170, 527, 3225, 527, 3225, 537, 3170, 537)
+color = Color(0.66, 0.58, 0.44, 1)
+polygon = PackedVector2Array(3170, 524, 3225, 524, 3225, 540, 3170, 540)
 
 [node name="Zone" type="Area2D" parent="SlideDoor_North8"]
 collision_layer = 0
@@ -7995,26 +8009,28 @@ shape = SubResource("RectangleShape2D_door_zone")
 [node name="SlideDoor_EmptyClass" type="Node2D" parent="."]
 script = ExtResource("6_sliding")
 travel = 55
+left_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_EmptyClass_L")
+right_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_EmptyClass_R")
 
 [node name="SDPanelL" type="StaticBody2D" parent="SlideDoor_EmptyClass"]
 
 [node name="Shape" type="CollisionPolygon2D" parent="SlideDoor_EmptyClass/SDPanelL"]
 polygon = PackedVector2Array(3037.5, 1523, 3092.5, 1523, 3092.5, 1533, 3037.5, 1533)
 
-[node name="Visual" type="Polygon2D" parent="SlideDoor_EmptyClass/SDPanelL"]
+[node name="SDVis_EmptyClass_L" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 2
-color = Color(0.52, 0.38, 0.24, 1)
-polygon = PackedVector2Array(3037.5, 1523, 3092.5, 1523, 3092.5, 1533, 3037.5, 1533)
+color = Color(0.66, 0.58, 0.44, 1)
+polygon = PackedVector2Array(3037.5, 1520, 3092.5, 1520, 3092.5, 1536, 3037.5, 1536)
 
 [node name="SDPanelR" type="StaticBody2D" parent="SlideDoor_EmptyClass"]
 
 [node name="Shape" type="CollisionPolygon2D" parent="SlideDoor_EmptyClass/SDPanelR"]
 polygon = PackedVector2Array(3092.5, 1523, 3147.5, 1523, 3147.5, 1533, 3092.5, 1533)
 
-[node name="Visual" type="Polygon2D" parent="SlideDoor_EmptyClass/SDPanelR"]
+[node name="SDVis_EmptyClass_R" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 2
-color = Color(0.52, 0.38, 0.24, 1)
-polygon = PackedVector2Array(3092.5, 1523, 3147.5, 1523, 3147.5, 1533, 3092.5, 1533)
+color = Color(0.66, 0.58, 0.44, 1)
+polygon = PackedVector2Array(3092.5, 1520, 3147.5, 1520, 3147.5, 1536, 3092.5, 1536)
 
 [node name="Zone" type="Area2D" parent="SlideDoor_EmptyClass"]
 collision_layer = 0
