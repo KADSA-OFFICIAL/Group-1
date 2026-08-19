@@ -60,21 +60,27 @@ C_LEAF = "Color(0.66, 0.58, 0.44, 1)"    # 미닫이 문짝 — 문 표식(C_DOO
 DOOR_LEAF_T = 10                          # 문짝 두께(벽 16 안쪽에 낀다)
 
 # 바닥 구역 — Floor(맵 바탕) 위, Rooms(방 바닥) 아래에 깔린다.
-C_CORRIDOR = "Color(0.168, 0.178, 0.170, 1)"  # 복도 리놀륨 — 방보다 밝고 살짝 초록
-C_SEAM = "Color(0.148, 0.156, 0.150, 1)"      # 타일 이음매
+C_CORRIDOR = "Color(0.196, 0.160, 0.120, 1)"  # 복도 마루 — 학교 목재 바닥
+C_SEAM = "Color(0.168, 0.134, 0.098, 1)"      # 마루 널 이음매
+C_WAINSCOT = "Color(0.34, 0.29, 0.22, 1)"     # 걸레받이(벽 아래 나무 띠)
+C_PILASTER = "Color(0.37, 0.39, 0.45, 1)"     # 복도 기둥
+C_TILE = "Color(0.150, 0.166, 0.172, 1)"      # 화장실 바닥 타일 이음매
+C_URINAL = "Color(0.32, 0.35, 0.37, 1)"       # 소변기
+C_STALLDOOR = "Color(0.26, 0.29, 0.31, 1)"    # 칸막이 문(장식)
+C_DRAIN = "Color(0.10, 0.11, 0.12, 1)"        # 배수구(장식)
 C_CEIL = "Color(0.215, 0.225, 0.250, 1)"      # 꺼진 천장 형광등(장식)
 
 # 방 종류별 바닥. 들어간 방이 무슨 방인지 바닥만 보고도 갈리게 한다.
 C_BLOCKED_FLOOR = "Color(0.072, 0.072, 0.078, 1)"   # 막힌 공간
 ROOM_FLOOR = {
-    "classroom": "Color(0.125, 0.118, 0.105, 1)",   # 마루
-    "office":    "Color(0.115, 0.118, 0.128, 1)",
+    "classroom": "Color(0.152, 0.124, 0.092, 1)",   # 마루
+    "office":    "Color(0.140, 0.118, 0.094, 1)",   # 마루(교실보다 어둡게)
     "toilet":    "Color(0.128, 0.142, 0.148, 1)",   # 타일
     "storage":   "Color(0.092, 0.088, 0.082, 1)",   # 시멘트
     "lab":       "Color(0.100, 0.120, 0.122, 1)",
     "computer":  "Color(0.100, 0.108, 0.128, 1)",
-    "entrance":  "Color(0.135, 0.128, 0.115, 1)",
-    "janitor":   "Color(0.122, 0.110, 0.098, 1)",
+    "entrance":  "Color(0.148, 0.126, 0.100, 1)",
+    "janitor":   "Color(0.134, 0.112, 0.090, 1)",
 }
 
 # 방 종류별 부속 — 규격 사각형만으로는 실험대와 선반이 크기만 다른 상자였다.
@@ -313,6 +319,22 @@ class Scene:
         self.node(f'[node name="PC_{key}" type="CollisionPolygon2D" parent="PropBodies"]\n'
                   f'polygon = {polygon}\n')
         self.poly2d(f"PV_{key}", "Props", color, polygon)
+
+    def wall_decor(self, key, polygon, color):
+        """벽면에 붙는 장식 — WallGlow 안이라 어둠을 받지 않고 벽 위에 그려진다.
+
+        Props(레이어 0)에 두면 CanvasLayer인 WallGlow의 벽 시각이 덮어
+        아예 안 보인다(#234와 같은 함정).
+        """
+        self.poly2d(f"WD_{key}", "WallGlow/RoomWallVisuals", color, polygon, z=1)
+
+    def floor_mark(self, key, polygon, color):
+        """방 바닥 표시 — 방 바닥 위, 집기 아래. 가구 밑에 깔리는 것이 정상이라
+
+        장식(PD_)으로 내면 verify_props가 집기와 겹쳤다고 잡는다. 바닥에
+        그리는 것과 벽·가구에 붙는 것은 레이어가 달라야 한다.
+        """
+        self.poly2d(f"FM_{key}", "RoomMarks", color, polygon)
 
     def ground(self, key, polygon, color):
         """바닥 구역 — Rooms보다 먼저 선언되는 Ground 아래. 충돌 없음."""
@@ -821,6 +843,9 @@ CORR_FIRE = (14, 22)   # 소화기(장식)
 CORR_HYDRANT = (44, 16)  # 소화전 함(장식) — 넓은 벽면에만
 CORR_WATER = (40, 26)    # 정수기(집기) — 몇 칸에 하나
 CORR_MAT = (150, 22)     # 문 앞 발판(장식)
+WAINSCOT = 5             # 걸레받이 두께(벽 16 안쪽)
+PILASTER = (16, 0)       # 기둥 폭 — 높이는 벽 두께 전체
+PILASTER_GAP = 340       # 기둥 간격
 CORR_LINE_H = 6       # 바닥 유도선(장식)
 
 # 방 종류 -> (단위 최대 크기, 단위 간격, 색).
@@ -1134,17 +1159,19 @@ def _classroom(sc, key, x0, y0, x1, y1, door, keepout):
 
 
 def add_sliding_doors(sc):
-    """교실 문을 두 짝 미닫이문으로 만든다.
+    """교실 문을 한 짝짜리 미닫이문으로 만든다.
 
-    벽에 뚫린 틈이 그대로 통로라 문이 늘 열려 있는 셈이었다. 짝 두 개를 틈에
-    세우고, 다가오면 양옆 벽 속으로 밀려 들어가게 한다.
+    루트가 Area2D다 — 플레이어의 InteractionArea가 겹치는 Area2D 중
+    interact()를 가진 것을 찾아 E로 부르기 때문에, 스크립트가 Area2D 본체에
+    붙어야 한다. collision_layer 2는 플레이어가 찾는 층이고, mask 1은 수위
+    몸을 감지하는 쪽이다(수위는 E 없이 지나간다).
 
     패널 폴리곤은 절대 좌표로 낸다(부모 노드는 원점에 둔다). 검사 스크립트들이
     노드 position을 반영하지 않고 폴리곤을 그대로 읽기 때문이다.
 
-    `SDPanel*` StaticBody2D는 경로탐색·도달성에서 제외된다 — 다가오면 열리므로
-    막힌 것으로 보면 안 된다. 제외는 janitor.gd·verify_floor_reach·
-    verify_janitor_route 세 곳에 같은 이름 규칙으로 들어 있다.
+    `SDPanel*` StaticBody2D는 경로탐색·도달성에서 제외된다 — 수위가 열고
+    지나가므로 막힌 것으로 보면 안 된다. 제외는 janitor.gd·verify_floor_reach·
+    verify_janitor_route·verify_hiding_spots 네 곳에 같은 이름 규칙으로 있다.
     """
     for key, (label, door, x0, x1, topf, botf) in sc.room_meta.items():
         if prop_kind(key, label) != "classroom" or door not in ("top", "bottom"):
@@ -1157,33 +1184,29 @@ def add_sliding_doors(sc):
         my = (wy0 + wy1) / 2
         inset = (T - DOOR_LEAF_T) / 2
         py0, py1 = wy0 + inset, wy1 - inset
+        dl, dr = cx - DOOR / 2, cx + DOOR / 2
+        # 미는 방향 — 맵 밖으로 나가지 않는 쪽. 방끼리 벽을 맞대고 있어서
+        # 어느 쪽으로 밀어도 벽 위를 지나간다(벽 속으로 들어가는 것처럼 보인다).
+        travel = DOOR if dr + DOOR <= W - EDGE else -DOOR
         root = f"SlideDoor_{key}"
-        sc.node(f'[node name="{root}" type="Node2D" parent="."]\n'
+        sc.node(f'[node name="{root}" type="Area2D" parent="."]\n'
+                f'collision_layer = 2\ncollision_mask = 1\n'
                 f'script = ExtResource("6_sliding")\n'
-                f'travel = {n(DOOR / 2)}\n'
-                f'left_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_{key}_L")\n'
-                f'right_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_{key}_R")\n')
-        for side, sx0, sx1 in (("L", cx - DOOR / 2, cx),
-                               ("R", cx, cx + DOOR / 2)):
-            body = f"SDPanel{side}"
-            sc.node(f'[node name="{body}" type="StaticBody2D" parent="{root}"]\n')
-            sc.node(f'[node name="Shape" type="CollisionPolygon2D" '
-                    f'parent="{root}/{body}"]\n'
-                    f'polygon = {rect(sx0, py0, sx1, py1)}\n')
-            # 시각은 WallGlow 안에 낸다. 레이어 0에 두면 CanvasLayer(layer=1)의
-            # 문 표식·벽 시각이 z_index와 무관하게 덮어 문이 아예 안 보인다(#234).
-            # 같은 문의 Door_ 마커보다 뒤에 선언되므로 그 위에 그려지고,
-            # 열려서 벽 쪽으로 밀리면 벽 시각 뒤로 숨는다 — 벽 속으로 들어가는
-            # 미닫이문의 실제 동작과 같다. 두께는 충돌(DOOR_LEAF_T)보다 넓은
-            # 벽 두께 전체를 쓴다 — 얇으면 벽 사이에 낀 실오라기로 보인다.
-            sc.poly2d(f"SDVis_{key}_{side}", "WallGlow/RoomWallVisuals",
-                      C_LEAF, rect(sx0, wy0, sx1, wy1), z=2)
-        sc.node(f'[node name="Zone" type="Area2D" parent="{root}"]\n'
-                f'collision_layer = 0\ncollision_mask = 1\n')
-        sc.node(f'[node name="ZoneShape" type="CollisionShape2D" '
-                f'parent="{root}/Zone"]\n'
+                f'travel = {n(travel)}\n'
+                f'leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_{key}")\n')
+        sc.node(f'[node name="Zone" type="CollisionShape2D" parent="{root}"]\n'
                 f'position = Vector2({n(cx)}, {n(my)})\n'
                 f'shape = SubResource("RectangleShape2D_door_zone")\n')
+        sc.node(f'[node name="SDPanel" type="StaticBody2D" parent="{root}"]\n')
+        sc.node(f'[node name="Panel" type="CollisionPolygon2D" '
+                f'parent="{root}/SDPanel"]\n'
+                f'polygon = {rect(dl, py0, dr, py1)}\n')
+        # 시각은 WallGlow 안에. 레이어 0에 두면 CanvasLayer(layer=1)의 문 표식·
+        # 벽 시각이 z_index와 무관하게 덮어 문이 아예 안 보인다(#234). 같은 문의
+        # Door_ 마커보다 뒤에 선언되므로 그 위에 그려지고, 열려서 밀리면 벽 시각
+        # 뒤로 숨는다. 두께는 충돌(DOOR_LEAF_T)보다 넓은 벽 두께 전체를 쓴다.
+        sc.poly2d(f"SDVis_{key}", "WallGlow/RoomWallVisuals",
+                  C_LEAF, rect(dl, wy0, dr, wy1), z=2)
 
 
 def _keepout_for(sc, x0, x1):
@@ -1241,9 +1264,12 @@ CORNER_PROP = {
     "janitor":  ("bed", 28, 64, C_BED),
     "hall":     ("plant", 26, 26, C_PLANT),
     "entrance": ("plant", 26, 26, C_PLANT),
+    "toilet":   ("bin", 22, 24, C_BIN),
 }
 
-TOILET_SINK = (26, 30)   # 화장실 세면대 — 왼쪽 벽 여유 띠에 세로로 세운다
+TOILET_SINK = (26, 30)     # 세면대 — 왼쪽 벽 여유 띠에 세로로 세운다
+TOILET_URINAL = (22, 26)   # 소변기 — 오른쪽 벽 여유 띠(남자 화장실만)
+TOILET_TILE = 60           # 바닥 타일 한 칸
 
 
 def add_room_fixtures(sc, key, kind, x0, x1, topf, botf, door, keepout, units):
@@ -1317,6 +1343,39 @@ def add_room_fixtures(sc, key, kind, x0, x1, topf, botf, door, keepout, units):
     # 화장실: 왼쪽 벽 여유 띠에 세면대를 세우고 그 위 벽에 거울을 건다.
     # 칸막이는 반대쪽에 이미 깔려 있어 이 띠가 비어 있다.
     if kind == "toilet":
+        # 바닥 타일 — 화장실만 마루가 아니라 타일이다. 격자를 그어 구분한다.
+        tx = wl + TOILET_TILE
+        while tx < wr - 4:
+            ttop, tbot = strip_bounds(tx, tx + 2)
+            sc.floor_mark(f"{key}_tileV{int(tx)}",
+                          rect(tx, ttop - 2, tx + 2, tbot + 2), C_TILE)
+            tx += TOILET_TILE
+        # 가로 줄은 사선 방에서 기운 벽을 가로지른다. 벽 시각이 위에 그려져
+        # 가려지긴 하지만, 굳이 낼 이유가 없어 건너뛴다.
+        if not sloped:
+            ty = wt + TOILET_TILE
+            while ty < wb - 4:
+                sc.floor_mark(f"{key}_tileH{int(ty)}",
+                              rect(wl, ty, wr, ty + 2), C_TILE)
+                ty += TOILET_TILE
+        # 배수구 — 방 가운데 아래쪽. 장식이라 통행에 영향 없다.
+        dx, dy = cx, (wt + wb) / 2 + (wb - wt) * 0.18
+        sc.floor_mark(f"{key}_drain",
+                      rect(dx - 11, dy - 11, dx + 11, dy + 11), C_DRAIN)
+        # 칸막이 문 — 각 칸막이의 문 쪽 면에 얇게. 칸이 칸막이임을 알려준다.
+        for i, (ux0, uy0, ux1, uy1) in enumerate(units):
+            edge = (uy0, uy0 + 5) if door == "top" else (uy1 - 5, uy1)
+            sc.overlay(f"{key}_stall{i}",
+                       rect(ux0 + 3, edge[0], ux1 - 3, edge[1]), C_STALLDOOR)
+        # 소변기 — 남자 화장실만. 세면대 반대쪽(오른쪽) 벽 여유 띠에 세운다.
+        if key.startswith("MensRoom"):
+            uw, uh = TOILET_URINAL
+            ux = wr - 2 - uw
+            utop, ubot = strip_bounds(ux, ux + uw)
+            for i, cell in enumerate(_col(ux, ux + uw, utop, ubot, uh, 16,
+                                          keepout + taken)):
+                sc.prop(f"{key}_urinal{i}", rect(*cell), C_URINAL)
+                taken.append(cell)
         sw, sh = TOILET_SINK
         # 거울은 벽면 wl~wl+6, 세면대는 그 앞 wl+8부터 — 붙여 놓으면 거울이
         # 세면대에 파묻힌다(verify_props가 장식↔집기 겹침을 오류로 잡는다).
@@ -1425,16 +1484,38 @@ def add_corridor_props(sc, corridors):
             # 맞춰 앵커를 잡아야 벽을 파고들지 않는다.
             if abs(botf(x1) - cy0) < 1:          # 방이 복도 위쪽에 접한다
                 ly0, ly1 = cy0, cy0 + CORR_LOCKER_D
+                wain = (cy0 - WAINSCOT, cy0)     # 벽 띠 중 복도 쪽 면
+                pil = (cy0 - T, cy0)
 
                 def face(depth, base=cy0):
                     return base, base + depth
             elif abs(topf(x0) - cy1) < 1:        # 방이 복도 아래쪽에 접한다
                 ly0, ly1 = cy1 - CORR_LOCKER_D, cy1
+                wain = (cy1, cy1 + WAINSCOT)
+                pil = (cy1, cy1 + T)
 
                 def face(depth, base=cy1):
                     return base - depth, base
             else:
                 continue
+            # 걸레받이와 기둥 — 벽 띠 안에 그린다. 사물함은 벽 바깥(복도 쪽)에
+            # 서므로 가리지 않는다. WallGlow 안이라 벽 위에 그려지고 어둠을
+            # 받지 않는다 — 벽과 같은 취급이다.
+            gap0, gap1 = cx - DOOR / 2, cx + DOOR / 2
+            for seg0, seg1 in ((x0 + T, gap0), (gap1, x1 - T)):
+                if seg1 - seg0 > 20:
+                    sc.wall_decor(f"Wain_{key}_{int(cy0)}_{int(seg0)}",
+                                  rect(seg0, wain[0], seg1, wain[1]), C_WAINSCOT)
+            px = x0 + T + PILASTER_GAP
+            pi = 0
+            while px < x1 - T - PILASTER[0]:
+                if not (gap0 - 24 < px < gap1 + 24):
+                    sc.wall_decor(f"Pil_{key}_{int(cy0)}_{pi}",
+                                  rect(px, pil[0], px + PILASTER[0], pil[1]),
+                                  C_PILASTER)
+                    pi += 1
+                px += PILASTER_GAP
+
             # 문 앞 발판 — 복도 바닥에 리듬을 준다. 장식이라 통행에 영향 없음.
             if door in ("top", "bottom"):
                 mw, mh = CORR_MAT
@@ -1505,33 +1586,46 @@ def room_floor(key, label):
 #   Floor(맵 전체 바탕) → Ground(복도 바닥·타일 이음매) → Rooms(방 바닥)
 #   → Props(집기) → Stairwells → WallGlow(벽·문·라벨, CanvasLayer)
 # Ground는 충돌이 없는 순수 시각 레이어다.
-TILE = 300            # 복도 타일 이음매 간격
-SEAM = 3              # 이음매 두께
+PLANK = 64            # 마루 널 폭
+PLANK_SEAM = 2        # 널 이음매 두께
+PLANK_JOINT = 560     # 널 이음매 간격(줄마다 엇갈림)
 CEIL_LIGHT = (150, 12)  # 꺼진 형광등(장식) 크기
 CEIL_LIGHT_GAP = 620    # 형광등 간격
 
 
 def add_ground(sc, corridors):
-    """복도 바닥을 칠하고 타일 이음매를 긋는다.
+    """복도 바닥을 마루로 깔고 널 이음매를 긋는다.
 
     Rooms보다 먼저 선언된 Ground 아래에 들어가므로 방 바닥이 이 위에 덮인다 —
     복도 띠가 방과 겹쳐도 결과가 어긋나지 않는다.
+
+    널은 복도를 따라(가로로) 길게 눕힌다. 세로 격자로 자르면 타일이 되고,
+    학교 마루로는 읽히지 않는다. 널 사이 짧은 이음매를 줄마다 엇갈리게 넣어
+    한 장짜리 판처럼 보이지 않게 한다.
     """
     for cy0, cy1 in corridors:
         tag = int(cy0)
         sc.ground(f"Corridor_{tag}", rect(EDGE, cy0, W - EDGE, cy1), C_CORRIDOR)
-        # 가로 이음매 — 복도를 따라 걸을 때 거리감을 준다
-        x = EDGE + TILE
-        i = 0
-        while x < W - EDGE:
-            sc.ground(f"SeamV_{tag}_{i}", rect(x, cy0, x + SEAM, cy1), C_SEAM)
-            x += TILE
-            i += 1
-        # 세로 이음매 — 복도 폭을 두세 칸으로 나눈다
-        rows = max(1, int((cy1 - cy0) // TILE))
-        for r in range(1, rows + 1):
-            y = cy0 + (cy1 - cy0) * r / (rows + 1)
-            sc.ground(f"SeamH_{tag}_{r}", rect(EDGE, y, W - EDGE, y + SEAM), C_SEAM)
+        row = 0
+        y = cy0 + PLANK
+        while y < cy1 - 4:
+            sc.ground(f"Plank_{tag}_{row}", rect(EDGE, y, W - EDGE, y + PLANK_SEAM),
+                      C_SEAM)
+            row += 1
+            y += PLANK
+        # 널 이음매 — 줄마다 반 칸씩 밀어 엇갈리게
+        for r in range(row + 1):
+            top = cy0 + r * PLANK
+            bot = min(top + PLANK, cy1)
+            if bot - top < 12:
+                continue
+            x = EDGE + (PLANK_JOINT / 2 if r % 2 else PLANK_JOINT)
+            k = 0
+            while x < W - EDGE:
+                sc.ground(f"Joint_{tag}_{r}_{k}",
+                          rect(x, top + 2, x + PLANK_SEAM, bot - 2), C_SEAM)
+                x += PLANK_JOINT
+                k += 1
 
 
 def add_ceiling_lights(sc, corridors):
@@ -1562,6 +1656,7 @@ def build_common(fl, spec):
             'layer = 1\nfollow_viewport_enabled = true\n')
     sc.node('[node name="RoomWallVisuals" type="Node2D" parent="WallGlow"]\n')
     sc.node('[node name="Rooms" type="Node2D" parent="."]\n')
+    sc.node('[node name="RoomMarks" type="Node2D" parent="."]\n')
     sc.node('[node name="Props" type="Node2D" parent="."]\n')
     sc.node('[node name="Stairwells" type="Node2D" parent="."]\n')
     sc.node('[node name="Labels" type="Node2D" parent="WallGlow"]\n')
@@ -1641,6 +1736,7 @@ def build_floor1():
             'layer = 1\nfollow_viewport_enabled = true\n')
     sc.node('[node name="RoomWallVisuals" type="Node2D" parent="WallGlow"]\n')
     sc.node('[node name="Rooms" type="Node2D" parent="."]\n')
+    sc.node('[node name="RoomMarks" type="Node2D" parent="."]\n')
     sc.node('[node name="Props" type="Node2D" parent="."]\n')
     sc.node('[node name="Stairwells" type="Node2D" parent="."]\n')
     sc.node('[node name="Labels" type="Node2D" parent="WallGlow"]\n')
