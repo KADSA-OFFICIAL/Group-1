@@ -345,7 +345,9 @@ PLACEMENT = {
     4: [("Dasan7", ["DasanStairKey", "FriendNote"]),              # 다산실
         ("CreativeDept", ["CounselRecord", "SiwooPainting"]),     # ← 상담실
         ("InfoDept", ["CrisisManual", "InkCan"]),                 # ← 인쇄실
-        ("ComputerRoom", ["StairKey", "ScienceClue"]),            # ← 과학 실험실
+        # 4층 계단 열쇠는 다산7실 하나로 충분하다 — 중복 열쇠 제거(#219).
+        # story_objects.json의 StairKey 항목은 남겨 둔다(되돌리기 쉽게).
+        ("ComputerRoom", ["ScienceClue"]),                        # ← 과학 실험실
         ("Dasan6", ["HistoryClue"]),                              # ← 역사자료실
         ("Storage2", ["TaehoNote"])],                             # ← 수학교구실
     3: [("North4", ["NayeonClue"]),                               # 생활지도부 ← 방송실
