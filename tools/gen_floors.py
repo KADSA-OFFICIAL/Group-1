@@ -39,6 +39,10 @@ C_METAL = "Color(0.25, 0.27, 0.31, 1)"   # 사물함·컴퓨터 책상
 C_SHELF = "Color(0.23, 0.20, 0.16, 1)"   # 창고 선반
 C_STALL = "Color(0.21, 0.24, 0.26, 1)"   # 화장실 칸막이
 C_BENCH = "Color(0.27, 0.25, 0.21, 1)"   # 벤치·의자
+C_LOCKER = "Color(0.30, 0.32, 0.37, 1)"  # 사물함
+C_CHAIR = "Color(0.22, 0.18, 0.14, 1)"   # 의자
+C_BOARD = "Color(0.13, 0.19, 0.16, 1)"   # 칠판(장식)
+C_NOTICE = "Color(0.34, 0.29, 0.21, 1)"  # 게시판(장식)
 
 # ── 세로 밴드 ────────────────────────────────────────────────
 # 외벽은 두께 40이 경계선 위에 걸쳐 있으므로 안쪽 면이 EDGE. 방을 여기 딱 붙인다(#159 피드백).
@@ -200,6 +204,15 @@ class Scene:
         self.node(f'[node name="PC_{key}" type="CollisionPolygon2D" parent="PropBodies"]\n'
                   f'polygon = {polygon}\n')
         self.poly2d(f"PV_{key}", "Props", color, polygon)
+
+    def decor(self, key, polygon, color):
+        """벽에 붙는 장식 — 충돌체가 없다(칠판·게시판).
+
+        통행에 전혀 영향을 주지 않으므로 도달성·순찰 검사가 흔들릴 걱정 없이
+        복도와 교실에 정보를 더할 수 있다. PC_/PV_와 접두사를 나눠서
+        verify_props가 짝 검사에서 제외한다.
+        """
+        self.poly2d(f"PD_{key}", "Props", color, polygon)
 
     def label(self, name, text, cx, cy):
         # 주의: offset은 실수 하나여야 한다. 예전엔 f"{n(v)}.0" 이라 폭이 소수인 층에서
@@ -592,38 +605,58 @@ def add_stairwell(sc, name, x0, y0, x1, y1):
         sc.poly2d(f"Rail_{name}_{key.split('_')[-1]}", "WallGlow", C_WALL, p)
 
 
-# ── 방 내부 집기 ────────────────────────────────────────────
+# ── 방 내부 집기 · 복도 ──────────────────────────────────────
 # 방이 색칠된 빈 사각형이라 문을 열고 들어가도 볼 것이 없었다. 방 종류마다 다른
 # 집기를 절차적으로 깐다. 좌표를 손으로 박지 않는 이유는 벽과 같다 — LAYOUT을
 # 고치면 방 크기가 바뀌고, 박아 둔 좌표는 그때마다 어긋난다.
 #
 # 배치가 지켜야 하는 것:
 #   1. 방 중심을 비운다 — verify_floor_reach가 방 폴리곤 중심으로 도달성을 본다.
-#   2. 문 틈에서 방 중앙까지 이어지는 통로를 비운다.
+#      교실은 문과 같은 x에 중앙 통로를 내서 이 조건을 자연히 만족시킨다.
+#   2. 문 틈 앞을 비운다 — 복도 사물함은 문 양옆으로 CORR_DOOR_PAD를 남긴다.
+#      수위 순찰의 문 앞 대기 지점이 여기 잡힌다(verify_janitor_route).
 #   3. 단서·은신처 좌표(sc.clue_pts) 주변을 비운다 — 덮으면 조사할 수 없다.
-#   4. 벽 안쪽 면에서 PROP_EDGE만큼 띄운다 — 붙이면 플레이어 반경(10)이 끼어
-#      통로가 사라지고 도달성 검사가 방을 막힌 것으로 본다.
-PROP_EDGE = 32        # 벽 안쪽 면에서 띄우는 거리
+#   4. 벽 안쪽 면에서 띄운다 — 붙이면 플레이어 반경(10)이 끼어 통로가 사라진다.
+PROP_EDGE = 32        # 벽 안쪽 면에서 띄우는 거리(일반 방)
 PROP_DOOR_PAD = 26    # 문 틈 좌우 여유
 PROP_CLUE_CLEAR = 76  # 단서 오브젝트 중심에서 비워 둘 반경
 PROP_AISLE_MIN = 34   # 방 중앙 가로 통로 반폭 하한(플레이어 반경 10 + 여유)
-PROP_AISLE_MAX = 62   # 상한 — 큰 방에서 통로만 넓어지지 않게
+PROP_AISLE_MAX = 62
 PROP_MIN_W = 34       # 이보다 좁은 자리에는 아무것도 두지 않는다
 PROP_MIN_H = 24
 
+# 교실 전용 치수 — 책상 하나가 사각형 하나면 뭔지 알아볼 수 없어 책상+의자로 놓는다.
+CLASS_EDGE = 24       # 교실은 벽 여유를 줄여 책상 열을 하나라도 더 넣는다
+CLASS_DESK = (44, 26)
+CLASS_CHAIR = (26, 12)
+CLASS_CHAIR_GAP = 5   # 책상과 의자 사이
+CLASS_COL_GAP = 20
+CLASS_ROW_GAP = 22
+CLASS_AISLE = 68      # 문과 같은 x에 내는 중앙 통로 폭
+CLASS_BOARD_H = 14    # 칠판 두께(장식, 충돌 없음)
+CLASS_TEACHER = (86, 32)
+CLASS_LOCKER_D = 30   # 뒷벽 사물함 깊이
+
+# 복도 사물함·게시판
+CORR_LOCKER_D = 32
+CORR_LOCKER_W = 58
+CORR_LOCKER_GAP = 8
+CORR_DOOR_PAD = 46    # 문 틈 양옆으로 남기는 폭(수위 대기 지점 확보)
+CORR_NOTICE_W = 120   # 사물함이 안 들어간 자리에 붙이는 게시판(장식)
+CORR_NOTICE_D = 10
+
 # 방 종류 -> (단위 최대 크기, 단위 간격, 색).
-# 크기는 "최대"다 — 남은 자리가 좁으면 PROP_MIN_* 까지 줄여서 넣는다. 규격을
-# 고집하면 화장실·창고처럼 짧은 방이 통째로 비어 버린다.
+# 크기는 최대치다 — 남은 자리가 좁으면 PROP_MIN_* 까지 줄여서 넣는다. 규격을
+# 고집하면 화장실·현관처럼 짧은 방이 통째로 비어 버린다.
 PROP_SPECS = {
-    "classroom": ((44, 30), (22, 22), C_DESK),     # 학생 책상
-    "office":    ((96, 40), (30, 26), C_DESK),     # 교사 책상
-    "computer":  ((54, 36), (24, 24), C_METAL),    # 컴퓨터 책상
-    "lab":       ((140, 38), (34, 30), C_DESK),    # 실험대
-    "storage":   ((68, 40), (22, 20), C_SHELF),    # 선반
+    "office":    ((96, 40), (28, 24), C_DESK),     # 교사 책상
+    "computer":  ((54, 36), (22, 22), C_METAL),    # 컴퓨터 책상
+    "lab":       ((140, 38), (30, 26), C_DESK),    # 실험대
+    "storage":   ((68, 40), (20, 18), C_SHELF),    # 선반
     "toilet":    ((58, 44), (20, 16), C_STALL),    # 칸막이
-    "entrance":  ((110, 36), (40, 30), C_BENCH),   # 신발장·벤치
-    "janitor":   ((96, 40), (30, 26), C_DESK),
-    "hall":      ((84, 40), (34, 28), C_BENCH),    # 탁자
+    "entrance":  ((110, 36), (36, 28), C_BENCH),   # 신발장·벤치
+    "janitor":   ((96, 40), (28, 24), C_DESK),
+    "hall":      ((84, 40), (30, 26), C_BENCH),    # 탁자
 }
 
 # 도달 불가로 남겨야 하는 방에는 집기를 두지 않는다(verify_floor_reach가 확인).
@@ -657,7 +690,7 @@ def _overlap(a, b):
     return not (a[2] <= b[0] or b[2] <= a[0] or a[3] <= b[1] or b[3] <= a[1])
 
 
-def _free_spans(bx0, bx1, by0, by1, keepout):
+def _free_spans(bx0, bx1, by0, by1, keepout, floor_w=PROP_MIN_W):
     """띠와 세로로 겹치는 keepout을 x축에 투영해 남는 가로 구간을 낸다.
 
     걸리는 칸을 그냥 버리면 문 통로와 단서가 방 가운데를 지나는 방(현관 등)에서
@@ -678,7 +711,7 @@ def _free_spans(bx0, bx1, by0, by1, keepout):
             if kx1 < sx1:
                 nxt.append((max(kx1, sx0), sx1))
         spans = nxt
-    return [sp for sp in spans if sp[1] - sp[0] >= PROP_MIN_W]
+    return [sp for sp in spans if sp[1] - sp[0] >= floor_w]
 
 
 def _fill(topf, botf, bx0, bx1, unit, gap, keepout):
@@ -717,8 +750,114 @@ def _fill(topf, botf, bx0, bx1, unit, gap, keepout):
     return out
 
 
-def add_props(sc):
-    """방마다 종류에 맞는 집기를 깐다.
+def _row(sx0, sx1, y0, y1, uw, gap, keepout):
+    """[sx0,sx1]에 폭 uw 단위를 한 줄로 채운다(사물함처럼 벽에 붙는 것)."""
+    out = []
+    for ax0, ax1 in _free_spans(sx0, sx1, y0, y1, keepout, floor_w=uw * 0.6):
+        avail = ax1 - ax0
+        uw_eff = min(uw, avail)
+        cols = max(1, int((avail + gap) // (uw_eff + gap)))
+        span = cols * uw_eff + (cols - 1) * gap
+        ox = ax0 + (avail - span) / 2
+        for c in range(cols):
+            x = ox + c * (uw_eff + gap)
+            out.append((x, y0, x + uw_eff, y1))
+    return out
+
+
+def _classroom(sc, key, x0, y0, x1, y1, door, keepout):
+    """교실: 칠판 → 교탁 → 책상+의자 격자(중앙 통로) → 뒷벽 사물함.
+
+    문 반대쪽이 앞(칠판)이다. 학생 책상은 앞을 보고, 의자는 책상 뒤에 붙는다.
+    중앙 통로는 문과 같은 x에 내므로 방 중심이 항상 비고, 문에서 교탁까지 곧장
+    걸어갈 수 있다.
+    """
+    ix0, ix1 = x0 + T + CLASS_EDGE, x1 - T - CLASS_EDGE
+    iy0, iy1 = y0 + T + CLASS_EDGE, y1 - T - CLASS_EDGE
+    if ix1 - ix0 < 120 or iy1 - iy0 < 120:
+        return
+    front_top = door != "top"          # 문이 아래쪽이면 칠판은 위쪽 벽
+    cx = (x0 + x1) / 2
+
+    # 칠판 — 벽에 붙는 장식(충돌 없음)
+    bw = min((ix1 - ix0) * 0.6, 220)
+    if front_top:
+        sc.decor(f"{key}_board",
+                 rect(cx - bw / 2, y0 + T, cx + bw / 2, y0 + T + CLASS_BOARD_H),
+                 C_BOARD)
+        teach_y = iy0 + 6
+    else:
+        sc.decor(f"{key}_board",
+                 rect(cx - bw / 2, y1 - T - CLASS_BOARD_H, cx + bw / 2, y1 - T),
+                 C_BOARD)
+        teach_y = iy1 - 6 - CLASS_TEACHER[1]
+
+    # 교탁
+    tw, th = CLASS_TEACHER
+    teach = (cx - tw / 2, teach_y, cx + tw / 2, teach_y + th)
+    if not any(_overlap(teach, k) for k in keepout):
+        sc.prop(f"{key}_teacher", rect(*teach), C_DESK)
+
+    # 뒷벽(문 쪽) 사물함 — 문 틈을 피해 양옆으로
+    door_gap = (cx - DOOR / 2 - PROP_DOOR_PAD, cx + DOOR / 2 + PROP_DOOR_PAD)
+    if front_top:
+        ly0, ly1 = iy1 - CLASS_LOCKER_D, iy1
+    else:
+        ly0, ly1 = iy0, iy0 + CLASS_LOCKER_D
+    blocked = keepout + [(door_gap[0], y0, door_gap[1], y1)]
+    for i, r4 in enumerate(_row(ix0, ix1, ly0, ly1, CORR_LOCKER_W,
+                                CORR_LOCKER_GAP, blocked)):
+        sc.prop(f"{key}_back{i}", rect(*r4), C_LOCKER)
+
+    # 학생 책상 — 교탁과 뒷벽 사물함 사이
+    dw, dh = CLASS_DESK
+    cw, ch = CLASS_CHAIR
+    unit_h = dh + CLASS_CHAIR_GAP + ch
+    if front_top:
+        gy0, gy1 = teach_y + th + 26, ly0 - 18
+    else:
+        gy0, gy1 = ly1 + 18, teach_y - 26
+    if gy1 - gy0 < unit_h:
+        return
+    rows = max(1, int((gy1 - gy0 + CLASS_ROW_GAP) // (unit_h + CLASS_ROW_GAP)))
+    total = rows * unit_h + (rows - 1) * CLASS_ROW_GAP
+    oy = gy0 + (gy1 - gy0 - total) / 2
+
+    idx = 0
+    for hx0, hx1 in ((ix0, cx - CLASS_AISLE / 2), (cx + CLASS_AISLE / 2, ix1)):
+        avail = hx1 - hx0
+        if avail < dw:
+            continue
+        cols = max(1, int((avail + CLASS_COL_GAP) // (dw + CLASS_COL_GAP)))
+        span = cols * dw + (cols - 1) * CLASS_COL_GAP
+        ox = hx0 + (avail - span) / 2
+        for c in range(cols):
+            x = ox + c * (dw + CLASS_COL_GAP)
+            for r in range(rows):
+                y = oy + r * (unit_h + CLASS_ROW_GAP)
+                if front_top:
+                    desk = (x, y, x + dw, y + dh)
+                    chair = (x + (dw - cw) / 2, y + dh + CLASS_CHAIR_GAP,
+                             x + (dw + cw) / 2, y + dh + CLASS_CHAIR_GAP + ch)
+                else:
+                    chair = (x + (dw - cw) / 2, y, x + (dw + cw) / 2, y + ch)
+                    desk = (x, y + ch + CLASS_CHAIR_GAP, x + dw,
+                            y + ch + CLASS_CHAIR_GAP + dh)
+                if any(_overlap(desk, k) or _overlap(chair, k) for k in keepout):
+                    continue
+                sc.prop(f"{key}_d{idx}", rect(*desk), C_DESK)
+                sc.prop(f"{key}_c{idx}", rect(*chair), C_CHAIR)
+                idx += 1
+
+
+def _keepout_for(sc, x0, x1):
+    return [(px - PROP_CLUE_CLEAR, py - PROP_CLUE_CLEAR,
+             px + PROP_CLUE_CLEAR, py + PROP_CLUE_CLEAR)
+            for px, py in sc.clue_pts if x0 - 40 <= px <= x1 + 40]
+
+
+def add_props(sc, corridors=()):
+    """방마다 종류에 맞는 집기를 깔고, 복도 벽에 사물함·게시판을 붙인다.
 
     add_story·add_hiding 뒤에 불러야 한다 — 단서·은신처 좌표(sc.clue_pts)가
     채워진 뒤라야 그 자리를 피할 수 있다.
@@ -726,6 +865,10 @@ def add_props(sc):
     for key, (label, door, x0, x1, topf, botf) in sc.room_meta.items():
         kind = prop_kind(key, label)
         if kind is None:
+            continue
+        keepout = _keepout_for(sc, x0, x1)
+        if kind == "classroom":
+            _classroom(sc, key, x0, topf(x0), x1, botf(x1), door, keepout)
             continue
         unit, gap, color = PROP_SPECS[kind]
 
@@ -743,11 +886,6 @@ def add_props(sc):
         def mid(x):
             return (inner_top(x) + inner_bot(x)) / 2
 
-        keepout = [(px - PROP_CLUE_CLEAR, py - PROP_CLUE_CLEAR,
-                    px + PROP_CLUE_CLEAR, py + PROP_CLUE_CLEAR)
-                   for px, py in sc.clue_pts if x0 - 40 <= px <= x1 + 40]
-        # 문 통로 — 문이 난 쪽 절반만 비운다. 양쪽 절반을 다 비우면 좁은 방
-        # (화장실·창고)에는 집기를 놓을 자리가 남지 않는다.
         door_gap = (cx - DOOR / 2 - PROP_DOOR_PAD, cx + DOOR / 2 + PROP_DOOR_PAD)
         near = []
         if door == "top":
@@ -761,6 +899,50 @@ def add_props(sc):
                        keepout + (near if door == "bottom" else []))
         for i, (rx0, ry0, rx1, ry1) in enumerate(rects):
             sc.prop(f"{key}_{i}", rect(rx0, ry0, rx1, ry1), color)
+
+    add_corridor_props(sc, corridors)
+
+
+def add_corridor_props(sc, corridors):
+    """복도 벽마다 사물함을 붙이고, 남는 벽면에는 게시판을 건다.
+
+    복도가 맨바닥이라 층을 내려가도 같은 회색 통로만 보였다. 사물함은 실체가
+    있어 시야도 조금 가리고, 게시판은 충돌이 없어 통행에 영향이 없다.
+    사선 벽(MID_RIGHT·교무실)은 벽면이 기울어 한 줄로 붙일 수 없으므로 건너뛴다.
+    """
+    for cy0, cy1 in corridors:
+        for key, (label, door, x0, x1, topf, botf) in sc.room_meta.items():
+            if not label:
+                continue
+            if abs(topf(x0) - topf(x1)) > 1 or abs(botf(x0) - botf(x1)) > 1:
+                continue
+            cx = (x0 + x1) / 2
+            door_gap = (cx - DOOR / 2 - CORR_DOOR_PAD, cx + DOOR / 2 + CORR_DOOR_PAD)
+            keepout = _keepout_for(sc, x0, x1)
+            keepout.append((door_gap[0], cy0 - 1, door_gap[1], cy1 + 1))
+            if abs(botf(x1) - cy0) < 1:          # 방이 복도 위쪽에 접한다
+                ly0, ly1 = cy0, cy0 + CORR_LOCKER_D
+                nz0, nz1 = cy0, cy0 + CORR_NOTICE_D
+            elif abs(topf(x0) - cy1) < 1:        # 방이 복도 아래쪽에 접한다
+                ly0, ly1 = cy1 - CORR_LOCKER_D, cy1
+                nz0, nz1 = cy1 - CORR_NOTICE_D, cy1
+            else:
+                continue
+            placed = _row(x0 + T, x1 - T, ly0, ly1, CORR_LOCKER_W,
+                          CORR_LOCKER_GAP, keepout)
+            for i, r4 in enumerate(placed):
+                sc.prop(f"Corr_{key}_{int(cy0)}_{i}", rect(*r4), C_LOCKER)
+            # 사물함이 못 들어간 벽면(문 옆 자투리)에는 게시판을 건다
+            taken = [(a, ly0, b, ly1) for a, _, b, _ in placed]
+            spans = _free_spans(x0 + T, x1 - T, ly0, ly1, keepout + taken,
+                                floor_w=40)
+            for j, (sx0, sx1) in enumerate(spans):
+                w = min(CORR_NOTICE_W, sx1 - sx0 - 8)
+                if w < 40:
+                    continue
+                mx = (sx0 + sx1) / 2
+                sc.decor(f"Notice_{key}_{int(cy0)}_{j}",
+                         rect(mx - w / 2, nz0, mx + w / 2, nz1), C_NOTICE)
 
 
 def build_common(fl, spec):
@@ -832,7 +1014,7 @@ def build_common(fl, spec):
 
     add_story(sc, fl)
     add_hiding(sc, fl)
-    add_props(sc)
+    add_props(sc, [(NORTH_Y1, MID_Y0), (VOID_Y1, SOUTH_Y0), (SOUTH_Y1, BOT_Y0)])
     add_outer(sc)
     return sc
 
@@ -876,7 +1058,8 @@ def build_floor1():
               rect((ex0 + ex1) / 2 - DOOR / 2, ey1 - T, (ex0 + ex1) / 2 + DOOR / 2, ey1), z=1)
     add_story(sc, 1)
     add_hiding(sc, 1)
-    add_props(sc)
+    # 1층은 아래쪽 절반만 건물이라 큰 홀 하나가 복도 역할을 한다.
+    add_props(sc, [(1500, BOT_Y0)])
 
     add_outer(sc)
     return sc

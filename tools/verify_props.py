@@ -1,9 +1,14 @@
 #!/usr/bin/env python3
-"""방 안 집기(PC_/PV_) 검사.
+"""방·복도 집기(PC_/PV_)와 장식(PD_) 검사.
 
-gen_floors.py의 add_props가 놓은 집기가 방 밖으로 나가거나, 벽·다른 집기와
+gen_floors.py의 add_props가 놓은 집기가 제자리를 벗어나거나, 벽·다른 집기와
 겹치거나, 단서·은신처를 덮지 않는지 본다. 도달성 자체는 verify_floor_reach가
 보므로 여기서는 "조사할 수 있는가"와 "겹치지 않는가"를 맡는다.
+
+집기는 두 갈래다. 방 집기는 방 폴리곤 안에 온전히 들어가야 하고, 복도 집기
+(Corr_*)는 반대로 어느 방에도 걸치지 않아야 한다 — 복도 벽에 붙는 사물함이라
+방 안으로 파고들면 방이 좁아지고 문 앞을 막는다.
+장식(PD_)은 충돌체가 없으므로 짝 검사에서 빼되, 벽·집기와 겹치는지는 본다.
 
 Godot 없이 도는 정적 검사.
   python3 tools/verify_props.py
@@ -88,6 +93,7 @@ def check(fl: int) -> None:
 
     props: dict[str, tuple] = {}      # PC_ 이름 -> bbox
     visuals: dict[str, str] = {}      # PV_ 이름 -> polygon 원문
+    decors: dict[str, tuple] = {}     # PD_ 이름 -> bbox (충돌 없는 장식)
     prop_polys: dict[str, str] = {}
     walls: list[list] = []
     rooms: dict[str, list] = {}
@@ -99,7 +105,10 @@ def check(fl: int) -> None:
             props[name[3:]] = bbox(pts(poly_m.group(1)))
             prop_polys[name[3:]] = poly_m.group(1).strip()
         elif ntype == "Polygon2D" and parent == "Props":
-            visuals[name[3:]] = poly_m.group(1).strip()
+            if name.startswith("PD_"):
+                decors[name[3:]] = bbox(pts(poly_m.group(1)))
+            else:
+                visuals[name[3:]] = poly_m.group(1).strip()
         elif ntype == "CollisionPolygon2D" and parent != "PropBodies" and poly_m:
             walls.append(pts(poly_m.group(1)))
         elif ntype == "Polygon2D" and parent == "Rooms" and poly_m:
@@ -118,11 +127,23 @@ def check(fl: int) -> None:
         elif prop_polys[key] != visuals[key]:
             errors.append(f"{tag}: PC_{key}와 PV_{key}의 폴리곤이 다르다")
 
-    # 2. 집기는 어느 방 안에 온전히 들어가야 한다
+    # 2. 방 집기는 방 안에, 복도 집기(Corr_*)는 방 밖에 있어야 한다
     for key, (x0, y0, x1, y1) in sorted(props.items()):
-        corners = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
-        if not any(all(inside(poly, cx, cy) for cx, cy in corners)
-                   for poly in rooms.values()):
+        # 1px 안쪽으로 재서 "벽면에 맞닿음"과 "방 안으로 침범"을 구분한다.
+        # 점-다각형 판정은 경계를 안쪽으로 세므로, 복도 사물함의 아래 변이 방
+        # 위 변과 같은 y면 그대로는 침범으로 잡힌다.
+        e = 1.0
+        corners = [(x0 + e, y0 + e), (x1 - e, y0 + e),
+                   (x1 - e, y1 - e), (x0 + e, y1 - e)]
+        in_room = any(all(inside(poly, cx, cy) for cx, cy in corners)
+                      for poly in rooms.values())
+        touches = any(any(inside(poly, cx, cy) for cx, cy in corners)
+                      for poly in rooms.values())
+        if key.startswith("Corr_"):
+            if touches:
+                errors.append(f"{tag}: 복도 집기 {key}가 방 안으로 들어갔다 "
+                              f"({x0:.0f},{y0:.0f})")
+        elif not in_room:
             errors.append(f"{tag}: 집기 {key}가 방 안에 온전히 들어 있지 않다 "
                           f"({x0:.0f},{y0:.0f})")
 
@@ -149,16 +170,31 @@ def check(fl: int) -> None:
                     and y0 - CLUE_CLEAR < py < y1 + CLUE_CLEAR):
                 errors.append(f"{tag}: 집기 {key}가 {name}({px:.0f},{py:.0f})를 덮는다")
 
-    # 6. 커버리지 — 집기가 하나도 없는 방(경고)
+    # 6. 장식(PD_)은 충돌체가 없지만 벽·집기와 겹쳐 보이면 안 된다
+    for key, (x0, y0, x1, y1) in sorted(decors.items()):
+        quad = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+        if any(sat_overlap(quad, w) for w in walls):
+            errors.append(f"{tag}: 장식 {key}가 벽과 겹친다 ({x0:.0f},{y0:.0f})")
+            continue
+        for pkey, box in props.items():
+            if overlap((x0, y0, x1, y1), box):
+                errors.append(f"{tag}: 장식 {key}가 집기 {pkey}와 겹친다")
+                break
+
+    # 7. 커버리지 — 집기가 하나도 없는 방(경고)
     have = set()
     for key, (x0, y0, x1, y1) in props.items():
+        if key.startswith("Corr_"):
+            continue
         cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
         for rname, poly in rooms.items():
             if inside(poly, cx, cy):
                 have.add(rname)
                 break
     bare = sorted(set(rooms) - have)
-    print(f"  {tag}: 집기 {len(props)}개, 방 {len(rooms)}개 중 {len(have)}개에 배치")
+    corr = sum(1 for k in props if k.startswith("Corr_"))
+    print(f"  {tag}: 집기 {len(props)}개(복도 {corr}) · 장식 {len(decors)}개, "
+          f"방 {len(rooms)}개 중 {len(have)}개에 배치")
     if bare:
         warnings.append(f"{tag}: 집기 없는 방 {len(bare)}개 — {', '.join(bare)}")
 

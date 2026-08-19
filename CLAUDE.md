@@ -27,7 +27,10 @@ main_menu → intro(프롤로그 컷신: street→back_gate→art_room→cabinet
 - 상태 영속: `scripts/game/game_state.gd` — 인벤토리(최대 5개), 플래그(set_flag/has_flag)로 문 개방·아이템 획득 기록(층 씬이 재로드돼도 유지).
 - 상호작용(E): `scripts/interactions/` — interactable(조사), locked_door(열쇠 문), pickup_item(접촉 획득), exit_door(현관 탈출→엔딩). Area2D는 collision_layer 2, prompt_text로 "[E] …" 안내 표시.
 - 잉크통(#169): 4층 정보부실에서 얻는 `ink_can`을 **Q**로 바라보는 방향에 던진다(1회용). `scenes/items/ink_projectile.tscn`이 레이캐스트로 벽을 확인하며 날아가다 터지고, 반경 120px 안의 수위를 5초간 멈춘다(`janitor.blind()` — 추적·접촉 판정 정지, 층을 옮기면 해제). 쓸 수 있는 아이템의 조작 키는 `hud.gd`의 `USABLE_ITEM_KEYS`에 적어 R 패널에 표시한다.
-- 방 집기: 방이 빈 사각형이라 들어갈 이유가 없던 것을 `gen_floors.py`의 `add_props()`가 채운다. 방 종류(`prop_kind()`)마다 다른 단위를 절차적으로 깔고, **방 중심·문 통로·단서 주변은 비운다** — 중심을 막으면 `verify_floor_reach`가 방을 도달 불가로 본다. 노드는 충돌 `PC_`(StaticBody2D `PropBodies`) + 시각 `PV_`(`Props`) 한 쌍이고, **벽과 달리 광원 차단체를 달지 않는다**(낮은 집기 설정 + 조명 튜닝 #74를 흔들지 않으려는 목적). 그래서 `verify_scenes`의 벽↔차단체 1:1 검사에 걸리지 않는다. 크기는 최대치라 좁은 자리에서는 `PROP_MIN_W/H`까지 줄어든다.
+- 방·복도 집기: 방이 빈 사각형이라 들어갈 이유가 없던 것을 `gen_floors.py`의 `add_props()`가 채운다. 노드는 충돌 `PC_`(StaticBody2D `PropBodies`) + 시각 `PV_`(`Props`) 한 쌍, 충돌 없는 장식은 `PD_`(칠판·게시판)다. **벽과 달리 광원 차단체를 달지 않는다**(낮은 집기 설정 + 조명 튜닝 #74를 흔들지 않으려는 목적)—그래서 `verify_scenes`의 벽↔차단체 1:1 검사에 걸리지 않는다.
+  - 교실은 전용 배치 `_classroom()`: 칠판→교탁→책상+의자 격자→뒷벽 사물함. **중앙 통로를 문과 같은 x에 내므로 방 중심이 항상 빈다** — 중심을 막으면 `verify_floor_reach`가 방을 도달 불가로 본다.
+  - 그 밖의 방은 `prop_kind()`로 종류를 정하고 `PROP_SPECS`의 단위를 깐다. 단위 크기는 최대치라 좁은 자리에서는 `PROP_MIN_W/H`까지 줄어든다(규격을 고집하면 화장실·현관이 통째로 빈다).
+  - 복도는 `add_corridor_props()`가 맞닿은 방 벽마다 사물함을 붙이고 남는 벽면에 게시판을 건다. 복도 띠는 빌더가 넘긴다(2~5층 3개, 1층 1개). 문 틈 양옆 `CORR_DOOR_PAD`는 비운다 — 수위 순찰의 문 앞 대기 지점이 거기다.
 - 조명: main의 CanvasModulate + 플레이어 PointLight2D(shadow_enabled) — 벽 차단체 때문에 벽 너머는 보이지 않음. 문·창문 틈으로만 빛이 샘.
 - UI: R 인벤토리 패널(5슬롯), 좌상단 HUD(목표/소지품)+층 표시, 하단 알림(game_state.request_notice).
 - 사운드(#9): 에셋을 받아오지 않고 **`tools/gen_sfx.py`가 8비트 톤으로 합성**해 `assets/audio/*.wav`로 커밋한다(표준 라이브러리만, 고정 시드라 재생성해도 바이트가 같다). 톤을 바꾸려면 그 스크립트의 `build_all()` 숫자를 고치고 다시 돌린다. 비위치 효과음은 autoload `Sfx`(`scripts/game/sound_manager.gd`)의 `Sfx.play(&"id")`, 위치가 정보인 소리(수위 발소리·열쇠·문)는 `janitor.tscn`의 AudioStreamPlayer2D가 낸다. **하단 알림 텍스트는 소리와 병행**한다 — 소리를 못 듣는 상황에서도 단서가 남아야 한다. 오디오 버스는 Master 하나뿐이고 음량은 `sound_manager.gd`의 `VOLUMES`에서 맞춘다.
@@ -106,7 +109,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate→art_room→cabinet
 - 맵 관련 변경은 **`python3 tools/gen_floors.py` 재생성 후** 아래 4개를 모두 돌립니다:
   `verify_scenes.py`(정합성·깨진 실수 값) / `verify_floor_reach.py`(방 도달성·막힌 공간 봉인·카메라 한계) /
   `verify_stairs.py`(floor_manager 계단 좌표 ↔ 씬 대조) / `verify_progression.py`(4층→1층 현관 완주 가능) /
-  `verify_props.py`(집기가 방 밖·벽·다른 집기·단서와 겹치지 않는지. 사선 벽이 있어 분리축으로 본다).
+  `verify_props.py`(방 집기는 방 안, 복도 집기 `Corr_*`는 방 밖. 벽·다른 집기·단서와 겹치지 않는지. 사선 벽이 있어 분리축으로 본다).
 - 씬이나 스크립트를 고쳤으면 **푸시 전에 `python3 tools/verify_scenes.py`를 실행**합니다.
   load_steps, 리소스 참조, 노드 부모 경로, 형제 이름 중복, 스크립트 $NodePath,
   벽 충돌↔광원 차단체 1:1을 검사합니다(Godot 불필요, 수초).
