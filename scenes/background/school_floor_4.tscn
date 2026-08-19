@@ -2707,6 +2707,12 @@ occluder = SubResource("Occ_WC_WomensRoomB_right")
 color = Color(0.45, 0.48, 0.55, 1)
 polygon = PackedVector2Array(2804, 2120, 2820, 2120, 2820, 2480, 2804, 2480)
 
+[node name="Furniture" type="Node2D" parent="."]
+
+[node name="DeskCreativeDept" type="Polygon2D" parent="Furniture"]
+color = Color(0.29, 0.23, 0.17, 1)
+polygon = PackedVector2Array(960, 1720, 1130, 1720, 1130, 1800, 960, 1800)
+
 [node name="DasanStairKey" type="Area2D" parent="."]
 position = Vector2(258.3, 1780.4)
 collision_layer = 0
@@ -2748,7 +2754,7 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 
 [node name="CounselRecord" type="Area2D" parent="."]
-position = Vector2(1036.7, 1780.4)
+position = Vector2(1045, 1752)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
@@ -2768,7 +2774,7 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 
 [node name="SiwooPainting" type="Area2D" parent="."]
-position = Vector2(1338.3, 1780.4)
+position = Vector2(1350, 1906)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
@@ -6720,102 +6726,88 @@ color = Color(0.22, 0.18, 0.14, 1)
 polygon = PackedVector2Array(612.5, 1852, 624.5, 1852, 624.5, 1878, 612.5, 1878)
 
 [node name="PC_CreativeDept_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(834.8, 1571.1, 930.8, 1571.1, 930.8, 1611.1, 834.8, 1611.1)
+polygon = PackedVector2Array(828, 1571.1, 924, 1571.1, 924, 1611.1, 828, 1611.1)
 
 [node name="PV_CreativeDept_0" type="Polygon2D" parent="Props"]
 color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(834.8, 1571.1, 930.8, 1571.1, 930.8, 1611.1, 834.8, 1611.1)
+polygon = PackedVector2Array(828, 1571.1, 924, 1571.1, 924, 1611.1, 828, 1611.1)
 
 [node name="PC_CreativeDept_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(834.8, 1635.1, 930.8, 1635.1, 930.8, 1675.1, 834.8, 1675.1)
+polygon = PackedVector2Array(828, 1635.1, 924, 1635.1, 924, 1675.1, 828, 1675.1)
 
 [node name="PV_CreativeDept_1" type="Polygon2D" parent="Props"]
 color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(834.8, 1635.1, 930.8, 1635.1, 930.8, 1675.1, 834.8, 1675.1)
+polygon = PackedVector2Array(828, 1635.1, 924, 1635.1, 924, 1675.1, 828, 1675.1)
 
 [node name="PC_CreativeDept_2" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(958.8, 1571.1, 1054.8, 1571.1, 1054.8, 1611.1, 958.8, 1611.1)
+polygon = PackedVector2Array(1320.2, 1571.1, 1416.2, 1571.1, 1416.2, 1611.1, 1320.2, 1611.1)
 
 [node name="PV_CreativeDept_2" type="Polygon2D" parent="Props"]
 color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(958.8, 1571.1, 1054.8, 1571.1, 1054.8, 1611.1, 958.8, 1611.1)
+polygon = PackedVector2Array(1320.2, 1571.1, 1416.2, 1571.1, 1416.2, 1611.1, 1320.2, 1611.1)
 
 [node name="PC_CreativeDept_3" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(958.8, 1635.1, 1054.8, 1635.1, 1054.8, 1675.1, 958.8, 1675.1)
+polygon = PackedVector2Array(1320.2, 1635.1, 1416.2, 1635.1, 1416.2, 1675.1, 1320.2, 1675.1)
 
 [node name="PV_CreativeDept_3" type="Polygon2D" parent="Props"]
 color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(958.8, 1635.1, 1054.8, 1635.1, 1054.8, 1675.1, 958.8, 1675.1)
+polygon = PackedVector2Array(1320.2, 1635.1, 1416.2, 1635.1, 1416.2, 1675.1, 1320.2, 1675.1)
 
 [node name="PC_CreativeDept_4" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1320.2, 1571.1, 1416.2, 1571.1, 1416.2, 1611.1, 1320.2, 1611.1)
+polygon = PackedVector2Array(1444.2, 1571.1, 1540.2, 1571.1, 1540.2, 1611.1, 1444.2, 1611.1)
 
 [node name="PV_CreativeDept_4" type="Polygon2D" parent="Props"]
 color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(1320.2, 1571.1, 1416.2, 1571.1, 1416.2, 1611.1, 1320.2, 1611.1)
+polygon = PackedVector2Array(1444.2, 1571.1, 1540.2, 1571.1, 1540.2, 1611.1, 1444.2, 1611.1)
 
 [node name="PC_CreativeDept_5" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1320.2, 1635.1, 1416.2, 1635.1, 1416.2, 1675.1, 1320.2, 1675.1)
+polygon = PackedVector2Array(1444.2, 1635.1, 1540.2, 1635.1, 1540.2, 1675.1, 1444.2, 1675.1)
 
 [node name="PV_CreativeDept_5" type="Polygon2D" parent="Props"]
 color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(1320.2, 1635.1, 1416.2, 1635.1, 1416.2, 1675.1, 1320.2, 1675.1)
+polygon = PackedVector2Array(1444.2, 1635.1, 1540.2, 1635.1, 1540.2, 1675.1, 1444.2, 1675.1)
 
 [node name="PC_CreativeDept_6" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1444.2, 1571.1, 1540.2, 1571.1, 1540.2, 1611.1, 1444.2, 1611.1)
+polygon = PackedVector2Array(819.5, 1784.9, 915.5, 1784.9, 915.5, 1824.9, 819.5, 1824.9)
 
 [node name="PV_CreativeDept_6" type="Polygon2D" parent="Props"]
 color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(1444.2, 1571.1, 1540.2, 1571.1, 1540.2, 1611.1, 1444.2, 1611.1)
+polygon = PackedVector2Array(819.5, 1784.9, 915.5, 1784.9, 915.5, 1824.9, 819.5, 1824.9)
 
 [node name="PC_CreativeDept_7" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1444.2, 1635.1, 1540.2, 1635.1, 1540.2, 1675.1, 1444.2, 1675.1)
+polygon = PackedVector2Array(819.5, 1848.9, 915.5, 1848.9, 915.5, 1888.9, 819.5, 1888.9)
 
 [node name="PV_CreativeDept_7" type="Polygon2D" parent="Props"]
 color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(1444.2, 1635.1, 1540.2, 1635.1, 1540.2, 1675.1, 1444.2, 1675.1)
+polygon = PackedVector2Array(819.5, 1848.9, 915.5, 1848.9, 915.5, 1888.9, 819.5, 1888.9)
 
 [node name="PC_CreativeDept_8" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(823.8, 1784.9, 919.8, 1784.9, 919.8, 1824.9, 823.8, 1824.9)
+polygon = PackedVector2Array(1158, 1784.9, 1254, 1784.9, 1254, 1824.9, 1158, 1824.9)
 
 [node name="PV_CreativeDept_8" type="Polygon2D" parent="Props"]
 color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(823.8, 1784.9, 919.8, 1784.9, 919.8, 1824.9, 823.8, 1824.9)
+polygon = PackedVector2Array(1158, 1784.9, 1254, 1784.9, 1254, 1824.9, 1158, 1824.9)
 
 [node name="PC_CreativeDept_9" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(823.8, 1848.9, 919.8, 1848.9, 919.8, 1888.9, 823.8, 1888.9)
+polygon = PackedVector2Array(1158, 1848.9, 1254, 1848.9, 1254, 1888.9, 1158, 1888.9)
 
 [node name="PV_CreativeDept_9" type="Polygon2D" parent="Props"]
 color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(823.8, 1848.9, 919.8, 1848.9, 919.8, 1888.9, 823.8, 1888.9)
+polygon = PackedVector2Array(1158, 1848.9, 1254, 1848.9, 1254, 1888.9, 1158, 1888.9)
 
 [node name="PC_CreativeDept_10" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1139.5, 1784.9, 1235.5, 1784.9, 1235.5, 1824.9, 1139.5, 1824.9)
+polygon = PackedVector2Array(1461, 1784.9, 1557, 1784.9, 1557, 1824.9, 1461, 1824.9)
 
 [node name="PV_CreativeDept_10" type="Polygon2D" parent="Props"]
 color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(1139.5, 1784.9, 1235.5, 1784.9, 1235.5, 1824.9, 1139.5, 1824.9)
+polygon = PackedVector2Array(1461, 1784.9, 1557, 1784.9, 1557, 1824.9, 1461, 1824.9)
 
 [node name="PC_CreativeDept_11" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1139.5, 1848.9, 1235.5, 1848.9, 1235.5, 1888.9, 1139.5, 1888.9)
+polygon = PackedVector2Array(1461, 1848.9, 1557, 1848.9, 1557, 1888.9, 1461, 1888.9)
 
 [node name="PV_CreativeDept_11" type="Polygon2D" parent="Props"]
 color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(1139.5, 1848.9, 1235.5, 1848.9, 1235.5, 1888.9, 1139.5, 1888.9)
-
-[node name="PC_CreativeDept_12" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1455.2, 1784.9, 1551.2, 1784.9, 1551.2, 1824.9, 1455.2, 1824.9)
-
-[node name="PV_CreativeDept_12" type="Polygon2D" parent="Props"]
-color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(1455.2, 1784.9, 1551.2, 1784.9, 1551.2, 1824.9, 1455.2, 1824.9)
-
-[node name="PC_CreativeDept_13" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1455.2, 1848.9, 1551.2, 1848.9, 1551.2, 1888.9, 1455.2, 1888.9)
-
-[node name="PV_CreativeDept_13" type="Polygon2D" parent="Props"]
-color = Color(0.29, 0.23, 0.17, 1)
-polygon = PackedVector2Array(1455.2, 1848.9, 1551.2, 1848.9, 1551.2, 1888.9, 1455.2, 1888.9)
+polygon = PackedVector2Array(1461, 1848.9, 1557, 1848.9, 1557, 1888.9, 1461, 1888.9)
 
 [node name="PC_ComputerRoom_0" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(2000.2, 1576.1, 2054.2, 1576.1, 2054.2, 1612.1, 2000.2, 1612.1)
@@ -7977,39 +7969,25 @@ color = Color(0.30, 0.32, 0.37, 1)
 polygon = PackedVector2Array(1021.8, 1940, 1079.8, 1940, 1079.8, 1972, 1021.8, 1972)
 
 [node name="PC_Corr_CreativeDept_1940_5" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1295.2, 1940, 1353.2, 1940, 1353.2, 1972, 1295.2, 1972)
+polygon = PackedVector2Array(1430, 1940, 1488, 1940, 1488, 1972, 1430, 1972)
 
 [node name="PV_Corr_CreativeDept_1940_5" type="Polygon2D" parent="Props"]
 color = Color(0.30, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1295.2, 1940, 1353.2, 1940, 1353.2, 1972, 1295.2, 1972)
+polygon = PackedVector2Array(1430, 1940, 1488, 1940, 1488, 1972, 1430, 1972)
 
 [node name="PC_Corr_CreativeDept_1940_6" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1361.2, 1940, 1419.2, 1940, 1419.2, 1972, 1361.2, 1972)
+polygon = PackedVector2Array(1496, 1940, 1554, 1940, 1554, 1972, 1496, 1972)
 
 [node name="PV_Corr_CreativeDept_1940_6" type="Polygon2D" parent="Props"]
 color = Color(0.30, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1361.2, 1940, 1419.2, 1940, 1419.2, 1972, 1361.2, 1972)
+polygon = PackedVector2Array(1496, 1940, 1554, 1940, 1554, 1972, 1496, 1972)
 
 [node name="PC_Corr_CreativeDept_1940_7" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1427.2, 1940, 1485.2, 1940, 1485.2, 1972, 1427.2, 1972)
+polygon = PackedVector2Array(1562, 1940, 1620, 1940, 1620, 1972, 1562, 1972)
 
 [node name="PV_Corr_CreativeDept_1940_7" type="Polygon2D" parent="Props"]
 color = Color(0.30, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1427.2, 1940, 1485.2, 1940, 1485.2, 1972, 1427.2, 1972)
-
-[node name="PC_Corr_CreativeDept_1940_8" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1493.2, 1940, 1551.2, 1940, 1551.2, 1972, 1493.2, 1972)
-
-[node name="PV_Corr_CreativeDept_1940_8" type="Polygon2D" parent="Props"]
-color = Color(0.30, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1493.2, 1940, 1551.2, 1940, 1551.2, 1972, 1493.2, 1972)
-
-[node name="PC_Corr_CreativeDept_1940_9" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1559.2, 1940, 1617.2, 1940, 1617.2, 1972, 1559.2, 1972)
-
-[node name="PV_Corr_CreativeDept_1940_9" type="Polygon2D" parent="Props"]
-color = Color(0.30, 0.32, 0.37, 1)
-polygon = PackedVector2Array(1559.2, 1940, 1617.2, 1940, 1617.2, 1972, 1559.2, 1972)
+polygon = PackedVector2Array(1562, 1940, 1620, 1940, 1620, 1972, 1562, 1972)
 
 [node name="PC_Corr_ComputerRoom_1940_0" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1939.2, 1940, 1997.2, 1940, 1997.2, 1972, 1939.2, 1972)

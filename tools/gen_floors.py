@@ -243,6 +243,7 @@ class Scene:
         self.rooms = {}
         self.room_meta = {}   # key -> 집기 배치에 필요한 방 형상(add_props가 읽는다)
         self.clue_pts = []    # 단서·은신처 좌표 — 집기가 덮으면 조사할 수 없다
+        self.furniture = []   # add_furniture가 손으로 놓은 가구 — 절차적 집기가 피한다
 
     def occ(self, oid, polygon):
         self.subs.append((oid, polygon))
@@ -501,7 +502,37 @@ LOCKED = {1: "stair_key_1", 2: "stair_key_2", 3: "stair_key_3",
 
 # 특정 단서의 위치를 방 안 자동 배치 대신 직접 지정한다.
 # 현관(ExitDoor)은 바깥으로 나가는 아래쪽 정문 앞에 둬야 안내와 실제 위치가 맞는다.
-POS_OVERRIDE = {(1, "ExitDoor"): (1800, 2432)}
+POS_OVERRIDE = {
+    (1, "ExitDoor"): (1800, 2432),
+    # 4층 창의체험부(750,1520)~(1640,1940) — 자동 배치는 방 한가운데라 대사와 어긋났다(#215).
+    # 액자는 "벽에 걸린" 것이므로 아래쪽 벽 안쪽에 붙이고,
+    # 상담기록부는 아래에 깐 책상 위(FURNITURE의 DeskCreativeDept)에 올린다.
+    (4, "SiwooPainting"): (1350, 1906),
+    (4, "CounselRecord"): (1045, 1752),
+}
+
+# 방 안 가구(시각 전용). 충돌은 넣지 않는다 — 통행·수위 경로탐색·도달성 검사에
+# 영향을 주기 때문. 단서보다 먼저 그려서 아래에 깔린다.
+FURNITURE = {
+    4: [("DeskCreativeDept", 960, 1720, 1130, 1800)],
+}
+# C_DESK는 위쪽 집기 색 블록에 이미 있다. #215가 여기서 다시 정의하고 있었는데
+# 나중 정의가 이겨서 절차적 집기 색이 전부 그 값으로 덮였다.
+
+
+def add_furniture(sc, floor):
+    """단서를 받치는 손배치 가구(시각 전용). add_props의 절차적 집기와 별개다.
+
+    add_props보다 먼저 돌고, 놓은 사각형을 sc.furniture에 남긴다 —
+    절차적 집기가 그 위에 겹쳐 깔리지 않게 하려는 것이다.
+    """
+    items = FURNITURE.get(floor, [])
+    if not items:
+        return
+    sc.node('[node name="Furniture" type="Node2D" parent="."]\n')
+    for name, x0, y0, x1, y1 in items:
+        sc.poly2d(name, "Furniture", C_DESK, rect(x0, y0, x1, y1))
+        sc.furniture.append((x0, y0, x1, y1))
 
 # 열쇠를 주는 오브젝트는 층에 상관없이 "다가가면 획득"으로 통일한다(사용자 요청).
 # 원래는 4층 열쇠 2개만 pickup_item(접촉)이고 나머지는 interactable(E 필요)이라
@@ -1102,9 +1133,14 @@ def add_sliding_doors(sc):
 
 
 def _keepout_for(sc, x0, x1):
-    return [(px - PROP_CLUE_CLEAR, py - PROP_CLUE_CLEAR,
-             px + PROP_CLUE_CLEAR, py + PROP_CLUE_CLEAR)
-            for px, py in sc.clue_pts if x0 - 40 <= px <= x1 + 40]
+    out = [(px - PROP_CLUE_CLEAR, py - PROP_CLUE_CLEAR,
+            px + PROP_CLUE_CLEAR, py + PROP_CLUE_CLEAR)
+           for px, py in sc.clue_pts if x0 - 40 <= px <= x1 + 40]
+    # 손배치 가구(#215) 위에도 깔지 않는다. 단서 여유(76px)로는 가구 가장자리가
+    # 삐져나온다 — 창의체험부 책상은 단서보다 넓다.
+    out += [(fx0 - 8, fy0 - 8, fx1 + 8, fy1 + 8)
+            for fx0, fy0, fx1, fy1 in sc.furniture if x0 - 40 <= fx0 <= x1 + 40]
+    return out
 
 
 def add_props(sc, corridors=()):
@@ -1303,6 +1339,7 @@ def build_common(fl, spec):
     for key, lb, x0, x1 in spec["bottom_left"] + BOTTOM_RIGHT:
         add_room(sc, key, lb, x0, BOT_Y0, x1, BOT_Y1, "top")
 
+    add_furniture(sc, fl)
     add_story(sc, fl)
     add_hiding(sc, fl)
     add_props(sc, [(NORTH_Y1, MID_Y0), (VOID_Y1, SOUTH_Y0), (SOUTH_Y1, BOT_Y0)])
@@ -1348,6 +1385,7 @@ def build_floor1():
     ex0, ey1, ex1 = 1600, 2480, 2000
     sc.poly2d("Door_FrontGate", "WallGlow/RoomWallVisuals", C_DOOR,
               rect((ex0 + ex1) / 2 - DOOR / 2, ey1 - T, (ex0 + ex1) / 2 + DOOR / 2, ey1), z=1)
+    add_furniture(sc, 1)
     add_story(sc, 1)
     add_hiding(sc, 1)
     # 1층은 아래쪽 절반만 건물이라 큰 홀 하나가 복도 역할을 한다.
