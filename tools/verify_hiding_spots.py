@@ -36,11 +36,16 @@ HIDING_SCRIPT = "res://scripts/interactions/hiding_spot.gd"
 BODY_HALF_WIDTH = 9.0
 BODY_HALF_HEIGHT = 15.0
 CELL = 25.0
-GRID_WIDTH = 112
-GRID_HEIGHT = 72
+# 맵이 3400×2500으로 커졌다(#159) — 옛 112×72는 하단 띠를 격자 밖으로 밀어냈다.
+GRID_WIDTH = 136
+GRID_HEIGHT = 100
 
-# floor_manager.gd ARRIVE_AFTER_DOWN — 전 층 공통 복도 지점(연결성 시드)
-ARRIVE_POINTS = [(281.0, 692.0), (1311.0, 1372.0)]
+# 계단 도착 지점(연결성 시드). 층마다 계단 위치·개수가 달라졌으므로(#159)
+# floor_manager.gd의 STAIRS에서 계산한 값을 층별로 둔다.
+ARRIVE_COMMON = [(579.0, 692.0), (461.0, 692.0), (1729.0, 2092.0), (1611.0, 2092.0)]
+ARRIVE_BY_FLOOR = {
+    1: [(499.0, 2092.0), (381.0, 2092.0)],   # 1층은 계단이 한 곳뿐
+}
 
 # 은신처가 벽에 너무 붙으면 들어가고 나올 때 끼일 수 있어 여유를 둔다
 CLEARANCE_MARGIN = 3.0
@@ -178,12 +183,13 @@ def build_solid(rects) -> set[tuple[int, int]]:
     return solid
 
 
-def reachable_cells(solid: set[tuple[int, int]]) -> set[tuple[int, int]]:
+def reachable_cells(solid: set[tuple[int, int]],
+                    floor: int = 0) -> set[tuple[int, int]]:
     """계단 도착 지점들에서 걸어서 닿는 칸(4방향 BFS)."""
     seen: set[tuple[int, int]] = set()
     queue: collections.deque = collections.deque()
 
-    for px, py in ARRIVE_POINTS:
+    for px, py in ARRIVE_BY_FLOOR.get(floor, ARRIVE_COMMON):
         start = cell_of(px, py)
         if start not in solid and start not in seen:
             seen.add(start)
@@ -205,7 +211,7 @@ def reachable_cells(solid: set[tuple[int, int]]) -> set[tuple[int, int]]:
 def suggest(floor: int) -> None:
     rects = load_blockers(floor)
     solid = build_solid(rects)
-    reach = reachable_cells(solid)
+    reach = reachable_cells(solid, floor)
 
     print(f"\n=== {floor}층 후보 (방 라벨에서 가장 가까운 통행 가능 지점) ===")
     for name, lx, ly in load_room_labels(floor):
@@ -231,7 +237,7 @@ def verify() -> None:
     for floor in PATROLLED_FLOORS:
         rects = load_blockers(floor)
         solid = build_solid(rects)
-        reach = reachable_cells(solid)
+        reach = reachable_cells(solid, floor)
         spots = load_hiding_spots(floor)
 
         if not spots:
