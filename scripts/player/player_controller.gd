@@ -13,8 +13,9 @@ const HIDDEN_PROMPT := "나오기"
 ## 두 장 모두 tools/gen_player_sprites.py가 원본 아트에서 만든다.
 const IDLE_TEXTURE := preload("res://assets/sprites/player_idle.png")
 const RUN_TEXTURE := preload("res://assets/sprites/player_run.png")
-## 40x48 스프라이트(중앙 정렬)의 발끝을 충돌 캡슐 바닥(y=13)에 맞추는 오프셋.
-const SPRITE_OFFSET_Y := -10.0
+## 48x56 스프라이트(중앙 정렬)의 발끝을 충돌 캡슐 바닥(y=13)에 맞추는 오프셋.
+## 캔버스 높이를 바꾸면 (발끝 y 14) - (높이/2)로 다시 계산할 것.
+const SPRITE_OFFSET_Y := -14.0
 ## 달리기 포즈가 한 장뿐이라 1px 위아래로 흔들어 걸음을 만든다.
 const BOB_INTERVAL := 0.14
 const BOB_HEIGHT := 1.0

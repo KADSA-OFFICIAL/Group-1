@@ -8,6 +8,9 @@
     assets/sprites/player_idle.png   대기(정면)
     assets/sprites/player_run.png    이동(달리기, 오른쪽을 봄 — 왼쪽은 flip_h)
 
+원본이 있는 폴더에는 `.gdignore`를 뒀다 — 1254x1254 원본까지 Godot이 임포트해
+빌드에 실을 이유가 없다(이 도구는 파일시스템에서 직접 읽는다).
+
 gen_sfx.py / gen_music.py와 같은 규약: **표준 라이브러리만 쓰고 결정론적**이다.
 톤이 아니라 크기·잘라낼 위치를 바꾸려면 아래 상수만 고치고 다시 돌리면 된다.
 같은 원본에 같은 상수면 출력 바이트도 같으므로 재실행해도 diff가 나오지 않는다.
@@ -28,9 +31,10 @@ SRC = ROOT / "assets" / "sprites" / "source" / "player_design.png"
 OUT_DIR = ROOT / "assets" / "sprites"
 
 # 출력 캔버스. 두 포즈가 같은 크기여야 Sprite2D 오프셋을 하나로 쓸 수 있다.
-# 폭 40은 달리기 포즈(뒤로 뻗은 다리 + 앞으로 뻗은 팔)가 잘리지 않는 최소치.
-CANVAS_W = 40
-CANVAS_H = 48
+# 폭은 달리기 포즈(뒤로 뻗은 다리 + 앞으로 뻗은 팔)가 잘리지 않을 만큼 필요하다
+# — 높이 56에서는 46이 최소치라 여유를 두고 48로 잡았다(_check_fits가 검사한다).
+CANVAS_W = 48
+CANVAS_H = 56
 
 # 배경으로 볼 밝기 상한(R+G+B). 머리카락은 (26,26,26)=78이라 걸리지 않는다.
 BG_LUMA = 40
@@ -274,10 +278,13 @@ def _check_fits(name: str, box: tuple[int, int, int, int], anchor_x: float,
     left = (box[0] - anchor_x) / scale + CANVAS_W / 2.0
     right = (box[1] + 1 - anchor_x) / scale + CANVAS_W / 2.0
     top = CANVAS_H - (box[3] + 1 - box[2]) / scale
-    if left < 0 or right > CANVAS_W:
+    # 대기 포즈는 배율의 기준이라 위·아래가 캔버스에 딱 맞는다 — 부동소수 오차가
+    # 음수로 새는 걸 EPS로 넘긴다.
+    eps = 1e-6
+    if left < -eps or right > CANVAS_W + eps:
         raise SystemExit(f"{name}: 가로가 넘친다 ({left:.1f}~{right:.1f} / 0~{CANVAS_W}) "
                          "— CANVAS_W를 넓힐 것")
-    if top < 0:
+    if top < -eps:
         raise SystemExit(f"{name}: 세로가 넘친다 (머리 위 {top:.1f}) — CANVAS_H를 늘릴 것")
 
 
