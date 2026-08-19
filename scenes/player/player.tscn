@@ -1,6 +1,7 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="1_player_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/player_idle.png" id="2_player_idle"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_player"]
 radius = 8.0
@@ -25,9 +26,10 @@ fill_to = Vector2(0.5, 0)
 motion_mode = 1
 script = ExtResource("1_player_script")
 
-[node name="Body" type="Polygon2D" parent="."]
-color = Color(0.48, 0.72, 0.86, 1)
-polygon = PackedVector2Array(0, -18, 10, -6, 7, 14, -7, 14, -10, -6)
+[node name="Body" type="Sprite2D" parent="."]
+texture_filter = 1
+offset = Vector2(0, -22)
+texture = ExtResource("2_player_idle")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CapsuleShape2D_player")
