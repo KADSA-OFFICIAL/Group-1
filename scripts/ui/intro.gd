@@ -87,12 +87,16 @@ const CHOICE_FADE_SECONDS := 0.4    # 선택창 등장 페이드인
 @onready var choice_panel: PanelContainer = $ChoicePanel
 @onready var choice_box: VBoxContainer = $ChoicePanel/Margin/ChoiceBox
 @onready var choice_prompt: Label = $ChoicePanel/Margin/ChoiceBox/ChoicePrompt
+@onready var skip_button: Button = $SkipButton
 
 var current_node: String = START_NODE
 var line_index: int = -1
 var transitioning: bool = false
 var finished: bool = false
 var choosing: bool = false
+## 장면 전환·시작 페이드에 쓰는 트윈. 건너뛰기가 도중에 끼어들 때 죽여야
+## 페이드가 서로 싸우지 않는다.
+var scene_tween: Tween = null
 
 
 func _ready() -> void:
@@ -101,9 +105,15 @@ func _ready() -> void:
 	dialogue.apply_font(scene_caption)
 	_apply_scene()
 
-	var tween := create_tween()
-	tween.tween_property(fade_rect, "color:a", 0.0, SCENE_FADE_SECONDS)
-	tween.tween_callback(_next_line)
+	# 테스트용 건너뛰기(#231) — 릴리스로 내보낸 빌드에서는 숨긴다.
+	# focus_mode는 씬에서 FOCUS_NONE이다. 포커스를 받으면 대사를 넘기려고
+	# 누른 Enter/Space가 버튼을 눌러 프롤로그가 통째로 날아간다.
+	skip_button.visible = OS.is_debug_build()
+	skip_button.pressed.connect(_on_skip_pressed)
+
+	scene_tween = create_tween()
+	scene_tween.tween_property(fade_rect, "color:a", 0.0, SCENE_FADE_SECONDS)
+	scene_tween.tween_callback(_next_line)
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -193,6 +203,7 @@ func _go_to(target: String) -> void:
 	var start_delay: float = SCRIPT_NODES[target].get("start_delay", 0.0)
 
 	var tween := create_tween()
+	scene_tween = tween
 	tween.tween_property(fade_rect, "color:a", 1.0, SCENE_FADE_SECONDS)
 	tween.tween_callback(func() -> void:
 		current_node = target
@@ -210,8 +221,21 @@ func _finish(scene_path: String) -> void:
 	if finished:
 		return
 	finished = true
+	# 장면 전환 도중에 건너뛰면 그 트윈이 계속 돌아 페이드를 도로 걷어낸다.
+	if scene_tween != null and scene_tween.is_valid():
+		scene_tween.kill()
 
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 1.0, SCENE_FADE_SECONDS)
 	tween.tween_callback(func() -> void:
 		get_tree().change_scene_to_file(scene_path))
+
+
+## 프롤로그를 통째로 건너뛰고 본편으로 간다(#231).
+## 마지막 장면의 @game과 같은 경로라 시작 지점·상태가 동일하다.
+func _on_skip_pressed() -> void:
+	if finished:
+		return
+	Sfx.play(&"ui_click")
+	skip_button.disabled = true
+	_finish(game_scene_path)

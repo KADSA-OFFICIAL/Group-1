@@ -84,6 +84,21 @@ theme_override_font_sizes/font_size = 22
 text = ""
 horizontal_alignment = 1
 
+[node name="SkipButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -206.0
+offset_top = 20.0
+offset_right = -24.0
+offset_bottom = 60.0
+grow_horizontal = 0
+focus_mode = 0
+modulate = Color(1, 1, 1, 0.72)
+theme_override_font_sizes/font_size = 18
+text = "프롤로그 건너뛰기"
+
 [node name="FadeRect" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
