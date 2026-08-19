@@ -56,7 +56,7 @@ C_SPEAKER = "Color(0.20, 0.21, 0.23, 1)" # 스피커
 C_CURTAIN = "Color(0.36, 0.33, 0.31, 1)" # 커튼
 C_BOOK = "Color(0.45, 0.34, 0.24, 1)"    # 책·교과서(집기 위 소품)
 C_PAPER = "Color(0.55, 0.54, 0.50, 1)"   # 서류
-C_LEAF = "Color(0.52, 0.38, 0.24, 1)"    # 미닫이 문짝
+C_LEAF = "Color(0.66, 0.58, 0.44, 1)"    # 미닫이 문짝 — 문 표식(C_DOOR)보다 밝게
 DOOR_LEAF_T = 10                          # 문짝 두께(벽 16 안쪽에 낀다)
 
 # ── 세로 밴드 ────────────────────────────────────────────────
@@ -1119,17 +1119,24 @@ def add_sliding_doors(sc):
         root = f"SlideDoor_{key}"
         sc.node(f'[node name="{root}" type="Node2D" parent="."]\n'
                 f'script = ExtResource("6_sliding")\n'
-                f'travel = {n(DOOR / 2)}\n')
-        for side, sx0, sx1 in (("L", cx - DOOR / 2, cx), ("R", cx, cx + DOOR / 2)):
+                f'travel = {n(DOOR / 2)}\n'
+                f'left_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_{key}_L")\n'
+                f'right_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_{key}_R")\n')
+        for side, sx0, sx1 in (("L", cx - DOOR / 2, cx),
+                               ("R", cx, cx + DOOR / 2)):
             body = f"SDPanel{side}"
             sc.node(f'[node name="{body}" type="StaticBody2D" parent="{root}"]\n')
             sc.node(f'[node name="Shape" type="CollisionPolygon2D" '
                     f'parent="{root}/{body}"]\n'
                     f'polygon = {rect(sx0, py0, sx1, py1)}\n')
-            sc.node(f'[node name="Visual" type="Polygon2D" '
-                    f'parent="{root}/{body}"]\n'
-                    f'z_index = 2\ncolor = {C_LEAF}\n'
-                    f'polygon = {rect(sx0, py0, sx1, py1)}\n')
+            # 시각은 WallGlow 안에 낸다. 레이어 0에 두면 CanvasLayer(layer=1)의
+            # 문 표식·벽 시각이 z_index와 무관하게 덮어 문이 아예 안 보인다(#234).
+            # 같은 문의 Door_ 마커보다 뒤에 선언되므로 그 위에 그려지고,
+            # 열려서 벽 쪽으로 밀리면 벽 시각 뒤로 숨는다 — 벽 속으로 들어가는
+            # 미닫이문의 실제 동작과 같다. 두께는 충돌(DOOR_LEAF_T)보다 넓은
+            # 벽 두께 전체를 쓴다 — 얇으면 벽 사이에 낀 실오라기로 보인다.
+            sc.poly2d(f"SDVis_{key}_{side}", "WallGlow/RoomWallVisuals",
+                      C_LEAF, rect(sx0, wy0, sx1, wy1), z=2)
         sc.node(f'[node name="Zone" type="Area2D" parent="{root}"]\n'
                 f'collision_layer = 0\ncollision_mask = 1\n')
         sc.node(f'[node name="ZoneShape" type="CollisionShape2D" '
