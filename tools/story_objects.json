@@ -187,7 +187,7 @@
    ]
   },
   "SpareKeyHook": {
-   "body": "[node name=\"SpareKeyHook\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(1160, 380)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"보관함 옆 고리에 여벌 열쇠가 걸려 있다. '3F 계단'. 4층에서 이미 챙겼더라도, 하나 더 있어서 나쁠 것은 없다.\"\nprompt_text = \"여벌 열쇠 챙기기\"\ngrants_item_id = \"stair_key_3\"\n\n",
+   "body": "[node name=\"SpareKeyHook\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(1160, 380)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"고리에 걸린 열쇠. 꼬리표에 '3F 계단'이라고 적혀 있다. 챙겼다.\"\nprompt_text = \"열쇠 챙기기\"\ngrants_item_id = \"stair_key_3\"\n\n",
    "kids": [
     "[node name=\"SpareKeyHookVisual\" type=\"Polygon2D\" parent=\"SpareKeyHook\"]\nz_index = 1\ncolor = Color(0.62, 0.55, 0.28, 1)\npolygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)\n\n",
     "[node name=\"SpareKeyHookZone\" type=\"CollisionShape2D\" parent=\"SpareKeyHook\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
