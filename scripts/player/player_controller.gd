@@ -8,13 +8,25 @@ extends CharacterBody2D
 const HIDDEN_LIGHT_ENERGY := 0.5
 const HIDDEN_PROMPT := "나오기"
 
+## 스프라이트(#210): 서 있을 땐 정면 대기 포즈, 움직이면 달리기 포즈.
+## 달리기 그림은 오른쪽을 보고 있어 왼쪽으로 갈 때만 뒤집는다.
+## 두 장 모두 tools/gen_player_sprites.py가 원본 아트에서 만든다.
+const IDLE_TEXTURE := preload("res://assets/sprites/player_idle.png")
+const RUN_TEXTURE := preload("res://assets/sprites/player_run.png")
+## 60x72 스프라이트(중앙 정렬)의 발끝을 충돌 캡슐 바닥(y=13)에 맞추는 오프셋.
+## 캔버스 높이를 바꾸면 (발끝 y 14) - (높이/2)로 다시 계산할 것.
+const SPRITE_OFFSET_Y := -22.0
+## 달리기 포즈가 한 장뿐이라 1px 위아래로 흔들어 걸음을 만든다.
+const BOB_INTERVAL := 0.14
+const BOB_HEIGHT := 1.0
+
 ## 잉크통 던지기(#169). 손에서 조금 앞에 놓고 던져야 벽에 붙어 있을 때
 ## 자기 발밑에서 터지지 않는다.
 const INK_ITEM_ID := "ink_can"
 const INK_PROJECTILE := preload("res://scenes/items/ink_projectile.tscn")
 const INK_SPAWN_OFFSET := 24.0
 
-@onready var body: Polygon2D = $Body
+@onready var body: Sprite2D = $Body
 @onready var interaction_area: Area2D = $InteractionArea
 @onready var interact_prompt: Label = $InteractPrompt
 @onready var player_light: PointLight2D = $PlayerLight
@@ -22,6 +34,9 @@ const INK_SPAWN_OFFSET := 24.0
 var facing_direction: Vector2 = Vector2.DOWN
 var is_hiding: bool = false
 var _light_energy: float = 1.0
+## 위아래로만 움직일 땐 직전 좌우를 유지한다(스프라이트가 제자리에서 뒤집히지 않게).
+var _facing_right: bool = true
+var _bob_time: float = 0.0
 
 
 func _ready() -> void:
@@ -39,7 +54,7 @@ func set_hiding(value: bool) -> void:
 	player_light.energy = HIDDEN_LIGHT_ENERGY if is_hiding else _light_energy
 
 
-func _physics_process(_delta: float) -> void:
+func _physics_process(delta: float) -> void:
 	if is_hiding:
 		# 숨은 자리에 고정. 프롬프트만 갱신해 "나오기" 안내를 유지한다.
 		velocity = Vector2.ZERO
@@ -50,13 +65,33 @@ func _physics_process(_delta: float) -> void:
 
 	if direction != Vector2.ZERO:
 		facing_direction = direction.normalized()
-		body.rotation = facing_direction.angle() - Vector2.UP.angle()
+		if not is_zero_approx(direction.x):
+			_facing_right = direction.x > 0.0
+
+	_update_sprite(direction != Vector2.ZERO, delta)
 
 	velocity = direction * speed
 	move_and_slide()
 
 	interaction_area.position = facing_direction * 22.0
 	_update_interact_prompt()
+
+
+## 대기/달리기 포즈 전환. 사람 그림이라 이동 각도로 회전시키면 안 된다
+## (예전 삼각형 도형은 회전으로 방향을 나타냈다).
+func _update_sprite(moving: bool, delta: float) -> void:
+	body.texture = RUN_TEXTURE if moving else IDLE_TEXTURE
+	# 대기 포즈는 정면이라 좌우가 없다 — 달릴 때만 뒤집는다.
+	body.flip_h = moving and not _facing_right
+
+	var bob := 0.0
+	if moving:
+		_bob_time += delta
+		if fmod(_bob_time, BOB_INTERVAL * 2.0) < BOB_INTERVAL:
+			bob = BOB_HEIGHT
+	else:
+		_bob_time = 0.0
+	body.offset = Vector2(0.0, SPRITE_OFFSET_Y - bob)
 
 
 func _unhandled_input(event: InputEvent) -> void:

@@ -467,7 +467,9 @@ PLACEMENT = {
     4: [("Dasan7", ["DasanStairKey", "FriendNote"]),              # 다산실
         ("CreativeDept", ["CounselRecord", "SiwooPainting"]),     # ← 상담실
         ("InfoDept", ["CrisisManual", "InkCan"]),                 # ← 인쇄실
-        ("ComputerRoom", ["StairKey", "ScienceClue"]),            # ← 과학 실험실
+        # 4층 계단 열쇠는 다산7실 하나로 충분하다 — 중복 열쇠 제거(#219).
+        # story_objects.json의 StairKey 항목은 남겨 둔다(되돌리기 쉽게).
+        ("ComputerRoom", ["ScienceClue"]),                        # ← 과학 실험실
         ("Dasan6", ["HistoryClue"]),                              # ← 역사자료실
         ("Storage2", ["TaehoNote"])],                             # ← 수학교구실
     3: [("North4", ["NayeonClue"]),                               # 생활지도부 ← 방송실
@@ -505,7 +507,8 @@ POS_OVERRIDE = {(1, "ExitDoor"): (1800, 2432)}
 # 원래는 4층 열쇠 2개만 pickup_item(접촉)이고 나머지는 interactable(E 필요)이라
 # 층마다 조작이 달랐다. 메시지와 플래그는 그대로 옮긴다.
 # KeyCabinet은 #207에서 열쇠 지급을 뗐으므로 여기 들어가지 않는다(E 조사 단서).
-AUTO_PICKUP = {"TaehoNote", "SpareKeyHook", "DrainKey", "JanitorSafe"}
+# TaehoNote는 #222에서 열쇠 지급을 뗐으므로 여기 들어가지 않는다(E 조사 단서).
+AUTO_PICKUP = {"SpareKeyHook", "DrainKey", "JanitorSafe"}
 
 
 def to_pickup(body):
