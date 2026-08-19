@@ -173,6 +173,10 @@ def load_blockers(floor: int) -> list[tuple[float, float, float, float]]:
         kind, parent, body = match.group(2), match.group(3) or "", match.group(4)
         if parent.split("/")[-1] not in static_bodies:
             continue
+        # 미닫이 교실문은 수위가 밀고 지나간다 — 장애물로 세지 않는다
+        # (janitor._collect_blockers도 같은 이름 규칙으로 건너뛴다).
+        if "SDPanel" in parent:
+            continue
         if kind == "CollisionPolygon2D":
             poly = re.search(r'polygon = PackedVector2Array\(([^)]*)\)', body)
             if poly:

@@ -9,6 +9,9 @@ gen_floors.py의 add_props가 놓은 집기가 제자리를 벗어나거나, 벽
 (Corr_*)는 반대로 어느 방에도 걸치지 않아야 한다 — 복도 벽에 붙는 사물함이라
 방 안으로 파고들면 방이 좁아지고 문 앞을 막는다.
 장식(PD_)은 충돌체가 없으므로 짝 검사에서 빼되, 벽·집기와 겹치는지는 본다.
+집기 위 소품(PT_ — 책상 위 교과서, 선반의 책)은 반대로 어느 집기 안에 온전히
+들어가야 한다. 미닫이 교실문(SDPanel*)은 닫힌 자리뿐 아니라 **열린 자리**도
+본다 — 열렸을 때 사물함이나 집기에 겹치면 문이 가구를 뚫고 들어간다.
 
 Godot 없이 도는 정적 검사.
   python3 tools/verify_props.py
@@ -24,6 +27,10 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 # 단서·은신처 Area2D 중심에서 이만큼은 집기가 없어야 상호작용 존(48×48)이 열린다.
 CLUE_CLEAR = 30
+
+# 미닫이 교실문 짝 하나가 밀려나는 거리. gen_floors.add_sliding_doors가 내는
+# travel(문 틈 폭의 절반)과 같아야 한다.
+DOOR_TRAVEL = 55.0
 
 NODE_RE = re.compile(
     r'\[node name="([^"]+)" type="(\w+)" parent="([^"]*)"\]\n(.*?)(?=\n\[node|\Z)', re.S)
@@ -94,6 +101,8 @@ def check(fl: int) -> None:
     props: dict[str, tuple] = {}      # PC_ 이름 -> bbox
     visuals: dict[str, str] = {}      # PV_ 이름 -> polygon 원문
     decors: dict[str, tuple] = {}     # PD_ 이름 -> bbox (충돌 없는 장식)
+    tops: dict[str, tuple] = {}       # PT_ 이름 -> bbox (집기 위 소품)
+    panels: dict[str, tuple] = {}     # 미닫이 문짝 -> bbox
     prop_polys: dict[str, str] = {}
     walls: list[list] = []
     rooms: dict[str, list] = {}
@@ -107,9 +116,13 @@ def check(fl: int) -> None:
         elif ntype == "Polygon2D" and parent == "Props":
             if name.startswith("PD_"):
                 decors[name[3:]] = bbox(pts(poly_m.group(1)))
+            elif name.startswith("PT_"):
+                tops[name[3:]] = bbox(pts(poly_m.group(1)))
             else:
                 visuals[name[3:]] = poly_m.group(1).strip()
         elif ntype == "CollisionPolygon2D" and parent != "PropBodies" and poly_m:
+            if "SDPanel" in parent:
+                panels[parent] = bbox(pts(poly_m.group(1)))
             walls.append(pts(poly_m.group(1)))
         elif ntype == "Polygon2D" and parent == "Rooms" and poly_m:
             rooms[name] = pts(poly_m.group(1))
@@ -181,7 +194,25 @@ def check(fl: int) -> None:
                 errors.append(f"{tag}: 장식 {key}가 집기 {pkey}와 겹친다")
                 break
 
-    # 7. 커버리지 — 집기가 하나도 없는 방(경고)
+    # 7. 집기 위 소품(PT_)은 어느 집기 안에 온전히 들어가야 한다
+    for key, (x0, y0, x1, y1) in sorted(tops.items()):
+        if not any(px0 - 0.5 <= x0 and x1 <= px1 + 0.5
+                   and py0 - 0.5 <= y0 and y1 <= py1 + 0.5
+                   for px0, py0, px1, py1 in props.values()):
+            errors.append(f"{tag}: 소품 {key}가 어느 집기 위에도 없다 "
+                          f"({x0:.0f},{y0:.0f})")
+
+    # 8. 미닫이문이 열린 자리에서 집기와 겹치지 않는지
+    travel = DOOR_TRAVEL
+    for parent, (x0, y0, x1, y1) in sorted(panels.items()):
+        step = -travel if parent.endswith("SDPanelL") else travel
+        moved = (x0 + step, y0, x1 + step, y1)
+        for pkey, box in props.items():
+            if overlap(moved, box):
+                errors.append(f"{tag}: 열린 문 {parent}가 집기 {pkey}와 겹친다")
+                break
+
+    # 9. 커버리지 — 집기가 하나도 없는 방(경고)
     have = set()
     for key, (x0, y0, x1, y1) in props.items():
         if key.startswith("Corr_"):

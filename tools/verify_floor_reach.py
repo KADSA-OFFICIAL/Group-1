@@ -27,7 +27,10 @@ def parse(path):
         # 벽(WC_/RC_)뿐 아니라 계단 자물쇠 배리어(SUBarrierCollision 등) 같은
         # 모든 정적 충돌 폴리곤을 막힌 것으로 본다. 접두사만 보면 배리어를 놓쳐
         # "잠긴 계단도 도달 가능"으로 잘못 통과한다(#159 P3에서 발견).
-        if ntype == "CollisionPolygon2D":
+        # 미닫이 교실문(SDPanel*)은 다가오면 열리므로 막힌 것으로 보지 않는다.
+        # 이 이름 규칙은 scripts/interactions/sliding_door.gd·janitor.gd·
+        # verify_janitor_route.py와 공유한다.
+        if ntype == "CollisionPolygon2D" and "SDPanel" not in parent:
             walls.append(poly)
         elif ntype == "Polygon2D" and parent == "Rooms":
             rooms[name] = poly
