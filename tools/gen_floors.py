@@ -157,7 +157,7 @@ TEX = {
     C_TV: "prop_glass",
     C_MONITOR: "prop_glass",
     C_WBOARD: "prop_glass",
-    C_BOARD: "prop_glass",
+    # 칠판은 단색으로 남긴다 — 유리 반사 무늬가 얹히면 분필판이 아니라 창처럼 보였다.
     C_SIGN: "prop_glass",
     # 천·코르크
     C_NOTICE: "prop_cloth",
@@ -166,7 +166,7 @@ TEX = {
     C_PAPER: "prop_cloth",
     C_CLEAN: "prop_cloth",
     C_MAT: "prop_cloth",
-    C_PLANT: "prop_cloth",
+    # 화분도 단색 — 잎에 천 짜임이 얹히면 식물로 안 읽힌다.
 }
 
 TEXTURES = {f"tex_{stem}": f"{TEX_DIR}/{stem}.png" for stem in sorted(set(TEX.values()))}
