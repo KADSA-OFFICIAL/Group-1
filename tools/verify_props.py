@@ -28,9 +28,11 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # 단서·은신처 Area2D 중심에서 이만큼은 집기가 없어야 상호작용 존(48×48)이 열린다.
 CLUE_CLEAR = 30
 
-# 미닫이 교실문 짝 하나가 밀려나는 거리. gen_floors.add_sliding_doors가 내는
-# travel(문 틈 폭의 절반)과 같아야 한다.
-DOOR_TRAVEL = 55.0
+# 미닫이 교실문이 밀려나는 거리·방향은 씬의 travel 값에서 읽는다. 상수로 박으면
+# 한 짝/두 짝, 미는 방향이 바뀔 때마다 조용히 어긋난다.
+TRAVEL_RE = re.compile(
+    r'\[node name="(SlideDoor_[^"]+)"[^\]]*\]\n(?:[^\[]*?)^travel = (-?[\d.]+)',
+    re.M | re.S)
 
 NODE_RE = re.compile(
     r'\[node name="([^"]+)" type="(\w+)" parent="([^"]*)"\]\n(.*?)(?=\n\[node|\Z)', re.S)
@@ -203,9 +205,13 @@ def check(fl: int) -> None:
                           f"({x0:.0f},{y0:.0f})")
 
     # 8. 미닫이문이 열린 자리에서 집기와 겹치지 않는지
-    travel = DOOR_TRAVEL
+    travels = {m.group(1): float(m.group(2)) for m in TRAVEL_RE.finditer(text)}
     for parent, (x0, y0, x1, y1) in sorted(panels.items()):
-        step = -travel if parent.endswith("SDPanelL") else travel
+        root = parent.split("/")[0]
+        step = travels.get(root)
+        if step is None:
+            errors.append(f"{tag}: {root}에 travel 값이 없다")
+            continue
         moved = (x0 + step, y0, x1 + step, y1)
         for pkey, box in props.items():
             if overlap(moved, box):
