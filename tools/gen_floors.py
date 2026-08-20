@@ -92,6 +92,103 @@ C_WATER = "Color(0.24, 0.30, 0.34, 1)"       # 정수기
 C_KEYBOARD_WALL = "Color(0.42, 0.36, 0.22, 1)"  # 수위실 열쇠판(장식)
 C_SIGN = "Color(0.30, 0.34, 0.38, 1)"        # 안내판(장식)
 
+# ── 도트 타일 텍스처 (#243) ──────────────────────────────────
+# 바닥·벽·집기는 단색 면이었다. `tools/gen_tiles.py`가 구운 회색조 도트 무늬를
+# 같은 폴리곤에 물려 2D 쯔꾸르류 타일 느낌을 낸다. 지오메트리는 건드리지 않는다.
+#
+# 왜 색이 아니라 무늬만 텍스처인가: 방 종류별 바닥색(#237)을 팔레트가 계속 쥐어야
+# 새 방에 타일을 붙일 때 색을 다시 고민하지 않는다. 텍스처는 color와 곱해진다.
+#
+# UV: Polygon2D의 uv를 비워 두면 정점 좌표가 곧 UV다. 이 폴리곤들은 전부 절대
+# 좌표 + position 0이므로 **맵 전체가 하나의 타일 격자에 정렬된다** — 방마다
+# 무늬가 어긋나지 않는다.
+TEX_DIR = "res://assets/tiles"
+TEX_MEAN = 0.78     # gen_tiles.py의 MEAN과 반드시 같아야 한다
+
+# 색 상수 -> 타일 이름. 여기 없는 색(열쇠·화살표·유도선·천장등처럼 얇거나 밝은
+# 표식)은 단색으로 남는다 — 잔무늬가 오히려 표식을 흐린다.
+TEX = {
+    # 바닥
+    C_FLOOR: "floor_cement",
+    C_ROOM: "floor_lino",
+    C_CORRIDOR: "floor_lino",
+    C_BLOCKED_FLOOR: "floor_cement",
+    ROOM_FLOOR["classroom"]: "floor_wood",
+    ROOM_FLOOR["office"]: "floor_carpet",
+    ROOM_FLOOR["toilet"]: "floor_tiles",
+    ROOM_FLOOR["storage"]: "floor_cement",
+    ROOM_FLOOR["lab"]: "floor_vinyl",
+    ROOM_FLOOR["computer"]: "floor_panel",
+    ROOM_FLOOR["entrance"]: "floor_stone",
+    ROOM_FLOOR["janitor"]: "floor_wood",
+    # 벽·문·계단
+    C_WALL: "wall_brick",
+    C_SEAL: "wall_brick",
+    C_STEP: "wall_brick",
+    C_SLAB: "floor_cement",
+    C_DOOR: "prop_grain",
+    C_LEAF: "prop_grain",
+    C_LOCK: "prop_metal",
+    # 나무 집기
+    C_DESK: "prop_grain",
+    C_SHELF: "prop_grain",
+    C_BENCH: "prop_grain",
+    C_CHAIR: "prop_grain",
+    C_CABINET: "prop_grain",
+    C_BED: "prop_grain",
+    C_BOOK: "prop_grain",
+    C_KEYBOARD_WALL: "prop_grain",
+    # 금속 집기
+    C_METAL: "prop_metal",
+    C_LOCKER: "prop_metal",
+    C_STALL: "prop_metal",
+    C_BIN: "prop_metal",
+    C_RACK: "prop_metal",
+    C_SINK: "prop_metal",
+    C_WATER: "prop_metal",
+    C_TRAY: "prop_metal",
+    C_HYDRANT: "prop_metal",
+    C_FIRE: "prop_metal",
+    C_CLOCK: "prop_metal",
+    C_SPEAKER: "prop_metal",
+    # 유리·화면
+    C_WINDOW: "prop_glass",
+    C_MIRROR: "prop_glass",
+    C_TV: "prop_glass",
+    C_MONITOR: "prop_glass",
+    C_WBOARD: "prop_glass",
+    C_BOARD: "prop_glass",
+    C_SIGN: "prop_glass",
+    # 천·코르크
+    C_NOTICE: "prop_cloth",
+    C_CURTAIN: "prop_cloth",
+    C_FLAG: "prop_cloth",
+    C_PAPER: "prop_cloth",
+    C_CLEAN: "prop_cloth",
+    C_MAT: "prop_cloth",
+    C_PLANT: "prop_cloth",
+}
+
+TEXTURES = {f"tex_{stem}": f"{TEX_DIR}/{stem}.png" for stem in sorted(set(TEX.values()))}
+
+# 텍스처를 곱하면 평균이 TEX_MEAN배 어두워진다. 어둠 + 손전등 밝기를 아슬아슬하게
+# 맞춰 놨으므로(#74) 그만큼 색에 게인을 줘서 평균 밝기를 텍스처 도입 전과 같게 둔다.
+CANVAS_ITEM_ROOTS = ("WallGlow",)   # CanvasLayer 직속 = 텍스처 설정을 물려받을 부모가 없다
+
+# texture_filter = 1(Nearest): 도트가 보간돼 뭉개지지 않게. 프로젝트 기본값은 Linear다.
+# texture_repeat = 2(Enabled): UV가 폴리곤 좌표라 1을 넘어간다 — 감싸지 않으면 한 장만
+#   늘어나 붙는다. 둘 다 CanvasItem 속성이라 자식이 부모에게서 물려받으므로(기본값 0 =
+#   Parent) 층 씬 루트와 RoomWallVisuals에만 걸면 그 아래 폴리곤 전부에 적용된다.
+TEX_FLAGS = "texture_filter = 1\ntexture_repeat = 2\n"
+
+
+def tex_color(color):
+    """텍스처와 곱해질 색: 원래 색 / TEX_MEAN (1.0에서 잘린다)."""
+    nums = [float(v) for v in color[color.index("(") + 1:color.rindex(")")].split(",")]
+    out = [min(1.0, round(v / TEX_MEAN, 4)) for v in nums[:3]] + nums[3:]
+    return "Color(" + ", ".join(f"{v:g}" for v in out) + ")"
+
+
 # ── 세로 밴드 ────────────────────────────────────────────────
 # 외벽은 두께 40이 경계선 위에 걸쳐 있으므로 안쪽 면이 EDGE. 방을 여기 딱 붙인다(#159 피드백).
 EDGE = 20
@@ -286,8 +383,17 @@ class Scene:
 
     def poly2d(self, name, parent, color, polygon, z=None):
         z_line = f"z_index = {z}\n" if z is not None else ""
+        tex_line = ""
+        stem = TEX.get(color)
+        if stem:
+            tex_line = f'texture = ExtResource("tex_{stem}")\n'
+            color = tex_color(color)
+            # 층 씬 루트와 RoomWallVisuals에 걸어 둔 Nearest·Repeat를 물려받는다.
+            # CanvasLayer 직속 노드(계단 난간)는 물려받을 부모가 없어 직접 적는다.
+            if parent in CANVAS_ITEM_ROOTS:
+                tex_line = TEX_FLAGS + tex_line
         self.node(f'[node name="{name}" type="Polygon2D" parent="{parent}"]\n'
-                  f'{z_line}color = {color}\npolygon = {polygon}\n')
+                  f'{z_line}{tex_line}color = {color}\npolygon = {polygon}\n')
 
     def solid(self, key, parent_body, polygon):
         """충돌 + 광원차단 한 쌍 (시각은 별도로 추가)."""
@@ -488,9 +594,16 @@ def text_of(sc):
 
 
 def ext_for(body):
-    """실제로 참조된 스크립트만 ext_resource로 선언한다(미사용 선언 방지)."""
-    return [f'[ext_resource type="Script" path="{path}" id="{rid}"]'
-            for rid, path in SCRIPTS.items() if f'ExtResource("{rid}")' in body]
+    """실제로 참조된 스크립트·타일만 ext_resource로 선언한다(미사용 선언 방지).
+
+    verify_scenes가 load_steps = ext + sub + 1과 파일 존재를 검사하므로, 참조하지 않는
+    타일을 선언해 두면 바로 걸린다.
+    """
+    out = [f'[ext_resource type="Script" path="{path}" id="{rid}"]'
+           for rid, path in SCRIPTS.items() if f'ExtResource("{rid}")' in body]
+    out += [f'[ext_resource type="Texture2D" path="{path}" id="{rid}"]'
+            for rid, path in TEXTURES.items() if f'ExtResource("{rid}")' in body]
+    return out
 
 
 EXT_LOCKED_DOOR = ('[ext_resource type="Script" '
@@ -643,9 +756,8 @@ def add_hiding(sc, floor):
                 f'collision_layer = 2\ncollision_mask = 0\n'
                 f'script = ExtResource("5_hiding")\n'
                 f'prompt_text = "{prompt}"\nmessage = "{message}"\n')
-        sc.node(f'[node name="{name}Visual" type="Polygon2D" parent="{name}"]\n'
-                f'z_index = 1\ncolor = Color(0.3, 0.32, 0.38, 1)\n'
-                f'polygon = {rect(-18, -26, 18, 26)}\n')
+        # 사물함·청소함 상자 — 색을 C_LOCKER로 맞춰 다른 금속 집기와 같은 타일을 받는다.
+        sc.poly2d(f"{name}Visual", name, C_LOCKER, rect(-18, -26, 18, 26), z=1)
         sc.node(f'[node name="{name}Zone" type="CollisionShape2D" parent="{name}"]\n'
                 f'shape = SubResource("RectangleShape2D_key_zone")\n')
 
@@ -1555,12 +1667,13 @@ def build_common(fl, spec):
                        ("RectangleShape2D_key_zone", "Vector2(48, 48)"),
                        ("RectangleShape2D_door_zone", "Vector2(140, 60)")]
 
-    sc.node('[node name="SchoolFloor" type="Node2D"]\n')
+    sc.node('[node name="SchoolFloor" type="Node2D"]\n' + TEX_FLAGS)
     sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, W, H))
     sc.node('[node name="Ground" type="Node2D" parent="."]\n')
     sc.node('[node name="WallGlow" type="CanvasLayer" parent="."]\n'
             'layer = 1\nfollow_viewport_enabled = true\n')
-    sc.node('[node name="RoomWallVisuals" type="Node2D" parent="WallGlow"]\n')
+    sc.node('[node name="RoomWallVisuals" type="Node2D" parent="WallGlow"]\n'
+            + TEX_FLAGS)
     sc.node('[node name="Rooms" type="Node2D" parent="."]\n')
     sc.node('[node name="Props" type="Node2D" parent="."]\n')
     sc.node('[node name="Stairwells" type="Node2D" parent="."]\n')
@@ -1634,12 +1747,13 @@ def build_floor1():
                       ("RectangleShape2D_stair_zone", "Vector2(240, 56)"),
                       ("RectangleShape2D_key_zone", "Vector2(48, 48)"),
                       ("RectangleShape2D_door_zone", "Vector2(140, 60)")]
-    sc.node('[node name="SchoolFloor" type="Node2D"]\n')
+    sc.node('[node name="SchoolFloor" type="Node2D"]\n' + TEX_FLAGS)
     sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, W, H))
     sc.node('[node name="Ground" type="Node2D" parent="."]\n')
     sc.node('[node name="WallGlow" type="CanvasLayer" parent="."]\n'
             'layer = 1\nfollow_viewport_enabled = true\n')
-    sc.node('[node name="RoomWallVisuals" type="Node2D" parent="WallGlow"]\n')
+    sc.node('[node name="RoomWallVisuals" type="Node2D" parent="WallGlow"]\n'
+            + TEX_FLAGS)
     sc.node('[node name="Rooms" type="Node2D" parent="."]\n')
     sc.node('[node name="Props" type="Node2D" parent="."]\n')
     sc.node('[node name="Stairwells" type="Node2D" parent="."]\n')
