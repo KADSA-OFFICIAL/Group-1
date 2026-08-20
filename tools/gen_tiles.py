@@ -104,12 +104,18 @@ def p_board(dx: int, dy: int, gw: int, gh: int) -> float:
     고르므로 조각이 이어지지 않고, 행·열 평균이 고르게 남는다(`_check_lineless`).
     """
     dx, dy = dx % gw, dy % gh
-    v = 0.86 + jit(0.05, dx // 2, dy, 141)
-    for k in range(3):                                # 조각의 시작점을 3도트 뒤까지 본다
-        if rnd((dx - k) % gw, dy, 142) > 0.93:
-            v -= 0.24                                 # 결 조각
+    v = 0.86 + jit(0.04, dx // 2, dy, 141)
+    # 줄마다 결 조각 **3개로 고정**. 조각을 확률로 뿌리면 어떤 줄에 우연히 더 많이
+    # 몰려 그 줄이 어두워지고, 타일이 48px마다 반복되니 그 줄도 같이 반복된다
+    # (첫 시도에서 _check_lineless가 19.3/14로 잡았다). 개수를 고정하면 행 평균이
+    # 흔들리지 않고, 자리만 줄마다 달라 결처럼 보인다.
+    for i in range(3):
+        if (dx - int(rnd(dy, 201 + i) * gw)) % gw < 3:
+            v -= 0.12                                 # 결 조각(3도트)
             break
-    v += jit(0.03, dx, dy, 143)
+    if rnd(dx, dy, 143) > 0.97:
+        v -= 0.24                                     # 옹이·긁힘 — 한 도트라 줄이 안 생긴다
+    v += jit(0.03, dx, dy, 144)
     return v
 
 
