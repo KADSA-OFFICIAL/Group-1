@@ -40,6 +40,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate→art_room→cabinet
   - 방 종류별 부속은 `add_room_fixtures()`가 붙인다 — 단위 위 소품(`PROP_OVERLAY`: 모니터·서류·개수대), 단위 아래 의자(`PROP_COMPANION`), 문 반대쪽 벽 장식(`WALL_DECOR`: 화이트보드·안내판·열쇠판), 문에서 먼 구석 집기(`CORNER_PROP`: 서버랙·약품장·침상·화분), 화장실 세면대+거울. 구석 집기는 좌·우 벽 × 먼쪽·가까운쪽 네 자리를 시도한다 — 수위실은 단서 4개가 가운데 띠를 차지해 한 자리만 보면 늘 막혔다. **사선 방은 벽 장식을 건너뛴다**(cx 한 점에서 잰 값으로 기운 벽을 가정하면 뚫는다).
   - 복도는 `add_corridor_props()`가 맞닿은 방 벽마다 사물함을 붙이고 남는 벽면에 소화기·게시판을 건다. 바닥 유도선은 `add_corridor_lines()`가 **먼저** 낸다(나중 노드가 위에 그려진다). 소화전 함과 정수기는 **사물함보다 먼저** 자리를 잡는다 — 자투리 벽면을 기다리면 사물함이 벽을 다 먹어서 한 개도 안 걸린다. 복도 띠는 빌더가 넘긴다(2~5층 3개, 1층 1개). 문 틈 양옆 `CORR_DOOR_PAD`는 비운다 — 수위 순찰의 문 앞 대기 지점이 거기다. 벽면이 복도 위/아래 어느 쪽인지에 따라 장식 앵커가 뒤집히므로 `face()`로 두께마다 맞춘다.
 - 플레이어 스프라이트(#210): 원본 캐릭터 아트 `assets/sprites/source/player_design.png`(대기 정면 + 달리기 측면 두 포즈)에서 **`tools/gen_player_sprites.py`가 60×72 도트 스프라이트를 잘라 낸다**(표준 라이브러리만, 결정론적). 크기를 바꾸려면 그 스크립트의 `CANVAS_W`/`CANVAS_H`를 고치고 다시 돌린 뒤 `player_controller.gd`의 `SPRITE_OFFSET_Y`(발끝을 충돌 캡슐 바닥에 맞추는 값)도 같이 맞춘다. 포즈 전환·좌우 반전은 `player_controller.gd`의 `_update_sprite()` — **사람 그림이라 이동 각도로 회전시키지 않는다**. 수위는 아직 `Polygon2D` 도형이다.
+- 도트 타일 텍스처(#246, 원안 #243): 바닥·벽·집기 `Polygon2D`는 단색이 아니라 **`tools/gen_tiles.py`가 구운 회색조 도트 무늬**(`assets/tiles/*.png`)를 물고 있다(표준 라이브러리만, 결정론적). 무늬만 텍스처이고 **색은 `gen_floors.py`의 팔레트가 계속 쥔다** — 방 종류별 바닥색(#237)과 #242의 마루 톤이 그대로 살아 있게. 색 → 타일 대응은 `gen_floors.py`의 `TEX` 표이고, 여기 없는 색은 단색으로 남는다(열쇠·화살표·천장등 같은 표식, 그리고 널 이음매·화장실 줄눈·칸막이문처럼 2~5px로 얇은 것). 규약 넷: ① 무늬 최소 단위는 월드 2px(`DOT`) — 카메라 zoom이 1.25라 1px 무늬는 화면에서 들쭉날쭉해진다. ② 모든 타일의 평균 휘도는 `MEAN`(0.78)로 고정하고 `gen_floors`가 텍스처를 붙인 색에만 `1/TEX_MEAN` 게인을 준다 — 그래서 평균 밝기가 텍스처 도입 전과 같고 조명 튜닝(#74)이 흔들리지 않는다(두 상수는 같이 고친다). ③ UV를 비워 정점 좌표를 UV로 쓰므로 맵 전체가 하나의 타일 격자에 정렬된다. `texture_filter = 1`(Nearest)·`texture_repeat = 2`는 층 씬 루트와 `WallGlow/RoomWallVisuals`에만 걸고 자식이 물려받는다 — **CanvasLayer 직속 노드(계단 난간)만 예외로 직접 적는다**(물려받을 부모가 없다). ④ **#242가 이미 격자를 그리는 면에는 선 없는 무늬를 쓴다** — 복도 마루널(`PLANK` 64px)·화장실 줄눈(`TOILET_TILE` 60px)과 타일 주기(48px)가 어긋나 격자가 겹쳐 보인다. 그 두 면은 `floor_board`/`floor_matte`를 쓰고 `gen_tiles.py`의 `LINELESS`·`_check_lineless`가 선이 없는지 검사한다. 새 타일을 넣으면 `TEX`에도 넣어야 실제로 쓰이고, 반대로 `TEX`에 없는 타일은 굽지 않는다.
 - 조명: main의 CanvasModulate + 플레이어 PointLight2D(shadow_enabled) — 벽 차단체 때문에 벽 너머는 보이지 않음. 문·창문 틈으로만 빛이 샘.
 - UI: R 인벤토리 패널(5슬롯), 좌상단 HUD(목표/소지품)+층 표시, 하단 알림(game_state.request_notice).
 - 사운드(#9): 에셋을 받아오지 않고 **`tools/gen_sfx.py`가 8비트 톤으로 합성**해 `assets/audio/*.wav`로 커밋한다(표준 라이브러리만, 고정 시드라 재생성해도 바이트가 같다). 톤을 바꾸려면 그 스크립트의 `build_all()` 숫자를 고치고 다시 돌린다. 비위치 효과음은 autoload `Sfx`(`scripts/game/sound_manager.gd`)의 `Sfx.play(&"id")`, 위치가 정보인 소리(수위 발소리·열쇠·문)는 `janitor.tscn`의 AudioStreamPlayer2D가 낸다. **하단 알림 텍스트는 소리와 병행**한다 — 소리를 못 듣는 상황에서도 단서가 남아야 한다. 오디오 버스는 Master 하나뿐이고 음량은 `sound_manager.gd`의 `VOLUMES`에서 맞춘다.
@@ -124,6 +125,9 @@ main_menu → intro(프롤로그 컷신: street→back_gate→art_room→cabinet
 - 씬이나 스크립트를 고쳤으면 **푸시 전에 `python3 tools/verify_scenes.py`를 실행**합니다.
   load_steps, 리소스 참조, 노드 부모 경로, 형제 이름 중복, 스크립트 $NodePath,
   벽 충돌↔광원 차단체 1:1을 검사합니다(Godot 불필요, 수초).
+- 타일 무늬를 고쳤으면 `python3 tools/gen_tiles.py` 후 `python3 tools/gen_floors.py`까지
+  다시 돌립니다(생성기가 평균 휘도·명암·주기성·도트 격자·선 없음을 스스로 검사하고,
+  결정론적이라 무늬를 안 바꿨으면 diff가 나오지 않습니다).
 - 효과음을 고쳤으면 `python3 tools/gen_sfx.py`, 앰비언트·BGM은 `python3 tools/gen_music.py`로
   재생성합니다(길이·피크·DC 오프셋·루프 이음매를 스스로 검사하고, 결정론적이라
   톤을 안 바꿨으면 diff가 나오지 않습니다).
