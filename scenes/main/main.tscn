@@ -38,6 +38,7 @@ script = ExtResource("4_game_state")
 [node name="HUD" parent="." instance=ExtResource("5_hud")]
 
 [node name="UI" type="CanvasLayer" parent="."]
+layer = 3
 
 [node name="FloorLabel" type="Label" parent="UI"]
 offset_left = 16.0
