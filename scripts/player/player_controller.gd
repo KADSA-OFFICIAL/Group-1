@@ -26,9 +26,13 @@ const INK_ITEM_ID := "ink_can"
 const INK_PROJECTILE := preload("res://scenes/items/ink_projectile.tscn")
 const INK_SPAWN_OFFSET := 24.0
 
-@onready var body: Sprite2D = $Body
+## 시각 노드는 벽 위에 그려야 해서(#250) layer 1 CanvasLayer(Visuals) 안에 있고,
+## 위치는 _process에서 본체에 맞춘다. 충돌·조명·카메라는 layer 0에 그대로 둔다 —
+## 손전등이 바닥·집기를 비추려면 같은 캔버스에 있어야 한다.
+@onready var visuals: Node2D = $Visuals/Anchor
+@onready var body: Sprite2D = $Visuals/Anchor/Body
 @onready var interaction_area: Area2D = $InteractionArea
-@onready var interact_prompt: Label = $InteractPrompt
+@onready var interact_prompt: Label = $Visuals/Anchor/InteractPrompt
 @onready var player_light: PointLight2D = $PlayerLight
 
 var facing_direction: Vector2 = Vector2.DOWN
@@ -41,6 +45,15 @@ var _bob_time: float = 0.0
 
 func _ready() -> void:
 	_light_energy = player_light.energy
+	visuals.global_position = global_position
+
+
+## 벽 시각(WallGlow, layer 1)은 layer 0보다 앞에 그려져 z_index로는 뒤집을 수 없다.
+## 그래서 시각만 같은 layer 1로 올리고, 여기서 본체 위치를 따라가게 한다.
+## follow_viewport CanvasLayer 안이라 global_position이 곧 월드 좌표다
+## (벽 페이드 마스크 wall_fade_mask.gd가 쓰는 방식과 같다).
+func _process(_delta: float) -> void:
+	visuals.global_position = global_position
 
 
 ## 은신처(hiding_spot.gd)가 숨길 때, 플레이어가 E로 나올 때 호출된다.

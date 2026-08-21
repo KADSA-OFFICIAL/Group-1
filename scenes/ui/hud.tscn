@@ -28,6 +28,7 @@ corner_radius_bottom_right = 2
 corner_radius_bottom_left = 2
 
 [node name="HUD" type="CanvasLayer"]
+layer = 3
 script = ExtResource("1_hud_script")
 
 [node name="Root" type="Control" parent="."]

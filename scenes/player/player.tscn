@@ -26,11 +26,6 @@ fill_to = Vector2(0.5, 0)
 motion_mode = 1
 script = ExtResource("1_player_script")
 
-[node name="Body" type="Sprite2D" parent="."]
-texture_filter = 1
-offset = Vector2(0, -22)
-texture = ExtResource("2_player_idle")
-
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CapsuleShape2D_player")
 
@@ -41,7 +36,18 @@ collision_mask = 2
 [node name="InteractionShape" type="CollisionShape2D" parent="InteractionArea"]
 shape = SubResource("RectangleShape2D_interaction")
 
-[node name="InteractPrompt" type="Label" parent="."]
+[node name="Visuals" type="CanvasLayer" parent="."]
+layer = 2
+follow_viewport_enabled = true
+
+[node name="Anchor" type="Node2D" parent="Visuals"]
+
+[node name="Body" type="Sprite2D" parent="Visuals/Anchor"]
+texture_filter = 1
+offset = Vector2(0, -22)
+texture = ExtResource("2_player_idle")
+
+[node name="InteractPrompt" type="Label" parent="Visuals/Anchor"]
 visible = false
 z_index = 10
 offset_left = 18.0
