@@ -59,9 +59,12 @@ FLOOR = 32          # 바닥 타일 한 변(#259) — 쯔꾸르식 32칸. 48이�
                     # 격자가 더 자주 보이게 했다. 무늬 함수의 칸 크기(널 높이·장
                     # 크기)는 FLOOR//DOT로 나누어떨어져야 이어붙는다 — 안 그러면
                     # _check_periodic이 잡는다.
-SMALL = 32          # 벽 타일 한 변(#259) — 16이면 반복이 눈에 띄어 32로 늘렸다.
-                    # 무늬 자체의 칸 크기(블록 8px 등)는 그대로라 벽 두께 T=16에
-                    # 여전히 블록 두 단이 들어간다.
+SMALL = 16          # 벽·얇은 장식 타일 한 변 — 벽 두께 T=16과 같아 두께 방향으로
+                    # 딱 한 장 들어간다. **면 두께보다 큰 타일을 쓰면 안 된다** —
+                    # UV가 월드 좌표라 얇은 면에는 타일의 일부만, 그것도 면의 y에
+                    # 따라 다른 조각이 잘려 들어간다. #259에서 32로 올렸다가
+                    # 벽돌 줄눈이 벽 가장자리에 안 맞아 되돌렸다(#262).
+                    # 두께 8~10px인 게시판·창문·걸레받이도 같은 이유로 이 타일을 쓴다.
 
 MEAN = 0.78         # 목표 평균 휘도 — gen_floors.py의 TEX_MEAN과 반드시 같아야 한다
 MEAN_TOL = 0.004    # 8비트 한 계단(1/255)만큼 허용
@@ -429,6 +432,23 @@ def o_plant(dx: int, dy: int, gw: int, gh: int) -> float:
     return 0.62 + jit(0.12, dx, dy, 402)              # 잎
 
 
+def o_toilet(dx: int, dy: int, gw: int, gh: int) -> float:
+    """대변기. 위에서 본 물탱크 + 변기통."""
+    e = _edge(dx, dy, gw, gh)
+    if e == 0:
+        return 0.88                                   # 칸 바닥이 비쳐 보이게
+    if dy < gh * 0.26:
+        return 0.94 + jit(0.03, dx, dy, 421)          # 물탱크
+    cx0 = (gw - 1) / 2.0
+    r = (((dx - cx0) / (gw * 0.30)) ** 2
+         + ((dy - gh * 0.62) / (gh * 0.30)) ** 2) ** 0.5
+    if r > 1.0:
+        return 0.88                                   # 변기 바깥
+    if r > 0.72:
+        return 0.99                                   # 변기 테
+    return 0.60 + 0.14 * r                            # 물이 담긴 안쪽
+
+
 def o_rack(dx: int, dy: int, gw: int, gh: int) -> float:
     """서버랙. 가로 슬롯이 층층이 + 표시등."""
     e = _edge(dx, dy, gw, gh)
@@ -457,6 +477,7 @@ OBJECTS = {
     "obj_bed": o_bed,
     "obj_plant": o_plant,
     "obj_rack": o_rack,
+    "obj_toilet": o_toilet,
 }
 
 
