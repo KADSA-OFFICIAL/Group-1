@@ -34,6 +34,11 @@ TRAVEL_RE = re.compile(
     r'\[node name="(SlideDoor_[^"]+)"[^\]]*\]\n(?:[^\[]*?)^travel = (-?[\d.]+)',
     re.M | re.S)
 
+# 사선 벽 문은 세로로도 밀린다(#252). 축정렬 문에는 이 줄이 없어 0으로 본다.
+TRAVEL_Y_RE = re.compile(
+    r'\[node name="(SlideDoor_[^"]+)"[^\]]*\]\n(?:[^\[]*?)^travel_y = (-?[\d.]+)',
+    re.M | re.S)
+
 NODE_RE = re.compile(
     r'\[node name="([^"]+)" type="(\w+)" parent="([^"]*)"\]\n(.*?)(?=\n\[node|\Z)', re.S)
 POLY_RE = re.compile(r'polygon = PackedVector2Array\(([^)]*)\)')
@@ -104,7 +109,7 @@ def check(fl: int) -> None:
     visuals: dict[str, str] = {}      # PV_ 이름 -> polygon 원문
     decors: dict[str, tuple] = {}     # PD_ 이름 -> bbox (충돌 없는 장식)
     tops: dict[str, tuple] = {}       # PT_ 이름 -> bbox (집기 위 소품)
-    panels: dict[str, tuple] = {}     # 미닫이 문짝 -> bbox
+    panels: dict[str, list] = {}      # 미닫이 문짝 -> 폴리곤(사선이라 경계상자로 보면 안 된다)
     prop_polys: dict[str, str] = {}
     walls: list[list] = []
     rooms: dict[str, list] = {}
@@ -124,7 +129,7 @@ def check(fl: int) -> None:
                 visuals[name[3:]] = poly_m.group(1).strip()
         elif ntype == "CollisionPolygon2D" and parent != "PropBodies" and poly_m:
             if "SDPanel" in parent:
-                panels[parent] = bbox(pts(poly_m.group(1)))
+                panels[parent] = pts(poly_m.group(1))
             walls.append(pts(poly_m.group(1)))
         elif ntype == "Polygon2D" and parent == "Rooms" and poly_m:
             rooms[name] = pts(poly_m.group(1))
@@ -206,15 +211,19 @@ def check(fl: int) -> None:
 
     # 8. 미닫이문이 열린 자리에서 집기와 겹치지 않는지
     travels = {m.group(1): float(m.group(2)) for m in TRAVEL_RE.finditer(text)}
-    for parent, (x0, y0, x1, y1) in sorted(panels.items()):
+    travel_ys = {m.group(1): float(m.group(2)) for m in TRAVEL_Y_RE.finditer(text)}
+    for parent, panel in sorted(panels.items()):
         root = parent.split("/")[0]
         step = travels.get(root)
         if step is None:
             errors.append(f"{tag}: {root}에 travel 값이 없다")
             continue
-        moved = (x0 + step, y0, x1 + step, y1)
-        for pkey, box in props.items():
-            if overlap(moved, box):
+        # 사선 벽 문짝은 평행사변형이다 — 경계상자로 보면 벽 아래 집기가 전부
+        # 걸린 것처럼 나온다(#252). 벽 검사와 같은 분리축으로 본다.
+        sy = travel_ys.get(root, 0.0)
+        moved = [(x + step, y + sy) for x, y in panel]
+        for pkey, raw in prop_polys.items():
+            if sat_overlap(moved, pts(raw)):
                 errors.append(f"{tag}: 열린 문 {parent}가 집기 {pkey}와 겹친다")
                 break
 

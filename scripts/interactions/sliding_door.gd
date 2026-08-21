@@ -1,5 +1,5 @@
 extends Area2D
-## 교실 미닫이문 — 한 짝이 옆으로 밀린다.
+## 방 미닫이문 — 한 짝이 옆으로 밀린다(#252로 교실 밖 방에도 붙는다).
 ##
 ## **플레이어는 E로 여닫는다.** 그래서 스크립트가 부모 Node2D가 아니라 Area2D
 ## 본체에 붙어 있다 — 플레이어의 InteractionArea는 겹치는 Area2D 중
@@ -17,11 +17,16 @@ extends Area2D
 ## 두면 문 표식·벽 시각이 z_index와 무관하게 덮어 문이 아예 안 보인다(#234).
 ## 몸체와 시각을 NodePath로 이어 붙이고 같은 트윈으로 함께 민다.
 ##
-## 광원 차단체는 달지 않는다. 학교 교실 문은 상단이 유리라 닫혀 있어도 빛이
-## 샌다는 설정이고, 차단체를 여닫이에 맞춰 켜고 끄면 조명 튜닝(#74)이 흔들린다.
+## 문짝에는 광원 차단체가 붙는다(#256). 없을 때는 문 틈이 벽 없는 구간이라
+## 닫힌 문 너머가 훤히 보여서 문이 있으나 마나였다. 차단체는 문짝 몸체의
+## 자식이라 문과 함께 움직인다 — 열리면 벽 쪽으로 비켜나 그 자리 벽 차단체와
+## 겹치고 문 틈이 빈다. 그래서 여닫이에 맞춰 켜고 끄는 코드가 없다.
 
 ## 문짝이 밀려나는 거리와 방향. 문 틈 폭 전체를 비켜야 완전히 열린다.
 @export var travel: float = 110.0
+## 사선 벽(오른쪽 중간 띠)에서는 벽 기울기만큼 세로로도 밀려야 벽에 붙어 있다.
+## 축정렬 벽에서는 0이라 씬에 아예 적히지 않는다.
+@export var travel_y: float = 0.0
 @export var open_time: float = 0.28
 ## WallGlow 안의 문짝 시각. 몸체와 같은 거리만큼 함께 움직인다.
 @export var leaf_visual: NodePath
@@ -46,9 +51,15 @@ func _ready() -> void:
 	_panel = get_node_or_null("SDPanel") as StaticBody2D
 	_leaf = get_node_or_null(leaf_visual) as Node2D
 	if _panel != null:
-		_shape = _panel.get_node_or_null("Panel") as CollisionPolygon2D
+		# 충돌 노드 이름이 방마다 다르다(<방키>DoorCollision) — 이름은
+		# verify_scenes의 벽↔차단체 1:1 검사에 편입되려고 그렇게 붙였다.
+		# 그래서 이름 대신 타입으로 찾는다.
+		for child in _panel.get_children():
+			if child is CollisionPolygon2D:
+				_shape = child
+				break
 	if _panel == null or _shape == null or _leaf == null:
-		push_error("sliding_door: SDPanel/Panel/문짝 시각을 찾지 못했다 — %s" % name)
+		push_error("sliding_door: SDPanel/충돌/문짝 시각을 찾지 못했다 — %s" % name)
 		return
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
@@ -92,12 +103,12 @@ func _apply() -> void:
 
 	if _tween != null and _tween.is_valid():
 		_tween.kill()
-	var offset := travel if _open else 0.0
+	var offset := Vector2(travel, travel_y) if _open else Vector2.ZERO
 	_tween = create_tween().set_parallel(true)
 	_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	for node in [_panel, _leaf]:
 		if node != null:
-			_tween.tween_property(node, "position", Vector2(offset, 0.0), open_time)
+			_tween.tween_property(node, "position", offset, open_time)
 	if not _open:
 		_tween.chain().tween_callback(_set_solid.bind(true))
 

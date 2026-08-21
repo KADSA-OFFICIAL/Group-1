@@ -68,6 +68,12 @@ C_TILE = "Color(0.150, 0.166, 0.172, 1)"      # 화장실 바닥 타일 이음�
 C_URINAL = "Color(0.32, 0.35, 0.37, 1)"       # 소변기
 C_STALLDOOR = "Color(0.26, 0.29, 0.31, 1)"    # 칸막이 문(장식)
 C_DRAIN = "Color(0.10, 0.11, 0.12, 1)"        # 배수구(장식)
+C_DRYER = "Color(0.40, 0.42, 0.44, 1)"        # 손건조기(장식)
+C_TISSUE = "Color(0.58, 0.56, 0.52, 1)"       # 휴지걸이(장식)
+C_FAN = "Color(0.28, 0.30, 0.32, 1)"          # 환풍기(장식)
+C_MOP = "Color(0.36, 0.30, 0.20, 1)"          # 대걸레
+C_BUCKET = "Color(0.22, 0.32, 0.30, 1)"       # 양동이
+C_STAIN = "Color(0.118, 0.130, 0.136, 1)"     # 바닥 물때(바닥 표시)
 C_CEIL = "Color(0.215, 0.225, 0.250, 1)"      # 꺼진 천장 형광등(장식)
 
 # 방 종류별 바닥. 들어간 방이 무슨 방인지 바닥만 보고도 갈리게 한다.
@@ -1280,7 +1286,7 @@ def _classroom(sc, key, x0, y0, x1, y1, door, keepout):
 
 
 def add_sliding_doors(sc):
-    """교실 문을 한 짝짜리 미닫이문으로 만든다.
+    """방 문을 한 짝짜리 미닫이문으로 만든다(라벨 있는 방 전부, #252).
 
     루트가 Area2D다 — 플레이어의 InteractionArea가 겹치는 Area2D 중
     interact()를 가진 것을 찾아 E로 부르기 때문에, 스크립트가 Area2D 본체에
@@ -1294,40 +1300,79 @@ def add_sliding_doors(sc):
     지나가므로 막힌 것으로 보면 안 된다. 제외는 janitor.gd·verify_floor_reach·
     verify_janitor_route·verify_hiding_spots 네 곳에 같은 이름 규칙으로 있다.
     """
+    # 문 틈 목록을 먼저 모은다 — 열린 문짝이 옆 방의 문 자리를 덮지 않는 방향을
+    # 고르는 데 쓴다(사선 띠의 좁은 화장실은 제 벽 안에 문짝이 다 들어가지 않는다).
+    gaps = []
     for key, (label, door, x0, x1, topf, botf) in sc.room_meta.items():
-        if prop_kind(key, label) != "classroom" or door not in ("top", "bottom"):
+        if prop_kind(key, label) is None or door not in ("top", "bottom"):
             continue
         cx = (x0 + x1) / 2
-        if door == "top":
-            wy0, wy1 = topf(cx), topf(cx) + T
-        else:
-            wy0, wy1 = botf(cx) - T, botf(cx)
+        wy = topf(cx) if door == "top" else botf(cx) - T
+        gaps.append((key, cx - DOOR / 2, cx + DOOR / 2, wy + T / 2))
+
+    def covers_gap(key, lo, hi, y):
+        for okey, ox0, ox1, oy in gaps:
+            if okey != key and lo < ox1 and hi > ox0 and abs(oy - y) < T:
+                return True
+        return False
+
+    for key, (label, door, x0, x1, topf, botf) in sc.room_meta.items():
+        # 라벨 없는 막힌 공간만 뺀다. #252 전에는 교실에만 문이 있어서 화장실·
+        # 창고·부서실은 문 표식만 있고 그냥 통과됐다.
+        if prop_kind(key, label) is None or door not in ("top", "bottom"):
+            continue
+        cx = (x0 + x1) / 2
+        # 사선 띠(오른쪽 중간)의 벽은 110px 문 폭에서 28px 내려간다 — 문짝과
+        # 충돌판을 축정렬 사각형으로 내면 벽을 벗어난다. 벽 윗변 함수로 낸다.
+        wall_top = (lambda x: topf(x)) if door == "top" else (lambda x: botf(x) - T)
+        wy0, wy1 = wall_top(cx), wall_top(cx) + T
         my = (wy0 + wy1) / 2
-        inset = (T - DOOR_LEAF_T) / 2
-        py0, py1 = wy0 + inset, wy1 - inset
         dl, dr = cx - DOOR / 2, cx + DOOR / 2
-        # 미는 방향 — 맵 밖으로 나가지 않는 쪽. 방끼리 벽을 맞대고 있어서
-        # 어느 쪽으로 밀어도 벽 위를 지나간다(벽 속으로 들어가는 것처럼 보인다).
-        travel = DOOR if dr + DOOR <= W - EDGE else -DOOR
+        yl, yr = wall_top(dl), wall_top(dr)
+        slope = (yr - yl) / DOOR
+        # 미는 방향 — 맵 밖으로 나가지 않고, 옆 방 문 자리를 덮지 않는 쪽.
+        # 방끼리 벽을 맞대고 있어 어느 쪽이든 벽 위를 지나간다(벽 속으로 들어가는
+        # 것처럼 보인다). 사선 벽에서는 기울기만큼 같이 내려가야 벽에 붙어 있다.
+        cands = [d for d in (DOOR, -DOOR)
+                 if EDGE <= dl + d and dr + d <= W - EDGE]
+        if not cands:
+            cands = [DOOR if dr + DOOR <= W - EDGE else -DOOR]
+        travel = next((d for d in cands
+                       if not covers_gap(key, dl + d, dr + d, my + d * slope)),
+                      cands[0])
+        ty = n(travel * slope)
         root = f"SlideDoor_{key}"
         sc.node(f'[node name="{root}" type="Area2D" parent="."]\n'
                 f'collision_layer = 2\ncollision_mask = 1\n'
                 f'script = ExtResource("6_sliding")\n'
                 f'travel = {n(travel)}\n'
-                f'leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_{key}")\n')
+                + (f'travel_y = {ty}\n' if float(ty) != 0.0 else "")
+                + f'leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_{key}")\n')
         sc.node(f'[node name="Zone" type="CollisionShape2D" parent="{root}"]\n'
                 f'position = Vector2({n(cx)}, {n(my)})\n'
                 f'shape = SubResource("RectangleShape2D_door_zone")\n')
         sc.node(f'[node name="SDPanel" type="StaticBody2D" parent="{root}"]\n')
-        sc.node(f'[node name="Panel" type="CollisionPolygon2D" '
-                f'parent="{root}/SDPanel"]\n'
-                f'polygon = {rect(dl, py0, dr, py1)}\n')
+        # 충돌 + 광원 차단체를 짝으로 낸다(#256). 닫힌 문이 빛을 막아야 문 너머
+        # 방 안이 안 보인다 — 없으면 문 틈이 벽 없는 구간이라 손전등이 그대로
+        # 통과해 문이 있으나 마나였다.
+        #
+        # 차단체는 문짝 몸체의 자식이라 문과 함께 움직인다. 열리면 벽 쪽으로
+        # 비켜나 그 자리 벽 차단체와 겹치고 문 틈이 비므로, 여닫이에 맞춰
+        # 켜고 끄는 코드가 필요 없다.
+        #
+        # 이름을 …DoorCollision으로 두면 verify_scenes의 벽↔차단체 1:1 검사에
+        # 자동으로 편입되어 누락·폴리곤 불일치를 검사기가 잡아 준다.
+        #
+        # 두께는 벽 전체다. 예전처럼 DOOR_LEAF_T(10)로 끼워 두면 위아래 3px씩
+        # 틈이 남아 그리로 빛이 샌다.
+        sc.solid(f"{key}DoorCollision", f"{root}/SDPanel",
+                 poly((dl, yl), (dr, yr), (dr, yr + T), (dl, yl + T)))
         # 시각은 WallGlow 안에. 레이어 0에 두면 CanvasLayer(layer=1)의 문 표식·
         # 벽 시각이 z_index와 무관하게 덮어 문이 아예 안 보인다(#234). 같은 문의
         # Door_ 마커보다 뒤에 선언되므로 그 위에 그려지고, 열려서 밀리면 벽 시각
-        # 뒤로 숨는다. 두께는 충돌(DOOR_LEAF_T)보다 넓은 벽 두께 전체를 쓴다.
+        # 뒤로 숨는다. 충돌·차단체와 같은 벽 두께 전체를 쓴다.
         sc.poly2d(f"SDVis_{key}", "WallGlow/RoomWallVisuals",
-                  C_LEAF, rect(dl, wy0, dr, wy1), z=2)
+                  C_LEAF, poly((dl, yl), (dr, yr), (dr, yr + T), (dl, yl + T)), z=2)
 
 
 def _keepout_for(sc, x0, x1):
@@ -1483,21 +1528,48 @@ def add_room_fixtures(sc, key, kind, x0, x1, topf, botf, door, keepout, units):
         dx, dy = cx, (wt + wb) / 2 + (wb - wt) * 0.18
         sc.floor_mark(f"{key}_drain",
                       rect(dx - 11, dy - 11, dx + 11, dy + 11), C_DRAIN)
+        # 바닥 물때 — 배수구 쪽으로 번진 자국 몇 군데. 칸마다 같은 자리에 두면
+        # 눈에 띄므로 칸 폭에 따라 조금씩 어긋나게 놓는다.
+        for i in range(3):
+            sx0 = wl + (wr - wl) * (0.22 + 0.28 * i)
+            sy0 = dy - 26 + 18 * (i % 2)
+            sc.floor_mark(f"{key}_stain{i}",
+                          rect(sx0, sy0, sx0 + 30 + 8 * i, sy0 + 14), C_STAIN)
         # 칸막이 문 — 각 칸막이의 문 쪽 면에 얇게. 칸이 칸막이임을 알려준다.
+        # 휴지걸이는 칸 안쪽 옆면에 붙는다(칸 위에 놓이므로 소품).
         for i, (ux0, uy0, ux1, uy1) in enumerate(units):
             edge = (uy0, uy0 + 5) if door == "top" else (uy1 - 5, uy1)
             sc.overlay(f"{key}_stall{i}",
                        rect(ux0 + 3, edge[0], ux1 - 3, edge[1]), C_STALLDOOR)
+            ty0 = uy0 + (uy1 - uy0) * 0.42
+            sc.overlay(f"{key}_tissue{i}",
+                       rect(ux0 + 4, ty0, ux0 + 13, ty0 + 12), C_TISSUE)
         # 소변기 — 남자 화장실만. 세면대 반대쪽(오른쪽) 벽 여유 띠에 세운다.
         if key.startswith("MensRoom"):
             uw, uh = TOILET_URINAL
             ux = wr - 2 - uw
             utop, ubot = strip_bounds(ux, ux + uw)
-            for i, cell in enumerate(_col(ux, ux + uw, utop, ubot, uh, 16,
-                                          keepout + taken)):
+            cells = _col(ux, ux + uw, utop, ubot, uh, 16, keepout + taken)
+            for i, cell in enumerate(cells):
                 sc.prop(f"{key}_urinal{i}", rect(*cell), C_URINAL)
                 taken.append(cell)
+                # 소변기 사이 칸막이 — 위쪽 소변기의 위 끝에 얇게 걸친다.
+                if i > 0:
+                    sc.decor(f"{key}_udiv{i}",
+                             rect(ux - 6, cell[1] - 9, ux + uw, cell[1] - 3),
+                             C_STALLDOOR)
         sw, sh = TOILET_SINK
+        # 손건조기는 세면대보다 먼저 자리를 잡는다. 세면대가 왼쪽 띠를 세로로
+        # 꽉 채우므로 나중에 놓으면 남는 자리가 없다(처음에 0개였다).
+        _, dbot0 = strip_bounds(wl, wl + 9)
+        dtop0, _ = strip_bounds(wl, wl + 9)
+        # 구석 집기(휴지통)가 문에서 먼 끝을 먼저 차지한다 — 손건조기는
+        # 반대쪽 끝에 붙인다. 같은 끝을 노리면 늘 밀려서 0개가 된다.
+        dry_y = dtop0 + 4 if door == "top" else dbot0 - 34
+        dry = (wl, dry_y, wl + 9, dry_y + 30)
+        if not any(_overlap(dry, k) for k in keepout + taken):
+            sc.decor(f"{key}_dryer", rect(*dry), C_DRYER)
+            taken.append((wl, dry_y - 4, wl + 36, dry_y + 34))
         # 거울은 벽면 wl~wl+6, 세면대는 그 앞 wl+8부터 — 붙여 놓으면 거울이
         # 세면대에 파묻힌다(verify_props가 장식↔집기 겹침을 오류로 잡는다).
         sx = wl + 8
@@ -1509,6 +1581,27 @@ def add_room_fixtures(sc, key, kind, x0, x1, topf, botf, door, keepout, units):
             top = min(c[1] for c in placed)
             bot = max(c[3] for c in placed)
             sc.decor(f"{key}_mirror", rect(wl, top, wl + 6, bot), C_MIRROR)
+        # 환풍기 — 문 반대쪽 벽 가운데. 오른쪽 구석에 두면 소변기 열과 부딪힌다
+        # (세면대·소변기가 양쪽 벽 여유 띠를 세로로 다 쓴다).
+        # 사선 방은 건너뛴다 — 폭 28px 사이에 벽이 7px 내려가서, cx 한 점에서
+        # 잰 벽면에 9px 두께를 붙이면 벽을 파고든다(다른 벽 장식과 같은 이유).
+        if not sloped:
+            fan_y = (wb - 9, wb) if door == "top" else (wt, wt + 9)
+            fan = (cx - 14, fan_y[0], cx + 14, fan_y[1])
+            if not any(_overlap(fan, k) for k in keepout + taken):
+                sc.decor(f"{key}_fan", rect(*fan), C_FAN)
+        # 청소도구 — 대걸레와 양동이. 화장실에 늘 서 있는 물건이다.
+        mtop, mbot = strip_bounds(wr - 2 - 20, wr - 2)
+        cursor = mtop + 4 if door == "top" else mbot - 4
+        for name, w, h, color in (("mop", 12, 34, C_MOP),
+                                  ("bucket", 20, 18, C_BUCKET)):
+            # 둘을 같은 자리에 노리면 둘째가 늘 밀린다 — 커서를 옮겨 이어 세운다.
+            top = cursor if door == "top" else cursor - h
+            cell = (wr - 2 - w, top, wr - 2, top + h)
+            if cell[1] >= mtop and cell[3] <= mbot                     and not any(_overlap(cell, k) for k in keepout + taken):
+                sc.prop(f"{key}_{name}", rect(*cell), color)
+                taken.append(cell)
+                cursor += (h + 6) if door == "top" else -(h + 6)
 
 
 def add_props(sc, corridors=()):
