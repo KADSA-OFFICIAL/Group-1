@@ -34,8 +34,15 @@ gen_sfx.py / gen_music.py / gen_player_sprites.py와 같은 규약 — **표준 
 아래 무늬 함수의 반환값은 **최종 곱셈 계수(0..1)를 그대로 적은 절대값**이다. 대략
 줄눈·이음매 0.56~0.62 / 바탕 0.82~0.86 / 하이라이트 0.92~0.96을 쓴다. `bake()`가
 평균만 MEAN으로 옮기므로 여기 적은 명암 관계가 화면에 그대로 나온다.
-새 타일을 추가하면 gen_floors.py의 `TEX`(색 -> 타일) 표에도 넣어야 실제로 쓰인다.
+새 타일을 추가하면 gen_floors.py의 `TEX`(색 -> 재질) 표에도 넣어야 실제로 쓰인다.
 반대로 `TEX`에서 빠진 타일은 굽지 않는다 — 쓰지 않는 에셋을 남기지 않는다.
+
+## 재질과 오브젝트
+이 파일은 두 갈래를 굽는다(#259). `PATTERNS`는 **이어붙는 재질**(바닥·벽)이고
+`OBJECTS`는 **경계가 있는 물건**(책상·사물함·세면대…)이다. 재질은 월드 좌표를
+UV로 써서 맵 전체가 한 격자에 정렬되고, 오브젝트는 gen_floors가 물건마다
+로컬 UV를 넣어 그림 한 장을 그 물건에 맞춰 늘린다. 오브젝트 대응표는
+gen_floors.py의 `SPRITE`다.
 """
 from __future__ import annotations
 
@@ -48,8 +55,13 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT_DIR = ROOT / "assets" / "tiles"
 
 DOT = 2             # 무늬 최소 단위(월드 px)
-FLOOR = 48          # 바닥 타일 한 변 — 플레이어(60x72)에 맞춘 쯔꾸르식 칸 크기
-SMALL = 16          # 벽·집기 타일 한 변 — 벽 두께 T=16과 같아 두께 방향으로 딱 한 장 들어간다
+FLOOR = 32          # 바닥 타일 한 변(#259) — 쯔꾸르식 32칸. 48이던 것을 줄여
+                    # 격자가 더 자주 보이게 했다. 무늬 함수의 칸 크기(널 높이·장
+                    # 크기)는 FLOOR//DOT로 나누어떨어져야 이어붙는다 — 안 그러면
+                    # _check_periodic이 잡는다.
+SMALL = 32          # 벽 타일 한 변(#259) — 16이면 반복이 눈에 띄어 32로 늘렸다.
+                    # 무늬 자체의 칸 크기(블록 8px 등)는 그대로라 벽 두께 T=16에
+                    # 여전히 블록 두 단이 들어간다.
 
 MEAN = 0.78         # 목표 평균 휘도 — gen_floors.py의 TEX_MEAN과 반드시 같아야 한다
 MEAN_TOL = 0.004    # 8비트 한 계단(1/255)만큼 허용
@@ -82,7 +94,7 @@ def jit(amp: float, *key: int) -> float:
 def p_wood(dx: int, dy: int, gw: int, gh: int) -> float:
     """교실·수위실 마루널. 널 높이 6도트(12px), 널마다 끝 맞댄 자리가 반 칸 어긋난다."""
     dx, dy = dx % gw, dy % gh
-    ph = 6
+    ph = 8                                            # 널 높이(도트) — gh=16을 나눠야 이어붙는다
     plank = dy // ph
     v = 0.86 + jit(0.07, plank, 11)                   # 널마다 색이 조금 다르다
     v += jit(0.04, dx, dy, 12)                        # 잔 나뭇결
@@ -147,9 +159,9 @@ def p_cement(dx: int, dy: int, gw: int, gh: int) -> float:
 
 
 def p_vinyl(dx: int, dy: int, gw: int, gh: int) -> float:
-    """실험실 데코타일. 24px 큰 장에 대리석 흉내 얼룩이 섞여 있다."""
+    """실험실 데코타일. 16px 장에 대리석 흉내 얼룩이 섞여 있다."""
     dx, dy = dx % gw, dy % gh
-    s = 12
+    s = 8                                             # 장 크기(도트) — gw=16을 나눠야 한다
     v = 0.86 + jit(0.05, dx // s, dy // s, 61)
     v += jit(0.09, dx // 2, dy // 2, 62)
     if dx % s == 0 or dy % s == 0:
@@ -158,9 +170,9 @@ def p_vinyl(dx: int, dy: int, gw: int, gh: int) -> float:
 
 
 def p_panel(dx: int, dy: int, gw: int, gh: int) -> float:
-    """컴퓨터실 액세스플로어. 24px 패널 + 네 귀퉁이 나사."""
+    """컴퓨터실 액세스플로어. 16px 패널 + 네 귀퉁이 나사."""
     dx, dy = dx % gw, dy % gh
-    s = 12
+    s = 8                                             # 패널 크기(도트) — gw=16을 나눠야 한다
     ix, iy = dx % s, dy % s
     v = 0.85 + jit(0.04, dx // s, dy // s, 71)
     v += jit(0.03, dx, dy, 72)
@@ -240,6 +252,212 @@ def p_glass(dx: int, dy: int, gw: int, gh: int) -> float:
     elif d == 4:
         v = 0.62                                      # 반사 사이 어두운 골
     return v
+
+
+# --------------------------------------------------------------------------- 오브젝트 그림
+# 위 무늬가 "이어붙는 재질"이라면 아래는 "경계가 있는 물건"이다(#259).
+#
+# 왜 나누는가: 재질 무늬는 `Polygon2D.uv`를 비워 정점 좌표를 UV로 쓴다 — 맵
+# 전체가 하나의 격자에 정렬된다(#246 규약 ③). 넓게 이어지는 바닥·벽에는 맞지만
+# 44x26짜리 책상에는 월드 격자의 아무 조각이나 잘려 들어가서, 상판도 모서리도
+# 서랍선도 있을 자리가 없었다. 집기는 gen_floors가 **오브젝트 로컬 UV**를 넣어
+# 그림 한 장을 물건 하나에 맞춰 늘린다.
+#
+# 그래서 이 그림들은 **이어붙지 않아도 된다** — `_check_periodic`을 돌리지
+# 않는다. 대신 평균 휘도·명암·도트 격자 규약은 재질과 똑같이 지킨다.
+#
+# 크기가 제각각인 집기에 한 장을 늘려 쓰므로(책상 44x26, 실험대 140x38, 사물함
+# 40x세로) **칸 수를 비율로 잡는다**. 문 네 짝짜리 사물함은 폭이 얼마든 네 짝으로
+# 보이고, 늘어나도 "무엇인지"는 유지된다.
+
+def _edge(dx: int, dy: int, gw: int, gh: int) -> int:
+    """네 변 중 가장 가까운 변까지의 거리(도트)."""
+    return min(dx, dy, gw - 1 - dx, gh - 1 - dy)
+
+
+def o_desk(dx: int, dy: int, gw: int, gh: int) -> float:
+    """책상·탁자·실험대. 어두운 모서리 + 밝은 상판 + 서랍선."""
+    e = _edge(dx, dy, gw, gh)
+    if e == 0:
+        return 0.55                                   # 바깥 모서리 그림자
+    v = 0.90 + jit(0.04, dx, dy, 301)
+    if e == 1:
+        v = 0.99                                      # 상판 가장자리 빛
+    if dy == gh - 4:
+        v = 0.68                                      # 서랍선
+    if rnd(dx, dy, 302) > 0.94:
+        v -= 0.05                                     # 잔 결
+    return v
+
+
+def o_chair(dx: int, dy: int, gw: int, gh: int) -> float:
+    """의자. 놓이는 방향이 제각각(책상 아래·오른쪽)이라 상하좌우 대칭으로 만든다."""
+    e = _edge(dx, dy, gw, gh)
+    if e == 0:
+        return 0.52
+    if e == 1:
+        return 0.88                                   # 등받이·팔걸이 테
+    v = 0.95 + jit(0.05, dx, dy, 311)
+    cx0, cy0 = (gw - 1) / 2.0, (gh - 1) / 2.0
+    r = (((dx - cx0) / (gw * 0.26)) ** 2 + ((dy - cy0) / (gh * 0.26)) ** 2) ** 0.5
+    if r < 1.0:
+        v -= 0.12                                     # 눌린 방석
+    return v
+
+
+def o_locker(dx: int, dy: int, gw: int, gh: int) -> float:
+    """사물함 한 벌. 문 네 짝 + 손잡이 — 폭이 얼마든 네 짝으로 보인다."""
+    e = _edge(dx, dy, gw, gh)
+    if e == 0:
+        return 0.54
+    door = max(2, gw // 4)
+    ix = dx % door
+    v = 0.90 + jit(0.03, dx // door, dy, 321)
+    if ix == 0:
+        v = 0.62                                      # 문 사이 틈
+    if ix == door - 2 and abs(dy - gh // 2) <= 1:
+        v = 0.55                                      # 손잡이
+    if dy == 1:
+        v += 0.07                                     # 위 모서리 빛
+    return v
+
+
+def o_shelf(dx: int, dy: int, gw: int, gh: int) -> float:
+    """선반. 널 세 단 + 양옆 기둥."""
+    e = _edge(dx, dy, gw, gh)
+    if e == 0:
+        return 0.52
+    band = max(2, gh // 3)
+    v = 0.88 + jit(0.05, dx, dy // band, 331)
+    if dy % band == 0:
+        v = 0.63                                      # 단 사이 그늘
+    if dx in (1, gw - 2):
+        v = 0.72                                      # 기둥
+    return v
+
+
+def o_sink(dx: int, dy: int, gw: int, gh: int) -> float:
+    """세면대·소변기. 테두리 안에 오목한 대야, 위쪽에 수도꼭지."""
+    e = _edge(dx, dy, gw, gh)
+    if e == 0:
+        return 0.58
+    cx0, cy0 = (gw - 1) / 2.0, (gh - 1) / 2.0
+    r = (((dx - cx0) / (gw * 0.40)) ** 2 + ((dy - cy0) / (gh * 0.34)) ** 2) ** 0.5
+    v = 0.95 + jit(0.03, dx, dy, 341)
+    if r < 1.0:
+        v = 0.74 + 0.14 * r                           # 대야 — 가운데가 깊다
+    if r < 0.30:
+        v = 0.60                                      # 배수구
+    if dy <= 2 and abs(dx - cx0) < 1.6:
+        v = 0.56                                      # 수도꼭지
+    return v
+
+
+def o_screen(dx: int, dy: int, gw: int, gh: int) -> float:
+    """모니터·화면. 두꺼운 베젤 + 대각 반사가 있는 유리."""
+    if _edge(dx, dy, gw, gh) <= 1:
+        return 0.50                                   # 베젤
+    v = 0.74 + jit(0.02, dx, dy, 351)
+    if (dx + dy) % 7 == 0:
+        v = 0.94                                      # 반사 띠
+    return v
+
+
+def o_panel(dx: int, dy: int, gw: int, gh: int) -> float:
+    """칸막이·문짝. 평평한 판 + 안쪽 홈 + 손잡이."""
+    e = _edge(dx, dy, gw, gh)
+    if e == 0:
+        return 0.56
+    v = 0.91 + jit(0.03, dx, dy, 361)
+    if e == 2:
+        v = 0.79                                      # 판 안쪽 홈
+    if abs(dy - gh // 2) <= 1 and dx >= gw - 4:
+        v = 0.58                                      # 손잡이
+    return v
+
+
+def o_cabinet(dx: int, dy: int, gw: int, gh: int) -> float:
+    """캐비닛·약품장·청소도구함. 문 두 짝 + 손잡이."""
+    e = _edge(dx, dy, gw, gh)
+    if e == 0:
+        return 0.54
+    v = 0.90 + jit(0.03, dx // 2, dy, 371)
+    if dx == gw // 2:
+        v = 0.62                                      # 문 사이
+    if abs(dy - gh // 2) <= 1 and dx in (gw // 2 - 2, gw // 2 + 2):
+        v = 0.56                                      # 손잡이
+    if dy == 1:
+        v += 0.06
+    return v
+
+
+def o_bin(dx: int, dy: int, gw: int, gh: int) -> float:
+    """쓰레기통·양동이. 둥근 테와 안쪽 그늘."""
+    cx0, cy0 = (gw - 1) / 2.0, (gh - 1) / 2.0
+    r = (((dx - cx0) / (gw * 0.46)) ** 2 + ((dy - cy0) / (gh * 0.46)) ** 2) ** 0.5
+    if r > 1.0:
+        return 0.88                                   # 통 바깥(바닥이 비쳐 보이게)
+    if r > 0.80:
+        return 0.97                                   # 테두리 빛
+    return 0.62 + jit(0.05, dx, dy, 381)              # 통 안
+
+
+def o_bed(dx: int, dy: int, gw: int, gh: int) -> float:
+    """간이침상. 매트리스 + 머리맡 베개."""
+    e = _edge(dx, dy, gw, gh)
+    if e == 0:
+        return 0.56
+    v = 0.90 + jit(0.04, dx, dy, 391)
+    if dy < gh // 4:
+        v = 0.99                                      # 베개
+    elif dy == gh // 4:
+        v = 0.66                                      # 베개 아래 그늘
+    return v
+
+
+def o_plant(dx: int, dy: int, gw: int, gh: int) -> float:
+    """화분. 아래 화분 + 위 잎 덩어리."""
+    cx0 = (gw - 1) / 2.0
+    if dy > gh * 0.62:
+        if abs(dx - cx0) > gw * 0.30:
+            return 0.90                               # 화분 바깥
+        return 0.80 + jit(0.04, dx, dy, 401)          # 화분
+    r = (((dx - cx0) / (gw * 0.42)) ** 2
+         + ((dy - gh * 0.34) / (gh * 0.32)) ** 2) ** 0.5
+    if r > 1.0:
+        return 0.90
+    return 0.62 + jit(0.12, dx, dy, 402)              # 잎
+
+
+def o_rack(dx: int, dy: int, gw: int, gh: int) -> float:
+    """서버랙. 가로 슬롯이 층층이 + 표시등."""
+    e = _edge(dx, dy, gw, gh)
+    if e == 0:
+        return 0.52
+    v = 0.87 + jit(0.03, dx, dy, 411)
+    if dy % 3 == 0:
+        v = 0.60                                      # 슬롯 사이
+    elif dy % 3 == 1 and dx > gw - 5:
+        v = 0.97                                      # 표시등
+    return v
+
+
+OBJ = 32            # 오브젝트 그림 한 변. 재질과 같은 32라 도트 크기가 어긋나지 않는다.
+
+OBJECTS = {
+    "obj_desk": o_desk,
+    "obj_chair": o_chair,
+    "obj_locker": o_locker,
+    "obj_shelf": o_shelf,
+    "obj_sink": o_sink,
+    "obj_screen": o_screen,
+    "obj_panel": o_panel,
+    "obj_cabinet": o_cabinet,
+    "obj_bin": o_bin,
+    "obj_bed": o_bed,
+    "obj_plant": o_plant,
+    "obj_rack": o_rack,
+}
 
 
 PATTERNS = {
@@ -406,7 +624,20 @@ def build_all() -> None:
         write_png(OUT_DIR / f"{name}.png", size, rgba)
         print(f"{name}.png  {size}x{size}  평균 {sum(px)/len(px)/255:.3f}  "
               f"명암 {min(px)}~{max(px)}")
-    print(f"타일 {len(PATTERNS)}장 -> {OUT_DIR.relative_to(ROOT)}")
+    for name, fn in sorted(OBJECTS.items()):
+        # 오브젝트 그림은 이어붙지 않아도 된다 — 물건 하나에 한 장을 늘려 쓰므로
+        # _check_periodic을 돌리지 않는다. 나머지 규약(평균 휘도·명암·도트 격자)은
+        # 재질과 똑같이 지킨다.
+        px = bake(fn, OBJ)
+        _check_mean(name, px)
+        _check_contrast(name, px)
+        rgba = upscale(px, OBJ)
+        _check_dot_grid(name, rgba, OBJ)
+        write_png(OUT_DIR / f"{name}.png", OBJ, rgba)
+        print(f"{name}.png  {OBJ}x{OBJ}  평균 {sum(px)/len(px)/255:.3f}  "
+              f"명암 {min(px)}~{max(px)}")
+    print(f"재질 {len(PATTERNS)}장 + 오브젝트 {len(OBJECTS)}장 "
+          f"-> {OUT_DIR.relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
