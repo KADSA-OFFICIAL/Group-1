@@ -1280,7 +1280,7 @@ def _classroom(sc, key, x0, y0, x1, y1, door, keepout):
 
 
 def add_sliding_doors(sc):
-    """교실 문을 한 짝짜리 미닫이문으로 만든다.
+    """방 문을 한 짝짜리 미닫이문으로 만든다(라벨 있는 방 전부, #252).
 
     루트가 Area2D다 — 플레이어의 InteractionArea가 겹치는 Area2D 중
     interact()를 가진 것을 찾아 E로 부르기 때문에, 스크립트가 Area2D 본체에
@@ -1294,40 +1294,68 @@ def add_sliding_doors(sc):
     지나가므로 막힌 것으로 보면 안 된다. 제외는 janitor.gd·verify_floor_reach·
     verify_janitor_route·verify_hiding_spots 네 곳에 같은 이름 규칙으로 있다.
     """
+    # 문 틈 목록을 먼저 모은다 — 열린 문짝이 옆 방의 문 자리를 덮지 않는 방향을
+    # 고르는 데 쓴다(사선 띠의 좁은 화장실은 제 벽 안에 문짝이 다 들어가지 않는다).
+    gaps = []
     for key, (label, door, x0, x1, topf, botf) in sc.room_meta.items():
-        if prop_kind(key, label) != "classroom" or door not in ("top", "bottom"):
+        if prop_kind(key, label) is None or door not in ("top", "bottom"):
             continue
         cx = (x0 + x1) / 2
-        if door == "top":
-            wy0, wy1 = topf(cx), topf(cx) + T
-        else:
-            wy0, wy1 = botf(cx) - T, botf(cx)
+        wy = topf(cx) if door == "top" else botf(cx) - T
+        gaps.append((key, cx - DOOR / 2, cx + DOOR / 2, wy + T / 2))
+
+    def covers_gap(key, lo, hi, y):
+        for okey, ox0, ox1, oy in gaps:
+            if okey != key and lo < ox1 and hi > ox0 and abs(oy - y) < T:
+                return True
+        return False
+
+    for key, (label, door, x0, x1, topf, botf) in sc.room_meta.items():
+        # 라벨 없는 막힌 공간만 뺀다. #252 전에는 교실에만 문이 있어서 화장실·
+        # 창고·부서실은 문 표식만 있고 그냥 통과됐다.
+        if prop_kind(key, label) is None or door not in ("top", "bottom"):
+            continue
+        cx = (x0 + x1) / 2
+        # 사선 띠(오른쪽 중간)의 벽은 110px 문 폭에서 28px 내려간다 — 문짝과
+        # 충돌판을 축정렬 사각형으로 내면 벽을 벗어난다. 벽 윗변 함수로 낸다.
+        wall_top = (lambda x: topf(x)) if door == "top" else (lambda x: botf(x) - T)
+        wy0, wy1 = wall_top(cx), wall_top(cx) + T
         my = (wy0 + wy1) / 2
         inset = (T - DOOR_LEAF_T) / 2
-        py0, py1 = wy0 + inset, wy1 - inset
         dl, dr = cx - DOOR / 2, cx + DOOR / 2
-        # 미는 방향 — 맵 밖으로 나가지 않는 쪽. 방끼리 벽을 맞대고 있어서
-        # 어느 쪽으로 밀어도 벽 위를 지나간다(벽 속으로 들어가는 것처럼 보인다).
-        travel = DOOR if dr + DOOR <= W - EDGE else -DOOR
+        yl, yr = wall_top(dl), wall_top(dr)
+        slope = (yr - yl) / DOOR
+        # 미는 방향 — 맵 밖으로 나가지 않고, 옆 방 문 자리를 덮지 않는 쪽.
+        # 방끼리 벽을 맞대고 있어 어느 쪽이든 벽 위를 지나간다(벽 속으로 들어가는
+        # 것처럼 보인다). 사선 벽에서는 기울기만큼 같이 내려가야 벽에 붙어 있다.
+        cands = [d for d in (DOOR, -DOOR)
+                 if EDGE <= dl + d and dr + d <= W - EDGE]
+        if not cands:
+            cands = [DOOR if dr + DOOR <= W - EDGE else -DOOR]
+        travel = next((d for d in cands
+                       if not covers_gap(key, dl + d, dr + d, my + d * slope)),
+                      cands[0])
+        ty = n(travel * slope)
         root = f"SlideDoor_{key}"
         sc.node(f'[node name="{root}" type="Area2D" parent="."]\n'
                 f'collision_layer = 2\ncollision_mask = 1\n'
                 f'script = ExtResource("6_sliding")\n'
                 f'travel = {n(travel)}\n'
-                f'leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_{key}")\n')
+                + (f'travel_y = {ty}\n' if float(ty) != 0.0 else "")
+                + f'leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_{key}")\n')
         sc.node(f'[node name="Zone" type="CollisionShape2D" parent="{root}"]\n'
                 f'position = Vector2({n(cx)}, {n(my)})\n'
                 f'shape = SubResource("RectangleShape2D_door_zone")\n')
         sc.node(f'[node name="SDPanel" type="StaticBody2D" parent="{root}"]\n')
         sc.node(f'[node name="Panel" type="CollisionPolygon2D" '
                 f'parent="{root}/SDPanel"]\n'
-                f'polygon = {rect(dl, py0, dr, py1)}\n')
+                f'polygon = {poly((dl, yl + inset), (dr, yr + inset), (dr, yr + T - inset), (dl, yl + T - inset))}\n')
         # 시각은 WallGlow 안에. 레이어 0에 두면 CanvasLayer(layer=1)의 문 표식·
         # 벽 시각이 z_index와 무관하게 덮어 문이 아예 안 보인다(#234). 같은 문의
         # Door_ 마커보다 뒤에 선언되므로 그 위에 그려지고, 열려서 밀리면 벽 시각
         # 뒤로 숨는다. 두께는 충돌(DOOR_LEAF_T)보다 넓은 벽 두께 전체를 쓴다.
         sc.poly2d(f"SDVis_{key}", "WallGlow/RoomWallVisuals",
-                  C_LEAF, rect(dl, wy0, dr, wy1), z=2)
+                  C_LEAF, poly((dl, yl), (dr, yr), (dr, yr + T), (dl, yl + T)), z=2)
 
 
 def _keepout_for(sc, x0, x1):

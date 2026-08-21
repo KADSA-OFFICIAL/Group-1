@@ -4991,6 +4991,161 @@ texture = ExtResource("tex_prop_grain")
 color = Color(0.8462, 0.7436, 0.5641, 1)
 polygon = PackedVector2Array(1045, 1484, 1155, 1484, 1155, 1500, 1045, 1500)
 
+[node name="SlideDoor_MensRoom1" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("6_sliding")
+travel = 110
+leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_MensRoom1")
+
+[node name="Zone" type="CollisionShape2D" parent="SlideDoor_MensRoom1"]
+position = Vector2(1037.5, 2128)
+shape = SubResource("RectangleShape2D_door_zone")
+
+[node name="SDPanel" type="StaticBody2D" parent="SlideDoor_MensRoom1"]
+
+[node name="Panel" type="CollisionPolygon2D" parent="SlideDoor_MensRoom1/SDPanel"]
+polygon = PackedVector2Array(982.5, 2123, 1092.5, 2123, 1092.5, 2133, 982.5, 2133)
+
+[node name="SDVis_MensRoom1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 2
+texture = ExtResource("tex_prop_grain")
+color = Color(0.8462, 0.7436, 0.5641, 1)
+polygon = PackedVector2Array(982.5, 2120, 1092.5, 2120, 1092.5, 2136, 982.5, 2136)
+
+[node name="SlideDoor_WomensRoom1" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("6_sliding")
+travel = 110
+leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_WomensRoom1")
+
+[node name="Zone" type="CollisionShape2D" parent="SlideDoor_WomensRoom1"]
+position = Vector2(1350, 2128)
+shape = SubResource("RectangleShape2D_door_zone")
+
+[node name="SDPanel" type="StaticBody2D" parent="SlideDoor_WomensRoom1"]
+
+[node name="Panel" type="CollisionPolygon2D" parent="SlideDoor_WomensRoom1/SDPanel"]
+polygon = PackedVector2Array(1295, 2123, 1405, 2123, 1405, 2133, 1295, 2133)
+
+[node name="SDVis_WomensRoom1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 2
+texture = ExtResource("tex_prop_grain")
+color = Color(0.8462, 0.7436, 0.5641, 1)
+polygon = PackedVector2Array(1295, 2120, 1405, 2120, 1405, 2136, 1295, 2136)
+
+[node name="SlideDoor_Entrance" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("6_sliding")
+travel = 110
+leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_Entrance")
+
+[node name="Zone" type="CollisionShape2D" parent="SlideDoor_Entrance"]
+position = Vector2(1787.5, 2128)
+shape = SubResource("RectangleShape2D_door_zone")
+
+[node name="SDPanel" type="StaticBody2D" parent="SlideDoor_Entrance"]
+
+[node name="Panel" type="CollisionPolygon2D" parent="SlideDoor_Entrance/SDPanel"]
+polygon = PackedVector2Array(1732.5, 2123, 1842.5, 2123, 1842.5, 2133, 1732.5, 2133)
+
+[node name="SDVis_Entrance" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 2
+texture = ExtResource("tex_prop_grain")
+color = Color(0.8462, 0.7436, 0.5641, 1)
+polygon = PackedVector2Array(1732.5, 2120, 1842.5, 2120, 1842.5, 2136, 1732.5, 2136)
+
+[node name="SlideDoor_JanitorRoom" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("6_sliding")
+travel = 110
+leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_JanitorRoom")
+
+[node name="Zone" type="CollisionShape2D" parent="SlideDoor_JanitorRoom"]
+position = Vector2(2320, 2128)
+shape = SubResource("RectangleShape2D_door_zone")
+
+[node name="SDPanel" type="StaticBody2D" parent="SlideDoor_JanitorRoom"]
+
+[node name="Panel" type="CollisionPolygon2D" parent="SlideDoor_JanitorRoom/SDPanel"]
+polygon = PackedVector2Array(2265, 2123, 2375, 2123, 2375, 2133, 2265, 2133)
+
+[node name="SDVis_JanitorRoom" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 2
+texture = ExtResource("tex_prop_grain")
+color = Color(0.8462, 0.7436, 0.5641, 1)
+polygon = PackedVector2Array(2265, 2120, 2375, 2120, 2375, 2136, 2265, 2136)
+
+[node name="SlideDoor_Storage1" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("6_sliding")
+travel = 110
+leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_Storage1")
+
+[node name="Zone" type="CollisionShape2D" parent="SlideDoor_Storage1"]
+position = Vector2(2785, 2128)
+shape = SubResource("RectangleShape2D_door_zone")
+
+[node name="SDPanel" type="StaticBody2D" parent="SlideDoor_Storage1"]
+
+[node name="Panel" type="CollisionPolygon2D" parent="SlideDoor_Storage1/SDPanel"]
+polygon = PackedVector2Array(2730, 2123, 2840, 2123, 2840, 2133, 2730, 2133)
+
+[node name="SDVis_Storage1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 2
+texture = ExtResource("tex_prop_grain")
+color = Color(0.8462, 0.7436, 0.5641, 1)
+polygon = PackedVector2Array(2730, 2120, 2840, 2120, 2840, 2136, 2730, 2136)
+
+[node name="SlideDoor_Storage2" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("6_sliding")
+travel = 110
+leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_Storage2")
+
+[node name="Zone" type="CollisionShape2D" parent="SlideDoor_Storage2"]
+position = Vector2(3180, 2128)
+shape = SubResource("RectangleShape2D_door_zone")
+
+[node name="SDPanel" type="StaticBody2D" parent="SlideDoor_Storage2"]
+
+[node name="Panel" type="CollisionPolygon2D" parent="SlideDoor_Storage2/SDPanel"]
+polygon = PackedVector2Array(3125, 2123, 3235, 2123, 3235, 2133, 3125, 2133)
+
+[node name="SDVis_Storage2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 2
+texture = ExtResource("tex_prop_grain")
+color = Color(0.8462, 0.7436, 0.5641, 1)
+polygon = PackedVector2Array(3125, 2120, 3235, 2120, 3235, 2136, 3125, 2136)
+
+[node name="SlideDoor_StaffRoom" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("6_sliding")
+travel = 110
+travel_y = 28.6
+leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_StaffRoom")
+
+[node name="Zone" type="CollisionShape2D" parent="SlideDoor_StaffRoom"]
+position = Vector2(2665, 1685.7)
+shape = SubResource("RectangleShape2D_door_zone")
+
+[node name="SDPanel" type="StaticBody2D" parent="SlideDoor_StaffRoom"]
+
+[node name="Panel" type="CollisionPolygon2D" parent="SlideDoor_StaffRoom/SDPanel"]
+polygon = PackedVector2Array(2610, 1666.4, 2720, 1695, 2720, 1705, 2610, 1676.4)
+
+[node name="SDVis_StaffRoom" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 2
+texture = ExtResource("tex_prop_grain")
+color = Color(0.8462, 0.7436, 0.5641, 1)
+polygon = PackedVector2Array(2610, 1663.4, 2720, 1692, 2720, 1708, 2610, 1679.4)
+
 [node name="Walls" type="StaticBody2D" parent="."]
 
 [node name="TopWall" type="CollisionShape2D" parent="Walls"]

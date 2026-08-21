@@ -1,5 +1,5 @@
 extends Area2D
-## 교실 미닫이문 — 한 짝이 옆으로 밀린다.
+## 방 미닫이문 — 한 짝이 옆으로 밀린다(#252로 교실 밖 방에도 붙는다).
 ##
 ## **플레이어는 E로 여닫는다.** 그래서 스크립트가 부모 Node2D가 아니라 Area2D
 ## 본체에 붙어 있다 — 플레이어의 InteractionArea는 겹치는 Area2D 중
@@ -22,6 +22,9 @@ extends Area2D
 
 ## 문짝이 밀려나는 거리와 방향. 문 틈 폭 전체를 비켜야 완전히 열린다.
 @export var travel: float = 110.0
+## 사선 벽(오른쪽 중간 띠)에서는 벽 기울기만큼 세로로도 밀려야 벽에 붙어 있다.
+## 축정렬 벽에서는 0이라 씬에 아예 적히지 않는다.
+@export var travel_y: float = 0.0
 @export var open_time: float = 0.28
 ## WallGlow 안의 문짝 시각. 몸체와 같은 거리만큼 함께 움직인다.
 @export var leaf_visual: NodePath
@@ -92,12 +95,12 @@ func _apply() -> void:
 
 	if _tween != null and _tween.is_valid():
 		_tween.kill()
-	var offset := travel if _open else 0.0
+	var offset := Vector2(travel, travel_y) if _open else Vector2.ZERO
 	_tween = create_tween().set_parallel(true)
 	_tween.set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 	for node in [_panel, _leaf]:
 		if node != null:
-			_tween.tween_property(node, "position", Vector2(offset, 0.0), open_time)
+			_tween.tween_property(node, "position", offset, open_time)
 	if not _open:
 		_tween.chain().tween_callback(_set_solid.bind(true))
 
