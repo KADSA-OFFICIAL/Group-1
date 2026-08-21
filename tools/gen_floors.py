@@ -48,7 +48,8 @@ C_BOARD = "Color(0.13, 0.19, 0.16, 1)"   # 칠판(장식)
 C_NOTICE = "Color(0.34, 0.29, 0.21, 1)"  # 게시판(장식)
 C_CLEAN = "Color(0.19, 0.26, 0.24, 1)"   # 청소도구함
 C_BIN = "Color(0.17, 0.19, 0.21, 1)"     # 쓰레기통
-C_WINDOW = "Color(0.29, 0.35, 0.42, 1)"  # 창문(장식)
+C_WINDOW = "Color(0.17, 0.23, 0.36, 1)"  # 창문 — 짙은 밤하늘이 비친 유리(#268)
+C_MOON = "Color(0.205, 0.205, 0.215, 1)" # 창 아래 바닥 달빛(바닥 표시)
 C_FIRE = "Color(0.44, 0.17, 0.15, 1)"    # 소화기(장식)
 C_LINE = "Color(0.17, 0.19, 0.23, 1)"    # 복도 바닥 유도선(장식)
 C_TRAY = "Color(0.33, 0.34, 0.36, 1)"    # 분필받이
@@ -61,11 +62,15 @@ C_BOOK = "Color(0.45, 0.34, 0.24, 1)"    # 책·교과서(집기 위 소품)
 C_PAPER = "Color(0.55, 0.54, 0.50, 1)"   # 서류
 C_LEAF = "Color(0.66, 0.58, 0.44, 1)"    # 미닫이 문짝 — 문 표식(C_DOOR)보다 밝게
 DOOR_LEAF_T = 10                          # 문짝 두께(벽 16 안쪽에 낀다)
+WALL_FACE = 14                            # 가로 벽 아래에 그리는 앞면 높이(#268)
+MOONLIGHT = 46                            # 창 아래 바닥에 고이는 달빛 깊이
 
 # 바닥 구역 — Floor(맵 바탕) 위, Rooms(방 바닥) 아래에 깔린다.
 C_CORRIDOR = "Color(0.196, 0.160, 0.120, 1)"  # 복도 마루 — 학교 목재 바닥
 C_SEAM = "Color(0.168, 0.134, 0.098, 1)"      # 마루 널 이음매
 C_WAINSCOT = "Color(0.34, 0.29, 0.22, 1)"     # 걸레받이(벽 아래 나무 띠)
+C_FACE = "Color(0.205, 0.216, 0.242, 1)"      # 벽 앞면 — 윗면보다 어둡게 해
+                                              # 세워진 면으로 읽히게 한다(#268)
 C_PILASTER = "Color(0.235, 0.248, 0.278, 1)"  # 복도 기둥 — 벽보다 **어둡게**.
                                               # 밝으면 흰 기둥처럼 튄다(#265)
 C_TILE = "Color(0.150, 0.166, 0.172, 1)"      # 화장실 바닥 타일 이음매
@@ -488,9 +493,25 @@ class Scene:
                   f'occluder = SubResource("{oid}")\n')
 
     def wall(self, key, polygon, body="RoomWalls"):
-        """벽 3종 세트: 충돌 WC_ + 시각 WV_(WallGlow) + 광원차단 LO_WC_."""
+        """벽 3종 세트: 충돌 WC_ + 시각 WV_(WallGlow) + 광원차단 LO_WC_.
+
+        가로 벽에는 **앞면**(WF_)을 하나 더 낸다(#268). 위에서 내려다본 16px 띠
+        하나만 그리면 두께만 있고 높이가 없어 건축 도면처럼 보인다. 아래쪽에
+        면을 덧그리면 벽이 서 있는 것으로 읽힌다.
+
+        앞면은 **시각 전용**이다 — 충돌·광원 차단체는 그대로 16px 띠에 있어서
+        통행과 시야 판정이 바뀌지 않는다. 세로 벽에는 그리지 않는다(탑다운에서
+        앞면이 보이는 것은 시선과 마주 보는 가로 벽뿐이다).
+        """
         self.solid(f"WC_{key}", body, polygon)
         self.poly2d(f"WV_{key}", "WallGlow/RoomWallVisuals", C_WALL, polygon)
+        nums = [float(v) for v in
+                polygon[polygon.index("(") + 1:polygon.rindex(")")].split(",")]
+        xs, ys = nums[0::2], nums[1::2]
+        w, h = max(xs) - min(xs), max(ys) - min(ys)
+        if w > h * 1.5:                       # 가로 벽만
+            self.poly2d(f"WF_{key}", "WallGlow/RoomWallVisuals", C_FACE,
+                        rect(min(xs), max(ys), max(xs), max(ys) + WALL_FACE))
 
     def prop(self, key, polygon, color):
         """방 안 집기: 충돌 PC_ + 시각 PV_ 한 쌍.
@@ -1238,21 +1259,32 @@ def _classroom(sc, key, x0, y0, x1, y1, door, keepout):
 
     # ── 외벽: 창문 + 커튼 / 문 쪽 벽: 스피커 + 게시판 ───────────
     door_gap = (cx - DOOR / 2 - CLASS_BACK_PAD, cx + DOOR / 2 + CLASS_BACK_PAD)
+    # 가로 벽 장식은 벽 **앞면 위**에 그린다(#268). 위쪽 벽은 앞면이 방 안으로
+    # 내려오므로 그 자리에, 아래쪽 벽은 앞면이 방 밖(복도)으로 가므로 벽 띠에.
+    # 레이어도 Props(PD_)가 아니라 WallGlow(WD_)여야 앞면에 안 가린다.
+    top_band = (wt, wt + WALL_FACE)
+    bot_band = (wb - CLASS_WALL_DECOR_D, wb)
     if door == "top":
-        win_y, note_y = (wb - CLASS_WALL_DECOR_D, wb), (wt, wt + CLASS_WALL_DECOR_D)
+        win_y, note_y = bot_band, top_band
     else:
-        win_y, note_y = (wt, wt + CLASS_WALL_DECOR_D), (wb - CLASS_WALL_DECOR_D, wb)
+        win_y, note_y = top_band, bot_band
     for i, (px0, py0, px1, py1) in enumerate(_spread(ix0, ix1, 72, 3, *win_y)):
-        sc.decor(f"{key}_win{i}", rect(px0, py0, px1, py1), C_WINDOW)
-        sc.decor(f"{key}_curtainL{i}", rect(px0 - 8, py0, px0, py1), C_CURTAIN)
-        sc.decor(f"{key}_curtainR{i}", rect(px1, py0, px1 + 8, py1), C_CURTAIN)
+        sc.wall_decor(f"{key}_win{i}", rect(px0, py0, px1, py1), C_WINDOW)
+        sc.wall_decor(f"{key}_curtainL{i}", rect(px0 - 8, py0, px0, py1), C_CURTAIN)
+        sc.wall_decor(f"{key}_curtainR{i}", rect(px1, py0, px1 + 8, py1), C_CURTAIN)
+        # 달빛 — 창 아래 방 바닥에 고인다(#268). 밤 학교에서 손전등 말고 유일하게
+        # 밖에서 들어오는 빛이다. 광원이 아니라 바닥 표시라 조명 튜닝(#74)에
+        # 영향이 없다. 창이 위쪽 벽이면 아래로, 아래쪽 벽이면 위로 번진다.
+        my0 = py1 if py0 < cy else (py0 - MOONLIGHT)
+        sc.floor_mark(f"{key}_moon{i}",
+                      rect(px0 - 10, my0, px1 + 10, my0 + MOONLIGHT), C_MOON)
     # 스피커도 게시판과 같은 벽면에 붙는다. note_y[0]에서 아래로 재면 문 쪽
     # 벽이 아래일 때 벽을 파고든다 — 벽면 방향에 맞춰 앵커를 잡는다.
     spk_y = (wt, wt + 14) if door == "top" else (wb - 14, wb)
     speakers = [(ix0, spk_y[0], ix0 + 18, spk_y[1]),
                 (ix1 - 18, spk_y[0], ix1, spk_y[1])]
     for i, r4 in enumerate(speakers):
-        sc.decor(f"{key}_spk{i}", rect(*r4), C_SPEAKER)
+        sc.wall_decor(f"{key}_spk{i}", rect(*r4), C_SPEAKER)
     # 게시판은 문 틈과 스피커를 피해, 남는 벽면 구간마다 한 장씩. 대칭으로 두
     # 장을 깔면 문이 가운데라 두 장 다 문에 걸려 한 장도 안 남는다.
     lanes = _free_spans(ix0, ix1, note_y[0], note_y[1],
@@ -1263,8 +1295,8 @@ def _classroom(sc, key, x0, y0, x1, y1, door, keepout):
     for i, (sx0, sx1) in enumerate(lanes):
         w = min(78, sx1 - sx0 - 16)
         mx = (sx0 + sx1) / 2
-        sc.decor(f"{key}_notice{i}", rect(mx - w / 2, note_y[0], mx + w / 2,
-                                          note_y[1]), C_NOTICE)
+        sc.wall_decor(f"{key}_notice{i}", rect(mx - w / 2, note_y[0], mx + w / 2,
+                                               note_y[1]), C_NOTICE)
 
     # ── 학생 책상 — 교탁과 사물함 사이. 책상 오른쪽에 의자(왼쪽을 본다) ──
     dw, dh = CLASS_DESK[1], CLASS_DESK[0]      # 90도 돌린 책상
@@ -1674,11 +1706,11 @@ def add_room_fixtures(sc, key, kind, x0, x1, topf, botf, door, keepout, units):
 
         # 환풍기 — 문 쪽 벽, 문 틈 **왼쪽**에. 오른쪽은 대변기 칸이 벽까지 차지해
         # 자리가 없다(오른쪽에 뒀더니 25곳 전부 안 들어갔다).
-        fan_y = (wt, wt + 9) if door == "top" else (wb - 9, wb)
+        fan_y = (wt, wt + WALL_FACE) if door == "top" else (wb - 9, wb)
         fx1 = cx - DOOR / 2 - 20
         fan = (fx1 - 28, fan_y[0], fx1, fan_y[1])
-        if fan[0] > wl + 40 and not any(_overlap(fan, k) for k in keepout + taken):
-            sc.decor(f"{key}_fan", rect(*fan), C_FAN)
+        if fan[0] > wl + 40:
+            sc.wall_decor(f"{key}_fan", rect(*fan), C_FAN)
 
         # 청소도구 — 문 반대쪽 벽 왼쪽 끝. 왼쪽 벽은 세면대가, 오른쪽 벽은 칸이
         # 다 쓴다(둘 다 시도했다가 0개가 나왔다).
@@ -1788,13 +1820,17 @@ def add_corridor_props(sc, corridors):
             # 뒤집힌다. 두께가 서로 다르므로(게시판 10, 소화기 22) 각각 벽면에
             # 맞춰 앵커를 잡아야 벽을 파고들지 않는다.
             if abs(botf(x1) - cy0) < 1:          # 방이 복도 위쪽에 접한다
-                ly0, ly1 = cy0, cy0 + CORR_LOCKER_D
-                wain = (cy0 - WAINSCOT, cy0)     # 벽 띠 중 복도 쪽 면
-                pil = (cy0 - T, cy0)
+                # 이 방의 아래 벽은 앞면이 복도로 WALL_FACE만큼 내려온다(#268).
+                # 사물함·비품을 그만큼 비켜 놓지 않으면 앞면에 가린다.
+                base = cy0 + WALL_FACE
+                ly0, ly1 = base, base + CORR_LOCKER_D
+                wain = (base - WAINSCOT, base)   # 걸레받이는 앞면 **아래 끝**에
+                pil = (cy0, base)                # 기둥은 앞면 전체를 덮는다
 
-                def face(depth, base=cy0):
+                def face(depth, base=base):
                     return base, base + depth
             elif abs(topf(x0) - cy1) < 1:        # 방이 복도 아래쪽에 접한다
+                # 이쪽 벽의 앞면은 방 안으로 내려가므로 복도 쪽은 그대로 쓴다.
                 ly0, ly1 = cy1 - CORR_LOCKER_D, cy1
                 wain = (cy1, cy1 + WAINSCOT)
                 pil = (cy1, cy1 + T)
@@ -1904,38 +1940,18 @@ SPRINK = 9              # 스프링클러 헤드 한 변
 
 
 def add_ground(sc, corridors):
-    """복도 바닥을 마루로 깔고 널 이음매를 긋는다.
+    """복도 바닥을 깐다.
 
     Rooms보다 먼저 선언된 Ground 아래에 들어가므로 방 바닥이 이 위에 덮인다 —
     복도 띠가 방과 겹쳐도 결과가 어긋나지 않는다.
 
-    널은 복도를 따라(가로로) 길게 눕힌다. 세로 격자로 자르면 타일이 되고,
-    학교 마루로는 읽히지 않는다. 널 사이 짧은 이음매를 줄마다 엇갈리게 넣어
-    한 장짜리 판처럼 보이지 않게 한다.
+    널 선은 **폴리곤이 아니라 `floor_board` 무늬가 낸다**(#268). #242는 64px마다
+    Polygon2D로 그렸는데, 널을 직각으로 돌리자 층당 150개가 넘게 생겨 노드
+    예산을 넘겼다. 무늬로 옮기니 노드 0개에 타일 격자(32px)와도 정확히 맞는다.
     """
     for cy0, cy1 in corridors:
-        tag = int(cy0)
-        sc.ground(f"Corridor_{tag}", rect(EDGE, cy0, W - EDGE, cy1), C_CORRIDOR)
-        row = 0
-        y = cy0 + PLANK
-        while y < cy1 - 4:
-            sc.ground(f"Plank_{tag}_{row}", rect(EDGE, y, W - EDGE, y + PLANK_SEAM),
-                      C_SEAM)
-            row += 1
-            y += PLANK
-        # 널 이음매 — 줄마다 반 칸씩 밀어 엇갈리게
-        for r in range(row + 1):
-            top = cy0 + r * PLANK
-            bot = min(top + PLANK, cy1)
-            if bot - top < 12:
-                continue
-            x = EDGE + (PLANK_JOINT / 2 if r % 2 else PLANK_JOINT)
-            k = 0
-            while x < W - EDGE:
-                sc.ground(f"Joint_{tag}_{r}_{k}",
-                          rect(x, top + 2, x + PLANK_SEAM, bot - 2), C_SEAM)
-                x += PLANK_JOINT
-                k += 1
+        sc.ground(f"Corridor_{int(cy0)}", rect(EDGE, cy0, W - EDGE, cy1),
+                  C_CORRIDOR)
 
 
 def add_ceiling_lights(sc, corridors):
