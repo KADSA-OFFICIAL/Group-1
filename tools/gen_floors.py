@@ -49,7 +49,8 @@ C_NOTICE = "Color(0.34, 0.29, 0.21, 1)"  # 게시판(장식)
 C_CLEAN = "Color(0.19, 0.26, 0.24, 1)"   # 청소도구함
 C_BIN = "Color(0.17, 0.19, 0.21, 1)"     # 쓰레기통
 C_WINDOW = "Color(0.17, 0.23, 0.36, 1)"  # 창문 — 짙은 밤하늘이 비친 유리(#268)
-C_MOON = "Color(0.205, 0.205, 0.215, 1)" # 창 아래 바닥 달빛(바닥 표시)
+C_MOON = "Color(0.62, 0.68, 0.85, 0.14)" # 창으로 드는 달빛 — 반투명이라
+                                         # 바닥·집기 위에 겹쳐 깔린다
 C_FIRE = "Color(0.44, 0.17, 0.15, 1)"    # 소화기(장식)
 C_LINE = "Color(0.17, 0.19, 0.23, 1)"    # 복도 바닥 유도선(장식)
 C_TRAY = "Color(0.33, 0.34, 0.36, 1)"    # 분필받이
@@ -62,13 +63,16 @@ C_BOOK = "Color(0.45, 0.34, 0.24, 1)"    # 책·교과서(집기 위 소품)
 C_PAPER = "Color(0.55, 0.54, 0.50, 1)"   # 서류
 C_LEAF = "Color(0.66, 0.58, 0.44, 1)"    # 미닫이 문짝 — 문 표식(C_DOOR)보다 밝게
 DOOR_LEAF_T = 10                          # 문짝 두께(벽 16 안쪽에 낀다)
-WALL_FACE = 14                            # 가로 벽 아래에 그리는 앞면 높이(#268)
-MOONLIGHT = 46                            # 창 아래 바닥에 고이는 달빛 깊이
+WALL_FACE = 20                            # 가로 벽 아래 앞면 높이(#268, #271에서
+                                          # 14->20. 낮으면 높이가 안 느껴진다)
+MOONLIGHT = 96                            # 창에서 방 안으로 빛이 뻗는 깊이
 
 # 바닥 구역 — Floor(맵 바탕) 위, Rooms(방 바닥) 아래에 깔린다.
 C_CORRIDOR = "Color(0.196, 0.160, 0.120, 1)"  # 복도 마루 — 학교 목재 바닥
 C_SEAM = "Color(0.168, 0.134, 0.098, 1)"      # 마루 널 이음매
 C_WAINSCOT = "Color(0.34, 0.29, 0.22, 1)"     # 걸레받이(벽 아래 나무 띠)
+C_WALL_TOP = "Color(0.375, 0.392, 0.430, 1)"  # 벽 윗변 하이라이트(#271)
+C_WALL_SHADOW = "Color(0.118, 0.124, 0.140, 1)"  # 앞면이 바닥에 닿는 그림자
 C_FACE = "Color(0.205, 0.216, 0.242, 1)"      # 벽 앞면 — 윗면보다 어둡게 해
                                               # 세워진 면으로 읽히게 한다(#268)
 C_PILASTER = "Color(0.235, 0.248, 0.278, 1)"  # 복도 기둥 — 벽보다 **어둡게**.
@@ -510,8 +514,15 @@ class Scene:
         xs, ys = nums[0::2], nums[1::2]
         w, h = max(xs) - min(xs), max(ys) - min(ys)
         if w > h * 1.5:                       # 가로 벽만
+            x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+            # 3단으로 나눈다 — 윗변 하이라이트 / 앞면 / 바닥에 닿는 그림자.
+            # 면 하나만 두면 밝기가 같은 띠 두 개라 여전히 납작해 보인다(#271).
+            self.poly2d(f"WH_{key}", "WallGlow/RoomWallVisuals", C_WALL_TOP,
+                        rect(x0, y0, x1, y0 + 3))
             self.poly2d(f"WF_{key}", "WallGlow/RoomWallVisuals", C_FACE,
-                        rect(min(xs), max(ys), max(xs), max(ys) + WALL_FACE))
+                        rect(x0, y1, x1, y1 + WALL_FACE - 4))
+            self.poly2d(f"WS_{key}", "WallGlow/RoomWallVisuals", C_WALL_SHADOW,
+                        rect(x0, y1 + WALL_FACE - 4, x1, y1 + WALL_FACE))
 
     def prop(self, key, polygon, color):
         """방 안 집기: 충돌 PC_ + 시각 PV_ 한 쌍.
@@ -523,6 +534,16 @@ class Scene:
         self.node(f'[node name="PC_{key}" type="CollisionPolygon2D" parent="PropBodies"]\n'
                   f'polygon = {polygon}\n')
         self.poly2d(f"PV_{key}", "Props", color, polygon)
+
+    def light(self, key, polygon, color):
+        """창으로 드는 빛 — **반투명**으로 WallGlow에 낸다(#271).
+
+        바닥 표시(FM_)로 냈더니 어둠(CanvasModulate)을 받아 손전등이 닿을
+        때만 보였다. 빛이 손전등에 비춰야 보이는 건 앞뒤가 안 맞는다.
+        WallGlow는 어둠을 안 받으므로 늘 보이고, 알파를 줘서 바닥·집기 위에
+        겹쳐 깔린다 — 불투명하면 책상을 지워 버린다.
+        """
+        self.poly2d(f"LT_{key}", "WallGlow/RoomWallVisuals", color, polygon, z=3)
 
     def wall_decor(self, key, polygon, color):
         """벽면에 붙는 장식 — WallGlow 안이라 어둠을 받지 않고 벽 위에 그려진다.
@@ -1272,12 +1293,26 @@ def _classroom(sc, key, x0, y0, x1, y1, door, keepout):
         sc.wall_decor(f"{key}_win{i}", rect(px0, py0, px1, py1), C_WINDOW)
         sc.wall_decor(f"{key}_curtainL{i}", rect(px0 - 8, py0, px0, py1), C_CURTAIN)
         sc.wall_decor(f"{key}_curtainR{i}", rect(px1, py0, px1 + 8, py1), C_CURTAIN)
-        # 달빛 — 창 아래 방 바닥에 고인다(#268). 밤 학교에서 손전등 말고 유일하게
-        # 밖에서 들어오는 빛이다. 광원이 아니라 바닥 표시라 조명 튜닝(#74)에
-        # 영향이 없다. 창이 위쪽 벽이면 아래로, 아래쪽 벽이면 위로 번진다.
-        my0 = py1 if py0 < cy else (py0 - MOONLIGHT)
-        sc.floor_mark(f"{key}_moon{i}",
-                      rect(px0 - 10, my0, px1 + 10, my0 + MOONLIGHT), C_MOON)
+        # 달빛 — 창에서 방 안으로 번진다(#268, #271에서 다시 손봄). 밤 학교에서
+        # 손전등 말고 유일하게 밖에서 들어오는 빛이다. 광원(PointLight2D)이
+        # 아니라 반투명 폴리곤이라 조명 튜닝(#74)에 영향이 없다.
+        #
+        # 처음엔 불투명한 회색 바닥 표시였는데 빛으로 안 읽혔다. 셋을 고쳤다 —
+        # ① 어둠을 안 받는 WallGlow로 올리고 알파를 줘서 겹쳐 깔리게,
+        # ② 안으로 갈수록 넓어지는 사다리꼴로(빛이 퍼지는 모양),
+        # ③ 창살 그림자로 끊어서 창을 통과한 빛임을 드러냈다.
+        down = py0 < cy
+        near = py1 if down else py0
+        far = near + MOONLIGHT if down else near - MOONLIGHT
+        spread = MOONLIGHT * 0.45
+        bars = 3
+        span = (px1 - px0) / bars
+        for b in range(bars):
+            nx0 = px0 + b * span + 3
+            nx1 = px0 + (b + 1) * span - 3
+            sc.light(f"{key}_moon{i}_{b}",
+                     poly((nx0, near), (nx1, near),
+                          (nx1 + spread, far), (nx0 - spread, far)), C_MOON)
     # 스피커도 게시판과 같은 벽면에 붙는다. note_y[0]에서 아래로 재면 문 쪽
     # 벽이 아래일 때 벽을 파고든다 — 벽면 방향에 맞춰 앵커를 잡는다.
     spk_y = (wt, wt + 14) if door == "top" else (wb - 14, wb)
@@ -1731,7 +1766,6 @@ def add_props(sc, corridors=()):
     add_story·add_hiding 뒤에 불러야 한다 — 단서·은신처 좌표(sc.clue_pts)가
     채워진 뒤라야 그 자리를 피할 수 있다.
     """
-    add_corridor_lines(sc, corridors)   # 바닥 유도선을 먼저 — 나중 노드가 위에 그려진다
     for key, (label, door, x0, x1, topf, botf) in sc.room_meta.items():
         kind = prop_kind(key, label)
         if kind is None:
@@ -1777,28 +1811,6 @@ def add_props(sc, corridors=()):
         add_room_fixtures(sc, key, kind, x0, x1, topf, botf, door, keepout, rects)
 
     add_corridor_props(sc, corridors)
-
-
-def add_corridor_lines(sc, corridors):
-    """복도 바닥 유도선(장식). 다른 집기보다 먼저 내야 밑에 깔린다.
-
-    방이 걸치는 x 구간은 잘라낸다 — 1층 교무실은 아래 변이 사선이라 오른쪽
-    끝에서 y가 380px 내려오고, 통짜로 그으면 그 벽을 가로지른다.
-    """
-    for cy0, cy1 in corridors:
-        y = (cy0 + cy1) / 2
-        blocked = []
-        for key, (label, door, x0, x1, topf, botf) in sc.room_meta.items():
-            top = min(topf(x0), topf(x1)) - T
-            bot = max(botf(x0), botf(x1)) + T
-            if top <= y <= bot:
-                blocked.append((x0, y - CORR_LINE_H, x1, y + CORR_LINE_H))
-        spans = _free_spans(EDGE, W - EDGE, y - CORR_LINE_H / 2,
-                            y + CORR_LINE_H / 2, blocked, floor_w=80)
-        for i, (sx0, sx1) in enumerate(spans):
-            sc.decor(f"Line_{int(cy0)}_{i}",
-                     rect(sx0, y - CORR_LINE_H / 2, sx1, y + CORR_LINE_H / 2),
-                     C_LINE)
 
 
 def add_corridor_props(sc, corridors):
@@ -1967,22 +1979,9 @@ def add_ceiling_lights(sc, corridors):
     for cy0, cy1 in corridors:
         tag = int(cy0)
         mid_y = (cy0 + cy1) / 2
-        # 배관 두 줄 — 복도를 따라 길게. 사물함 띠(가장자리 32px)에 닿지 않게
-        # 가운데 쪽으로 붙인다.
-        for k, off in enumerate((-0.18, 0.20)):
-            py = mid_y + (cy1 - cy0) * off
-            for j, (sx0, sx1) in enumerate(_corridor_clear(sc, py, py + PIPE_T, 80)):
-                sc.decor(f"Pipe_{tag}_{k}_{j}",
-                         rect(sx0, py, sx1, py + PIPE_T), C_PIPE)
-                # 걸이 — 일정 간격의 짧은 가로 토막. 이게 없으면 그냥 바닥에
-                # 그은 선으로 읽힌다.
-                bx = sx0 + PIPE_BRACKET / 2
-                m = 0
-                while bx + 10 < sx1:
-                    sc.decor(f"Brk_{tag}_{k}_{j}_{m}",
-                             rect(bx, py - 3, bx + 10, py + PIPE_T + 3), C_PIPE)
-                    bx += PIPE_BRACKET
-                    m += 1
+        # 배관과 바닥 유도선은 걷어냈다(#271). 복도를 끝에서 끝까지 가로지르는
+        # 선은 걸이를 달아도 "천장에 걸린 것"으로 안 읽히고 바닥에 그은 줄로
+        # 보인다. 복도 위쪽은 형광등·스프링클러처럼 **끊긴 덩어리**로만 채운다.
         y = mid_y - lh / 2
         spans = _corridor_clear(sc, y, y + lh, 40)
         x = EDGE + CEIL_LIGHT_GAP / 2
