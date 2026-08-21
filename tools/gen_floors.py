@@ -25,7 +25,9 @@ W, H = 3400, 2500   # 캔버스
 
 C_FLOOR = "Color(0.14, 0.14, 0.16, 1)"
 C_ROOM = "Color(0.1, 0.11, 0.12, 1)"
-C_WALL = "Color(0.45, 0.48, 0.55, 1)"
+# 벽은 텍스처 게인(1/TEX_MEAN)이 붙어 실제로는 이 값의 1.28배로 칠해진다.
+# 0.45,0.48,0.55였을 때 화면에서 **가장 밝은 것이 벽**이라 시선을 다 가져갔다(#265).
+C_WALL = "Color(0.285, 0.300, 0.335, 1)"
 C_DOOR = "Color(0.45, 0.32, 0.2, 1)"
 C_SLAB = "Color(0.1, 0.12, 0.13, 1)"
 C_STEP = "Color(0.22, 0.24, 0.28, 1)"
@@ -64,7 +66,8 @@ DOOR_LEAF_T = 10                          # 문짝 두께(벽 16 안쪽에 낀�
 C_CORRIDOR = "Color(0.196, 0.160, 0.120, 1)"  # 복도 마루 — 학교 목재 바닥
 C_SEAM = "Color(0.168, 0.134, 0.098, 1)"      # 마루 널 이음매
 C_WAINSCOT = "Color(0.34, 0.29, 0.22, 1)"     # 걸레받이(벽 아래 나무 띠)
-C_PILASTER = "Color(0.37, 0.39, 0.45, 1)"     # 복도 기둥
+C_PILASTER = "Color(0.235, 0.248, 0.278, 1)"  # 복도 기둥 — 벽보다 **어둡게**.
+                                              # 밝으면 흰 기둥처럼 튄다(#265)
 C_TILE = "Color(0.150, 0.166, 0.172, 1)"      # 화장실 바닥 타일 이음매
 C_URINAL = "Color(0.32, 0.35, 0.37, 1)"       # 소변기
 C_STALLDOOR = "Color(0.26, 0.29, 0.31, 1)"    # 칸막이 문(장식)
@@ -290,12 +293,10 @@ def north_x(i, count):
     x0 = EDGE + i * pitch
     return x0, x0 + pitch - NORTH_GAP
 
-# 사선 우측 동: x가 늘면 y가 SLOPE만큼 내려간다
-SLOPE = 0.26
+# 오른쪽 중간 띠는 예전에 x가 늘수록 y가 내려가는 평행사변형이었다(#159 도면).
+# #265에서 일자로 폈다 — 사선 때문에 벽 장식·환풍기·줄눈·복도 사물함·유도선이
+# 전부 "사선 방은 건너뛴다" 특례를 달고 있었고, 유지 비용이 모양값보다 컸다.
 RIGHT_X0 = 1920
-
-def slope_y(x, base):
-    return round(base + (x - RIGHT_X0) * SLOPE, 1)
 
 
 # ── 층별 방 구성 (도면 그대로) ───────────────────────────────
@@ -608,49 +609,6 @@ def add_room(sc, key, label, x0, y0, x1, y1, door):
         sc.poly2d(f"Door_{key}", "WallGlow/RoomWallVisuals", C_DOOR, rect(x1 - T, dt, x1, db), z=1)
     else:
         sc.wall(f"{key}_right", rect(x1 - T, y0, x1, y1))
-
-
-def add_sloped_room(sc, key, label, x0, x1, base_top, base_bot, door="bottom"):
-    """사선 방: 위·아래 변이 SLOPE만큼 기운 평행사변형(#159 사용자 결정)."""
-    ty0, ty1 = slope_y(x0, base_top), slope_y(x1, base_top)
-    by0, by1 = slope_y(x0, base_bot), slope_y(x1, base_bot)
-    sc.rooms[key] = (x0, min(ty0, ty1), x1, max(by0, by1))
-    sc.room_meta[key] = (label, door, x0, x1,
-                         lambda x, b=base_top: slope_y(x, b),
-                         lambda x, b=base_bot: slope_y(x, b))
-    sc.poly2d(key, "Rooms", room_floor(key, label),
-              poly((x0, ty0), (x1, ty1), (x1, by1), (x0, by0)))
-    if label:
-        sc.label(key, label, (x0 + x1) / 2, (slope_y((x0 + x1) / 2, base_top)
-                                             + slope_y((x0 + x1) / 2, base_bot)) / 2)
-
-    # 좌·우 세로 벽
-    sc.wall(f"{key}_left", poly((x0, ty0), (x0 + T, ty0), (x0 + T, by0), (x0, by0)))
-    sc.wall(f"{key}_right", poly((x1 - T, ty1), (x1, ty1), (x1, by1), (x1 - T, by1)))
-    cx = (x0 + x1) / 2
-    dl, dr = cx - DOOR / 2, cx + DOOR / 2
-
-    # 위 변(사선) — door=="top"이면 가운데를 문 틈으로 비운다
-    if door == "top":
-        tdl, tdr = slope_y(dl, base_top), slope_y(dr, base_top)
-        sc.wall(f"{key}_topL", poly((x0, ty0), (dl, tdl), (dl, tdl + T), (x0, ty0 + T)))
-        sc.wall(f"{key}_topR", poly((dr, tdr), (x1, ty1), (x1, ty1 + T), (dr, tdr + T)))
-        sc.poly2d(f"Door_{key}", "WallGlow/RoomWallVisuals", C_DOOR,
-                  poly((dl, tdl), (dr, tdr), (dr, tdr + T), (dl, tdl + T)), z=1)
-    else:
-        sc.wall(f"{key}_top", poly((x0, ty0), (x1, ty1), (x1, ty1 + T), (x0, ty0 + T)))
-
-    # 아래 변(사선)
-    if door == "bottom":
-        sc.wall(f"{key}_botL", poly((x0, by0 - T), (dl, slope_y(dl, base_bot) - T),
-                                    (dl, slope_y(dl, base_bot)), (x0, by0)))
-        sc.wall(f"{key}_botR", poly((dr, slope_y(dr, base_bot) - T), (x1, by1 - T),
-                                    (x1, by1), (dr, slope_y(dr, base_bot))))
-        sc.poly2d(f"Door_{key}", "WallGlow/RoomWallVisuals", C_DOOR,
-                  poly((dl, slope_y(dl, base_bot) - T), (dr, slope_y(dr, base_bot) - T),
-                       (dr, slope_y(dr, base_bot)), (dl, slope_y(dl, base_bot))), z=1)
-    else:
-        sc.wall(f"{key}_bot", poly((x0, by0 - T), (x1, by1 - T), (x1, by1), (x0, by0)))
 
 
 # 본편에서 오갈 수 있는 층 범위 — floor_manager.gd의 MIN_FLOOR/MAX_FLOOR와 맞춘다.
@@ -1499,95 +1457,78 @@ TOILET_URINAL = (22, 26)   # 소변기 — 오른쪽 벽 여유 띠(남자 화�
 TOILET_TILE = 60           # 바닥 타일 한 칸
 
 
-# 대변기 칸(#262). 예전에는 막힌 사각형이라 들어갈 수 없고 변기도 없었다.
-# 칸막이 세 면 + 열린 앞면으로 만들어 실제로 걸어 들어갈 수 있게 한다.
+# 대변기 칸(#262, #265에서 오른쪽 벽으로). 예전에는 막힌 사각형이라 들어갈 수
+# 없고 변기도 없었다. 칸막이 세 면 + 열린 앞면으로 만들어 실제로 걸어 들어갈 수
+# 있게 한다.
+#
+# **오른쪽 벽에 등을 대고 세로로 쌓이며 왼쪽으로 열린다**(#265 사용자 결정).
+# 세면대는 왼쪽 벽, 소변기는 문 반대쪽 벽으로 간다 — 실제 학교 화장실 배치다.
 #
 # 크기 기준은 플레이어 **충돌**(캡슐 반경 8·높이 26)이지 스프라이트(60x72)가
 # 아니다. 스프라이트가 칸보다 커서 칸막이 위로 삐져나오는 것은 탑다운에서
 # 흔한 일이고, 플레이어는 집기 위에 그려진다(#250).
-CUB_W = 76          # 칸 안쪽 폭(목표) — 남는 폭은 나눠 넓힌다
-CUB_D_MAX = 100     # 칸 전체 깊이 상한(칸막이 포함)
+CUB_DEPTH = 96      # 오른쪽 벽에서 왼쪽으로 나오는 깊이(칸막이 포함)
+CUB_H = 84          # 칸 하나의 세로 크기(목표) — 남는 높이는 나눠 넓힌다
 CUB_PART = 8        # 칸막이 두께
-CUB_MIN_W = 44      # 이보다 좁으면 칸을 만들지 않는다
-CUB_DEPTH_RATIO = 0.46   # 방 안쪽 높이 대비 칸 깊이 상한
+CUB_MIN_H = 52      # 이보다 낮으면 칸을 만들지 않는다
+CUB_MAX_DEPTH_RATIO = 0.46   # 방 안쪽 폭 대비 깊이 상한
 #   방 중심은 비어 있어야 한다(verify_floor_reach가 방 폴리곤 중심으로 도달성을
-#   본다). 짧은 화장실(안쪽 높이 184)에서 깊이를 92로 잡으면 칸 앞면이 정확히
-#   방 중심에 걸린다 — 그래서 비율로 한 번 더 조인다.
+#   본다). 깊이를 방 폭의 절반 넘게 잡으면 칸 앞면이 방 중심을 덮는다.
 
 
-def _toilet_cubicles(sc, key, bx0, bx1, strip_bounds, door, keepout, taken):
-    """[bx0,bx1] 띠에 대변기 칸을 만든다. 문 반대쪽 벽에 등을 붙이고 앞이 열린다."""
-    avail = bx1 - bx0
-    if avail < CUB_MIN_W + 2 * CUB_PART:
+def _toilet_cubicles(sc, key, wr, by0, by1, door, keepout, taken, room_w):
+    """오른쪽 벽 [by0,by1] 구간에 대변기 칸을 세로로 쌓는다. 앞(왼쪽)이 열린다."""
+    avail = by1 - by0
+    if avail < CUB_MIN_H + 2 * CUB_PART:
         return
-    top, bot = strip_bounds(bx0, bx1)
-    inner_h = bot - top
-    depth = min(CUB_D_MAX, inner_h * CUB_DEPTH_RATIO)
-    if depth < CUB_PART + 40:
+    depth = min(CUB_DEPTH, room_w * CUB_MAX_DEPTH_RATIO)
+    if depth < CUB_PART + 44:
         return
+    cx1 = wr                                  # 오른쪽 벽 안쪽 면 = 칸 뒷면
+    cx0 = cx1 - depth                         # 칸 앞면(열린 쪽)
 
-    n = max(1, int((avail - CUB_PART) // (CUB_W + CUB_PART)))
-    # 남는 폭은 칸마다 나눠 넓힌다 — 한쪽에 몰아 두면 빈 자리가 눈에 띈다.
-    inner_w = (avail - CUB_PART * (n + 1)) / n
-    if inner_w < CUB_MIN_W:
+    n = max(1, int((avail - CUB_PART) // (CUB_H + CUB_PART)))
+    inner_h = (avail - CUB_PART * (n + 1)) / n
+    if inner_h < CUB_MIN_H:
         n = max(1, n - 1)
-        inner_w = (avail - CUB_PART * (n + 1)) / n
-    if inner_w < CUB_MIN_W:
+        inner_h = (avail - CUB_PART * (n + 1)) / n
+    if inner_h < CUB_MIN_H:
+        return
+    if any(_overlap((cx0, by0, cx1, by1), k) for k in keepout + taken):
         return
 
-    back_is_bottom = door != "bottom"
-    if back_is_bottom:
-        cy0, cy1 = bot - depth, bot            # 칸 전체(뒤쪽 벽에 붙는다)
-        back = (cy1 - CUB_PART, cy1)
-        front = cy0
-    else:
-        cy0, cy1 = top, top + depth
-        back = (cy0, cy0 + CUB_PART)
-        front = cy1
+    # 뒷벽 칸막이 한 줄(오른쪽 벽에 붙는다)
+    back = (cx1 - CUB_PART, by0, cx1, by1)
+    sc.prop(f"{key}_cubback", rect(*back), C_STALL)
+    taken.append(back)
 
-    cell = (bx0, cy0, bx1, cy1)
-    if any(_overlap(cell, k) for k in keepout + taken):
-        return
-
-    # 뒷벽 칸막이 한 줄
-    sc.prop(f"{key}_cubback", rect(bx0, back[0], bx1, back[1]), C_STALL)
-    taken.append((bx0, back[0], bx1, back[1]))
-
-    inner_y0 = cy0 + CUB_PART if not back_is_bottom else cy0
-    inner_y1 = cy1 - CUB_PART if back_is_bottom else cy1
-    # 옆 칸막이는 뒷벽 안쪽 면까지만 온다. 모서리에서 뒷벽과 겹치면
-    # verify_props가 집기끼리 겹쳤다고 잡는다(실제로 잡혔다).
     for i in range(n + 1):
-        px = bx0 + i * (inner_w + CUB_PART)
-        sc.prop(f"{key}_cubdiv{i}", rect(px, inner_y0, px + CUB_PART, inner_y1),
-                C_STALL)
-        taken.append((px, inner_y0, px + CUB_PART, inner_y1))
+        py = by0 + i * (inner_h + CUB_PART)
+        # 칸 사이 칸막이는 뒷벽 안쪽 면까지만 온다. 모서리에서 겹치면
+        # verify_props가 집기끼리 겹쳤다고 잡는다.
+        div = (cx0, py, cx1 - CUB_PART, py + CUB_PART)
+        sc.prop(f"{key}_cubdiv{i}", rect(*div), C_STALL)
+        taken.append(div)
 
     for i in range(n):
-        ix0 = bx0 + CUB_PART + i * (inner_w + CUB_PART)
-        ix1 = ix0 + inner_w
-        # 변기 — 뒷벽에 붙인다. 물탱크가 벽 쪽이라 그림도 그 방향으로 그렸다.
-        # 칸 안을 다 채우면 안 된다. 도달성 격자가 장애물을 플레이어 반경(10)만큼
-        # 부풀리므로, 변기 앞에 최소 40px은 남아야 걸어 들어갈 수 있다
-        # (처음에 48x38짜리를 넣었더니 39칸 전부 들어갈 수 없었다).
-        depth_in = inner_y1 - inner_y0
-        bw = min(34.0, inner_w - 34)
-        bh = min(36.0, depth_in * 0.40)
-        mx = (ix0 + ix1) / 2
-        by0 = inner_y1 - 6 - bh if back_is_bottom else inner_y0 + 6
-        sc.prop(f"{key}_bowl{i}", rect(mx - bw / 2, by0, mx + bw / 2, by0 + bh),
+        iy0 = by0 + CUB_PART + i * (inner_h + CUB_PART)
+        iy1 = iy0 + inner_h
+        # 변기 — 뒷벽(오른쪽)에 붙인다. 칸을 다 채우면 안 된다: 도달성 격자가
+        # 장애물을 플레이어 반경(10)만큼 부풀리므로 변기 앞에 40px은 남아야 한다.
+        bw = min(36.0, (cx1 - CUB_PART - cx0) * 0.40)
+        bh = min(38.0, inner_h - 16)
+        my = (iy0 + iy1) / 2
+        bx1 = cx1 - CUB_PART - 6
+        sc.prop(f"{key}_bowl{i}", rect(bx1 - bw, my - bh / 2, bx1, my + bh / 2),
                 C_TOILET)
-        # 열린 문 — 칸 앞 한쪽에 짧게 붙여 "문이 열려 있는 칸"으로 읽히게 한다.
-        # 앞을 가로질러 그리면 들어갈 수 없는 것처럼 보인다.
-        dy0 = front if back_is_bottom else front - CUB_PART
+        # 열린 문 — 앞쪽 한 귀퉁이에만 짧게. 앞을 가로지르면 못 들어가는 칸으로
+        # 보인다.
         sc.decor(f"{key}_cubdoor{i}",
-                 rect(ix0, dy0, ix0 + inner_w * 0.42, dy0 + CUB_PART),
-                 C_STALLDOOR)
-        # 휴지걸이 — 옆 칸막이 **위에** 얹는다. 칸 안 허공에 두면 PT_ 규칙
-        # (소품은 어느 집기 안에 온전히 들어가야 한다)에 걸린다.
-        ty = (inner_y0 + inner_y1) / 2 - 6
+                 rect(cx0, iy0, cx0 + CUB_PART, iy0 + inner_h * 0.42), C_STALLDOOR)
+        # 휴지걸이 — 칸막이 위에 얹는다(PT_는 집기 안에 온전히 들어가야 한다).
         sc.overlay(f"{key}_tissue{i}",
-                   rect(ix0 - CUB_PART + 1, ty, ix0 - 1, ty + 12), C_TISSUE)
+                   rect(cx1 - CUB_PART - 13, iy0 - CUB_PART + 1,
+                        cx1 - CUB_PART - 1, iy0 - 1), C_TISSUE)
 
 
 def add_room_fixtures(sc, key, kind, x0, x1, topf, botf, door, keepout, units):
@@ -1597,14 +1538,14 @@ def add_room_fixtures(sc, key, kind, x0, x1, topf, botf, door, keepout, units):
     wt, wb = topf(cx) + T, botf(cx) - T
     iy0, iy1 = wt + PROP_EDGE, wb - PROP_EDGE
     taken = list(units)
-    # 사선 방(MID_RIGHT·교무실)은 위·아래 벽이 x에 따라 내려간다. cx 한 점에서 잰
-    # 값으로 벽 전체를 가정하면 넓은 장식이 기운 벽을 뚫는다(StorageR에서 났다).
-    sloped = abs(topf(x0) - topf(x1)) > 1 or abs(botf(x0) - botf(x1)) > 1
-
     def strip_bounds(sx0, sx1):
-        top = max(topf(sx0), topf(sx1)) + T + 2
-        bot = min(botf(sx0), botf(sx1)) - T - 2
-        return top, bot
+        """[sx0,sx1] 구간에서 집기를 놓을 수 있는 세로 범위(벽 안쪽 + 2px).
+
+        #265에서 사선 방을 없앤 뒤로는 어느 x에서 재도 같다. 구간을 받는 꼴은
+        남겨 둔다 — 호출부가 이미 그렇게 쓰고 있고, 방 모양이 다시 바뀌어도
+        여기만 고치면 된다.
+        """
+        return topf(sx0) + T + 2, botf(sx1) - T - 2
 
     # 단위 위 소품 + 단위 아래 의자
     over = PROP_OVERLAY.get(kind)
@@ -1629,7 +1570,7 @@ def add_room_fixtures(sc, key, kind, x0, x1, topf, botf, door, keepout, units):
 
     # 문 반대쪽 벽 장식
     deco = WALL_DECOR.get(kind)
-    if deco is not None and not sloped:
+    if deco is not None:
         name, dw, dt, color = deco
         dw = min(dw, (wr - wl) * 0.7)
         dy = (wb - dt, wb) if door == "top" else (wt, wt + dt)
@@ -1641,7 +1582,10 @@ def add_room_fixtures(sc, key, kind, x0, x1, topf, botf, door, keepout, units):
         name, cw, ch, color = corner
         # 좌·우 벽 구석을 문에서 먼 쪽부터 네 자리 시도한다. 수위실은 단서
         # 4개가 방 가운데 띠를 차지해 한 자리만 보면 늘 막혔다.
-        for sx in (wl + 2, wr - 2 - cw):
+        # 화장실만 예외로 왼쪽 벽만 쓴다 — 오른쪽 벽은 대변기 칸 자리다.
+        # (휴지통이 오른쪽 구석을 차지한 방은 칸이 통째로 취소됐다: 25곳 중 13곳)
+        sides = (wl + 2,) if kind == "toilet" else (wl + 2, wr - 2 - cw)
+        for sx in sides:
             stop, sbot = strip_bounds(sx, sx + cw)
             order = (sbot - ch, stop) if door == "top" else (stop, sbot - ch)
             spot = None
@@ -1668,14 +1612,11 @@ def add_room_fixtures(sc, key, kind, x0, x1, topf, botf, door, keepout, units):
             sc.floor_mark(f"{key}_tileV{int(tx)}",
                           rect(tx, ttop - 2, tx + 2, tbot + 2), C_TILE)
             tx += TOILET_TILE
-        # 가로 줄은 사선 방에서 기운 벽을 가로지른다. 벽 시각이 위에 그려져
-        # 가려지긴 하지만, 굳이 낼 이유가 없어 건너뛴다.
-        if not sloped:
-            ty = wt + TOILET_TILE
-            while ty < wb - 4:
-                sc.floor_mark(f"{key}_tileH{int(ty)}",
-                              rect(wl, ty, wr, ty + 2), C_TILE)
-                ty += TOILET_TILE
+        ty = wt + TOILET_TILE
+        while ty < wb - 4:
+            sc.floor_mark(f"{key}_tileH{int(ty)}",
+                          rect(wl, ty, wr, ty + 2), C_TILE)
+            ty += TOILET_TILE
         # 배수구 — 방 가운데 아래쪽. 바닥 표시라 통행에 영향 없다.
         dx, dy = cx, (wt + wb) / 2 + (wb - wt) * 0.18
         sc.floor_mark(f"{key}_drain",
@@ -1687,23 +1628,25 @@ def add_room_fixtures(sc, key, kind, x0, x1, topf, botf, door, keepout, units):
             sc.floor_mark(f"{key}_stain{i}",
                           rect(sx0, sy0, sx0 + 30 + 8 * i, sy0 + 14), C_STAIN)
 
-        # 소변기 — 남자 화장실만. 세면대 반대쪽(오른쪽) 벽 여유 띠에 세운다.
-        right_used = wr - 2
+        # 대변기 칸이 오른쪽 벽을 먼저 차지한다(#265). 나중에 놓으면 청소도구·
+        # 휴지통이 이미 그 자리에 서 있어 칸이 안 들어간다.
+        ctop, cbot = strip_bounds(wr - CUB_DEPTH, wr)
+        _toilet_cubicles(sc, key, wr, ctop, cbot, door, keepout, taken, wr - wl)
+
+        # 소변기 — 남자 화장실만. 오른쪽 벽은 대변기 칸이 쓰므로 문 반대쪽 벽에
+        # 가로로 건다.
         if key.startswith("MensRoom"):
-            uw, uh = TOILET_URINAL
-            ux = wr - 2 - uw
-            utop, ubot = strip_bounds(ux, ux + uw)
-            cells = _col(ux, ux + uw, utop, ubot, uh, 16, keepout + taken)
-            for i, cell in enumerate(cells):
+            uh, uw = TOILET_URINAL          # 가로로 걸어 폭·높이가 뒤바뀐다
+            uy = (wb - 2 - uw) if door == "top" else (wt + 2)
+            for i, cell in enumerate(_row(wl + 42, wr - CUB_DEPTH - 10, uy,
+                                          uy + uw, uh, 16, keepout + taken)):
                 sc.prop(f"{key}_urinal{i}", rect(*cell), C_URINAL)
                 taken.append(cell)
-                # 소변기 사이 칸막이 — 위쪽 소변기의 위 끝에 얇게 걸친다.
+                # 소변기 사이 칸막이 — 왼쪽 소변기의 왼 끝에 얇게 걸친다.
                 if i > 0:
                     sc.decor(f"{key}_udiv{i}",
-                             rect(ux - 6, cell[1] - 9, ux + uw, cell[1] - 3),
+                             rect(cell[0] - 9, uy - 6, cell[0] - 3, uy + uw),
                              C_STALLDOOR)
-            if cells:
-                right_used = ux
 
         sw, sh = TOILET_SINK
         # 손건조기는 세면대보다 먼저 자리를 잡는다. 세면대가 왼쪽 띠를 세로로
@@ -1728,32 +1671,26 @@ def add_room_fixtures(sc, key, kind, x0, x1, topf, botf, door, keepout, units):
             top = min(c[1] for c in placed)
             bot = max(c[3] for c in placed)
             sc.decor(f"{key}_mirror", rect(wl, top, wl + 6, bot), C_MIRROR)
-        left_used = (sx + sw) if placed else (wl + 2)
 
-        # 환풍기 — 문 쪽 벽, 문 틈 옆에. 문 반대쪽 벽은 이제 대변기 칸의 뒷벽이
-        # 차지한다. 사선 방은 건너뛴다(폭 28px 사이에 벽이 7px 내려간다).
-        if not sloped:
-            fan_y = (wt, wt + 9) if door == "top" else (wb - 9, wb)
-            fx0 = cx + DOOR / 2 + 20
-            fan = (fx0, fan_y[0], fx0 + 28, fan_y[1])
-            if fan[2] < wr - 4 and not any(_overlap(fan, k) for k in keepout + taken):
-                sc.decor(f"{key}_fan", rect(*fan), C_FAN)
+        # 환풍기 — 문 쪽 벽, 문 틈 **왼쪽**에. 오른쪽은 대변기 칸이 벽까지 차지해
+        # 자리가 없다(오른쪽에 뒀더니 25곳 전부 안 들어갔다).
+        fan_y = (wt, wt + 9) if door == "top" else (wb - 9, wb)
+        fx1 = cx - DOOR / 2 - 20
+        fan = (fx1 - 28, fan_y[0], fx1, fan_y[1])
+        if fan[0] > wl + 40 and not any(_overlap(fan, k) for k in keepout + taken):
+            sc.decor(f"{key}_fan", rect(*fan), C_FAN)
 
-        # 청소도구 — 대걸레와 양동이를 커서로 이어 세운다.
-        mtop, mbot = strip_bounds(wr - 2 - 20, wr - 2)
-        cursor = mtop + 4 if door == "top" else mbot - 4
-        for name, w, h, color in (("mop", 12, 34, C_MOP),
-                                  ("bucket", 20, 18, C_BUCKET)):
-            top = cursor if door == "top" else cursor - h
-            cell = (wr - 2 - w, top, wr - 2, top + h)
-            if cell[1] >= mtop and cell[3] <= mbot \
-                    and not any(_overlap(cell, k) for k in keepout + taken):
+        # 청소도구 — 문 반대쪽 벽 왼쪽 끝. 왼쪽 벽은 세면대가, 오른쪽 벽은 칸이
+        # 다 쓴다(둘 다 시도했다가 0개가 나왔다).
+        my0 = (wb - 2 - 30) if door == "top" else (wt + 2)
+        cursor = wl + 44
+        for name, w, h, color in (("mop", 30, 12, C_MOP),
+                                  ("bucket", 18, 20, C_BUCKET)):
+            cell = (cursor, my0, cursor + w, my0 + h)
+            if cell[2] < wr - CUB_DEPTH - 10                     and not any(_overlap(cell, k) for k in keepout + taken):
                 sc.prop(f"{key}_{name}", rect(*cell), color)
                 taken.append(cell)
-                cursor += (h + 6) if door == "top" else -(h + 6)
-
-        _toilet_cubicles(sc, key, left_used + 8, right_used - 8,
-                         strip_bounds, door, keepout, taken)
+                cursor += w + 8
 
 
 def add_props(sc, corridors=()):
@@ -1837,14 +1774,11 @@ def add_corridor_props(sc, corridors):
 
     복도가 맨바닥이라 층을 내려가도 같은 회색 통로만 보였다. 사물함은 실체가
     있어 시야도 조금 가리고, 게시판·소화기는 충돌이 없어 통행에 영향이 없다.
-    사선 벽(MID_RIGHT·교무실)은 벽면이 기울어 한 줄로 붙일 수 없으므로 건너뛴다.
     """
     for cy0, cy1 in corridors:
         seat = 0          # 벽면 순번 — 몇 칸에 하나씩 정수기를 둔다
         for key, (label, door, x0, x1, topf, botf) in sc.room_meta.items():
             if not label:
-                continue
-            if abs(topf(x0) - topf(x1)) > 1 or abs(botf(x0) - botf(x1)) > 1:
                 continue
             cx = (x0 + x1) / 2
             door_gap = (cx - DOOR / 2 - CORR_DOOR_PAD, cx + DOOR / 2 + CORR_DOOR_PAD)
@@ -2157,7 +2091,7 @@ def build_common(fl, spec):
         add_room(sc, key, lb, x0, MID_Y0, x1, MID_Y1, "top" if lb else None)
     # 중간 띠 우(사선) — 문은 위쪽 복도
     for key, lb, x0, x1 in MID_RIGHT:
-        add_sloped_room(sc, key, lb, x0, x1, MID_Y0, MID_Y1, "top" if lb else None)
+        add_room(sc, key, lb, x0, MID_Y0, x1, MID_Y1, "top" if lb else None)
 
     # 계단실 2곳
     add_stairwell(sc, "StairA", *STAIR_A)
@@ -2171,8 +2105,7 @@ def build_common(fl, spec):
     # 공백 구역(건물 밖) 봉인 — 중앙다리 폭만 열어 둔다.
     # 위 경계: 왼쪽은 수평, 오른쪽은 중간 띠와 같은 기울기.
     sc.wall("VoidTopL", rect(0, MID_Y1, BRIDGE_X0, MID_Y1 + T))
-    sc.wall("VoidTopR", poly((BRIDGE_X1, slope_y(BRIDGE_X1, MID_Y1)), (W, slope_y(W, MID_Y1)),
-                             (W, slope_y(W, MID_Y1) + T), (BRIDGE_X1, slope_y(BRIDGE_X1, MID_Y1) + T)))
+    sc.wall("VoidTopR", rect(BRIDGE_X1, MID_Y1, W, MID_Y1 + T))
     # 아래 경계: 남쪽 복도와 맞닿는 수평선
     sc.wall("VoidBotL", rect(0, VOID_Y1 - T, BRIDGE_X0, VOID_Y1))
     sc.wall("VoidBotR", rect(BRIDGE_X1, VOID_Y1 - T, W, VOID_Y1))
@@ -2180,7 +2113,7 @@ def build_common(fl, spec):
     # 공백 구역 내부를 메워 통행 후보에서 뺀다(수위 스폰 방지)
     fill_void(sc, "VoidFillL", 0, BRIDGE_X0 - T, lambda x: MID_Y1 + T, VOID_Y1 - T)
     fill_void(sc, "VoidFillR", BRIDGE_X1 + T, W,
-              lambda x: slope_y(x, MID_Y1) + T, VOID_Y1 - T)
+              lambda x: MID_Y1 + T, VOID_Y1 - T)
 
     # 중앙다리 — 좌·우 벽
     sc.wall("BridgeL", rect(BRIDGE_X0 - T, BRIDGE_Y0, BRIDGE_X0, BRIDGE_Y1))
@@ -2233,7 +2166,7 @@ def build_floor1():
         add_room(sc, key, lb, x0, y0, x1, y1, door)
     # 교무실(사선)
     sx0, sy0, sx1, sy1 = FLOOR1["staff"]
-    add_sloped_room(sc, "StaffRoom", "교무실", sx0, sx1, sy0, sy1, "bottom")
+    add_room(sc, "StaffRoom", "교무실", sx0, sy0, sx1, sy1, "bottom")
     add_stairwell(sc, "StairA", *FLOOR1["stair"])
     add_stair_markers(sc, "StairA", *FLOOR1["stair"], floor=1)
     add_stair_locks(sc, 1, LOCKED[1], [FLOOR1["stair"]])
