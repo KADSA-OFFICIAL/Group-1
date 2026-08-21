@@ -188,7 +188,53 @@ TEX = {
     C_MAT: "prop_cloth",
 }
 
-TEXTURES = {f"tex_{stem}": f"{TEX_DIR}/{stem}.png" for stem in sorted(set(TEX.values()))}
+# 색 -> 오브젝트 그림(#259). TEX가 "이어붙는 재질"이라면 이쪽은 "경계가 있는
+# 물건"이다. 여기 있는 색은 TEX보다 우선하고, 물건마다 로컬 UV가 들어가 그림
+# 한 장이 그 물건에 맞춰 늘어난다 — 44x26 책상에도 상판·모서리·서랍선이 제자리에
+# 온다. 재질만 쓰던 때는 월드 격자의 아무 조각이나 잘려 들어갔다.
+SPRITE = {
+    C_DESK: "obj_desk",
+    C_CHAIR: "obj_chair",
+    C_LOCKER: "obj_locker",
+    C_SHELF: "obj_shelf",
+    C_SINK: "obj_sink",
+    C_URINAL: "obj_sink",
+    C_MONITOR: "obj_screen",
+    C_STALL: "obj_panel",
+    C_STALLDOOR: "obj_panel",
+    C_LEAF: "obj_panel",
+    C_CABINET: "obj_cabinet",
+    C_CLEAN: "obj_cabinet",
+    C_METAL: "obj_locker",
+    C_BIN: "obj_bin",
+    C_BUCKET: "obj_bin",
+    C_BED: "obj_bed",
+    C_PLANT: "obj_plant",
+    C_RACK: "obj_rack",
+    C_BENCH: "obj_shelf",
+}
+SPRITE_SIZE = 32    # gen_tiles.py의 OBJ와 반드시 같아야 한다
+
+
+def uv_for(polygon):
+    """폴리곤 경계상자를 오브젝트 그림 한 장에 대응시키는 UV.
+
+    UV는 텍스처 픽셀 좌표다 — 정점마다 (0,0)~(SPRITE_SIZE,SPRITE_SIZE) 안의
+    자리를 준다. 그래서 44x26 책상이든 140x38 실험대든 그림 한 장이 통째로
+    늘어나 들어간다(잘리지 않는다).
+    """
+    nums = [float(v) for v in polygon[polygon.index("(") + 1:polygon.rindex(")")].split(",")]
+    xs, ys = nums[0::2], nums[1::2]
+    x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+    w = (x1 - x0) or 1.0
+    h = (y1 - y0) or 1.0
+    pts = [((x - x0) / w * SPRITE_SIZE, (y - y0) / h * SPRITE_SIZE)
+           for x, y in zip(xs, ys)]
+    return poly(*pts)
+
+
+TEXTURES = {f"tex_{stem}": f"{TEX_DIR}/{stem}.png"
+            for stem in sorted(set(TEX.values()) | set(SPRITE.values()))}
 
 CANVAS_ITEM_ROOTS = ("WallGlow",)   # CanvasLayer 직속 = 텍스처 설정을 물려받을 부모가 없다
 
@@ -405,9 +451,14 @@ class Scene:
     def poly2d(self, name, parent, color, polygon, z=None):
         z_line = f"z_index = {z}\n" if z is not None else ""
         tex_line = ""
-        stem = TEX.get(color)
+        # 오브젝트 그림이 재질보다 우선한다(#259). 물건 하나에 한 장을 맞춰 늘리려고
+        # 로컬 UV를 넣는다 — 재질은 UV를 비워 월드 격자에 정렬시키는 것과 반대다.
+        obj = SPRITE.get(color)
+        stem = obj or TEX.get(color)
         if stem:
             tex_line = f'texture = ExtResource("tex_{stem}")\n'
+            if obj:
+                tex_line += f"uv = {uv_for(polygon)}\n"
             color = tex_color(color)
             # 층 씬 루트와 RoomWallVisuals에 걸어 둔 Nearest·Repeat를 물려받는다.
             # CanvasLayer 직속 노드(계단 난간)는 물려받을 부모가 없어 직접 적는다.
