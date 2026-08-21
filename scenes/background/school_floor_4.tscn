@@ -683,9 +683,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(20, 20, 393.3, 20, 393.3, 36, 20, 36)
 
+[node name="WH_North1_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(20, 20, 393.3, 20, 393.3, 23, 20, 23)
+
 [node name="WF_North1_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(20, 36, 393.3, 36, 393.3, 50, 20, 50)
+polygon = PackedVector2Array(20, 36, 393.3, 36, 393.3, 52, 20, 52)
+
+[node name="WS_North1_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(20, 52, 393.3, 52, 393.3, 56, 20, 56)
 
 [node name="WC_North1_botL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(20, 524, 151.7, 524, 151.7, 540, 20, 540)
@@ -698,9 +706,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(20, 524, 151.7, 524, 151.7, 540, 20, 540)
 
+[node name="WH_North1_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(20, 524, 151.7, 524, 151.7, 527, 20, 527)
+
 [node name="WF_North1_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(20, 540, 151.7, 540, 151.7, 554, 20, 554)
+polygon = PackedVector2Array(20, 540, 151.7, 540, 151.7, 556, 20, 556)
+
+[node name="WS_North1_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(20, 556, 151.7, 556, 151.7, 560, 20, 560)
 
 [node name="WC_North1_botR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(261.7, 524, 393.3, 524, 393.3, 540, 261.7, 540)
@@ -713,9 +729,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(261.7, 524, 393.3, 524, 393.3, 540, 261.7, 540)
 
+[node name="WH_North1_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(261.7, 524, 393.3, 524, 393.3, 527, 261.7, 527)
+
 [node name="WF_North1_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(261.7, 540, 393.3, 540, 393.3, 554, 261.7, 554)
+polygon = PackedVector2Array(261.7, 540, 393.3, 540, 393.3, 556, 261.7, 556)
+
+[node name="WS_North1_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(261.7, 556, 393.3, 556, 393.3, 560, 261.7, 560)
 
 [node name="Door_North1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -773,9 +797,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(393.3, 20, 766.7, 20, 766.7, 36, 393.3, 36)
 
+[node name="WH_North2_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(393.3, 20, 766.7, 20, 766.7, 23, 393.3, 23)
+
 [node name="WF_North2_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(393.3, 36, 766.7, 36, 766.7, 50, 393.3, 50)
+polygon = PackedVector2Array(393.3, 36, 766.7, 36, 766.7, 52, 393.3, 52)
+
+[node name="WS_North2_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(393.3, 52, 766.7, 52, 766.7, 56, 393.3, 56)
 
 [node name="WC_North2_botL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(393.3, 524, 525, 524, 525, 540, 393.3, 540)
@@ -788,9 +820,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(393.3, 524, 525, 524, 525, 540, 393.3, 540)
 
+[node name="WH_North2_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(393.3, 524, 525, 524, 525, 527, 393.3, 527)
+
 [node name="WF_North2_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(393.3, 540, 525, 540, 525, 554, 393.3, 554)
+polygon = PackedVector2Array(393.3, 540, 525, 540, 525, 556, 393.3, 556)
+
+[node name="WS_North2_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(393.3, 556, 525, 556, 525, 560, 393.3, 560)
 
 [node name="WC_North2_botR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(635, 524, 766.7, 524, 766.7, 540, 635, 540)
@@ -803,9 +843,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(635, 524, 766.7, 524, 766.7, 540, 635, 540)
 
+[node name="WH_North2_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(635, 524, 766.7, 524, 766.7, 527, 635, 527)
+
 [node name="WF_North2_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(635, 540, 766.7, 540, 766.7, 554, 635, 554)
+polygon = PackedVector2Array(635, 540, 766.7, 540, 766.7, 556, 635, 556)
+
+[node name="WS_North2_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(635, 556, 766.7, 556, 766.7, 560, 635, 560)
 
 [node name="Door_North2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -863,9 +911,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(766.7, 20, 1140, 20, 1140, 36, 766.7, 36)
 
+[node name="WH_North3_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(766.7, 20, 1140, 20, 1140, 23, 766.7, 23)
+
 [node name="WF_North3_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(766.7, 36, 1140, 36, 1140, 50, 766.7, 50)
+polygon = PackedVector2Array(766.7, 36, 1140, 36, 1140, 52, 766.7, 52)
+
+[node name="WS_North3_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(766.7, 52, 1140, 52, 1140, 56, 766.7, 56)
 
 [node name="WC_North3_botL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(766.7, 524, 898.3, 524, 898.3, 540, 766.7, 540)
@@ -878,9 +934,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(766.7, 524, 898.3, 524, 898.3, 540, 766.7, 540)
 
+[node name="WH_North3_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(766.7, 524, 898.3, 524, 898.3, 527, 766.7, 527)
+
 [node name="WF_North3_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(766.7, 540, 898.3, 540, 898.3, 554, 766.7, 554)
+polygon = PackedVector2Array(766.7, 540, 898.3, 540, 898.3, 556, 766.7, 556)
+
+[node name="WS_North3_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(766.7, 556, 898.3, 556, 898.3, 560, 766.7, 560)
 
 [node name="WC_North3_botR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1008.3, 524, 1140, 524, 1140, 540, 1008.3, 540)
@@ -893,9 +957,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1008.3, 524, 1140, 524, 1140, 540, 1008.3, 540)
 
+[node name="WH_North3_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1008.3, 524, 1140, 524, 1140, 527, 1008.3, 527)
+
 [node name="WF_North3_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1008.3, 540, 1140, 540, 1140, 554, 1008.3, 554)
+polygon = PackedVector2Array(1008.3, 540, 1140, 540, 1140, 556, 1008.3, 556)
+
+[node name="WS_North3_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1008.3, 556, 1140, 556, 1140, 560, 1008.3, 560)
 
 [node name="Door_North3" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -953,9 +1025,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1140, 20, 1513.3, 20, 1513.3, 36, 1140, 36)
 
+[node name="WH_North4_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1140, 20, 1513.3, 20, 1513.3, 23, 1140, 23)
+
 [node name="WF_North4_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1140, 36, 1513.3, 36, 1513.3, 50, 1140, 50)
+polygon = PackedVector2Array(1140, 36, 1513.3, 36, 1513.3, 52, 1140, 52)
+
+[node name="WS_North4_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1140, 52, 1513.3, 52, 1513.3, 56, 1140, 56)
 
 [node name="WC_North4_botL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1140, 524, 1271.7, 524, 1271.7, 540, 1140, 540)
@@ -968,9 +1048,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1140, 524, 1271.7, 524, 1271.7, 540, 1140, 540)
 
+[node name="WH_North4_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1140, 524, 1271.7, 524, 1271.7, 527, 1140, 527)
+
 [node name="WF_North4_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1140, 540, 1271.7, 540, 1271.7, 554, 1140, 554)
+polygon = PackedVector2Array(1140, 540, 1271.7, 540, 1271.7, 556, 1140, 556)
+
+[node name="WS_North4_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1140, 556, 1271.7, 556, 1271.7, 560, 1140, 560)
 
 [node name="WC_North4_botR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1381.7, 524, 1513.3, 524, 1513.3, 540, 1381.7, 540)
@@ -983,9 +1071,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1381.7, 524, 1513.3, 524, 1513.3, 540, 1381.7, 540)
 
+[node name="WH_North4_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1381.7, 524, 1513.3, 524, 1513.3, 527, 1381.7, 527)
+
 [node name="WF_North4_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1381.7, 540, 1513.3, 540, 1513.3, 554, 1381.7, 554)
+polygon = PackedVector2Array(1381.7, 540, 1513.3, 540, 1513.3, 556, 1381.7, 556)
+
+[node name="WS_North4_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1381.7, 556, 1513.3, 556, 1513.3, 560, 1381.7, 560)
 
 [node name="Door_North4" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -1043,9 +1139,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1513.3, 20, 1886.7, 20, 1886.7, 36, 1513.3, 36)
 
+[node name="WH_North5_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1513.3, 20, 1886.7, 20, 1886.7, 23, 1513.3, 23)
+
 [node name="WF_North5_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1513.3, 36, 1886.7, 36, 1886.7, 50, 1513.3, 50)
+polygon = PackedVector2Array(1513.3, 36, 1886.7, 36, 1886.7, 52, 1513.3, 52)
+
+[node name="WS_North5_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1513.3, 52, 1886.7, 52, 1886.7, 56, 1513.3, 56)
 
 [node name="WC_North5_botL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1513.3, 524, 1645, 524, 1645, 540, 1513.3, 540)
@@ -1058,9 +1162,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1513.3, 524, 1645, 524, 1645, 540, 1513.3, 540)
 
+[node name="WH_North5_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1513.3, 524, 1645, 524, 1645, 527, 1513.3, 527)
+
 [node name="WF_North5_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1513.3, 540, 1645, 540, 1645, 554, 1513.3, 554)
+polygon = PackedVector2Array(1513.3, 540, 1645, 540, 1645, 556, 1513.3, 556)
+
+[node name="WS_North5_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1513.3, 556, 1645, 556, 1645, 560, 1513.3, 560)
 
 [node name="WC_North5_botR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1755, 524, 1886.7, 524, 1886.7, 540, 1755, 540)
@@ -1073,9 +1185,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1755, 524, 1886.7, 524, 1886.7, 540, 1755, 540)
 
+[node name="WH_North5_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1755, 524, 1886.7, 524, 1886.7, 527, 1755, 527)
+
 [node name="WF_North5_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1755, 540, 1886.7, 540, 1886.7, 554, 1755, 554)
+polygon = PackedVector2Array(1755, 540, 1886.7, 540, 1886.7, 556, 1755, 556)
+
+[node name="WS_North5_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1755, 556, 1886.7, 556, 1886.7, 560, 1755, 560)
 
 [node name="Door_North5" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -1133,9 +1253,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1886.7, 20, 2260, 20, 2260, 36, 1886.7, 36)
 
+[node name="WH_North6_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1886.7, 20, 2260, 20, 2260, 23, 1886.7, 23)
+
 [node name="WF_North6_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1886.7, 36, 2260, 36, 2260, 50, 1886.7, 50)
+polygon = PackedVector2Array(1886.7, 36, 2260, 36, 2260, 52, 1886.7, 52)
+
+[node name="WS_North6_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1886.7, 52, 2260, 52, 2260, 56, 1886.7, 56)
 
 [node name="WC_North6_botL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1886.7, 524, 2018.3, 524, 2018.3, 540, 1886.7, 540)
@@ -1148,9 +1276,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1886.7, 524, 2018.3, 524, 2018.3, 540, 1886.7, 540)
 
+[node name="WH_North6_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1886.7, 524, 2018.3, 524, 2018.3, 527, 1886.7, 527)
+
 [node name="WF_North6_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1886.7, 540, 2018.3, 540, 2018.3, 554, 1886.7, 554)
+polygon = PackedVector2Array(1886.7, 540, 2018.3, 540, 2018.3, 556, 1886.7, 556)
+
+[node name="WS_North6_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1886.7, 556, 2018.3, 556, 2018.3, 560, 1886.7, 560)
 
 [node name="WC_North6_botR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2128.3, 524, 2260, 524, 2260, 540, 2128.3, 540)
@@ -1163,9 +1299,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2128.3, 524, 2260, 524, 2260, 540, 2128.3, 540)
 
+[node name="WH_North6_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2128.3, 524, 2260, 524, 2260, 527, 2128.3, 527)
+
 [node name="WF_North6_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2128.3, 540, 2260, 540, 2260, 554, 2128.3, 554)
+polygon = PackedVector2Array(2128.3, 540, 2260, 540, 2260, 556, 2128.3, 556)
+
+[node name="WS_North6_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2128.3, 556, 2260, 556, 2260, 560, 2128.3, 560)
 
 [node name="Door_North6" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -1223,9 +1367,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2260, 20, 2633.3, 20, 2633.3, 36, 2260, 36)
 
+[node name="WH_North7_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2260, 20, 2633.3, 20, 2633.3, 23, 2260, 23)
+
 [node name="WF_North7_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2260, 36, 2633.3, 36, 2633.3, 50, 2260, 50)
+polygon = PackedVector2Array(2260, 36, 2633.3, 36, 2633.3, 52, 2260, 52)
+
+[node name="WS_North7_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2260, 52, 2633.3, 52, 2633.3, 56, 2260, 56)
 
 [node name="WC_North7_botL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2260, 524, 2391.7, 524, 2391.7, 540, 2260, 540)
@@ -1238,9 +1390,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2260, 524, 2391.7, 524, 2391.7, 540, 2260, 540)
 
+[node name="WH_North7_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2260, 524, 2391.7, 524, 2391.7, 527, 2260, 527)
+
 [node name="WF_North7_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2260, 540, 2391.7, 540, 2391.7, 554, 2260, 554)
+polygon = PackedVector2Array(2260, 540, 2391.7, 540, 2391.7, 556, 2260, 556)
+
+[node name="WS_North7_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2260, 556, 2391.7, 556, 2391.7, 560, 2260, 560)
 
 [node name="WC_North7_botR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2501.7, 524, 2633.3, 524, 2633.3, 540, 2501.7, 540)
@@ -1253,9 +1413,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2501.7, 524, 2633.3, 524, 2633.3, 540, 2501.7, 540)
 
+[node name="WH_North7_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2501.7, 524, 2633.3, 524, 2633.3, 527, 2501.7, 527)
+
 [node name="WF_North7_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2501.7, 540, 2633.3, 540, 2633.3, 554, 2501.7, 554)
+polygon = PackedVector2Array(2501.7, 540, 2633.3, 540, 2633.3, 556, 2501.7, 556)
+
+[node name="WS_North7_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2501.7, 556, 2633.3, 556, 2633.3, 560, 2501.7, 560)
 
 [node name="Door_North7" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -1313,9 +1481,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2633.3, 20, 3006.7, 20, 3006.7, 36, 2633.3, 36)
 
+[node name="WH_North8_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2633.3, 20, 3006.7, 20, 3006.7, 23, 2633.3, 23)
+
 [node name="WF_North8_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2633.3, 36, 3006.7, 36, 3006.7, 50, 2633.3, 50)
+polygon = PackedVector2Array(2633.3, 36, 3006.7, 36, 3006.7, 52, 2633.3, 52)
+
+[node name="WS_North8_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2633.3, 52, 3006.7, 52, 3006.7, 56, 2633.3, 56)
 
 [node name="WC_North8_botL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2633.3, 524, 2765, 524, 2765, 540, 2633.3, 540)
@@ -1328,9 +1504,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2633.3, 524, 2765, 524, 2765, 540, 2633.3, 540)
 
+[node name="WH_North8_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2633.3, 524, 2765, 524, 2765, 527, 2633.3, 527)
+
 [node name="WF_North8_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2633.3, 540, 2765, 540, 2765, 554, 2633.3, 554)
+polygon = PackedVector2Array(2633.3, 540, 2765, 540, 2765, 556, 2633.3, 556)
+
+[node name="WS_North8_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2633.3, 556, 2765, 556, 2765, 560, 2633.3, 560)
 
 [node name="WC_North8_botR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2875, 524, 3006.7, 524, 3006.7, 540, 2875, 540)
@@ -1343,9 +1527,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2875, 524, 3006.7, 524, 3006.7, 540, 2875, 540)
 
+[node name="WH_North8_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2875, 524, 3006.7, 524, 3006.7, 527, 2875, 527)
+
 [node name="WF_North8_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2875, 540, 3006.7, 540, 3006.7, 554, 2875, 554)
+polygon = PackedVector2Array(2875, 540, 3006.7, 540, 3006.7, 556, 2875, 556)
+
+[node name="WS_North8_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2875, 556, 3006.7, 556, 3006.7, 560, 2875, 560)
 
 [node name="Door_North8" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -1403,9 +1595,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(3006.7, 20, 3380, 20, 3380, 36, 3006.7, 36)
 
+[node name="WH_North9_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(3006.7, 20, 3380, 20, 3380, 23, 3006.7, 23)
+
 [node name="WF_North9_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(3006.7, 36, 3380, 36, 3380, 50, 3006.7, 50)
+polygon = PackedVector2Array(3006.7, 36, 3380, 36, 3380, 52, 3006.7, 52)
+
+[node name="WS_North9_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(3006.7, 52, 3380, 52, 3380, 56, 3006.7, 56)
 
 [node name="WC_North9_botL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(3006.7, 524, 3138.3, 524, 3138.3, 540, 3006.7, 540)
@@ -1418,9 +1618,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(3006.7, 524, 3138.3, 524, 3138.3, 540, 3006.7, 540)
 
+[node name="WH_North9_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(3006.7, 524, 3138.3, 524, 3138.3, 527, 3006.7, 527)
+
 [node name="WF_North9_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(3006.7, 540, 3138.3, 540, 3138.3, 554, 3006.7, 554)
+polygon = PackedVector2Array(3006.7, 540, 3138.3, 540, 3138.3, 556, 3006.7, 556)
+
+[node name="WS_North9_botL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(3006.7, 556, 3138.3, 556, 3138.3, 560, 3006.7, 560)
 
 [node name="WC_North9_botR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(3248.3, 524, 3380, 524, 3380, 540, 3248.3, 540)
@@ -1433,9 +1641,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(3248.3, 524, 3380, 524, 3380, 540, 3248.3, 540)
 
+[node name="WH_North9_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(3248.3, 524, 3380, 524, 3380, 527, 3248.3, 527)
+
 [node name="WF_North9_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(3248.3, 540, 3380, 540, 3380, 554, 3248.3, 554)
+polygon = PackedVector2Array(3248.3, 540, 3380, 540, 3380, 556, 3248.3, 556)
+
+[node name="WS_North9_botR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(3248.3, 556, 3380, 556, 3380, 560, 3248.3, 560)
 
 [node name="Door_North9" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -1493,9 +1709,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(800, 720, 882.5, 720, 882.5, 736, 800, 736)
 
+[node name="WH_MensRoomL_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(800, 720, 882.5, 720, 882.5, 723, 800, 723)
+
 [node name="WF_MensRoomL_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(800, 736, 882.5, 736, 882.5, 750, 800, 750)
+polygon = PackedVector2Array(800, 736, 882.5, 736, 882.5, 752, 800, 752)
+
+[node name="WS_MensRoomL_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(800, 752, 882.5, 752, 882.5, 756, 800, 756)
 
 [node name="WC_MensRoomL_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(992.5, 720, 1075, 720, 1075, 736, 992.5, 736)
@@ -1508,9 +1732,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(992.5, 720, 1075, 720, 1075, 736, 992.5, 736)
 
+[node name="WH_MensRoomL_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(992.5, 720, 1075, 720, 1075, 723, 992.5, 723)
+
 [node name="WF_MensRoomL_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(992.5, 736, 1075, 736, 1075, 750, 992.5, 750)
+polygon = PackedVector2Array(992.5, 736, 1075, 736, 1075, 752, 992.5, 752)
+
+[node name="WS_MensRoomL_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(992.5, 752, 1075, 752, 1075, 756, 992.5, 756)
 
 [node name="Door_MensRoomL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -1529,9 +1761,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(800, 984, 1075, 984, 1075, 1000, 800, 1000)
 
+[node name="WH_MensRoomL_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(800, 984, 1075, 984, 1075, 987, 800, 987)
+
 [node name="WF_MensRoomL_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(800, 1000, 1075, 1000, 1075, 1014, 800, 1014)
+polygon = PackedVector2Array(800, 1000, 1075, 1000, 1075, 1016, 800, 1016)
+
+[node name="WS_MensRoomL_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(800, 1016, 1075, 1016, 1075, 1020, 800, 1020)
 
 [node name="WC_MensRoomL_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(800, 720, 816, 720, 816, 1000, 800, 1000)
@@ -1583,9 +1823,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1075, 720, 1165, 720, 1165, 736, 1075, 736)
 
+[node name="WH_WomensRoomL_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1075, 720, 1165, 720, 1165, 723, 1075, 723)
+
 [node name="WF_WomensRoomL_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1075, 736, 1165, 736, 1165, 750, 1075, 750)
+polygon = PackedVector2Array(1075, 736, 1165, 736, 1165, 752, 1075, 752)
+
+[node name="WS_WomensRoomL_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1075, 752, 1165, 752, 1165, 756, 1075, 756)
 
 [node name="WC_WomensRoomL_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1275, 720, 1365, 720, 1365, 736, 1275, 736)
@@ -1598,9 +1846,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1275, 720, 1365, 720, 1365, 736, 1275, 736)
 
+[node name="WH_WomensRoomL_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1275, 720, 1365, 720, 1365, 723, 1275, 723)
+
 [node name="WF_WomensRoomL_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1275, 736, 1365, 736, 1365, 750, 1275, 750)
+polygon = PackedVector2Array(1275, 736, 1365, 736, 1365, 752, 1275, 752)
+
+[node name="WS_WomensRoomL_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1275, 752, 1365, 752, 1365, 756, 1275, 756)
 
 [node name="Door_WomensRoomL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -1619,9 +1875,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1075, 984, 1365, 984, 1365, 1000, 1075, 1000)
 
+[node name="WH_WomensRoomL_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1075, 984, 1365, 984, 1365, 987, 1075, 987)
+
 [node name="WF_WomensRoomL_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1075, 1000, 1365, 1000, 1365, 1014, 1075, 1014)
+polygon = PackedVector2Array(1075, 1000, 1365, 1000, 1365, 1016, 1075, 1016)
+
+[node name="WS_WomensRoomL_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1075, 1016, 1365, 1016, 1365, 1020, 1075, 1020)
 
 [node name="WC_WomensRoomL_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1075, 720, 1091, 720, 1091, 1000, 1075, 1000)
@@ -1661,9 +1925,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1365, 720, 1640, 720, 1640, 736, 1365, 736)
 
+[node name="WH_BlockedL_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1365, 720, 1640, 720, 1640, 723, 1365, 723)
+
 [node name="WF_BlockedL_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1365, 736, 1640, 736, 1640, 750, 1365, 750)
+polygon = PackedVector2Array(1365, 736, 1640, 736, 1640, 752, 1365, 752)
+
+[node name="WS_BlockedL_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1365, 752, 1640, 752, 1640, 756, 1365, 756)
 
 [node name="WC_BlockedL_bot" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1365, 984, 1640, 984, 1640, 1000, 1365, 1000)
@@ -1676,9 +1948,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1365, 984, 1640, 984, 1640, 1000, 1365, 1000)
 
+[node name="WH_BlockedL_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1365, 984, 1640, 984, 1640, 987, 1365, 987)
+
 [node name="WF_BlockedL_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1365, 1000, 1640, 1000, 1640, 1014, 1365, 1014)
+polygon = PackedVector2Array(1365, 1000, 1640, 1000, 1640, 1016, 1365, 1016)
+
+[node name="WS_BlockedL_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1365, 1016, 1640, 1016, 1640, 1020, 1365, 1020)
 
 [node name="WC_BlockedL_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1365, 720, 1381, 720, 1381, 1000, 1365, 1000)
@@ -1730,9 +2010,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1920, 720, 2052.5, 720, 2052.5, 736, 1920, 736)
 
+[node name="WH_StorageR_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1920, 720, 2052.5, 720, 2052.5, 723, 1920, 723)
+
 [node name="WF_StorageR_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1920, 736, 2052.5, 736, 2052.5, 750, 1920, 750)
+polygon = PackedVector2Array(1920, 736, 2052.5, 736, 2052.5, 752, 1920, 752)
+
+[node name="WS_StorageR_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1920, 752, 2052.5, 752, 2052.5, 756, 1920, 756)
 
 [node name="WC_StorageR_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2162.5, 720, 2295, 720, 2295, 736, 2162.5, 736)
@@ -1745,9 +2033,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2162.5, 720, 2295, 720, 2295, 736, 2162.5, 736)
 
+[node name="WH_StorageR_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2162.5, 720, 2295, 720, 2295, 723, 2162.5, 723)
+
 [node name="WF_StorageR_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2162.5, 736, 2295, 736, 2295, 750, 2162.5, 750)
+polygon = PackedVector2Array(2162.5, 736, 2295, 736, 2295, 752, 2162.5, 752)
+
+[node name="WS_StorageR_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2162.5, 752, 2295, 752, 2295, 756, 2162.5, 756)
 
 [node name="Door_StorageR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -1766,9 +2062,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1920, 984, 2295, 984, 2295, 1000, 1920, 1000)
 
+[node name="WH_StorageR_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1920, 984, 2295, 984, 2295, 987, 1920, 987)
+
 [node name="WF_StorageR_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1920, 1000, 2295, 1000, 2295, 1014, 1920, 1014)
+polygon = PackedVector2Array(1920, 1000, 2295, 1000, 2295, 1016, 1920, 1016)
+
+[node name="WS_StorageR_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1920, 1016, 2295, 1016, 2295, 1020, 1920, 1020)
 
 [node name="WC_StorageR_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1920, 720, 1936, 720, 1936, 1000, 1920, 1000)
@@ -1808,9 +2112,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2295, 720, 2805, 720, 2805, 736, 2295, 736)
 
+[node name="WH_BlockedR_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2295, 720, 2805, 720, 2805, 723, 2295, 723)
+
 [node name="WF_BlockedR_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2295, 736, 2805, 736, 2805, 750, 2295, 750)
+polygon = PackedVector2Array(2295, 736, 2805, 736, 2805, 752, 2295, 752)
+
+[node name="WS_BlockedR_top" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2295, 752, 2805, 752, 2805, 756, 2295, 756)
 
 [node name="WC_BlockedR_bot" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2295, 984, 2805, 984, 2805, 1000, 2295, 1000)
@@ -1823,9 +2135,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2295, 984, 2805, 984, 2805, 1000, 2295, 1000)
 
+[node name="WH_BlockedR_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2295, 984, 2805, 984, 2805, 987, 2295, 987)
+
 [node name="WF_BlockedR_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2295, 1000, 2805, 1000, 2805, 1014, 2295, 1014)
+polygon = PackedVector2Array(2295, 1000, 2805, 1000, 2805, 1016, 2295, 1016)
+
+[node name="WS_BlockedR_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2295, 1016, 2805, 1016, 2805, 1020, 2295, 1020)
 
 [node name="WC_BlockedR_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2295, 720, 2311, 720, 2311, 1000, 2295, 1000)
@@ -1877,9 +2197,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2805, 720, 2885, 720, 2885, 736, 2805, 736)
 
+[node name="WH_MensRoomR_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2805, 720, 2885, 720, 2885, 723, 2805, 723)
+
 [node name="WF_MensRoomR_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2805, 736, 2885, 736, 2885, 750, 2805, 750)
+polygon = PackedVector2Array(2805, 736, 2885, 736, 2885, 752, 2805, 752)
+
+[node name="WS_MensRoomR_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2805, 752, 2885, 752, 2885, 756, 2805, 756)
 
 [node name="WC_MensRoomR_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2995, 720, 3075, 720, 3075, 736, 2995, 736)
@@ -1892,9 +2220,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2995, 720, 3075, 720, 3075, 736, 2995, 736)
 
+[node name="WH_MensRoomR_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2995, 720, 3075, 720, 3075, 723, 2995, 723)
+
 [node name="WF_MensRoomR_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2995, 736, 3075, 736, 3075, 750, 2995, 750)
+polygon = PackedVector2Array(2995, 736, 3075, 736, 3075, 752, 2995, 752)
+
+[node name="WS_MensRoomR_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2995, 752, 3075, 752, 3075, 756, 2995, 756)
 
 [node name="Door_MensRoomR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -1913,9 +2249,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2805, 984, 3075, 984, 3075, 1000, 2805, 1000)
 
+[node name="WH_MensRoomR_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2805, 984, 3075, 984, 3075, 987, 2805, 987)
+
 [node name="WF_MensRoomR_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2805, 1000, 3075, 1000, 3075, 1014, 2805, 1014)
+polygon = PackedVector2Array(2805, 1000, 3075, 1000, 3075, 1016, 2805, 1016)
+
+[node name="WS_MensRoomR_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2805, 1016, 3075, 1016, 3075, 1020, 2805, 1020)
 
 [node name="WC_MensRoomR_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2805, 720, 2821, 720, 2821, 1000, 2805, 1000)
@@ -1967,9 +2311,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(3075, 720, 3172.5, 720, 3172.5, 736, 3075, 736)
 
+[node name="WH_WomensRoomR_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(3075, 720, 3172.5, 720, 3172.5, 723, 3075, 723)
+
 [node name="WF_WomensRoomR_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(3075, 736, 3172.5, 736, 3172.5, 750, 3075, 750)
+polygon = PackedVector2Array(3075, 736, 3172.5, 736, 3172.5, 752, 3075, 752)
+
+[node name="WS_WomensRoomR_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(3075, 752, 3172.5, 752, 3172.5, 756, 3075, 756)
 
 [node name="WC_WomensRoomR_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(3282.5, 720, 3380, 720, 3380, 736, 3282.5, 736)
@@ -1982,9 +2334,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(3282.5, 720, 3380, 720, 3380, 736, 3282.5, 736)
 
+[node name="WH_WomensRoomR_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(3282.5, 720, 3380, 720, 3380, 723, 3282.5, 723)
+
 [node name="WF_WomensRoomR_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(3282.5, 736, 3380, 736, 3380, 750, 3282.5, 750)
+polygon = PackedVector2Array(3282.5, 736, 3380, 736, 3380, 752, 3282.5, 752)
+
+[node name="WS_WomensRoomR_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(3282.5, 752, 3380, 752, 3380, 756, 3282.5, 756)
 
 [node name="Door_WomensRoomR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -2003,9 +2363,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(3075, 984, 3380, 984, 3380, 1000, 3075, 1000)
 
+[node name="WH_WomensRoomR_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(3075, 984, 3380, 984, 3380, 987, 3075, 987)
+
 [node name="WF_WomensRoomR_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(3075, 1000, 3380, 1000, 3380, 1014, 3075, 1014)
+polygon = PackedVector2Array(3075, 1000, 3380, 1000, 3380, 1016, 3075, 1016)
+
+[node name="WS_WomensRoomR_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(3075, 1016, 3380, 1016, 3380, 1020, 3075, 1020)
 
 [node name="WC_WomensRoomR_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(3075, 720, 3091, 720, 3091, 1000, 3075, 1000)
@@ -2348,9 +2716,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(0, 1000, 1670, 1000, 1670, 1016, 0, 1016)
 
+[node name="WH_VoidTopL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(0, 1000, 1670, 1000, 1670, 1003, 0, 1003)
+
 [node name="WF_VoidTopL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(0, 1016, 1670, 1016, 1670, 1030, 0, 1030)
+polygon = PackedVector2Array(0, 1016, 1670, 1016, 1670, 1032, 0, 1032)
+
+[node name="WS_VoidTopL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(0, 1032, 1670, 1032, 1670, 1036, 0, 1036)
 
 [node name="WC_VoidTopR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1890, 1000, 3400, 1000, 3400, 1016, 1890, 1016)
@@ -2363,9 +2739,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1890, 1000, 3400, 1000, 3400, 1016, 1890, 1016)
 
+[node name="WH_VoidTopR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1890, 1000, 3400, 1000, 3400, 1003, 1890, 1003)
+
 [node name="WF_VoidTopR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1890, 1016, 3400, 1016, 3400, 1030, 1890, 1030)
+polygon = PackedVector2Array(1890, 1016, 3400, 1016, 3400, 1032, 1890, 1032)
+
+[node name="WS_VoidTopR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1890, 1032, 3400, 1032, 3400, 1036, 1890, 1036)
 
 [node name="WC_VoidBotL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(0, 1384, 1670, 1384, 1670, 1400, 0, 1400)
@@ -2378,9 +2762,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(0, 1384, 1670, 1384, 1670, 1400, 0, 1400)
 
+[node name="WH_VoidBotL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(0, 1384, 1670, 1384, 1670, 1387, 0, 1387)
+
 [node name="WF_VoidBotL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(0, 1400, 1670, 1400, 1670, 1414, 0, 1414)
+polygon = PackedVector2Array(0, 1400, 1670, 1400, 1670, 1416, 0, 1416)
+
+[node name="WS_VoidBotL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(0, 1416, 1670, 1416, 1670, 1420, 0, 1420)
 
 [node name="WC_VoidBotR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1890, 1384, 3400, 1384, 3400, 1400, 1890, 1400)
@@ -2393,9 +2785,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1890, 1384, 3400, 1384, 3400, 1400, 1890, 1400)
 
+[node name="WH_VoidBotR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1890, 1384, 3400, 1384, 3400, 1387, 1890, 1387)
+
 [node name="WF_VoidBotR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1890, 1400, 3400, 1400, 3400, 1414, 1890, 1414)
+polygon = PackedVector2Array(1890, 1400, 3400, 1400, 3400, 1416, 1890, 1416)
+
+[node name="WS_VoidBotR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1890, 1416, 3400, 1416, 3400, 1420, 1890, 1420)
 
 [node name="WC_VoidFillL0" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(0, 1016, 100, 1016, 100, 1384, 0, 1384)
@@ -2639,9 +3039,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(20, 1520, 322.5, 1520, 322.5, 1536, 20, 1536)
 
+[node name="WH_Dasan7_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(20, 1520, 322.5, 1520, 322.5, 1523, 20, 1523)
+
 [node name="WF_Dasan7_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(20, 1536, 322.5, 1536, 322.5, 1550, 20, 1550)
+polygon = PackedVector2Array(20, 1536, 322.5, 1536, 322.5, 1552, 20, 1552)
+
+[node name="WS_Dasan7_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(20, 1552, 322.5, 1552, 322.5, 1556, 20, 1556)
 
 [node name="WC_Dasan7_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(432.5, 1520, 735, 1520, 735, 1536, 432.5, 1536)
@@ -2654,9 +3062,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(432.5, 1520, 735, 1520, 735, 1536, 432.5, 1536)
 
+[node name="WH_Dasan7_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(432.5, 1520, 735, 1520, 735, 1523, 432.5, 1523)
+
 [node name="WF_Dasan7_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(432.5, 1536, 735, 1536, 735, 1550, 432.5, 1550)
+polygon = PackedVector2Array(432.5, 1536, 735, 1536, 735, 1552, 432.5, 1552)
+
+[node name="WS_Dasan7_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(432.5, 1552, 735, 1552, 735, 1556, 432.5, 1556)
 
 [node name="Door_Dasan7" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -2675,9 +3091,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(20, 1924, 735, 1924, 735, 1940, 20, 1940)
 
+[node name="WH_Dasan7_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(20, 1924, 735, 1924, 735, 1927, 20, 1927)
+
 [node name="WF_Dasan7_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(20, 1940, 735, 1940, 735, 1954, 20, 1954)
+polygon = PackedVector2Array(20, 1940, 735, 1940, 735, 1956, 20, 1956)
+
+[node name="WS_Dasan7_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(20, 1956, 735, 1956, 735, 1960, 20, 1960)
 
 [node name="WC_Dasan7_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(20, 1520, 36, 1520, 36, 1940, 20, 1940)
@@ -2729,9 +3153,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(735, 1520, 1132.5, 1520, 1132.5, 1536, 735, 1536)
 
+[node name="WH_CreativeDept_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(735, 1520, 1132.5, 1520, 1132.5, 1523, 735, 1523)
+
 [node name="WF_CreativeDept_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(735, 1536, 1132.5, 1536, 1132.5, 1550, 735, 1550)
+polygon = PackedVector2Array(735, 1536, 1132.5, 1536, 1132.5, 1552, 735, 1552)
+
+[node name="WS_CreativeDept_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(735, 1552, 1132.5, 1552, 1132.5, 1556, 735, 1556)
 
 [node name="WC_CreativeDept_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1242.5, 1520, 1640, 1520, 1640, 1536, 1242.5, 1536)
@@ -2744,9 +3176,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1242.5, 1520, 1640, 1520, 1640, 1536, 1242.5, 1536)
 
+[node name="WH_CreativeDept_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1242.5, 1520, 1640, 1520, 1640, 1523, 1242.5, 1523)
+
 [node name="WF_CreativeDept_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1242.5, 1536, 1640, 1536, 1640, 1550, 1242.5, 1550)
+polygon = PackedVector2Array(1242.5, 1536, 1640, 1536, 1640, 1552, 1242.5, 1552)
+
+[node name="WS_CreativeDept_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1242.5, 1552, 1640, 1552, 1640, 1556, 1242.5, 1556)
 
 [node name="Door_CreativeDept" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -2765,9 +3205,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(735, 1924, 1640, 1924, 1640, 1940, 735, 1940)
 
+[node name="WH_CreativeDept_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(735, 1924, 1640, 1924, 1640, 1927, 735, 1927)
+
 [node name="WF_CreativeDept_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(735, 1940, 1640, 1940, 1640, 1954, 735, 1954)
+polygon = PackedVector2Array(735, 1940, 1640, 1940, 1640, 1956, 735, 1956)
+
+[node name="WS_CreativeDept_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(735, 1956, 1640, 1956, 1640, 1960, 735, 1960)
 
 [node name="WC_CreativeDept_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(735, 1520, 751, 1520, 751, 1940, 735, 1940)
@@ -2819,9 +3267,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1920, 1520, 2112.5, 1520, 2112.5, 1536, 1920, 1536)
 
+[node name="WH_ComputerRoom_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1920, 1520, 2112.5, 1520, 2112.5, 1523, 1920, 1523)
+
 [node name="WF_ComputerRoom_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1920, 1536, 2112.5, 1536, 2112.5, 1550, 1920, 1550)
+polygon = PackedVector2Array(1920, 1536, 2112.5, 1536, 2112.5, 1552, 1920, 1552)
+
+[node name="WS_ComputerRoom_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1920, 1552, 2112.5, 1552, 2112.5, 1556, 1920, 1556)
 
 [node name="WC_ComputerRoom_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2222.5, 1520, 2415, 1520, 2415, 1536, 2222.5, 1536)
@@ -2834,9 +3290,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2222.5, 1520, 2415, 1520, 2415, 1536, 2222.5, 1536)
 
+[node name="WH_ComputerRoom_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2222.5, 1520, 2415, 1520, 2415, 1523, 2222.5, 1523)
+
 [node name="WF_ComputerRoom_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2222.5, 1536, 2415, 1536, 2415, 1550, 2222.5, 1550)
+polygon = PackedVector2Array(2222.5, 1536, 2415, 1536, 2415, 1552, 2222.5, 1552)
+
+[node name="WS_ComputerRoom_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2222.5, 1552, 2415, 1552, 2415, 1556, 2222.5, 1556)
 
 [node name="Door_ComputerRoom" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -2855,9 +3319,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1920, 1924, 2415, 1924, 2415, 1940, 1920, 1940)
 
+[node name="WH_ComputerRoom_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1920, 1924, 2415, 1924, 2415, 1927, 1920, 1927)
+
 [node name="WF_ComputerRoom_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1920, 1940, 2415, 1940, 2415, 1954, 1920, 1954)
+polygon = PackedVector2Array(1920, 1940, 2415, 1940, 2415, 1956, 1920, 1956)
+
+[node name="WS_ComputerRoom_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1920, 1956, 2415, 1956, 2415, 1960, 1920, 1960)
 
 [node name="WC_ComputerRoom_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1920, 1520, 1936, 1520, 1936, 1940, 1920, 1940)
@@ -2909,9 +3381,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2415, 1520, 2555, 1520, 2555, 1536, 2415, 1536)
 
+[node name="WH_Storage2_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2415, 1520, 2555, 1520, 2555, 1523, 2415, 1523)
+
 [node name="WF_Storage2_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2415, 1536, 2555, 1536, 2555, 1550, 2415, 1550)
+polygon = PackedVector2Array(2415, 1536, 2555, 1536, 2555, 1552, 2415, 1552)
+
+[node name="WS_Storage2_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2415, 1552, 2555, 1552, 2555, 1556, 2415, 1556)
 
 [node name="WC_Storage2_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2665, 1520, 2805, 1520, 2805, 1536, 2665, 1536)
@@ -2924,9 +3404,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2665, 1520, 2805, 1520, 2805, 1536, 2665, 1536)
 
+[node name="WH_Storage2_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2665, 1520, 2805, 1520, 2805, 1523, 2665, 1523)
+
 [node name="WF_Storage2_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2665, 1536, 2805, 1536, 2805, 1550, 2665, 1550)
+polygon = PackedVector2Array(2665, 1536, 2805, 1536, 2805, 1552, 2665, 1552)
+
+[node name="WS_Storage2_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2665, 1552, 2805, 1552, 2805, 1556, 2665, 1556)
 
 [node name="Door_Storage2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -2945,9 +3433,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2415, 1924, 2805, 1924, 2805, 1940, 2415, 1940)
 
+[node name="WH_Storage2_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2415, 1924, 2805, 1924, 2805, 1927, 2415, 1927)
+
 [node name="WF_Storage2_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2415, 1940, 2805, 1940, 2805, 1954, 2415, 1954)
+polygon = PackedVector2Array(2415, 1940, 2805, 1940, 2805, 1956, 2415, 1956)
+
+[node name="WS_Storage2_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2415, 1956, 2805, 1956, 2805, 1960, 2415, 1960)
 
 [node name="WC_Storage2_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2415, 1520, 2431, 1520, 2431, 1940, 2415, 1940)
@@ -2999,9 +3495,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2805, 1520, 3037.5, 1520, 3037.5, 1536, 2805, 1536)
 
+[node name="WH_InfoDept_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2805, 1520, 3037.5, 1520, 3037.5, 1523, 2805, 1523)
+
 [node name="WF_InfoDept_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2805, 1536, 3037.5, 1536, 3037.5, 1550, 2805, 1550)
+polygon = PackedVector2Array(2805, 1536, 3037.5, 1536, 3037.5, 1552, 2805, 1552)
+
+[node name="WS_InfoDept_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2805, 1552, 3037.5, 1552, 3037.5, 1556, 2805, 1556)
 
 [node name="WC_InfoDept_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(3147.5, 1520, 3380, 1520, 3380, 1536, 3147.5, 1536)
@@ -3014,9 +3518,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(3147.5, 1520, 3380, 1520, 3380, 1536, 3147.5, 1536)
 
+[node name="WH_InfoDept_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(3147.5, 1520, 3380, 1520, 3380, 1523, 3147.5, 1523)
+
 [node name="WF_InfoDept_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(3147.5, 1536, 3380, 1536, 3380, 1550, 3147.5, 1550)
+polygon = PackedVector2Array(3147.5, 1536, 3380, 1536, 3380, 1552, 3147.5, 1552)
+
+[node name="WS_InfoDept_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(3147.5, 1552, 3380, 1552, 3380, 1556, 3147.5, 1556)
 
 [node name="Door_InfoDept" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -3035,9 +3547,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2805, 1924, 3380, 1924, 3380, 1940, 2805, 1940)
 
+[node name="WH_InfoDept_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2805, 1924, 3380, 1924, 3380, 1927, 2805, 1927)
+
 [node name="WF_InfoDept_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2805, 1940, 3380, 1940, 3380, 1954, 2805, 1954)
+polygon = PackedVector2Array(2805, 1940, 3380, 1940, 3380, 1956, 2805, 1956)
+
+[node name="WS_InfoDept_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2805, 1956, 3380, 1956, 3380, 1960, 2805, 1960)
 
 [node name="WC_InfoDept_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2805, 1520, 2821, 1520, 2821, 1940, 2805, 1940)
@@ -3089,9 +3609,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(20, 2120, 555, 2120, 555, 2136, 20, 2136)
 
+[node name="WH_Dasan6_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(20, 2120, 555, 2120, 555, 2123, 20, 2123)
+
 [node name="WF_Dasan6_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(20, 2136, 555, 2136, 555, 2150, 20, 2150)
+polygon = PackedVector2Array(20, 2136, 555, 2136, 555, 2152, 20, 2152)
+
+[node name="WS_Dasan6_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(20, 2152, 555, 2152, 555, 2156, 20, 2156)
 
 [node name="WC_Dasan6_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(665, 2120, 1200, 2120, 1200, 2136, 665, 2136)
@@ -3104,9 +3632,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(665, 2120, 1200, 2120, 1200, 2136, 665, 2136)
 
+[node name="WH_Dasan6_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(665, 2120, 1200, 2120, 1200, 2123, 665, 2123)
+
 [node name="WF_Dasan6_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(665, 2136, 1200, 2136, 1200, 2150, 665, 2150)
+polygon = PackedVector2Array(665, 2136, 1200, 2136, 1200, 2152, 665, 2152)
+
+[node name="WS_Dasan6_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(665, 2152, 1200, 2152, 1200, 2156, 665, 2156)
 
 [node name="Door_Dasan6" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -3125,9 +3661,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(20, 2464, 1200, 2464, 1200, 2480, 20, 2480)
 
+[node name="WH_Dasan6_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(20, 2464, 1200, 2464, 1200, 2467, 20, 2467)
+
 [node name="WF_Dasan6_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(20, 2480, 1200, 2480, 1200, 2494, 20, 2494)
+polygon = PackedVector2Array(20, 2480, 1200, 2480, 1200, 2496, 20, 2496)
+
+[node name="WS_Dasan6_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(20, 2496, 1200, 2496, 1200, 2500, 20, 2500)
 
 [node name="WC_Dasan6_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(20, 2120, 36, 2120, 36, 2480, 20, 2480)
@@ -3179,9 +3723,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2270, 2120, 2352.5, 2120, 2352.5, 2136, 2270, 2136)
 
+[node name="WH_MensRoomB_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2270, 2120, 2352.5, 2120, 2352.5, 2123, 2270, 2123)
+
 [node name="WF_MensRoomB_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2270, 2136, 2352.5, 2136, 2352.5, 2150, 2270, 2150)
+polygon = PackedVector2Array(2270, 2136, 2352.5, 2136, 2352.5, 2152, 2270, 2152)
+
+[node name="WS_MensRoomB_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2270, 2152, 2352.5, 2152, 2352.5, 2156, 2270, 2156)
 
 [node name="WC_MensRoomB_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2462.5, 2120, 2545, 2120, 2545, 2136, 2462.5, 2136)
@@ -3194,9 +3746,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2462.5, 2120, 2545, 2120, 2545, 2136, 2462.5, 2136)
 
+[node name="WH_MensRoomB_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2462.5, 2120, 2545, 2120, 2545, 2123, 2462.5, 2123)
+
 [node name="WF_MensRoomB_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2462.5, 2136, 2545, 2136, 2545, 2150, 2462.5, 2150)
+polygon = PackedVector2Array(2462.5, 2136, 2545, 2136, 2545, 2152, 2462.5, 2152)
+
+[node name="WS_MensRoomB_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2462.5, 2152, 2545, 2152, 2545, 2156, 2462.5, 2156)
 
 [node name="Door_MensRoomB" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -3215,9 +3775,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2270, 2464, 2545, 2464, 2545, 2480, 2270, 2480)
 
+[node name="WH_MensRoomB_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2270, 2464, 2545, 2464, 2545, 2467, 2270, 2467)
+
 [node name="WF_MensRoomB_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2270, 2480, 2545, 2480, 2545, 2494, 2270, 2494)
+polygon = PackedVector2Array(2270, 2480, 2545, 2480, 2545, 2496, 2270, 2496)
+
+[node name="WS_MensRoomB_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2270, 2496, 2545, 2496, 2545, 2500, 2270, 2500)
 
 [node name="WC_MensRoomB_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2270, 2120, 2286, 2120, 2286, 2480, 2270, 2480)
@@ -3269,9 +3837,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2545, 2120, 2627.5, 2120, 2627.5, 2136, 2545, 2136)
 
+[node name="WH_WomensRoomB_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2545, 2120, 2627.5, 2120, 2627.5, 2123, 2545, 2123)
+
 [node name="WF_WomensRoomB_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2545, 2136, 2627.5, 2136, 2627.5, 2150, 2545, 2150)
+polygon = PackedVector2Array(2545, 2136, 2627.5, 2136, 2627.5, 2152, 2545, 2152)
+
+[node name="WS_WomensRoomB_topL" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2545, 2152, 2627.5, 2152, 2627.5, 2156, 2545, 2156)
 
 [node name="WC_WomensRoomB_topR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2737.5, 2120, 2820, 2120, 2820, 2136, 2737.5, 2136)
@@ -3284,9 +3860,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2737.5, 2120, 2820, 2120, 2820, 2136, 2737.5, 2136)
 
+[node name="WH_WomensRoomB_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2737.5, 2120, 2820, 2120, 2820, 2123, 2737.5, 2123)
+
 [node name="WF_WomensRoomB_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2737.5, 2136, 2820, 2136, 2820, 2150, 2737.5, 2150)
+polygon = PackedVector2Array(2737.5, 2136, 2820, 2136, 2820, 2152, 2737.5, 2152)
+
+[node name="WS_WomensRoomB_topR" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2737.5, 2152, 2820, 2152, 2820, 2156, 2737.5, 2156)
 
 [node name="Door_WomensRoomB" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -3305,9 +3889,17 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2545, 2464, 2820, 2464, 2820, 2480, 2545, 2480)
 
+[node name="WH_WomensRoomB_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(2545, 2464, 2820, 2464, 2820, 2467, 2545, 2467)
+
 [node name="WF_WomensRoomB_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(2545, 2480, 2820, 2480, 2820, 2494, 2545, 2494)
+polygon = PackedVector2Array(2545, 2480, 2820, 2480, 2820, 2496, 2545, 2496)
+
+[node name="WS_WomensRoomB_bot" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(2545, 2496, 2820, 2496, 2820, 2500, 2545, 2500)
 
 [node name="WC_WomensRoomB_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(2545, 2120, 2561, 2120, 2561, 2480, 2545, 2480)
@@ -3774,18 +4366,6 @@ polygon = PackedVector2Array(1620, 2069.6, 1642, 2069.6, 1642, 2084.6, 1620, 208
 color = Color(0.52, 0.50, 0.45, 1)
 polygon = PackedVector2Array(2617, 1986.8, 2639, 1986.8, 2639, 2001.8, 2617, 2001.8)
 
-[node name="PD_Line_540_0" type="Polygon2D" parent="Props"]
-color = Color(0.17, 0.19, 0.23, 1)
-polygon = PackedVector2Array(20, 627, 3380, 627, 3380, 633, 20, 633)
-
-[node name="PD_Line_1400_0" type="Polygon2D" parent="Props"]
-color = Color(0.17, 0.19, 0.23, 1)
-polygon = PackedVector2Array(20, 1457, 3380, 1457, 3380, 1463, 20, 1463)
-
-[node name="PD_Line_1940_0" type="Polygon2D" parent="Props"]
-color = Color(0.17, 0.19, 0.23, 1)
-polygon = PackedVector2Array(20, 2027, 3380, 2027, 3380, 2033, 20, 2033)
-
 [node name="PD_North1_board" type="Polygon2D" parent="Props"]
 color = Color(0.13, 0.19, 0.16, 1)
 polygon = PackedVector2Array(36, 160, 50, 160, 50, 400, 36, 400)
@@ -3955,67 +4535,100 @@ polygon = PackedVector2Array(363.3, 266, 377.3, 266, 377.3, 294, 363.3, 294)
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(79.3, 36, 151.3, 36, 151.3, 50, 79.3, 50)
+polygon = PackedVector2Array(79.3, 36, 151.3, 36, 151.3, 56, 79.3, 56)
 
 [node name="WD_North1_curtainL0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(71.3, 36, 79.3, 36, 79.3, 50, 71.3, 50)
+polygon = PackedVector2Array(71.3, 36, 79.3, 36, 79.3, 56, 71.3, 56)
 
 [node name="WD_North1_curtainR0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(151.3, 36, 159.3, 36, 159.3, 50, 151.3, 50)
+polygon = PackedVector2Array(151.3, 36, 159.3, 36, 159.3, 56, 151.3, 56)
 
-[node name="FM_North1_moon0" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(69.3, 50, 161.3, 50, 161.3, 96, 69.3, 96)
+[node name="LT_North1_moon0_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(82.3, 56, 100.3, 56, 143.5, 152, 39.1, 152)
+
+[node name="LT_North1_moon0_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(106.3, 56, 124.3, 56, 167.5, 152, 63.1, 152)
+
+[node name="LT_North1_moon0_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(130.3, 56, 148.3, 56, 191.5, 152, 87.1, 152)
 
 [node name="WD_North1_win1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(170.7, 36, 242.7, 36, 242.7, 50, 170.7, 50)
+polygon = PackedVector2Array(170.7, 36, 242.7, 36, 242.7, 56, 170.7, 56)
 
 [node name="WD_North1_curtainL1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(162.7, 36, 170.7, 36, 170.7, 50, 162.7, 50)
+polygon = PackedVector2Array(162.7, 36, 170.7, 36, 170.7, 56, 162.7, 56)
 
 [node name="WD_North1_curtainR1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(242.7, 36, 250.7, 36, 250.7, 50, 242.7, 50)
+polygon = PackedVector2Array(242.7, 36, 250.7, 36, 250.7, 56, 242.7, 56)
 
-[node name="FM_North1_moon1" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(160.7, 50, 252.7, 50, 252.7, 96, 160.7, 96)
+[node name="LT_North1_moon1_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(173.7, 56, 191.7, 56, 234.9, 152, 130.5, 152)
+
+[node name="LT_North1_moon1_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(197.7, 56, 215.7, 56, 258.9, 152, 154.5, 152)
+
+[node name="LT_North1_moon1_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(221.7, 56, 239.7, 56, 282.9, 152, 178.5, 152)
 
 [node name="WD_North1_win2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(262, 36, 334, 36, 334, 50, 262, 50)
+polygon = PackedVector2Array(262, 36, 334, 36, 334, 56, 262, 56)
 
 [node name="WD_North1_curtainL2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(254, 36, 262, 36, 262, 50, 254, 50)
+polygon = PackedVector2Array(254, 36, 262, 36, 262, 56, 254, 56)
 
 [node name="WD_North1_curtainR2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(334, 36, 342, 36, 342, 50, 334, 50)
+polygon = PackedVector2Array(334, 36, 342, 36, 342, 56, 334, 56)
 
-[node name="FM_North1_moon2" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(252, 50, 344, 50, 344, 96, 252, 96)
+[node name="LT_North1_moon2_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(265, 56, 283, 56, 326.2, 152, 221.8, 152)
+
+[node name="LT_North1_moon2_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(289, 56, 307, 56, 350.2, 152, 245.8, 152)
+
+[node name="LT_North1_moon2_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(313, 56, 331, 56, 374.2, 152, 269.8, 152)
 
 [node name="WD_North1_spk0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -4499,67 +5112,100 @@ polygon = PackedVector2Array(736.7, 266, 750.7, 266, 750.7, 294, 736.7, 294)
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(452.7, 36, 524.7, 36, 524.7, 50, 452.7, 50)
+polygon = PackedVector2Array(452.7, 36, 524.7, 36, 524.7, 56, 452.7, 56)
 
 [node name="WD_North2_curtainL0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(444.7, 36, 452.7, 36, 452.7, 50, 444.7, 50)
+polygon = PackedVector2Array(444.7, 36, 452.7, 36, 452.7, 56, 444.7, 56)
 
 [node name="WD_North2_curtainR0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(524.7, 36, 532.7, 36, 532.7, 50, 524.7, 50)
+polygon = PackedVector2Array(524.7, 36, 532.7, 36, 532.7, 56, 524.7, 56)
 
-[node name="FM_North2_moon0" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(442.7, 50, 534.7, 50, 534.7, 96, 442.7, 96)
+[node name="LT_North2_moon0_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(455.7, 56, 473.7, 56, 516.9, 152, 412.5, 152)
+
+[node name="LT_North2_moon0_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(479.7, 56, 497.7, 56, 540.9, 152, 436.5, 152)
+
+[node name="LT_North2_moon0_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(503.7, 56, 521.7, 56, 564.9, 152, 460.5, 152)
 
 [node name="WD_North2_win1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(544, 36, 616, 36, 616, 50, 544, 50)
+polygon = PackedVector2Array(544, 36, 616, 36, 616, 56, 544, 56)
 
 [node name="WD_North2_curtainL1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(536, 36, 544, 36, 544, 50, 536, 50)
+polygon = PackedVector2Array(536, 36, 544, 36, 544, 56, 536, 56)
 
 [node name="WD_North2_curtainR1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(616, 36, 624, 36, 624, 50, 616, 50)
+polygon = PackedVector2Array(616, 36, 624, 36, 624, 56, 616, 56)
 
-[node name="FM_North2_moon1" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(534, 50, 626, 50, 626, 96, 534, 96)
+[node name="LT_North2_moon1_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(547, 56, 565, 56, 608.2, 152, 503.8, 152)
+
+[node name="LT_North2_moon1_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(571, 56, 589, 56, 632.2, 152, 527.8, 152)
+
+[node name="LT_North2_moon1_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(595, 56, 613, 56, 656.2, 152, 551.8, 152)
 
 [node name="WD_North2_win2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(635.3, 36, 707.3, 36, 707.3, 50, 635.3, 50)
+polygon = PackedVector2Array(635.3, 36, 707.3, 36, 707.3, 56, 635.3, 56)
 
 [node name="WD_North2_curtainL2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(627.3, 36, 635.3, 36, 635.3, 50, 627.3, 50)
+polygon = PackedVector2Array(627.3, 36, 635.3, 36, 635.3, 56, 627.3, 56)
 
 [node name="WD_North2_curtainR2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(707.3, 36, 715.3, 36, 715.3, 50, 707.3, 50)
+polygon = PackedVector2Array(707.3, 36, 715.3, 36, 715.3, 56, 707.3, 56)
 
-[node name="FM_North2_moon2" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(625.3, 50, 717.3, 50, 717.3, 96, 625.3, 96)
+[node name="LT_North2_moon2_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(638.3, 56, 656.3, 56, 699.5, 152, 595.1, 152)
+
+[node name="LT_North2_moon2_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(662.3, 56, 680.3, 56, 723.5, 152, 619.1, 152)
+
+[node name="LT_North2_moon2_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(686.3, 56, 704.3, 56, 747.5, 152, 643.1, 152)
 
 [node name="WD_North2_spk0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -5043,67 +5689,100 @@ polygon = PackedVector2Array(1110, 266, 1124, 266, 1124, 294, 1110, 294)
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(826, 36, 898, 36, 898, 50, 826, 50)
+polygon = PackedVector2Array(826, 36, 898, 36, 898, 56, 826, 56)
 
 [node name="WD_North3_curtainL0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(818, 36, 826, 36, 826, 50, 818, 50)
+polygon = PackedVector2Array(818, 36, 826, 36, 826, 56, 818, 56)
 
 [node name="WD_North3_curtainR0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(898, 36, 906, 36, 906, 50, 898, 50)
+polygon = PackedVector2Array(898, 36, 906, 36, 906, 56, 898, 56)
 
-[node name="FM_North3_moon0" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(816, 50, 908, 50, 908, 96, 816, 96)
+[node name="LT_North3_moon0_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(829, 56, 847, 56, 890.2, 152, 785.8, 152)
+
+[node name="LT_North3_moon0_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(853, 56, 871, 56, 914.2, 152, 809.8, 152)
+
+[node name="LT_North3_moon0_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(877, 56, 895, 56, 938.2, 152, 833.8, 152)
 
 [node name="WD_North3_win1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(917.3, 36, 989.3, 36, 989.3, 50, 917.3, 50)
+polygon = PackedVector2Array(917.3, 36, 989.3, 36, 989.3, 56, 917.3, 56)
 
 [node name="WD_North3_curtainL1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(909.3, 36, 917.3, 36, 917.3, 50, 909.3, 50)
+polygon = PackedVector2Array(909.3, 36, 917.3, 36, 917.3, 56, 909.3, 56)
 
 [node name="WD_North3_curtainR1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(989.3, 36, 997.3, 36, 997.3, 50, 989.3, 50)
+polygon = PackedVector2Array(989.3, 36, 997.3, 36, 997.3, 56, 989.3, 56)
 
-[node name="FM_North3_moon1" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(907.3, 50, 999.3, 50, 999.3, 96, 907.3, 96)
+[node name="LT_North3_moon1_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(920.3, 56, 938.3, 56, 981.5, 152, 877.1, 152)
+
+[node name="LT_North3_moon1_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(944.3, 56, 962.3, 56, 1005.5, 152, 901.1, 152)
+
+[node name="LT_North3_moon1_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(968.3, 56, 986.3, 56, 1029.5, 152, 925.1, 152)
 
 [node name="WD_North3_win2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(1008.7, 36, 1080.7, 36, 1080.7, 50, 1008.7, 50)
+polygon = PackedVector2Array(1008.7, 36, 1080.7, 36, 1080.7, 56, 1008.7, 56)
 
 [node name="WD_North3_curtainL2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(1000.7, 36, 1008.7, 36, 1008.7, 50, 1000.7, 50)
+polygon = PackedVector2Array(1000.7, 36, 1008.7, 36, 1008.7, 56, 1000.7, 56)
 
 [node name="WD_North3_curtainR2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(1080.7, 36, 1088.7, 36, 1088.7, 50, 1080.7, 50)
+polygon = PackedVector2Array(1080.7, 36, 1088.7, 36, 1088.7, 56, 1080.7, 56)
 
-[node name="FM_North3_moon2" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(998.7, 50, 1090.7, 50, 1090.7, 96, 998.7, 96)
+[node name="LT_North3_moon2_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(1011.7, 56, 1029.7, 56, 1072.9, 152, 968.5, 152)
+
+[node name="LT_North3_moon2_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(1035.7, 56, 1053.7, 56, 1096.9, 152, 992.5, 152)
+
+[node name="LT_North3_moon2_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(1059.7, 56, 1077.7, 56, 1120.9, 152, 1016.5, 152)
 
 [node name="WD_North3_spk0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -5785,67 +6464,100 @@ polygon = PackedVector2Array(1856.7, 266, 1870.7, 266, 1870.7, 294, 1856.7, 294)
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(1572.7, 36, 1644.7, 36, 1644.7, 50, 1572.7, 50)
+polygon = PackedVector2Array(1572.7, 36, 1644.7, 36, 1644.7, 56, 1572.7, 56)
 
 [node name="WD_North5_curtainL0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(1564.7, 36, 1572.7, 36, 1572.7, 50, 1564.7, 50)
+polygon = PackedVector2Array(1564.7, 36, 1572.7, 36, 1572.7, 56, 1564.7, 56)
 
 [node name="WD_North5_curtainR0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(1644.7, 36, 1652.7, 36, 1652.7, 50, 1644.7, 50)
+polygon = PackedVector2Array(1644.7, 36, 1652.7, 36, 1652.7, 56, 1644.7, 56)
 
-[node name="FM_North5_moon0" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(1562.7, 50, 1654.7, 50, 1654.7, 96, 1562.7, 96)
+[node name="LT_North5_moon0_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(1575.7, 56, 1593.7, 56, 1636.9, 152, 1532.5, 152)
+
+[node name="LT_North5_moon0_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(1599.7, 56, 1617.7, 56, 1660.9, 152, 1556.5, 152)
+
+[node name="LT_North5_moon0_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(1623.7, 56, 1641.7, 56, 1684.9, 152, 1580.5, 152)
 
 [node name="WD_North5_win1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(1664, 36, 1736, 36, 1736, 50, 1664, 50)
+polygon = PackedVector2Array(1664, 36, 1736, 36, 1736, 56, 1664, 56)
 
 [node name="WD_North5_curtainL1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(1656, 36, 1664, 36, 1664, 50, 1656, 50)
+polygon = PackedVector2Array(1656, 36, 1664, 36, 1664, 56, 1656, 56)
 
 [node name="WD_North5_curtainR1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(1736, 36, 1744, 36, 1744, 50, 1736, 50)
+polygon = PackedVector2Array(1736, 36, 1744, 36, 1744, 56, 1736, 56)
 
-[node name="FM_North5_moon1" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(1654, 50, 1746, 50, 1746, 96, 1654, 96)
+[node name="LT_North5_moon1_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(1667, 56, 1685, 56, 1728.2, 152, 1623.8, 152)
+
+[node name="LT_North5_moon1_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(1691, 56, 1709, 56, 1752.2, 152, 1647.8, 152)
+
+[node name="LT_North5_moon1_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(1715, 56, 1733, 56, 1776.2, 152, 1671.8, 152)
 
 [node name="WD_North5_win2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(1755.3, 36, 1827.3, 36, 1827.3, 50, 1755.3, 50)
+polygon = PackedVector2Array(1755.3, 36, 1827.3, 36, 1827.3, 56, 1755.3, 56)
 
 [node name="WD_North5_curtainL2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(1747.3, 36, 1755.3, 36, 1755.3, 50, 1747.3, 50)
+polygon = PackedVector2Array(1747.3, 36, 1755.3, 36, 1755.3, 56, 1747.3, 56)
 
 [node name="WD_North5_curtainR2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(1827.3, 36, 1835.3, 36, 1835.3, 50, 1827.3, 50)
+polygon = PackedVector2Array(1827.3, 36, 1835.3, 36, 1835.3, 56, 1827.3, 56)
 
-[node name="FM_North5_moon2" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(1745.3, 50, 1837.3, 50, 1837.3, 96, 1745.3, 96)
+[node name="LT_North5_moon2_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(1758.3, 56, 1776.3, 56, 1819.5, 152, 1715.1, 152)
+
+[node name="LT_North5_moon2_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(1782.3, 56, 1800.3, 56, 1843.5, 152, 1739.1, 152)
+
+[node name="LT_North5_moon2_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(1806.3, 56, 1824.3, 56, 1867.5, 152, 1763.1, 152)
 
 [node name="WD_North5_spk0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -6329,67 +7041,100 @@ polygon = PackedVector2Array(2230, 266, 2244, 266, 2244, 294, 2230, 294)
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(1946, 36, 2018, 36, 2018, 50, 1946, 50)
+polygon = PackedVector2Array(1946, 36, 2018, 36, 2018, 56, 1946, 56)
 
 [node name="WD_North6_curtainL0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(1938, 36, 1946, 36, 1946, 50, 1938, 50)
+polygon = PackedVector2Array(1938, 36, 1946, 36, 1946, 56, 1938, 56)
 
 [node name="WD_North6_curtainR0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2018, 36, 2026, 36, 2026, 50, 2018, 50)
+polygon = PackedVector2Array(2018, 36, 2026, 36, 2026, 56, 2018, 56)
 
-[node name="FM_North6_moon0" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(1936, 50, 2028, 50, 2028, 96, 1936, 96)
+[node name="LT_North6_moon0_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(1949, 56, 1967, 56, 2010.2, 152, 1905.8, 152)
+
+[node name="LT_North6_moon0_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(1973, 56, 1991, 56, 2034.2, 152, 1929.8, 152)
+
+[node name="LT_North6_moon0_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(1997, 56, 2015, 56, 2058.2, 152, 1953.8, 152)
 
 [node name="WD_North6_win1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(2037.3, 36, 2109.3, 36, 2109.3, 50, 2037.3, 50)
+polygon = PackedVector2Array(2037.3, 36, 2109.3, 36, 2109.3, 56, 2037.3, 56)
 
 [node name="WD_North6_curtainL1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2029.3, 36, 2037.3, 36, 2037.3, 50, 2029.3, 50)
+polygon = PackedVector2Array(2029.3, 36, 2037.3, 36, 2037.3, 56, 2029.3, 56)
 
 [node name="WD_North6_curtainR1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2109.3, 36, 2117.3, 36, 2117.3, 50, 2109.3, 50)
+polygon = PackedVector2Array(2109.3, 36, 2117.3, 36, 2117.3, 56, 2109.3, 56)
 
-[node name="FM_North6_moon1" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(2027.3, 50, 2119.3, 50, 2119.3, 96, 2027.3, 96)
+[node name="LT_North6_moon1_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2040.3, 56, 2058.3, 56, 2101.5, 152, 1997.1, 152)
+
+[node name="LT_North6_moon1_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2064.3, 56, 2082.3, 56, 2125.5, 152, 2021.1, 152)
+
+[node name="LT_North6_moon1_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2088.3, 56, 2106.3, 56, 2149.5, 152, 2045.1, 152)
 
 [node name="WD_North6_win2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(2128.7, 36, 2200.7, 36, 2200.7, 50, 2128.7, 50)
+polygon = PackedVector2Array(2128.7, 36, 2200.7, 36, 2200.7, 56, 2128.7, 56)
 
 [node name="WD_North6_curtainL2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2120.7, 36, 2128.7, 36, 2128.7, 50, 2120.7, 50)
+polygon = PackedVector2Array(2120.7, 36, 2128.7, 36, 2128.7, 56, 2120.7, 56)
 
 [node name="WD_North6_curtainR2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2200.7, 36, 2208.7, 36, 2208.7, 50, 2200.7, 50)
+polygon = PackedVector2Array(2200.7, 36, 2208.7, 36, 2208.7, 56, 2200.7, 56)
 
-[node name="FM_North6_moon2" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(2118.7, 50, 2210.7, 50, 2210.7, 96, 2118.7, 96)
+[node name="LT_North6_moon2_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2131.7, 56, 2149.7, 56, 2192.9, 152, 2088.5, 152)
+
+[node name="LT_North6_moon2_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2155.7, 56, 2173.7, 56, 2216.9, 152, 2112.5, 152)
+
+[node name="LT_North6_moon2_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2179.7, 56, 2197.7, 56, 2240.9, 152, 2136.5, 152)
 
 [node name="WD_North6_spk0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -6873,67 +7618,100 @@ polygon = PackedVector2Array(2603.3, 266, 2617.3, 266, 2617.3, 294, 2603.3, 294)
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(2319.3, 36, 2391.3, 36, 2391.3, 50, 2319.3, 50)
+polygon = PackedVector2Array(2319.3, 36, 2391.3, 36, 2391.3, 56, 2319.3, 56)
 
 [node name="WD_North7_curtainL0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2311.3, 36, 2319.3, 36, 2319.3, 50, 2311.3, 50)
+polygon = PackedVector2Array(2311.3, 36, 2319.3, 36, 2319.3, 56, 2311.3, 56)
 
 [node name="WD_North7_curtainR0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2391.3, 36, 2399.3, 36, 2399.3, 50, 2391.3, 50)
+polygon = PackedVector2Array(2391.3, 36, 2399.3, 36, 2399.3, 56, 2391.3, 56)
 
-[node name="FM_North7_moon0" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(2309.3, 50, 2401.3, 50, 2401.3, 96, 2309.3, 96)
+[node name="LT_North7_moon0_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2322.3, 56, 2340.3, 56, 2383.5, 152, 2279.1, 152)
+
+[node name="LT_North7_moon0_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2346.3, 56, 2364.3, 56, 2407.5, 152, 2303.1, 152)
+
+[node name="LT_North7_moon0_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2370.3, 56, 2388.3, 56, 2431.5, 152, 2327.1, 152)
 
 [node name="WD_North7_win1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(2410.7, 36, 2482.7, 36, 2482.7, 50, 2410.7, 50)
+polygon = PackedVector2Array(2410.7, 36, 2482.7, 36, 2482.7, 56, 2410.7, 56)
 
 [node name="WD_North7_curtainL1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2402.7, 36, 2410.7, 36, 2410.7, 50, 2402.7, 50)
+polygon = PackedVector2Array(2402.7, 36, 2410.7, 36, 2410.7, 56, 2402.7, 56)
 
 [node name="WD_North7_curtainR1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2482.7, 36, 2490.7, 36, 2490.7, 50, 2482.7, 50)
+polygon = PackedVector2Array(2482.7, 36, 2490.7, 36, 2490.7, 56, 2482.7, 56)
 
-[node name="FM_North7_moon1" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(2400.7, 50, 2492.7, 50, 2492.7, 96, 2400.7, 96)
+[node name="LT_North7_moon1_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2413.7, 56, 2431.7, 56, 2474.9, 152, 2370.5, 152)
+
+[node name="LT_North7_moon1_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2437.7, 56, 2455.7, 56, 2498.9, 152, 2394.5, 152)
+
+[node name="LT_North7_moon1_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2461.7, 56, 2479.7, 56, 2522.9, 152, 2418.5, 152)
 
 [node name="WD_North7_win2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(2502, 36, 2574, 36, 2574, 50, 2502, 50)
+polygon = PackedVector2Array(2502, 36, 2574, 36, 2574, 56, 2502, 56)
 
 [node name="WD_North7_curtainL2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2494, 36, 2502, 36, 2502, 50, 2494, 50)
+polygon = PackedVector2Array(2494, 36, 2502, 36, 2502, 56, 2494, 56)
 
 [node name="WD_North7_curtainR2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2574, 36, 2582, 36, 2582, 50, 2574, 50)
+polygon = PackedVector2Array(2574, 36, 2582, 36, 2582, 56, 2574, 56)
 
-[node name="FM_North7_moon2" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(2492, 50, 2584, 50, 2584, 96, 2492, 96)
+[node name="LT_North7_moon2_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2505, 56, 2523, 56, 2566.2, 152, 2461.8, 152)
+
+[node name="LT_North7_moon2_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2529, 56, 2547, 56, 2590.2, 152, 2485.8, 152)
+
+[node name="LT_North7_moon2_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2553, 56, 2571, 56, 2614.2, 152, 2509.8, 152)
 
 [node name="WD_North7_spk0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -7417,67 +8195,100 @@ polygon = PackedVector2Array(2976.7, 266, 2990.7, 266, 2990.7, 294, 2976.7, 294)
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(2692.7, 36, 2764.7, 36, 2764.7, 50, 2692.7, 50)
+polygon = PackedVector2Array(2692.7, 36, 2764.7, 36, 2764.7, 56, 2692.7, 56)
 
 [node name="WD_North8_curtainL0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2684.7, 36, 2692.7, 36, 2692.7, 50, 2684.7, 50)
+polygon = PackedVector2Array(2684.7, 36, 2692.7, 36, 2692.7, 56, 2684.7, 56)
 
 [node name="WD_North8_curtainR0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2764.7, 36, 2772.7, 36, 2772.7, 50, 2764.7, 50)
+polygon = PackedVector2Array(2764.7, 36, 2772.7, 36, 2772.7, 56, 2764.7, 56)
 
-[node name="FM_North8_moon0" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(2682.7, 50, 2774.7, 50, 2774.7, 96, 2682.7, 96)
+[node name="LT_North8_moon0_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2695.7, 56, 2713.7, 56, 2756.9, 152, 2652.5, 152)
+
+[node name="LT_North8_moon0_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2719.7, 56, 2737.7, 56, 2780.9, 152, 2676.5, 152)
+
+[node name="LT_North8_moon0_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2743.7, 56, 2761.7, 56, 2804.9, 152, 2700.5, 152)
 
 [node name="WD_North8_win1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(2784, 36, 2856, 36, 2856, 50, 2784, 50)
+polygon = PackedVector2Array(2784, 36, 2856, 36, 2856, 56, 2784, 56)
 
 [node name="WD_North8_curtainL1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2776, 36, 2784, 36, 2784, 50, 2776, 50)
+polygon = PackedVector2Array(2776, 36, 2784, 36, 2784, 56, 2776, 56)
 
 [node name="WD_North8_curtainR1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2856, 36, 2864, 36, 2864, 50, 2856, 50)
+polygon = PackedVector2Array(2856, 36, 2864, 36, 2864, 56, 2856, 56)
 
-[node name="FM_North8_moon1" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(2774, 50, 2866, 50, 2866, 96, 2774, 96)
+[node name="LT_North8_moon1_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2787, 56, 2805, 56, 2848.2, 152, 2743.8, 152)
+
+[node name="LT_North8_moon1_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2811, 56, 2829, 56, 2872.2, 152, 2767.8, 152)
+
+[node name="LT_North8_moon1_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2835, 56, 2853, 56, 2896.2, 152, 2791.8, 152)
 
 [node name="WD_North8_win2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(2875.3, 36, 2947.3, 36, 2947.3, 50, 2875.3, 50)
+polygon = PackedVector2Array(2875.3, 36, 2947.3, 36, 2947.3, 56, 2875.3, 56)
 
 [node name="WD_North8_curtainL2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2867.3, 36, 2875.3, 36, 2875.3, 50, 2867.3, 50)
+polygon = PackedVector2Array(2867.3, 36, 2875.3, 36, 2875.3, 56, 2867.3, 56)
 
 [node name="WD_North8_curtainR2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2947.3, 36, 2955.3, 36, 2955.3, 50, 2947.3, 50)
+polygon = PackedVector2Array(2947.3, 36, 2955.3, 36, 2955.3, 56, 2947.3, 56)
 
-[node name="FM_North8_moon2" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(2865.3, 50, 2957.3, 50, 2957.3, 96, 2865.3, 96)
+[node name="LT_North8_moon2_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2878.3, 56, 2896.3, 56, 2939.5, 152, 2835.1, 152)
+
+[node name="LT_North8_moon2_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2902.3, 56, 2920.3, 56, 2963.5, 152, 2859.1, 152)
+
+[node name="LT_North8_moon2_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(2926.3, 56, 2944.3, 56, 2987.5, 152, 2883.1, 152)
 
 [node name="WD_North8_spk0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -7961,67 +8772,100 @@ polygon = PackedVector2Array(3350, 266, 3364, 266, 3364, 294, 3350, 294)
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(3066, 36, 3138, 36, 3138, 50, 3066, 50)
+polygon = PackedVector2Array(3066, 36, 3138, 36, 3138, 56, 3066, 56)
 
 [node name="WD_North9_curtainL0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(3058, 36, 3066, 36, 3066, 50, 3058, 50)
+polygon = PackedVector2Array(3058, 36, 3066, 36, 3066, 56, 3058, 56)
 
 [node name="WD_North9_curtainR0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(3138, 36, 3146, 36, 3146, 50, 3138, 50)
+polygon = PackedVector2Array(3138, 36, 3146, 36, 3146, 56, 3138, 56)
 
-[node name="FM_North9_moon0" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(3056, 50, 3148, 50, 3148, 96, 3056, 96)
+[node name="LT_North9_moon0_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(3069, 56, 3087, 56, 3130.2, 152, 3025.8, 152)
+
+[node name="LT_North9_moon0_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(3093, 56, 3111, 56, 3154.2, 152, 3049.8, 152)
+
+[node name="LT_North9_moon0_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(3117, 56, 3135, 56, 3178.2, 152, 3073.8, 152)
 
 [node name="WD_North9_win1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(3157.3, 36, 3229.3, 36, 3229.3, 50, 3157.3, 50)
+polygon = PackedVector2Array(3157.3, 36, 3229.3, 36, 3229.3, 56, 3157.3, 56)
 
 [node name="WD_North9_curtainL1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(3149.3, 36, 3157.3, 36, 3157.3, 50, 3149.3, 50)
+polygon = PackedVector2Array(3149.3, 36, 3157.3, 36, 3157.3, 56, 3149.3, 56)
 
 [node name="WD_North9_curtainR1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(3229.3, 36, 3237.3, 36, 3237.3, 50, 3229.3, 50)
+polygon = PackedVector2Array(3229.3, 36, 3237.3, 36, 3237.3, 56, 3229.3, 56)
 
-[node name="FM_North9_moon1" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(3147.3, 50, 3239.3, 50, 3239.3, 96, 3147.3, 96)
+[node name="LT_North9_moon1_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(3160.3, 56, 3178.3, 56, 3221.5, 152, 3117.1, 152)
+
+[node name="LT_North9_moon1_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(3184.3, 56, 3202.3, 56, 3245.5, 152, 3141.1, 152)
+
+[node name="LT_North9_moon1_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(3208.3, 56, 3226.3, 56, 3269.5, 152, 3165.1, 152)
 
 [node name="WD_North9_win2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(3248.7, 36, 3320.7, 36, 3320.7, 50, 3248.7, 50)
+polygon = PackedVector2Array(3248.7, 36, 3320.7, 36, 3320.7, 56, 3248.7, 56)
 
 [node name="WD_North9_curtainL2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(3240.7, 36, 3248.7, 36, 3248.7, 50, 3240.7, 50)
+polygon = PackedVector2Array(3240.7, 36, 3248.7, 36, 3248.7, 56, 3240.7, 56)
 
 [node name="WD_North9_curtainR2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(3320.7, 36, 3328.7, 36, 3328.7, 50, 3320.7, 50)
+polygon = PackedVector2Array(3320.7, 36, 3328.7, 36, 3328.7, 56, 3320.7, 56)
 
-[node name="FM_North9_moon2" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(3238.7, 50, 3330.7, 50, 3330.7, 96, 3238.7, 96)
+[node name="LT_North9_moon2_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(3251.7, 56, 3269.7, 56, 3312.9, 152, 3208.5, 152)
+
+[node name="LT_North9_moon2_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(3275.7, 56, 3293.7, 56, 3336.9, 152, 3232.5, 152)
+
+[node name="LT_North9_moon2_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(3299.7, 56, 3317.7, 56, 3360.9, 152, 3256.5, 152)
 
 [node name="WD_North9_spk0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -9347,9 +10191,20 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(236.8, 1916, 244.8, 1916, 244.8, 1924, 236.8, 1924)
 
-[node name="FM_Dasan7_moon0" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(154.8, 1870, 246.8, 1870, 246.8, 1916, 154.8, 1916)
+[node name="LT_Dasan7_moon0_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(167.8, 1916, 185.8, 1916, 228.9, 1820, 124.5, 1820)
+
+[node name="LT_Dasan7_moon0_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(191.8, 1916, 209.8, 1916, 252.9, 1820, 148.6, 1820)
+
+[node name="LT_Dasan7_moon0_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(215.8, 1916, 233.8, 1916, 276.9, 1820, 172.6, 1820)
 
 [node name="WD_Dasan7_win1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -9369,9 +10224,20 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(413.5, 1916, 421.5, 1916, 421.5, 1924, 413.5, 1924)
 
-[node name="FM_Dasan7_moon1" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(331.5, 1870, 423.5, 1870, 423.5, 1916, 331.5, 1916)
+[node name="LT_Dasan7_moon1_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(344.5, 1916, 362.5, 1916, 405.7, 1820, 301.3, 1820)
+
+[node name="LT_Dasan7_moon1_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(368.5, 1916, 386.5, 1916, 429.7, 1820, 325.3, 1820)
+
+[node name="LT_Dasan7_moon1_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(392.5, 1916, 410.5, 1916, 453.7, 1820, 349.3, 1820)
 
 [node name="WD_Dasan7_win2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -9391,9 +10257,20 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(590.2, 1916, 598.2, 1916, 598.2, 1924, 590.2, 1924)
 
-[node name="FM_Dasan7_moon2" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(508.2, 1870, 600.2, 1870, 600.2, 1916, 508.2, 1916)
+[node name="LT_Dasan7_moon2_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(521.2, 1916, 539.2, 1916, 582.5, 1820, 478.1, 1820)
+
+[node name="LT_Dasan7_moon2_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(545.2, 1916, 563.2, 1916, 606.5, 1820, 502.1, 1820)
+
+[node name="LT_Dasan7_moon2_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(569.2, 1916, 587.2, 1916, 630.5, 1820, 526.0, 1820)
 
 [node name="WD_Dasan7_spk0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -9411,13 +10288,13 @@ polygon = PackedVector2Array(677, 1536, 695, 1536, 695, 1550, 677, 1550)
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4359, 0.3718, 0.2692, 1)
-polygon = PackedVector2Array(158.2, 1536, 236.2, 1536, 236.2, 1550, 158.2, 1550)
+polygon = PackedVector2Array(158.2, 1536, 236.2, 1536, 236.2, 1556, 158.2, 1556)
 
 [node name="WD_Dasan7_notice1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4359, 0.3718, 0.2692, 1)
-polygon = PackedVector2Array(521.8, 1536, 599.8, 1536, 599.8, 1550, 521.8, 1550)
+polygon = PackedVector2Array(521.8, 1536, 599.8, 1536, 599.8, 1556, 521.8, 1556)
 
 [node name="PC_Dasan7_d0" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(140.5, 1573, 166.5, 1573, 166.5, 1617, 140.5, 1617)
@@ -10575,9 +11452,20 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(353, 2456, 361, 2456, 361, 2464, 353, 2464)
 
-[node name="FM_Dasan6_moon0" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(271, 2410, 363, 2410, 363, 2456, 271, 2456)
+[node name="LT_Dasan6_moon0_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(284, 2456, 302, 2456, 345.2, 2360, 240.8, 2360)
+
+[node name="LT_Dasan6_moon0_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(308, 2456, 326, 2456, 369.2, 2360, 264.8, 2360)
+
+[node name="LT_Dasan6_moon0_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(332, 2456, 350, 2456, 393.2, 2360, 288.8, 2360)
 
 [node name="WD_Dasan6_win1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -10597,9 +11485,20 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(646, 2456, 654, 2456, 654, 2464, 646, 2464)
 
-[node name="FM_Dasan6_moon1" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(564, 2410, 656, 2410, 656, 2456, 564, 2456)
+[node name="LT_Dasan6_moon1_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(577, 2456, 595, 2456, 638.2, 2360, 533.8, 2360)
+
+[node name="LT_Dasan6_moon1_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(601, 2456, 619, 2456, 662.2, 2360, 557.8, 2360)
+
+[node name="LT_Dasan6_moon1_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(625, 2456, 643, 2456, 686.2, 2360, 581.8, 2360)
 
 [node name="WD_Dasan6_win2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -10619,9 +11518,20 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(939, 2456, 947, 2456, 947, 2464, 939, 2464)
 
-[node name="FM_Dasan6_moon2" type="Polygon2D" parent="RoomMarks"]
-color = Color(0.205, 0.205, 0.215, 1)
-polygon = PackedVector2Array(857, 2410, 949, 2410, 949, 2456, 857, 2456)
+[node name="LT_Dasan6_moon2_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(870, 2456, 888, 2456, 931.2, 2360, 826.8, 2360)
+
+[node name="LT_Dasan6_moon2_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(894, 2456, 912, 2456, 955.2, 2360, 850.8, 2360)
+
+[node name="LT_Dasan6_moon2_2" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
+z_index = 3
+color = Color(0.62, 0.68, 0.85, 0.14)
+polygon = PackedVector2Array(918, 2456, 936, 2456, 979.2, 2360, 874.8, 2360)
 
 [node name="WD_Dasan6_spk0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -10639,13 +11549,13 @@ polygon = PackedVector2Array(1142, 2136, 1160, 2136, 1160, 2150, 1142, 2150)
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4359, 0.3718, 0.2692, 1)
-polygon = PackedVector2Array(274.5, 2136, 352.5, 2136, 352.5, 2150, 274.5, 2150)
+polygon = PackedVector2Array(274.5, 2136, 352.5, 2136, 352.5, 2156, 274.5, 2156)
 
 [node name="WD_Dasan6_notice1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4359, 0.3718, 0.2692, 1)
-polygon = PackedVector2Array(870.5, 2136, 948.5, 2136, 948.5, 2150, 870.5, 2150)
+polygon = PackedVector2Array(870.5, 2136, 948.5, 2136, 948.5, 2156, 870.5, 2156)
 
 [node name="PC_Dasan6_d0" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(121, 2191, 147, 2191, 147, 2235, 121, 2235)
@@ -11591,88 +12501,88 @@ polygon = PackedVector2Array(2643, 2432, 2661, 2432, 2661, 2452, 2643, 2452)
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(36, 549, 151.7, 549, 151.7, 554, 36, 554)
+polygon = PackedVector2Array(36, 555, 151.7, 555, 151.7, 560, 36, 560)
 
 [node name="WD_Wain_North1_540_261" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(261.7, 549, 377.3, 549, 377.3, 554, 261.7, 554)
+polygon = PackedVector2Array(261.7, 555, 377.3, 555, 377.3, 560, 261.7, 560)
 
 [node name="PD_Mat_North1_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(131.7, 558, 281.7, 558, 281.7, 580, 131.7, 580)
+polygon = PackedVector2Array(131.7, 564, 281.7, 564, 281.7, 586, 131.7, 586)
 
 [node name="PC_Corr_North1_540_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(41.8, 554, 99.8, 554, 99.8, 586, 41.8, 586)
+polygon = PackedVector2Array(41.8, 560, 99.8, 560, 99.8, 592, 41.8, 592)
 
 [node name="PV_Corr_North1_540_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(41.8, 554, 99.8, 554, 99.8, 586, 41.8, 586)
+polygon = PackedVector2Array(41.8, 560, 99.8, 560, 99.8, 592, 41.8, 592)
 
 [node name="PC_Corr_North1_540_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(313.5, 554, 371.5, 554, 371.5, 586, 313.5, 586)
+polygon = PackedVector2Array(313.5, 560, 371.5, 560, 371.5, 592, 313.5, 592)
 
 [node name="PV_Corr_North1_540_1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(313.5, 554, 371.5, 554, 371.5, 586, 313.5, 586)
+polygon = PackedVector2Array(313.5, 560, 371.5, 560, 371.5, 592, 313.5, 592)
 
 [node name="WD_Wain_North2_540_409" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(409.3, 549, 525, 549, 525, 554, 409.3, 554)
+polygon = PackedVector2Array(409.3, 555, 525, 555, 525, 560, 409.3, 560)
 
 [node name="WD_Wain_North2_540_635" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(635, 549, 750.7, 549, 750.7, 554, 635, 554)
+polygon = PackedVector2Array(635, 555, 750.7, 555, 750.7, 560, 635, 560)
 
 [node name="PD_Mat_North2_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(505, 558, 655, 558, 655, 580, 505, 580)
+polygon = PackedVector2Array(505, 564, 655, 564, 655, 586, 505, 586)
 
 [node name="PC_Corr_North2_540_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(415.2, 554, 473.2, 554, 473.2, 586, 415.2, 586)
+polygon = PackedVector2Array(415.2, 560, 473.2, 560, 473.2, 592, 415.2, 592)
 
 [node name="PV_Corr_North2_540_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(415.2, 554, 473.2, 554, 473.2, 586, 415.2, 586)
+polygon = PackedVector2Array(415.2, 560, 473.2, 560, 473.2, 592, 415.2, 592)
 
 [node name="PC_Corr_North2_540_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(686.8, 554, 744.8, 554, 744.8, 586, 686.8, 586)
+polygon = PackedVector2Array(686.8, 560, 744.8, 560, 744.8, 592, 686.8, 592)
 
 [node name="PV_Corr_North2_540_1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(686.8, 554, 744.8, 554, 744.8, 586, 686.8, 586)
+polygon = PackedVector2Array(686.8, 560, 744.8, 560, 744.8, 592, 686.8, 592)
 
 [node name="WD_Wain_North3_540_782" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(782.7, 549, 898.3, 549, 898.3, 554, 782.7, 554)
+polygon = PackedVector2Array(782.7, 555, 898.3, 555, 898.3, 560, 782.7, 560)
 
 [node name="WD_Wain_North3_540_1008" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1008.3, 549, 1124, 549, 1124, 554, 1008.3, 554)
+polygon = PackedVector2Array(1008.3, 555, 1124, 555, 1124, 560, 1008.3, 560)
 
 [node name="PD_Mat_North3_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(878.3, 558, 1028.3, 558, 1028.3, 580, 878.3, 580)
+polygon = PackedVector2Array(878.3, 564, 1028.3, 564, 1028.3, 586, 878.3, 586)
 
 [node name="PD_Hydrant_North3_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
@@ -11680,30 +12590,30 @@ color = Color(0.4872, 0.2051, 0.1923, 1)
 polygon = PackedVector2Array(1072, 540, 1116, 540, 1116, 556, 1072, 556)
 
 [node name="PC_Corr_North3_540_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(788.5, 554, 846.5, 554, 846.5, 586, 788.5, 586)
+polygon = PackedVector2Array(788.5, 560, 846.5, 560, 846.5, 592, 788.5, 592)
 
 [node name="PV_Corr_North3_540_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(788.5, 554, 846.5, 554, 846.5, 586, 788.5, 586)
+polygon = PackedVector2Array(788.5, 560, 846.5, 560, 846.5, 592, 788.5, 592)
 
 [node name="WD_Wain_North4_540_1156" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1156, 549, 1271.7, 549, 1271.7, 554, 1156, 554)
+polygon = PackedVector2Array(1156, 555, 1271.7, 555, 1271.7, 560, 1156, 560)
 
 [node name="WD_Wain_North4_540_1381" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1381.7, 549, 1497.3, 549, 1497.3, 554, 1381.7, 554)
+polygon = PackedVector2Array(1381.7, 555, 1497.3, 555, 1497.3, 560, 1381.7, 560)
 
 [node name="PD_Mat_North4_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(1251.7, 558, 1401.7, 558, 1401.7, 580, 1251.7, 580)
+polygon = PackedVector2Array(1251.7, 564, 1401.7, 564, 1401.7, 586, 1251.7, 586)
 
 [node name="PC_Corr_North4_540_water" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1162, 540, 1202, 540, 1202, 566, 1162, 566)
@@ -11714,65 +12624,65 @@ color = Color(0.3077, 0.3846, 0.4359, 1)
 polygon = PackedVector2Array(1162, 540, 1202, 540, 1202, 566, 1162, 566)
 
 [node name="PC_Corr_North4_540_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1433.5, 554, 1491.5, 554, 1491.5, 586, 1433.5, 586)
+polygon = PackedVector2Array(1433.5, 560, 1491.5, 560, 1491.5, 592, 1433.5, 592)
 
 [node name="PV_Corr_North4_540_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(1433.5, 554, 1491.5, 554, 1491.5, 586, 1433.5, 586)
+polygon = PackedVector2Array(1433.5, 560, 1491.5, 560, 1491.5, 592, 1433.5, 592)
 
 [node name="WD_Wain_North5_540_1529" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1529.3, 549, 1645, 549, 1645, 554, 1529.3, 554)
+polygon = PackedVector2Array(1529.3, 555, 1645, 555, 1645, 560, 1529.3, 560)
 
 [node name="WD_Wain_North5_540_1755" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1755, 549, 1870.7, 549, 1870.7, 554, 1755, 554)
+polygon = PackedVector2Array(1755, 555, 1870.7, 555, 1870.7, 560, 1755, 560)
 
 [node name="PD_Mat_North5_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(1625, 558, 1775, 558, 1775, 580, 1625, 580)
+polygon = PackedVector2Array(1625, 564, 1775, 564, 1775, 586, 1625, 586)
 
 [node name="PC_Corr_North5_540_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1535.2, 554, 1593.2, 554, 1593.2, 586, 1535.2, 586)
+polygon = PackedVector2Array(1535.2, 560, 1593.2, 560, 1593.2, 592, 1535.2, 592)
 
 [node name="PV_Corr_North5_540_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(1535.2, 554, 1593.2, 554, 1593.2, 586, 1535.2, 586)
+polygon = PackedVector2Array(1535.2, 560, 1593.2, 560, 1593.2, 592, 1535.2, 592)
 
 [node name="PC_Corr_North5_540_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1806.8, 554, 1864.8, 554, 1864.8, 586, 1806.8, 586)
+polygon = PackedVector2Array(1806.8, 560, 1864.8, 560, 1864.8, 592, 1806.8, 592)
 
 [node name="PV_Corr_North5_540_1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(1806.8, 554, 1864.8, 554, 1864.8, 586, 1806.8, 586)
+polygon = PackedVector2Array(1806.8, 560, 1864.8, 560, 1864.8, 592, 1806.8, 592)
 
 [node name="WD_Wain_North6_540_1902" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1902.7, 549, 2018.3, 549, 2018.3, 554, 1902.7, 554)
+polygon = PackedVector2Array(1902.7, 555, 2018.3, 555, 2018.3, 560, 1902.7, 560)
 
 [node name="WD_Wain_North6_540_2128" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(2128.3, 549, 2244, 549, 2244, 554, 2128.3, 554)
+polygon = PackedVector2Array(2128.3, 555, 2244, 555, 2244, 560, 2128.3, 560)
 
 [node name="PD_Mat_North6_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(1998.3, 558, 2148.3, 558, 2148.3, 580, 1998.3, 580)
+polygon = PackedVector2Array(1998.3, 564, 2148.3, 564, 2148.3, 586, 1998.3, 586)
 
 [node name="PD_Hydrant_North6_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
@@ -11780,65 +12690,65 @@ color = Color(0.4872, 0.2051, 0.1923, 1)
 polygon = PackedVector2Array(2192, 540, 2236, 540, 2236, 556, 2192, 556)
 
 [node name="PC_Corr_North6_540_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1908.5, 554, 1966.5, 554, 1966.5, 586, 1908.5, 586)
+polygon = PackedVector2Array(1908.5, 560, 1966.5, 560, 1966.5, 592, 1908.5, 592)
 
 [node name="PV_Corr_North6_540_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(1908.5, 554, 1966.5, 554, 1966.5, 586, 1908.5, 586)
+polygon = PackedVector2Array(1908.5, 560, 1966.5, 560, 1966.5, 592, 1908.5, 592)
 
 [node name="WD_Wain_North7_540_2276" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(2276, 549, 2391.7, 549, 2391.7, 554, 2276, 554)
+polygon = PackedVector2Array(2276, 555, 2391.7, 555, 2391.7, 560, 2276, 560)
 
 [node name="WD_Wain_North7_540_2501" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(2501.7, 549, 2617.3, 549, 2617.3, 554, 2501.7, 554)
+polygon = PackedVector2Array(2501.7, 555, 2617.3, 555, 2617.3, 560, 2501.7, 560)
 
 [node name="PD_Mat_North7_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(2371.7, 558, 2521.7, 558, 2521.7, 580, 2371.7, 580)
+polygon = PackedVector2Array(2371.7, 564, 2521.7, 564, 2521.7, 586, 2371.7, 586)
 
 [node name="PC_Corr_North7_540_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2281.8, 554, 2339.8, 554, 2339.8, 586, 2281.8, 586)
+polygon = PackedVector2Array(2281.8, 560, 2339.8, 560, 2339.8, 592, 2281.8, 592)
 
 [node name="PV_Corr_North7_540_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(2281.8, 554, 2339.8, 554, 2339.8, 586, 2281.8, 586)
+polygon = PackedVector2Array(2281.8, 560, 2339.8, 560, 2339.8, 592, 2281.8, 592)
 
 [node name="PC_Corr_North7_540_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2553.5, 554, 2611.5, 554, 2611.5, 586, 2553.5, 586)
+polygon = PackedVector2Array(2553.5, 560, 2611.5, 560, 2611.5, 592, 2553.5, 592)
 
 [node name="PV_Corr_North7_540_1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(2553.5, 554, 2611.5, 554, 2611.5, 586, 2553.5, 586)
+polygon = PackedVector2Array(2553.5, 560, 2611.5, 560, 2611.5, 592, 2553.5, 592)
 
 [node name="WD_Wain_North8_540_2649" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(2649.3, 549, 2765, 549, 2765, 554, 2649.3, 554)
+polygon = PackedVector2Array(2649.3, 555, 2765, 555, 2765, 560, 2649.3, 560)
 
 [node name="WD_Wain_North8_540_2875" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(2875, 549, 2990.7, 549, 2990.7, 554, 2875, 554)
+polygon = PackedVector2Array(2875, 555, 2990.7, 555, 2990.7, 560, 2875, 560)
 
 [node name="PD_Mat_North8_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(2745, 558, 2895, 558, 2895, 580, 2745, 580)
+polygon = PackedVector2Array(2745, 564, 2895, 564, 2895, 586, 2745, 586)
 
 [node name="PC_Corr_North8_540_water" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(2655.3, 540, 2695.3, 540, 2695.3, 566, 2655.3, 566)
@@ -11849,30 +12759,30 @@ color = Color(0.3077, 0.3846, 0.4359, 1)
 polygon = PackedVector2Array(2655.3, 540, 2695.3, 540, 2695.3, 566, 2655.3, 566)
 
 [node name="PC_Corr_North8_540_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2926.8, 554, 2984.8, 554, 2984.8, 586, 2926.8, 586)
+polygon = PackedVector2Array(2926.8, 560, 2984.8, 560, 2984.8, 592, 2926.8, 592)
 
 [node name="PV_Corr_North8_540_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(2926.8, 554, 2984.8, 554, 2984.8, 586, 2926.8, 586)
+polygon = PackedVector2Array(2926.8, 560, 2984.8, 560, 2984.8, 592, 2926.8, 592)
 
 [node name="WD_Wain_North9_540_3022" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(3022.7, 549, 3138.3, 549, 3138.3, 554, 3022.7, 554)
+polygon = PackedVector2Array(3022.7, 555, 3138.3, 555, 3138.3, 560, 3022.7, 560)
 
 [node name="WD_Wain_North9_540_3248" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(3248.3, 549, 3364, 549, 3364, 554, 3248.3, 554)
+polygon = PackedVector2Array(3248.3, 555, 3364, 555, 3364, 560, 3248.3, 560)
 
 [node name="PD_Mat_North9_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(3118.3, 558, 3268.3, 558, 3268.3, 580, 3118.3, 580)
+polygon = PackedVector2Array(3118.3, 564, 3268.3, 564, 3268.3, 586, 3118.3, 586)
 
 [node name="PD_Hydrant_North9_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
@@ -11880,13 +12790,13 @@ color = Color(0.4872, 0.2051, 0.1923, 1)
 polygon = PackedVector2Array(3312, 540, 3356, 540, 3356, 556, 3312, 556)
 
 [node name="PC_Corr_North9_540_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(3028.5, 554, 3086.5, 554, 3086.5, 586, 3028.5, 586)
+polygon = PackedVector2Array(3028.5, 560, 3086.5, 560, 3086.5, 592, 3028.5, 592)
 
 [node name="PV_Corr_North9_540_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(3028.5, 554, 3086.5, 554, 3086.5, 586, 3028.5, 586)
+polygon = PackedVector2Array(3028.5, 560, 3086.5, 560, 3086.5, 592, 3028.5, 592)
 
 [node name="WD_Wain_MensRoomL_540_816" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -12401,216 +13311,216 @@ polygon = PackedVector2Array(3344.8, 1498, 3358.8, 1498, 3358.8, 1520, 3344.8, 1
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(36, 1949, 322.5, 1949, 322.5, 1954, 36, 1954)
+polygon = PackedVector2Array(36, 1955, 322.5, 1955, 322.5, 1960, 36, 1960)
 
 [node name="WD_Wain_Dasan7_1940_432" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(432.5, 1949, 719, 1949, 719, 1954, 432.5, 1954)
+polygon = PackedVector2Array(432.5, 1955, 719, 1955, 719, 1960, 432.5, 1960)
 
 [node name="PD_Mat_Dasan7_1940" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(302.5, 1958, 452.5, 1958, 452.5, 1980, 302.5, 1980)
+polygon = PackedVector2Array(302.5, 1964, 452.5, 1964, 452.5, 1986, 302.5, 1986)
 
 [node name="PC_Corr_Dasan7_1940_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(61.2, 1954, 119.2, 1954, 119.2, 1986, 61.2, 1986)
+polygon = PackedVector2Array(61.2, 1960, 119.2, 1960, 119.2, 1992, 61.2, 1992)
 
 [node name="PV_Corr_Dasan7_1940_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(61.2, 1954, 119.2, 1954, 119.2, 1986, 61.2, 1986)
+polygon = PackedVector2Array(61.2, 1960, 119.2, 1960, 119.2, 1992, 61.2, 1992)
 
 [node name="PC_Corr_Dasan7_1940_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(127.2, 1954, 185.2, 1954, 185.2, 1986, 127.2, 1986)
+polygon = PackedVector2Array(127.2, 1960, 185.2, 1960, 185.2, 1992, 127.2, 1992)
 
 [node name="PV_Corr_Dasan7_1940_1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(127.2, 1954, 185.2, 1954, 185.2, 1986, 127.2, 1986)
+polygon = PackedVector2Array(127.2, 1960, 185.2, 1960, 185.2, 1992, 127.2, 1992)
 
 [node name="PC_Corr_Dasan7_1940_2" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(193.2, 1954, 251.2, 1954, 251.2, 1986, 193.2, 1986)
+polygon = PackedVector2Array(193.2, 1960, 251.2, 1960, 251.2, 1992, 193.2, 1992)
 
 [node name="PV_Corr_Dasan7_1940_2" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(193.2, 1954, 251.2, 1954, 251.2, 1986, 193.2, 1986)
+polygon = PackedVector2Array(193.2, 1960, 251.2, 1960, 251.2, 1992, 193.2, 1992)
 
 [node name="PC_Corr_Dasan7_1940_3" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(503.8, 1954, 561.8, 1954, 561.8, 1986, 503.8, 1986)
+polygon = PackedVector2Array(503.8, 1960, 561.8, 1960, 561.8, 1992, 503.8, 1992)
 
 [node name="PV_Corr_Dasan7_1940_3" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(503.8, 1954, 561.8, 1954, 561.8, 1986, 503.8, 1986)
+polygon = PackedVector2Array(503.8, 1960, 561.8, 1960, 561.8, 1992, 503.8, 1992)
 
 [node name="PC_Corr_Dasan7_1940_4" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(569.8, 1954, 627.8, 1954, 627.8, 1986, 569.8, 1986)
+polygon = PackedVector2Array(569.8, 1960, 627.8, 1960, 627.8, 1992, 569.8, 1992)
 
 [node name="PV_Corr_Dasan7_1940_4" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(569.8, 1954, 627.8, 1954, 627.8, 1986, 569.8, 1986)
+polygon = PackedVector2Array(569.8, 1960, 627.8, 1960, 627.8, 1992, 569.8, 1992)
 
 [node name="PC_Corr_Dasan7_1940_5" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(635.8, 1954, 693.8, 1954, 693.8, 1986, 635.8, 1986)
+polygon = PackedVector2Array(635.8, 1960, 693.8, 1960, 693.8, 1992, 635.8, 1992)
 
 [node name="PV_Corr_Dasan7_1940_5" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(635.8, 1954, 693.8, 1954, 693.8, 1986, 635.8, 1986)
+polygon = PackedVector2Array(635.8, 1960, 693.8, 1960, 693.8, 1992, 635.8, 1992)
 
 [node name="PD_Fire_Dasan7_1940_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
 color = Color(0.5641, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(40, 1954, 54, 1954, 54, 1976, 40, 1976)
+polygon = PackedVector2Array(40, 1960, 54, 1960, 54, 1982, 40, 1982)
 
 [node name="PD_Fire_Dasan7_1940_1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
 color = Color(0.5641, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(255.2, 1954, 269.2, 1954, 269.2, 1976, 255.2, 1976)
+polygon = PackedVector2Array(255.2, 1960, 269.2, 1960, 269.2, 1982, 255.2, 1982)
 
 [node name="PD_Fire_Dasan7_1940_2" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
 color = Color(0.5641, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(482.5, 1954, 496.5, 1954, 496.5, 1976, 482.5, 1976)
+polygon = PackedVector2Array(482.5, 1960, 496.5, 1960, 496.5, 1982, 482.5, 1982)
 
 [node name="PD_Fire_Dasan7_1940_3" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
 color = Color(0.5641, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(697.8, 1954, 711.8, 1954, 711.8, 1976, 697.8, 1976)
+polygon = PackedVector2Array(697.8, 1960, 711.8, 1960, 711.8, 1982, 697.8, 1982)
 
 [node name="WD_Wain_CreativeDept_1940_751" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(751, 1949, 1132.5, 1949, 1132.5, 1954, 751, 1954)
+polygon = PackedVector2Array(751, 1955, 1132.5, 1955, 1132.5, 1960, 751, 1960)
 
 [node name="WD_Wain_CreativeDept_1940_1242" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1242.5, 1949, 1624, 1949, 1624, 1954, 1242.5, 1954)
+polygon = PackedVector2Array(1242.5, 1955, 1624, 1955, 1624, 1960, 1242.5, 1960)
 
 [node name="WD_Pil_CreativeDept_1940_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_wall_brick")
 color = Color(0.3013, 0.3179, 0.3564, 1)
-polygon = PackedVector2Array(1091, 1940, 1107, 1940, 1107, 1954, 1091, 1954)
+polygon = PackedVector2Array(1091, 1940, 1107, 1940, 1107, 1960, 1091, 1960)
 
 [node name="WD_Pil_CreativeDept_1940_1" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_wall_brick")
 color = Color(0.3013, 0.3179, 0.3564, 1)
-polygon = PackedVector2Array(1431, 1940, 1447, 1940, 1447, 1954, 1431, 1954)
+polygon = PackedVector2Array(1431, 1940, 1447, 1940, 1447, 1960, 1431, 1960)
 
 [node name="PD_Mat_CreativeDept_1940" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(1112.5, 1958, 1262.5, 1958, 1262.5, 1980, 1112.5, 1980)
+polygon = PackedVector2Array(1112.5, 1964, 1262.5, 1964, 1262.5, 1986, 1112.5, 1986)
 
 [node name="PC_Corr_CreativeDept_1940_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(757.8, 1954, 815.8, 1954, 815.8, 1986, 757.8, 1986)
+polygon = PackedVector2Array(757.8, 1960, 815.8, 1960, 815.8, 1992, 757.8, 1992)
 
 [node name="PV_Corr_CreativeDept_1940_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(757.8, 1954, 815.8, 1954, 815.8, 1986, 757.8, 1986)
+polygon = PackedVector2Array(757.8, 1960, 815.8, 1960, 815.8, 1992, 757.8, 1992)
 
 [node name="PC_Corr_CreativeDept_1940_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(823.8, 1954, 881.8, 1954, 881.8, 1986, 823.8, 1986)
+polygon = PackedVector2Array(823.8, 1960, 881.8, 1960, 881.8, 1992, 823.8, 1992)
 
 [node name="PV_Corr_CreativeDept_1940_1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(823.8, 1954, 881.8, 1954, 881.8, 1986, 823.8, 1986)
+polygon = PackedVector2Array(823.8, 1960, 881.8, 1960, 881.8, 1992, 823.8, 1992)
 
 [node name="PC_Corr_CreativeDept_1940_2" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(889.8, 1954, 947.8, 1954, 947.8, 1986, 889.8, 1986)
+polygon = PackedVector2Array(889.8, 1960, 947.8, 1960, 947.8, 1992, 889.8, 1992)
 
 [node name="PV_Corr_CreativeDept_1940_2" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(889.8, 1954, 947.8, 1954, 947.8, 1986, 889.8, 1986)
+polygon = PackedVector2Array(889.8, 1960, 947.8, 1960, 947.8, 1992, 889.8, 1992)
 
 [node name="PC_Corr_CreativeDept_1940_3" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(955.8, 1954, 1013.8, 1954, 1013.8, 1986, 955.8, 1986)
+polygon = PackedVector2Array(955.8, 1960, 1013.8, 1960, 1013.8, 1992, 955.8, 1992)
 
 [node name="PV_Corr_CreativeDept_1940_3" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(955.8, 1954, 1013.8, 1954, 1013.8, 1986, 955.8, 1986)
+polygon = PackedVector2Array(955.8, 1960, 1013.8, 1960, 1013.8, 1992, 955.8, 1992)
 
 [node name="PC_Corr_CreativeDept_1940_4" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1021.8, 1954, 1079.8, 1954, 1079.8, 1986, 1021.8, 1986)
+polygon = PackedVector2Array(1021.8, 1960, 1079.8, 1960, 1079.8, 1992, 1021.8, 1992)
 
 [node name="PV_Corr_CreativeDept_1940_4" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(1021.8, 1954, 1079.8, 1954, 1079.8, 1986, 1021.8, 1986)
+polygon = PackedVector2Array(1021.8, 1960, 1079.8, 1960, 1079.8, 1992, 1021.8, 1992)
 
 [node name="PC_Corr_CreativeDept_1940_5" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1430, 1954, 1488, 1954, 1488, 1986, 1430, 1986)
+polygon = PackedVector2Array(1430, 1960, 1488, 1960, 1488, 1992, 1430, 1992)
 
 [node name="PV_Corr_CreativeDept_1940_5" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(1430, 1954, 1488, 1954, 1488, 1986, 1430, 1986)
+polygon = PackedVector2Array(1430, 1960, 1488, 1960, 1488, 1992, 1430, 1992)
 
 [node name="PC_Corr_CreativeDept_1940_6" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1496, 1954, 1554, 1954, 1554, 1986, 1496, 1986)
+polygon = PackedVector2Array(1496, 1960, 1554, 1960, 1554, 1992, 1496, 1992)
 
 [node name="PV_Corr_CreativeDept_1940_6" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(1496, 1954, 1554, 1954, 1554, 1986, 1496, 1986)
+polygon = PackedVector2Array(1496, 1960, 1554, 1960, 1554, 1992, 1496, 1992)
 
 [node name="PC_Corr_CreativeDept_1940_7" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1562, 1954, 1620, 1954, 1620, 1986, 1562, 1986)
+polygon = PackedVector2Array(1562, 1960, 1620, 1960, 1620, 1992, 1562, 1992)
 
 [node name="PV_Corr_CreativeDept_1940_7" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(1562, 1954, 1620, 1954, 1620, 1986, 1562, 1986)
+polygon = PackedVector2Array(1562, 1960, 1620, 1960, 1620, 1992, 1562, 1992)
 
 [node name="WD_Wain_ComputerRoom_1940_1936" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1936, 1949, 2112.5, 1949, 2112.5, 1954, 1936, 1954)
+polygon = PackedVector2Array(1936, 1955, 2112.5, 1955, 2112.5, 1960, 1936, 1960)
 
 [node name="WD_Wain_ComputerRoom_1940_2222" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(2222.5, 1949, 2399, 1949, 2399, 1954, 2222.5, 1954)
+polygon = PackedVector2Array(2222.5, 1955, 2399, 1955, 2399, 1960, 2222.5, 1960)
 
 [node name="WD_Pil_ComputerRoom_1940_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_wall_brick")
 color = Color(0.3013, 0.3179, 0.3564, 1)
-polygon = PackedVector2Array(2276, 1940, 2292, 1940, 2292, 1954, 2276, 1954)
+polygon = PackedVector2Array(2276, 1940, 2292, 1940, 2292, 1960, 2276, 1960)
 
 [node name="PD_Mat_ComputerRoom_1940" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(2092.5, 1958, 2242.5, 1958, 2242.5, 1980, 2092.5, 1980)
+polygon = PackedVector2Array(2092.5, 1964, 2242.5, 1964, 2242.5, 1986, 2092.5, 1986)
 
 [node name="PD_Hydrant_ComputerRoom_1940" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
@@ -12618,54 +13528,54 @@ color = Color(0.4872, 0.2051, 0.1923, 1)
 polygon = PackedVector2Array(2347, 1940, 2391, 1940, 2391, 1956, 2347, 1956)
 
 [node name="PC_Corr_ComputerRoom_1940_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1939.2, 1954, 1997.2, 1954, 1997.2, 1986, 1939.2, 1986)
+polygon = PackedVector2Array(1939.2, 1960, 1997.2, 1960, 1997.2, 1992, 1939.2, 1992)
 
 [node name="PV_Corr_ComputerRoom_1940_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(1939.2, 1954, 1997.2, 1954, 1997.2, 1986, 1939.2, 1986)
+polygon = PackedVector2Array(1939.2, 1960, 1997.2, 1960, 1997.2, 1992, 1939.2, 1992)
 
 [node name="PC_Corr_ComputerRoom_1940_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2005.2, 1954, 2063.2, 1954, 2063.2, 1986, 2005.2, 1986)
+polygon = PackedVector2Array(2005.2, 1960, 2063.2, 1960, 2063.2, 1992, 2005.2, 1992)
 
 [node name="PV_Corr_ComputerRoom_1940_1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(2005.2, 1954, 2063.2, 1954, 2063.2, 1986, 2005.2, 1986)
+polygon = PackedVector2Array(2005.2, 1960, 2063.2, 1960, 2063.2, 1992, 2005.2, 1992)
 
 [node name="PC_Corr_ComputerRoom_1940_2" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2274.8, 1954, 2332.8, 1954, 2332.8, 1986, 2274.8, 1986)
+polygon = PackedVector2Array(2274.8, 1960, 2332.8, 1960, 2332.8, 1992, 2274.8, 1992)
 
 [node name="PV_Corr_ComputerRoom_1940_2" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(2274.8, 1954, 2332.8, 1954, 2332.8, 1986, 2274.8, 1986)
+polygon = PackedVector2Array(2274.8, 1960, 2332.8, 1960, 2332.8, 1992, 2274.8, 1992)
 
 [node name="WD_Wain_Storage2_1940_2431" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(2431, 1949, 2555, 1949, 2555, 1954, 2431, 1954)
+polygon = PackedVector2Array(2431, 1955, 2555, 1955, 2555, 1960, 2431, 1960)
 
 [node name="WD_Wain_Storage2_1940_2665" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(2665, 1949, 2789, 1949, 2789, 1954, 2665, 1954)
+polygon = PackedVector2Array(2665, 1955, 2789, 1955, 2789, 1960, 2665, 1960)
 
 [node name="WD_Pil_Storage2_1940_0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_wall_brick")
 color = Color(0.3013, 0.3179, 0.3564, 1)
-polygon = PackedVector2Array(2771, 1940, 2787, 1940, 2787, 1954, 2771, 1954)
+polygon = PackedVector2Array(2771, 1940, 2787, 1940, 2787, 1960, 2771, 1960)
 
 [node name="PD_Mat_Storage2_1940" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(2535, 1958, 2685, 1958, 2685, 1980, 2535, 1980)
+polygon = PackedVector2Array(2535, 1964, 2685, 1964, 2685, 1986, 2535, 1986)
 
 [node name="PC_Corr_Storage2_1940_water" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(2437, 1940, 2477, 1940, 2477, 1966, 2437, 1966)
@@ -12676,91 +13586,91 @@ color = Color(0.3077, 0.3846, 0.4359, 1)
 polygon = PackedVector2Array(2437, 1940, 2477, 1940, 2477, 1966, 2437, 1966)
 
 [node name="PC_Corr_Storage2_1940_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2721, 1954, 2779, 1954, 2779, 1986, 2721, 1986)
+polygon = PackedVector2Array(2721, 1960, 2779, 1960, 2779, 1992, 2721, 1992)
 
 [node name="PV_Corr_Storage2_1940_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(2721, 1954, 2779, 1954, 2779, 1986, 2721, 1986)
+polygon = PackedVector2Array(2721, 1960, 2779, 1960, 2779, 1992, 2721, 1992)
 
 [node name="PD_Fire_Storage2_1940_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
 color = Color(0.5641, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(2489, 1954, 2503, 1954, 2503, 1976, 2489, 1976)
+polygon = PackedVector2Array(2489, 1960, 2503, 1960, 2503, 1982, 2489, 1982)
 
 [node name="WD_Wain_InfoDept_1940_2821" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(2821, 1949, 3037.5, 1949, 3037.5, 1954, 2821, 1954)
+polygon = PackedVector2Array(2821, 1955, 3037.5, 1955, 3037.5, 1960, 2821, 1960)
 
 [node name="WD_Wain_InfoDept_1940_3147" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(3147.5, 1949, 3364, 1949, 3364, 1954, 3147.5, 1954)
+polygon = PackedVector2Array(3147.5, 1955, 3364, 1955, 3364, 1960, 3147.5, 1960)
 
 [node name="PD_Mat_InfoDept_1940" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(3017.5, 1958, 3167.5, 1958, 3167.5, 1980, 3017.5, 1980)
+polygon = PackedVector2Array(3017.5, 1964, 3167.5, 1964, 3167.5, 1986, 3017.5, 1986)
 
 [node name="PC_Corr_InfoDept_1940_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2844.2, 1954, 2902.2, 1954, 2902.2, 1986, 2844.2, 1986)
+polygon = PackedVector2Array(2844.2, 1960, 2902.2, 1960, 2902.2, 1992, 2844.2, 1992)
 
 [node name="PV_Corr_InfoDept_1940_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(2844.2, 1954, 2902.2, 1954, 2902.2, 1986, 2844.2, 1986)
+polygon = PackedVector2Array(2844.2, 1960, 2902.2, 1960, 2902.2, 1992, 2844.2, 1992)
 
 [node name="PC_Corr_InfoDept_1940_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2910.2, 1954, 2968.2, 1954, 2968.2, 1986, 2910.2, 1986)
+polygon = PackedVector2Array(2910.2, 1960, 2968.2, 1960, 2968.2, 1992, 2910.2, 1992)
 
 [node name="PV_Corr_InfoDept_1940_1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(2910.2, 1954, 2968.2, 1954, 2968.2, 1986, 2910.2, 1986)
+polygon = PackedVector2Array(2910.2, 1960, 2968.2, 1960, 2968.2, 1992, 2910.2, 1992)
 
 [node name="PC_Corr_InfoDept_1940_2" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(3216.8, 1954, 3274.8, 1954, 3274.8, 1986, 3216.8, 1986)
+polygon = PackedVector2Array(3216.8, 1960, 3274.8, 1960, 3274.8, 1992, 3216.8, 1992)
 
 [node name="PV_Corr_InfoDept_1940_2" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(3216.8, 1954, 3274.8, 1954, 3274.8, 1986, 3216.8, 1986)
+polygon = PackedVector2Array(3216.8, 1960, 3274.8, 1960, 3274.8, 1992, 3216.8, 1992)
 
 [node name="PC_Corr_InfoDept_1940_3" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(3282.8, 1954, 3340.8, 1954, 3340.8, 1986, 3282.8, 1986)
+polygon = PackedVector2Array(3282.8, 1960, 3340.8, 1960, 3340.8, 1992, 3282.8, 1992)
 
 [node name="PV_Corr_InfoDept_1940_3" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4103, 0.4744, 1)
-polygon = PackedVector2Array(3282.8, 1954, 3340.8, 1954, 3340.8, 1986, 3282.8, 1986)
+polygon = PackedVector2Array(3282.8, 1960, 3340.8, 1960, 3340.8, 1992, 3282.8, 1992)
 
 [node name="PD_Fire_InfoDept_1940_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
 color = Color(0.5641, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(2825, 1954, 2839, 1954, 2839, 1976, 2825, 1976)
+polygon = PackedVector2Array(2825, 1960, 2839, 1960, 2839, 1982, 2825, 1982)
 
 [node name="PD_Fire_InfoDept_1940_1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
 color = Color(0.5641, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(2972.2, 1954, 2986.2, 1954, 2986.2, 1976, 2972.2, 1976)
+polygon = PackedVector2Array(2972.2, 1960, 2986.2, 1960, 2986.2, 1982, 2972.2, 1982)
 
 [node name="PD_Fire_InfoDept_1940_2" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
 color = Color(0.5641, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(3197.5, 1954, 3211.5, 1954, 3211.5, 1976, 3197.5, 1976)
+polygon = PackedVector2Array(3197.5, 1960, 3211.5, 1960, 3211.5, 1982, 3197.5, 1982)
 
 [node name="PD_Fire_InfoDept_1940_3" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
 color = Color(0.5641, 0.2179, 0.1923, 1)
-polygon = PackedVector2Array(3344.8, 1954, 3358.8, 1954, 3358.8, 1976, 3344.8, 1976)
+polygon = PackedVector2Array(3344.8, 1960, 3358.8, 1960, 3358.8, 1982, 3344.8, 1982)
 
 [node name="WD_Wain_Dasan6_1940_36" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -12953,94 +13863,6 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
 polygon = PackedVector2Array(2607.5, 2096, 2757.5, 2096, 2757.5, 2118, 2607.5, 2118)
 
-[node name="PD_Pipe_540_0_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(20, 597.6, 3380, 597.6, 3380, 602.6, 20, 602.6)
-
-[node name="PD_Brk_540_0_0_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(180, 594.6, 190, 594.6, 190, 605.6, 180, 605.6)
-
-[node name="PD_Brk_540_0_0_1" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(500, 594.6, 510, 594.6, 510, 605.6, 500, 605.6)
-
-[node name="PD_Brk_540_0_0_2" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(820, 594.6, 830, 594.6, 830, 605.6, 820, 605.6)
-
-[node name="PD_Brk_540_0_0_3" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1140, 594.6, 1150, 594.6, 1150, 605.6, 1140, 605.6)
-
-[node name="PD_Brk_540_0_0_4" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1460, 594.6, 1470, 594.6, 1470, 605.6, 1460, 605.6)
-
-[node name="PD_Brk_540_0_0_5" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1780, 594.6, 1790, 594.6, 1790, 605.6, 1780, 605.6)
-
-[node name="PD_Brk_540_0_0_6" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2100, 594.6, 2110, 594.6, 2110, 605.6, 2100, 605.6)
-
-[node name="PD_Brk_540_0_0_7" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2420, 594.6, 2430, 594.6, 2430, 605.6, 2420, 605.6)
-
-[node name="PD_Brk_540_0_0_8" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2740, 594.6, 2750, 594.6, 2750, 605.6, 2740, 605.6)
-
-[node name="PD_Brk_540_0_0_9" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(3060, 594.6, 3070, 594.6, 3070, 605.6, 3060, 605.6)
-
-[node name="PD_Pipe_540_1_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(20, 666, 3380, 666, 3380, 671, 20, 671)
-
-[node name="PD_Brk_540_1_0_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(180, 663, 190, 663, 190, 674, 180, 674)
-
-[node name="PD_Brk_540_1_0_1" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(500, 663, 510, 663, 510, 674, 500, 674)
-
-[node name="PD_Brk_540_1_0_2" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(820, 663, 830, 663, 830, 674, 820, 674)
-
-[node name="PD_Brk_540_1_0_3" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1140, 663, 1150, 663, 1150, 674, 1140, 674)
-
-[node name="PD_Brk_540_1_0_4" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1460, 663, 1470, 663, 1470, 674, 1460, 674)
-
-[node name="PD_Brk_540_1_0_5" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1780, 663, 1790, 663, 1790, 674, 1780, 674)
-
-[node name="PD_Brk_540_1_0_6" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2100, 663, 2110, 663, 2110, 674, 2100, 674)
-
-[node name="PD_Brk_540_1_0_7" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2420, 663, 2430, 663, 2430, 674, 2420, 674)
-
-[node name="PD_Brk_540_1_0_8" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2740, 663, 2750, 663, 2750, 674, 2740, 674)
-
-[node name="PD_Brk_540_1_0_9" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(3060, 663, 3070, 663, 3070, 674, 3060, 674)
-
 [node name="PD_Ceil_540_0" type="Polygon2D" parent="Props"]
 color = Color(0.215, 0.225, 0.250, 1)
 polygon = PackedVector2Array(230, 622, 420, 622, 420, 638, 230, 638)
@@ -13101,98 +13923,6 @@ polygon = PackedVector2Array(3055, 625.5, 3064, 625.5, 3064, 634.5, 3055, 634.5)
 color = Color(0.215, 0.225, 0.250, 1)
 polygon = PackedVector2Array(3170, 622, 3360, 622, 3360, 638, 3170, 638)
 
-[node name="PD_Pipe_1400_0_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(20, 1438.4, 3380, 1438.4, 3380, 1443.4, 20, 1443.4)
-
-[node name="PD_Brk_1400_0_0_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(180, 1435.4, 190, 1435.4, 190, 1446.4, 180, 1446.4)
-
-[node name="PD_Brk_1400_0_0_1" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(500, 1435.4, 510, 1435.4, 510, 1446.4, 500, 1446.4)
-
-[node name="PD_Brk_1400_0_0_2" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(820, 1435.4, 830, 1435.4, 830, 1446.4, 820, 1446.4)
-
-[node name="PD_Brk_1400_0_0_3" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1140, 1435.4, 1150, 1435.4, 1150, 1446.4, 1140, 1446.4)
-
-[node name="PD_Brk_1400_0_0_4" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1460, 1435.4, 1470, 1435.4, 1470, 1446.4, 1460, 1446.4)
-
-[node name="PD_Brk_1400_0_0_5" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1780, 1435.4, 1790, 1435.4, 1790, 1446.4, 1780, 1446.4)
-
-[node name="PD_Brk_1400_0_0_6" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2100, 1435.4, 2110, 1435.4, 2110, 1446.4, 2100, 1446.4)
-
-[node name="PD_Brk_1400_0_0_7" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2420, 1435.4, 2430, 1435.4, 2430, 1446.4, 2420, 1446.4)
-
-[node name="PD_Brk_1400_0_0_8" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2740, 1435.4, 2750, 1435.4, 2750, 1446.4, 2740, 1446.4)
-
-[node name="PD_Brk_1400_0_0_9" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(3060, 1435.4, 3070, 1435.4, 3070, 1446.4, 3060, 1446.4)
-
-[node name="PD_Pipe_1400_1_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(255.2, 1484, 499.8, 1484, 499.8, 1489, 255.2, 1489)
-
-[node name="PD_Brk_1400_1_0_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(415.2, 1481, 425.2, 1481, 425.2, 1492, 415.2, 1492)
-
-[node name="PD_Pipe_1400_1_1" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1083.8, 1484, 1291.2, 1484, 1291.2, 1489, 1083.8, 1489)
-
-[node name="PD_Brk_1400_1_1_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1243.8, 1481, 1253.8, 1481, 1253.8, 1492, 1243.8, 1492)
-
-[node name="PD_Pipe_1400_1_2" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1621.2, 1484, 1935.2, 1484, 1935.2, 1489, 1621.2, 1489)
-
-[node name="PD_Brk_1400_1_2_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1781.2, 1481, 1791.2, 1481, 1791.2, 1492, 1781.2, 1492)
-
-[node name="PD_Pipe_1400_1_3" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2067.2, 1484, 2270.8, 1484, 2270.8, 1489, 2067.2, 1489)
-
-[node name="PD_Brk_1400_1_3_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2227.2, 1481, 2237.2, 1481, 2237.2, 1492, 2227.2, 1492)
-
-[node name="PD_Pipe_1400_1_4" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2336.8, 1484, 2717, 1484, 2717, 1489, 2336.8, 1489)
-
-[node name="PD_Brk_1400_1_4_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2496.8, 1481, 2506.8, 1481, 2506.8, 1492, 2496.8, 1492)
-
-[node name="PD_Pipe_1400_1_5" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2972.2, 1484, 3212.8, 1484, 3212.8, 1489, 2972.2, 1489)
-
-[node name="PD_Brk_1400_1_5_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(3132.2, 1481, 3142.2, 1481, 3142.2, 1492, 3132.2, 1492)
-
 [node name="PD_Ceil_1400_0" type="Polygon2D" parent="Props"]
 color = Color(0.215, 0.225, 0.250, 1)
 polygon = PackedVector2Array(230, 1452, 420, 1452, 420, 1468, 230, 1468)
@@ -13252,94 +13982,6 @@ polygon = PackedVector2Array(3055, 1455.5, 3064, 1455.5, 3064, 1464.5, 3055, 146
 [node name="PD_Ceil_1400_7" type="Polygon2D" parent="Props"]
 color = Color(0.215, 0.225, 0.250, 1)
 polygon = PackedVector2Array(3170, 1452, 3360, 1452, 3360, 1468, 3170, 1468)
-
-[node name="PD_Pipe_1940_0_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(20, 1997.6, 3380, 1997.6, 3380, 2002.6, 20, 2002.6)
-
-[node name="PD_Brk_1940_0_0_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(180, 1994.6, 190, 1994.6, 190, 2005.6, 180, 2005.6)
-
-[node name="PD_Brk_1940_0_0_1" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(500, 1994.6, 510, 1994.6, 510, 2005.6, 500, 2005.6)
-
-[node name="PD_Brk_1940_0_0_2" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(820, 1994.6, 830, 1994.6, 830, 2005.6, 820, 2005.6)
-
-[node name="PD_Brk_1940_0_0_3" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1140, 1994.6, 1150, 1994.6, 1150, 2005.6, 1140, 2005.6)
-
-[node name="PD_Brk_1940_0_0_4" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1460, 1994.6, 1470, 1994.6, 1470, 2005.6, 1460, 2005.6)
-
-[node name="PD_Brk_1940_0_0_5" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1780, 1994.6, 1790, 1994.6, 1790, 2005.6, 1780, 2005.6)
-
-[node name="PD_Brk_1940_0_0_6" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2100, 1994.6, 2110, 1994.6, 2110, 2005.6, 2100, 2005.6)
-
-[node name="PD_Brk_1940_0_0_7" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2420, 1994.6, 2430, 1994.6, 2430, 2005.6, 2420, 2005.6)
-
-[node name="PD_Brk_1940_0_0_8" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2740, 1994.6, 2750, 1994.6, 2750, 2005.6, 2740, 2005.6)
-
-[node name="PD_Brk_1940_0_0_9" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(3060, 1994.6, 3070, 1994.6, 3070, 2005.6, 3060, 2005.6)
-
-[node name="PD_Pipe_1940_1_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(20, 2066, 3380, 2066, 3380, 2071, 20, 2071)
-
-[node name="PD_Brk_1940_1_0_0" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(180, 2063, 190, 2063, 190, 2074, 180, 2074)
-
-[node name="PD_Brk_1940_1_0_1" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(500, 2063, 510, 2063, 510, 2074, 500, 2074)
-
-[node name="PD_Brk_1940_1_0_2" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(820, 2063, 830, 2063, 830, 2074, 820, 2074)
-
-[node name="PD_Brk_1940_1_0_3" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1140, 2063, 1150, 2063, 1150, 2074, 1140, 2074)
-
-[node name="PD_Brk_1940_1_0_4" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1460, 2063, 1470, 2063, 1470, 2074, 1460, 2074)
-
-[node name="PD_Brk_1940_1_0_5" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(1780, 2063, 1790, 2063, 1790, 2074, 1780, 2074)
-
-[node name="PD_Brk_1940_1_0_6" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2100, 2063, 2110, 2063, 2110, 2074, 2100, 2074)
-
-[node name="PD_Brk_1940_1_0_7" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2420, 2063, 2430, 2063, 2430, 2074, 2420, 2074)
-
-[node name="PD_Brk_1940_1_0_8" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(2740, 2063, 2750, 2063, 2750, 2074, 2740, 2074)
-
-[node name="PD_Brk_1940_1_0_9" type="Polygon2D" parent="Props"]
-color = Color(0.225, 0.235, 0.255, 1)
-polygon = PackedVector2Array(3060, 2063, 3070, 2063, 3070, 2074, 3060, 2074)
 
 [node name="PD_Ceil_1940_0" type="Polygon2D" parent="Props"]
 color = Color(0.215, 0.225, 0.250, 1)
