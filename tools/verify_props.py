@@ -184,7 +184,15 @@ def check(fl: int) -> None:
                 errors.append(f"{tag}: 집기 {ka}와 {kb}가 겹친다")
 
     # 5. 단서·은신처를 덮지 않는다
+    #
+    # 창가 조사(Window_*)는 뺀다(#274). 이 검사는 '걸어가서 조사할 수 있게
+    # 집기에서 CLUE_CLEAR만큼 떨어져 있어라'는 뜻인데, 창가 조사는 **벽에 붙어
+    # 있는 것이 정상**이다. 교실 창가는 원래 책상이 벽까지 들어차 있어
+    # 어떤 좌표를 골라도 이 여유를 못 만든다.
+    # 대신 실제로 다가갈 수 있는지는 verify_floor_reach가 도달 격자로 본다.
     for name, px, py in clues:
+        if name.startswith("Window_"):
+            continue
         for key, (x0, y0, x1, y1) in sorted(props.items()):
             if (x0 - CLUE_CLEAR < px < x1 + CLUE_CLEAR
                     and y0 - CLUE_CLEAR < py < y1 + CLUE_CLEAR):
