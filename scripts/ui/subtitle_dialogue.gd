@@ -55,8 +55,8 @@ const PORTRAIT_FADE := 0.22
 # 말하지 않는 동안에는 **끄지 않고 어둡게** 둔다 — 껐다 켜면 한 장면 안에서
 # 그림이 깜빡인다. 지문이 대사 사이에 자주 끼는 프롤로그에서 특히 심하다.
 const PORTRAIT_DIM := Color(0.40, 0.42, 0.48, 1.0)
-# 스탠딩이 서는 폭. 화자가 바뀔 때마다 여백을 움직이면 글이 좌우로 튀므로,
-# 컷신에서는 스탠딩이 아직 없어도 이 폭을 늘 비워 둔다.
+# 스탠딩이 서는 폭(화면 **오른쪽**, #286). 화자가 바뀔 때마다 여백을 움직이면
+# 글이 좌우로 튀므로, 컷신에서는 스탠딩이 아직 없어도 이 폭을 늘 비워 둔다.
 const PORTRAIT_TEXT_MARGIN := 430.0
 
 const FONT: FontFile = preload("res://assets/fonts/NotoSansKR-VF.ttf")
@@ -97,10 +97,10 @@ func show_line(speaker: String, text: String, emotion: String = "") -> void:
 	var monologue := speaker.is_empty()
 	var margin_x: float = MONOLOGUE_MARGIN_X if monologue else SPEECH_MARGIN_X
 
-	# 스탠딩이 서는 쪽 여백만 넓힌다. 오른쪽은 그대로라 글이 살짝 오른쪽으로
+	# 스탠딩이 서는 쪽(오른쪽) 여백만 넓힌다. 왼쪽은 그대로라 글이 살짝 왼쪽으로
 	# 치우치는데, 사람 그림 옆에 글이 붙는 것이 가운데 정렬보다 자연스럽다.
-	lines_box.offset_left = maxf(margin_x, PORTRAIT_TEXT_MARGIN) if portraits_enabled else margin_x
-	lines_box.offset_right = -margin_x
+	lines_box.offset_left = margin_x
+	lines_box.offset_right = -(maxf(margin_x, PORTRAIT_TEXT_MARGIN) if portraits_enabled else margin_x)
 	lines_box.offset_bottom = -(MONOLOGUE_MARGIN_BOTTOM if monologue else SPEECH_MARGIN_BOTTOM)
 
 	name_label.visible = not monologue
