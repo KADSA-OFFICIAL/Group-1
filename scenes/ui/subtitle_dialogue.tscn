@@ -1,4 +1,6 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/portraits/iseol.png" id="2_iseol"]
 
 [ext_resource type="Script" path="res://scripts/ui/subtitle_dialogue.gd" id="1_subtitle_script"]
 
@@ -35,6 +37,20 @@ grow_vertical = 0
 mouse_filter = 2
 texture = SubResource("GradientTexture2D_shade")
 expand_mode = 1
+
+[node name="Portrait" type="TextureRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = -760.0
+offset_right = 377.0
+grow_vertical = 0
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Lines" type="VBoxContainer" parent="."]
 layout_mode = 1

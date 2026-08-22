@@ -46,19 +46,38 @@ const EMOTIONS: Dictionary = {
 	},
 }
 
+# 화자별 스탠딩 일러스트(#280). 컷신에서만 쓴다 — 본편 HUD는 화면을 가리면 안 된다.
+# 표에 없는 화자(수위·지문)는 그림 없이 지나간다.
+const PORTRAITS: Dictionary = {
+	"이설": preload("res://assets/portraits/iseol.png"),
+}
+const PORTRAIT_FADE := 0.22
+# 말하지 않는 동안에는 **끄지 않고 어둡게** 둔다 — 껐다 켜면 한 장면 안에서
+# 그림이 깜빡인다. 지문이 대사 사이에 자주 끼는 프롤로그에서 특히 심하다.
+const PORTRAIT_DIM := Color(0.40, 0.42, 0.48, 1.0)
+# 스탠딩이 서는 폭. 화자가 바뀔 때마다 여백을 움직이면 글이 좌우로 튀므로,
+# 컷신에서는 스탠딩이 아직 없어도 이 폭을 늘 비워 둔다.
+const PORTRAIT_TEXT_MARGIN := 430.0
+
 const FONT: FontFile = preload("res://assets/fonts/NotoSansKR-VF.ttf")
 const WGHT_TAG := 0x77676874  # OpenType 가변 축 'wght'
 
 ## 하단 그라디언트 농도. 컷신은 1.0(시안 그대로), 본편 HUD는 게임 화면을 덜 가리게 낮춘다.
 @export_range(0.0, 1.0, 0.05) var shade_alpha: float = 1.0
 
+## 스탠딩 일러스트를 쓸지. 컷신만 켠다(#280) — 본편 HUD 알림에 사람 그림이 서면
+## 게임 화면을 가린다. 켜면 자막 왼쪽에 스탠딩 자리를 비운다.
+@export var portraits_enabled: bool = false
+
 @onready var shade: TextureRect = $Shade
 @onready var lines_box: VBoxContainer = $Lines
 @onready var name_label: Label = $Lines/NameLabel
 @onready var text_label: Label = $Lines/TextLabel
+@onready var portrait: TextureRect = $Portrait
 
 var typing: bool = false
 var typing_tween: Tween
+var portrait_tween: Tween
 
 ## 마지막 show_line()의 타이핑 소요 시간(초). 넘기는 입력이 없는 본편에서
 ## "타이핑이 끝나기 전에 자막이 사라지는" 일이 없도록 HUD가 표시 시간을 여기서 잰다.
@@ -78,7 +97,9 @@ func show_line(speaker: String, text: String, emotion: String = "") -> void:
 	var monologue := speaker.is_empty()
 	var margin_x: float = MONOLOGUE_MARGIN_X if monologue else SPEECH_MARGIN_X
 
-	lines_box.offset_left = margin_x
+	# 스탠딩이 서는 쪽 여백만 넓힌다. 오른쪽은 그대로라 글이 살짝 오른쪽으로
+	# 치우치는데, 사람 그림 옆에 글이 붙는 것이 가운데 정렬보다 자연스럽다.
+	lines_box.offset_left = maxf(margin_x, PORTRAIT_TEXT_MARGIN) if portraits_enabled else margin_x
 	lines_box.offset_right = -margin_x
 	lines_box.offset_bottom = -(MONOLOGUE_MARGIN_BOTTOM if monologue else SPEECH_MARGIN_BOTTOM)
 
@@ -91,6 +112,7 @@ func show_line(speaker: String, text: String, emotion: String = "") -> void:
 	text_label.add_theme_color_override("font_color", MONOLOGUE_COLOR if monologue else SPEECH_COLOR)
 	text_label.text = text
 
+	_update_portrait(speaker)
 	visible = true
 	_start_typing(emotion)
 
@@ -117,12 +139,37 @@ func clear() -> void:
 		typing_finished.emit()
 	name_label.text = ""
 	text_label.text = ""
+	# 장면이 바뀌면 스탠딩도 없앤다 — 다음 장면은 다른 장소다.
+	if portrait_tween != null:
+		portrait_tween.kill()
+	portrait.texture = null
+	portrait.visible = false
 	visible = false
 
 
 ## 장면 자막처럼 대화창 바깥에 있지만 같은 서체를 써야 하는 Label에 본문 서체를 입힌다.
 func apply_font(label: Label, weight: float = 400.0) -> void:
 	label.add_theme_font_override("font", _weighted_font(weight, 0))
+
+
+func _update_portrait(speaker: String) -> void:
+	if not portraits_enabled:
+		return
+	if PORTRAITS.has(speaker):
+		portrait.texture = PORTRAITS[speaker]
+		_fade_portrait(Color.WHITE)
+	elif portrait.texture != null:
+		_fade_portrait(PORTRAIT_DIM)
+
+
+func _fade_portrait(target: Color) -> void:
+	if portrait_tween != null:
+		portrait_tween.kill()
+	if not portrait.visible:
+		portrait.modulate = Color(target, 0.0)   # 처음 등장은 투명에서 떠오른다
+		portrait.visible = true
+	portrait_tween = create_tween()
+	portrait_tween.tween_property(portrait, "modulate", target, PORTRAIT_FADE)
 
 
 func _start_typing(emotion: String) -> void:
