@@ -129,7 +129,11 @@ C_SIGN = "Color(0.30, 0.34, 0.38, 1)"
 C_SOFA = "Color(0.28, 0.24, 0.26, 1)"        # 접견 소파(교무실)
 C_COPIER = "Color(0.30, 0.31, 0.33, 1)"      # 복사기
 C_FRIDGE = "Color(0.38, 0.39, 0.41, 1)"      # 냉장고
-C_PARTITION = "Color(0.31, 0.29, 0.26, 1)"   # 마주 본 책상 사이 칸막이        # 안내판(장식)
+C_PARTITION = "Color(0.31, 0.29, 0.26, 1)"   # 마주 본 책상 사이 칸막이
+C_BAG = "Color(0.30, 0.26, 0.32, 1)"         # 책가방(#289)
+C_CUP = "Color(0.66, 0.65, 0.60, 1)"         # 컵·비누
+C_CASE = "Color(0.44, 0.32, 0.22, 1)"        # 필통·도구함
+C_CLOTHES = "Color(0.35, 0.38, 0.42, 1)"     # 체육복·담요·쿠션        # 안내판(장식)
 
 # ── 도트 타일 텍스처 (#246, 원안 #243) ───────────────────────
 # 바닥·벽·집기는 단색 면이었다. `tools/gen_tiles.py`가 구운 회색조 도트 무늬를
@@ -275,6 +279,25 @@ CANVAS_ITEM_ROOTS = ("WallGlow",)   # CanvasLayer 직속 = 텍스처 설정을 �
 #   늘어나 붙는다. 둘 다 CanvasItem 속성이라 자식이 부모에게서 물려받으므로(기본값 0 =
 #   Parent) 층 씬 루트와 RoomWallVisuals에만 걸면 그 아래 폴리곤 전부에 적용된다.
 TEX_FLAGS = "texture_filter = 1\ntexture_repeat = 2\n"
+
+
+def shade_jitter(color, name, amount=0.06):
+    """같은 종류 집기라도 조금씩 다른 색으로 칠한다(#289).
+
+    교실 책상 스무 개가 완전히 같은 색이라 복사·붙여넣기로 보였다. 노드
+    이름으로 결정론적으로 흔들어, 재생성해도 같은 물건에 같은 색이 붙는다.
+
+    **텍스처를 고른 뒤에** 걸어야 한다 — `SPRITE`·`TEX`가 색 문자열을 키로
+    쓰므로 먼저 흔들면 그림을 못 찾는다. 벽·바닥에는 걸지 않는다 — 이어붙는
+    면이라 조각마다 색이 다르면 누더기가 된다.
+    """
+    h = 2166136261
+    for ch in name:
+        h = ((h ^ ord(ch)) * 16777619) & 0xFFFFFFFF
+    k = 1.0 + ((h % 2001) / 1000.0 - 1.0) * amount
+    nums = [float(v) for v in color[color.index("(") + 1:color.rindex(")")].split(",")]
+    out = [min(1.0, max(0.0, round(v * k, 4))) for v in nums[:3]] + nums[3:]
+    return "Color(" + ", ".join(f"{v:g}" for v in out) + ")"
 
 
 def tex_color(color):
@@ -460,6 +483,14 @@ def rect(x0, y0, x1, y1):
     return poly((x0, y0), (x1, y0), (x1, y1), (x0, y1))
 
 
+def _poly_box(polygon):
+    """폴리곤 문자열에서 경계상자를 되읽는다 — 집기 목록을 남기는 데 쓴다(#289)."""
+    vals = [float(v) for v in
+            polygon[polygon.index("(") + 1:polygon.rindex(")")].split(",")]
+    xs, ys = vals[0::2], vals[1::2]
+    return (min(xs), min(ys), max(xs), max(ys))
+
+
 class Scene:
     """노드/서브리소스를 모아 .tscn 텍스트로 직렬화."""
 
@@ -472,6 +503,8 @@ class Scene:
         self.clue_pts = []    # 단서·은신처 좌표 — 집기가 덮으면 조사할 수 없다
         self.furniture = []   # add_furniture가 손으로 놓은 가구 — 절차적 집기가 피한다
         self.corridor_props = []  # 복도에 선 집기 — 복도 장식이 피한다
+        self.prop_rects = []      # (이름, 경계상자, 색) — add_clutter가 훑는다(#289)
+        self.overlay_rects = []   # 이미 놓인 소품 — 겹쳐 놓지 않으려고
         self.raw_subs = []    # 손으로 쓴 sub_resource 블록(달빛 그라디언트)
         self.floor_no = 0     # 창밖 묘사가 층마다 다르다
 
@@ -493,6 +526,8 @@ class Scene:
             if obj:
                 tex_line += f"uv = {uv_for(polygon)}\n"
             color = tex_color(color)
+            if obj:
+                color = shade_jitter(color, name)
             # 층 씬 루트와 RoomWallVisuals에 걸어 둔 Nearest·Repeat를 물려받는다.
             # CanvasLayer 직속 노드(계단 난간)는 물려받을 부모가 없어 직접 적는다.
             if parent in CANVAS_ITEM_ROOTS:
@@ -547,6 +582,7 @@ class Scene:
         self.node(f'[node name="PC_{key}" type="CollisionPolygon2D" parent="PropBodies"]\n'
                   f'polygon = {polygon}\n')
         self.poly2d(f"PV_{key}", "Props", color, polygon)
+        self.prop_rects.append((key, _poly_box(polygon), color))
 
     def window_light(self, key, x, y):
         """창으로 드는 달빛 — 진짜 광원(#274).
@@ -627,6 +663,7 @@ class Scene:
         겹치는 게 정상이고, 대신 어느 집기 안에 온전히 들어가야 한다.
         """
         self.poly2d(f"PT_{key}", "Props", color, polygon)
+        self.overlay_rects.append(_poly_box(polygon))
 
     def label(self, name, text, cx, cy):
         # 주의: offset은 실수 하나여야 한다. 예전엔 f"{n(v)}.0" 이라 폭이 소수인 층에서
@@ -1742,6 +1779,99 @@ def _office(sc, key, x0, y0, x1, y1, door, keepout):
 
 
 
+# ── 집기 위 작은 소품(#289) ──────────────────────────────────────
+# 방마다 손으로 놓지 않고 **이미 놓인 집기를 훑어** 얹는다. 종류·자리·있고 없고를
+# 집기 이름 해시로 정하므로 재생성해도 같은 자리에 같은 것이 온다.
+#
+# 전부 `PT_`(충돌 없음)이고 집기 경계 안에 들어간다 — 통행·수위 경로·도달성에
+# 영향이 없고 `verify_props`의 "소품은 집기 안" 규칙을 자동으로 지킨다.
+#
+# **바닥에 흩뿌리지 않는다.** 유도선·배관·형광등·닳은 자국·스프링클러로 다섯 번
+# 실패한 길이다(#271·#274·#277). 물건은 물건 위에 놓는다.
+#
+# 집기 색 -> [(이름, 폭 비율, 높이 비율, 소품 색), ...]
+CLUTTER = {
+    C_DESK:    [("book", 0.40, 0.34, C_BOOK), ("cup", 0.15, 0.20, C_CUP),
+                ("case", 0.34, 0.18, C_CASE), ("note", 0.36, 0.26, C_PAPER),
+                ("bottle", 0.13, 0.26, C_WATER)],
+    C_CHAIR:   [("bag", 0.66, 0.40, C_BAG), ("gym", 0.60, 0.34, C_CLOTHES)],
+    C_LOCKER:  [("tag", 0.70, 0.09, C_PAPER)],
+    C_METAL:   [("tag", 0.70, 0.09, C_PAPER), ("box", 0.44, 0.24, C_BOOK)],
+    C_SHELF:   [("box", 0.50, 0.28, C_BOOK), ("files", 0.64, 0.18, C_PAPER),
+                ("kit", 0.30, 0.24, C_CASE)],
+    C_CABINET: [("files", 0.60, 0.15, C_PAPER), ("box", 0.42, 0.24, C_BOOK)],
+    C_CLEAN:   [("tag", 0.56, 0.10, C_PAPER)],
+    C_SINK:    [("soap", 0.20, 0.15, C_CUP)],
+    C_BENCH:   [("bag", 0.34, 0.28, C_BAG), ("cup", 0.14, 0.18, C_CUP)],
+    C_BED:     [("fold", 0.68, 0.22, C_CLOTHES)],
+    C_RACK:    [("tag", 0.52, 0.10, C_PAPER)],
+    C_SOFA:    [("cushion", 0.30, 0.44, C_CLOTHES)],
+    C_COPIER:  [("stack", 0.50, 0.16, C_PAPER)],
+}
+
+# 집기 색 -> 소품이 붙을 확률(%). 노드 예산(3300) 안에서 방이 채워 보이게 맞춘 값.
+# 책상은 사람이 쓰던 자리라 높이고, 벽에 붙는 수납장은 낮춘다.
+CLUTTER_CHANCE = {
+    C_DESK: 88, C_CHAIR: 44, C_LOCKER: 40, C_METAL: 55, C_SHELF: 80,
+    C_CABINET: 60, C_CLEAN: 70, C_SINK: 60, C_BENCH: 55, C_BED: 60,
+    C_RACK: 60, C_SOFA: 70, C_COPIER: 60,
+}
+CLUTTER_PAD = 3        # 집기 가장자리에서 띄우는 여백
+CLUTTER_TOP = 0.62     # 소품은 집기 위쪽 이만큼 안에만 — 아래쪽은 앞면이다(#289)
+
+
+def _name_hash(name):
+    h = 2166136261
+    for ch in name:
+        h = ((h ^ ord(ch)) * 16777619) & 0xFFFFFFFF
+    return h
+
+
+def add_clutter(sc):
+    """집기를 훑어 위에 작은 소품을 얹는다(#289). 놓은 개수를 돌려준다.
+
+    자리는 집기 위쪽 `CLUTTER_TOP` 안에서 고른다 — 아래쪽 띠는 오브젝트 그림의
+    **앞면**이라(#289) 거기 물건을 얹으면 공중에 뜬 것으로 보인다.
+    """
+    placed = 0
+    for key, box, color in list(sc.prop_rects):
+        table = CLUTTER.get(color)
+        if not table:
+            continue
+        x0, y0, x1, y1 = box
+        w, h = x1 - x0, y1 - y0
+        if w < 18 or h < 14:
+            continue
+        seed = _name_hash(key)
+        if seed % 100 >= CLUTTER_CHANCE.get(color, 50):
+            continue
+        # 넓은 집기에는 둘까지 — 좁은 책상에 둘을 얹으면 서로 밀려 하나도 못 놓는다.
+        want = 2 if (w >= 56 or h >= 38) else 1
+        for i in range(want):
+            name, fw, fh, col = table[(seed // (7 + i * 11)) % len(table)]
+            # 비율이 작으면 몇 px밖에 안 나와 걸러졌다(사물함 이름표가 3.6px였다).
+            # 최소 크기로 바닥을 받쳐 준다.
+            iw = min(w - 2 * CLUTTER_PAD, max(6.0, w * fw))
+            ih = min((h - 2 * CLUTTER_PAD) * CLUTTER_TOP, max(4.0, h * fh))
+            if iw < 5 or ih < 3.5:
+                break
+            # 위쪽 세 자리 중 하나 — 왼쪽·오른쪽·가운데
+            slot = (seed // (13 + i * 17)) % 3
+            if slot == 0:
+                px = x0 + CLUTTER_PAD
+            elif slot == 1:
+                px = x1 - CLUTTER_PAD - iw
+            else:
+                px = (x0 + x1 - iw) / 2
+            py = y0 + CLUTTER_PAD + ((seed // (29 + i * 7)) % 3) * 1.5
+            cell = (px, py, px + iw, py + ih)
+            if any(_overlap(cell, r) for r in sc.overlay_rects):
+                continue
+            sc.overlay(f"{key}_{name}{i}", rect(*cell), col)
+            placed += 1
+    return placed
+
+
 def add_sliding_doors(sc):
     """방 문을 한 짝짜리 미닫이문으로 만든다(라벨 있는 방 전부, #252).
 
@@ -2402,6 +2532,7 @@ def build_common(fl, spec):
     corridors = [(NORTH_Y1, MID_Y0), (VOID_Y1, SOUTH_Y0), (SOUTH_Y1, BOT_Y0)]
     add_ground(sc, corridors)
     add_props(sc, corridors)
+    add_clutter(sc)
     add_sliding_doors(sc)
     add_outer(sc)
     return sc
@@ -2457,6 +2588,7 @@ def build_floor1():
     corridors = [(1500, BOT_Y0)]
     add_ground(sc, corridors)
     add_props(sc, corridors)
+    add_clutter(sc)
     add_sliding_doors(sc)
 
     add_outer(sc)
