@@ -540,20 +540,55 @@ def o_rack(dx: int, dy: int, gw: int, gh: int) -> float:
 
 OBJ = 32            # 오브젝트 그림 한 변. 재질과 같은 32라 도트 크기가 어긋나지 않는다.
 
+def solid_obj(fn):
+    """오브젝트 그림에 **높이**를 준다(#289).
+
+    여태 집기는 `_edge()`가 사방 1도트를 똑같이 어둡게 칠할 뿐이었다 — 어느
+    쪽이 위인지 알 수 없어 위에서 눌러 붙인 스티커로 보였다. 벽에 통한
+    방법(윗변 하이라이트 / 앞면 / 바닥에 닿는 그림자, #268·#271)을 **그림 안으로**
+    옮긴다. 폴리곤을 안 늘리므로 노드는 하나도 안 는다.
+
+    집기마다 그림자 폴리곤을 따로 내는 방법도 있지만 층당 600개가 늘어
+    노드 예산(3300)을 넘긴다. 그림 안에 넣으면 공짜다 — 대신 그림자가 물건
+    **바깥**으로 못 나가므로, 드리운 그림자가 아니라 앞면과 접지 그늘이 된다.
+    탑다운에서 남쪽을 보고 있으니 그게 실제로 보이는 면이기도 하다.
+    """
+    def wrapped(dx: int, dy: int, gw: int, gh: int) -> float:
+        v = fn(dx, dy, gw, gh)
+        face = max(2, gh // 5)                        # 앞면 높이
+        if dy == 0:
+            v *= 1.22                                 # 윗변 — 빛을 받는 모서리
+        elif dy == 1:
+            v *= 1.08
+        elif dy >= gh - face:
+            k = (dy - (gh - face)) / max(1, face - 1)  # 아래로 갈수록 어둡다
+            v *= 0.78 - 0.34 * k                      # 앞면 → 접지 그늘
+        if dx == gw - 1:
+            v *= 0.70                                 # 오른쪽 옆면
+        elif dx == gw - 2:
+            v *= 0.86
+        elif dx == 0:
+            v *= 0.94
+        return v
+    wrapped.__name__ = fn.__name__
+    wrapped.__doc__ = fn.__doc__
+    return wrapped
+
+
 OBJECTS = {
-    "obj_desk": o_desk,
-    "obj_chair": o_chair,
-    "obj_locker": o_locker,
-    "obj_shelf": o_shelf,
-    "obj_sink": o_sink,
-    "obj_screen": o_screen,
-    "obj_panel": o_panel,
-    "obj_cabinet": o_cabinet,
-    "obj_bin": o_bin,
-    "obj_bed": o_bed,
-    "obj_plant": o_plant,
-    "obj_rack": o_rack,
-    "obj_toilet": o_toilet,
+    "obj_desk": solid_obj(o_desk),
+    "obj_chair": solid_obj(o_chair),
+    "obj_locker": solid_obj(o_locker),
+    "obj_shelf": solid_obj(o_shelf),
+    "obj_sink": solid_obj(o_sink),
+    "obj_screen": solid_obj(o_screen),
+    "obj_panel": solid_obj(o_panel),
+    "obj_cabinet": solid_obj(o_cabinet),
+    "obj_bin": solid_obj(o_bin),
+    "obj_bed": solid_obj(o_bed),
+    "obj_plant": solid_obj(o_plant),
+    "obj_rack": solid_obj(o_rack),
+    "obj_toilet": solid_obj(o_toilet),
 }
 
 
