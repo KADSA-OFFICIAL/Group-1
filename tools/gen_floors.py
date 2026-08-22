@@ -19,6 +19,8 @@ import pathlib
 import re
 import json
 
+NL = chr(10)   # 노드 블록을 줄 단위로 조립할 때 쓴다
+
 T = 16          # 벽 두께
 DOOR = 110      # 문 틈 폭
 W, H = 3400, 2500   # 캔버스
@@ -49,8 +51,7 @@ C_NOTICE = "Color(0.34, 0.29, 0.21, 1)"  # 게시판(장식)
 C_CLEAN = "Color(0.19, 0.26, 0.24, 1)"   # 청소도구함
 C_BIN = "Color(0.17, 0.19, 0.21, 1)"     # 쓰레기통
 C_WINDOW = "Color(0.17, 0.23, 0.36, 1)"  # 창문 — 짙은 밤하늘이 비친 유리(#268)
-C_MOON = "Color(0.62, 0.68, 0.85, 0.14)" # 창으로 드는 달빛 — 반투명이라
-                                         # 바닥·집기 위에 겹쳐 깔린다
+C_MOON_LIGHT = "Color(0.54, 0.65, 0.95, 1)"  # 달빛 — 폴리곤이 아니라 광원(#274)
 C_FIRE = "Color(0.44, 0.17, 0.15, 1)"    # 소화기(장식)
 C_LINE = "Color(0.17, 0.19, 0.23, 1)"    # 복도 바닥 유도선(장식)
 C_TRAY = "Color(0.33, 0.34, 0.36, 1)"    # 분필받이
@@ -65,7 +66,15 @@ C_LEAF = "Color(0.66, 0.58, 0.44, 1)"    # 미닫이 문짝 — 문 표식(C_DOO
 DOOR_LEAF_T = 10                          # 문짝 두께(벽 16 안쪽에 낀다)
 WALL_FACE = 20                            # 가로 벽 아래 앞면 높이(#268, #271에서
                                           # 14->20. 낮으면 높이가 안 느껴진다)
-MOONLIGHT = 96                            # 창에서 방 안으로 빛이 뻗는 깊이
+# ── 창문 달빛(#274) ─────────────────────────────────────────────
+# 세 번 다르게 그려 봤다 — 불투명한 바닥 표시(#268), 사다리꼴, 반투명
+# 사다리꼴(#271). 매번 다른 이유로 빛이 아니라 바닥에 깔린 천으로 보였다.
+# **그리는 방법이 아니라 도구가 틀렸다.** 폴리곤에는 빛의 성질이 없다 —
+# 가장자리가 안 번지고, 아래를 덮을 뿐 밝히지 못하고, 벽에 안 막힌다.
+MOON_ENERGY = 1.25   # 창 하나가 내는 밝기. 어둠은 (0.1, 0.1, 0.13)이다
+MOON_SCALE = 0.72    # 512px 그라디언트에 곱한다 → 반경 약 185px
+MOON_INSET = 24      # 광원을 창에서 방 안으로 들여놓는 거리
+WINDOW_ZONE = (170, 52)   # 창가 조사(E) 범위
 
 # 바닥 구역 — Floor(맵 바탕) 위, Rooms(방 바닥) 아래에 깔린다.
 C_CORRIDOR = "Color(0.196, 0.160, 0.120, 1)"  # 복도 마루 — 학교 목재 바닥
@@ -94,7 +103,6 @@ C_LITTER = "Color(0.52, 0.50, 0.45, 1)"       # 떨어진 종이(바닥 표시)
 C_PIPE = "Color(0.225, 0.235, 0.255, 1)"      # 천장 배관(장식) — 바닥보다
                                               # 살짝만 밝게. 진하면 바닥 선이 된다
 C_SPRINK = "Color(0.44, 0.42, 0.36, 1)"       # 스프링클러(장식)
-C_CEIL = "Color(0.215, 0.225, 0.250, 1)"      # 꺼진 천장 형광등(장식)
 
 # 방 종류별 바닥. 들어간 방이 무슨 방인지 바닥만 보고도 갈리게 한다.
 C_BLOCKED_FLOOR = "Color(0.072, 0.072, 0.078, 1)"   # 막힌 공간
@@ -461,6 +469,8 @@ class Scene:
         self.clue_pts = []    # 단서·은신처 좌표 — 집기가 덮으면 조사할 수 없다
         self.furniture = []   # add_furniture가 손으로 놓은 가구 — 절차적 집기가 피한다
         self.corridor_props = []  # 복도에 선 집기 — 복도 장식이 피한다
+        self.raw_subs = []    # 손으로 쓴 sub_resource 블록(달빛 그라디언트)
+        self.floor_no = 0     # 창밖 묘사가 층마다 다르다
 
     def occ(self, oid, polygon):
         self.subs.append((oid, polygon))
@@ -535,15 +545,48 @@ class Scene:
                   f'polygon = {polygon}\n')
         self.poly2d(f"PV_{key}", "Props", color, polygon)
 
-    def light(self, key, polygon, color):
-        """창으로 드는 빛 — **반투명**으로 WallGlow에 낸다(#271).
+    def window_light(self, key, x, y):
+        """창으로 드는 달빛 — 진짜 광원(#274).
 
-        바닥 표시(FM_)로 냈더니 어둠(CanvasModulate)을 받아 손전등이 닿을
-        때만 보였다. 빛이 손전등에 비춰야 보이는 건 앞뒤가 안 맞는다.
-        WallGlow는 어둠을 안 받으므로 늘 보이고, 알파를 줘서 바닥·집기 위에
-        겹쳐 깔린다 — 불투명하면 책상을 지워 버린다.
+        `Lights`(Node2D, 씬 루트)에 둔다. **WallGlow에 두면 안 된다** —
+        CanvasLayer는 별도 캔버스라 그 안의 광원은 아래 레이어의 바닥·집기를
+        못 비춘다.
+
+        그림자를 켜야 벽(LO_)에 막혀 옆 방·복도로 새지 않는다. 광원은 화면
+        밖이면 컬링되므로 층당 서른 개를 달아도 카메라(1600x900)에 드는 것은
+        대여섯 개뿐이다.
         """
-        self.poly2d(f"LT_{key}", "WallGlow/RoomWallVisuals", color, polygon, z=3)
+        self.node(NL.join([
+            f'[node name="WinLight_{key}" type="PointLight2D" parent="Lights"]',
+            f"position = Vector2({x:.1f}, {y:.1f})",
+            f"color = {C_MOON_LIGHT}",
+            f"energy = {MOON_ENERGY}",
+            "shadow_enabled = true",
+            "shadow_filter = 1",
+            "shadow_filter_smooth = 4.0",
+            'texture = SubResource("GradientTexture2D_moon")',
+            f"texture_scale = {MOON_SCALE}",
+            ""]))
+
+    def window_probe(self, key, x, y, message):
+        """창가 조사(E) — 방마다 하나.
+
+        창마다 달면 층당 서른 개가 되는데, `_find_interactable`는 겹친 것 중
+        **아무거나** 돌려주므로 창문이 단서를 가로챌 수 있다.
+        """
+        name = f"Window_{key}"
+        self.node(NL.join([
+            f'[node name="{name}" type="Area2D" parent="."]',
+            f"position = Vector2({x:.1f}, {y:.1f})",
+            "collision_layer = 2",
+            "collision_mask = 0",
+            'script = ExtResource("3_interactable")',
+            f'message = "{message}"',
+            'prompt_text = "창밖 보기"',
+            "",
+            f'[node name="{name}Zone" type="CollisionShape2D" parent="{name}"]',
+            'shape = SubResource("RectangleShape2D_window_zone")',
+            ""]))
 
     def wall_decor(self, key, polygon, color):
         """벽면에 붙는 장식 — WallGlow 안이라 어둠을 받지 않고 벽 위에 그려진다.
@@ -596,7 +639,8 @@ class Scene:
                   f'text = "{text}"\nhorizontal_alignment = 1\n')
 
     def render(self, ext):
-        steps = len(ext) + len(self.subs) + len(self.rect_shapes) + 1
+        steps = (len(ext) + len(self.subs) + len(self.rect_shapes)
+                 + len(self.raw_subs) + 1)
         out = [f"[gd_scene load_steps={steps} format=3]\n"]
         for e in ext:
             out.append(e)
@@ -605,9 +649,69 @@ class Scene:
             out.append(f'[sub_resource type="RectangleShape2D" id="{sid}"]\nsize = {size}\n')
         for oid, p in self.subs:
             out.append(f'[sub_resource type="OccluderPolygon2D" id="{oid}"]\npolygon = {p}\n')
+        out.extend(self.raw_subs)
         out.append("")
         out.extend(self.nodes)
         return "\n".join(out)
+
+
+# 창밖 묘사(#274) — 층마다 셋을 돌려 쓴다. 방 이름으로 고르므로 재생성해도
+# 같은 방에 같은 대사가 붙는다.
+WINDOW_LINES = {
+    1: [
+        '운동장이 내려다보인다. 가로등 하나만 켜져 있고 그 아래엔 아무도 없다.',
+        '정문 쪽 유리다. 철문이 사슬로 감겨 있다. 안쪽에서 잠근 모양이다.',
+        '화단 흙이 한 군데만 파헤쳐져 있다. 삽이 그대로 꽂혀 있다.',
+    ],
+    2: [
+        '창틀에 먼지가 두껍게 앉았다. 손자국 하나가 안쪽에서 찍혀 있다.',
+        '유리에 복도가 비친다. 뒤를 돌아봤지만 아무도 없다.',
+        '빗물 자국 사이로 운동장 트랙이 보인다. 흰 선이 반쯤 지워져 있다.',
+    ],
+    3: [
+        '운동장 구석 창고 앞에서 불빛이 하나 움직인다. 손전등 같다. 곧 꺼진다.',
+        '창문이 3cm쯤 열려 있다. 바람이 들어오는데 커튼은 흔들리지 않는다.',
+        '유리에 금이 가 있다. 밖에서 뭔가 부딪친 자국이다. 여기는 3층인데.',
+    ],
+    4: [
+        '여기서는 담장 너머 도로까지 보인다. 차가 한 대도 지나가지 않는다.',
+        '창문이 못으로 박혀 있다. 새 못이다. 머리에 아직 광이 남아 있다.',
+        '옥상 물탱크 그림자가 운동장에 길게 누워 있다. 그 끝이 조금씩 움직인다.',
+    ],
+    5: [
+        '옥상으로 이어지는 계단참 창이다. 유리에 손자국이 안쪽에서 찍혀 있다.',
+        '학교에서 제일 높은 창이다. 운동장 조명이 전부 꺼져 있다.',
+        '창밖으로 비상계단이 보인다. 난간에 교복 재킷 하나가 걸려 있다.',
+    ],
+}
+
+
+def window_text(floor_no, key):
+    lines = WINDOW_LINES.get(floor_no) or WINDOW_LINES[2]
+    return lines[sum(ord(c) for c in key) % len(lines)]
+
+
+def add_lights_root(sc):
+    """창문 광원이 들어갈 `Lights`와 달빛 그라디언트를 낸다(#274).
+
+    씬 골격에서 부른다. 광원은 그려지는 것이 아니라 다른 것을 밝히므로
+    선언 순서(레이어)와 무관하다 — 다만 자식보다 먼저 있어야 한다.
+    """
+    sc.node(NL.join(['[node name="Lights" type="Node2D" parent="."]', '']))
+    sc.raw_subs.append(NL.join([
+        '[sub_resource type="Gradient" id="Gradient_moon"]',
+        'offsets = PackedFloat32Array(0, 0.5, 1)',
+        'colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0.35, 1, 1, 1, 0)',
+        '']))
+    sc.raw_subs.append(NL.join([
+        '[sub_resource type="GradientTexture2D" id="GradientTexture2D_moon"]',
+        'gradient = SubResource("Gradient_moon")',
+        'width = 512',
+        'height = 512',
+        'fill = 1',
+        'fill_from = Vector2(0.5, 0.5)',
+        'fill_to = Vector2(0.5, 0)',
+        '']))
 
 
 def add_room(sc, key, label, x0, y0, x1, y1, door):
@@ -1014,6 +1118,8 @@ CLASS_WALL_DECOR_D = 8   # 옆벽에 붙는 창문·게시판 두께
 CLASS_LOCKER_W = 40      # 교실 뒷벽 사물함 폭 — 복도용(58)보다 좁다
 CLASS_BACK_PAD = 12      # 뒷벽에서 문 틈 좌우로 남기는 폭
 CLASS_DOOR_LANE = 72     # 문에서 가로 통로까지 이어지는 세로 통로 폭
+CLASS_WIN_LANE = 20      # 창 쪽 벽과 첫 책상 열 사이 통로(#274)
+CLASS_WALK = 46          # 플레이어가 지나갈 수 있는 최소 틈(격자 20px + 여유)
 #   문 틈(110)만큼 통째로 비우면 북쪽 교실에서 책상 열 3개 중 3개가 다 걸려
 #   문 쪽 절반이 통째로 빈다. 플레이어 반경이 10이라 72면 충분히 지난다.
 #   교실은 방 안쪽이라 문 앞 여유가 복도만큼 필요하지 않다. 복도 규격을
@@ -1289,30 +1395,29 @@ def _classroom(sc, key, x0, y0, x1, y1, door, keepout):
         win_y, note_y = bot_band, top_band
     else:
         win_y, note_y = top_band, bot_band
-    for i, (px0, py0, px1, py1) in enumerate(_spread(ix0, ix1, 72, 3, *win_y)):
+    win_cells = list(_spread(ix0, ix1, 72, 3, *win_y))
+    for i, (px0, py0, px1, py1) in enumerate(win_cells):
         sc.wall_decor(f"{key}_win{i}", rect(px0, py0, px1, py1), C_WINDOW)
         sc.wall_decor(f"{key}_curtainL{i}", rect(px0 - 8, py0, px0, py1), C_CURTAIN)
         sc.wall_decor(f"{key}_curtainR{i}", rect(px1, py0, px1 + 8, py1), C_CURTAIN)
-        # 달빛 — 창에서 방 안으로 번진다(#268, #271에서 다시 손봄). 밤 학교에서
-        # 손전등 말고 유일하게 밖에서 들어오는 빛이다. 광원(PointLight2D)이
-        # 아니라 반투명 폴리곤이라 조명 튜닝(#74)에 영향이 없다.
-        #
-        # 처음엔 불투명한 회색 바닥 표시였는데 빛으로 안 읽혔다. 셋을 고쳤다 —
-        # ① 어둠을 안 받는 WallGlow로 올리고 알파를 줘서 겹쳐 깔리게,
-        # ② 안으로 갈수록 넓어지는 사다리꼴로(빛이 퍼지는 모양),
-        # ③ 창살 그림자로 끊어서 창을 통과한 빛임을 드러냈다.
+        # 달빛 — 창마다 광원 하나(#274). 폴리곤으로 세 번 실패한 뒤 진짜
+        # 광원으로 바꿨다. 벽(LO_)에 막히므로 방 밖으로 새지 않는다.
         down = py0 < cy
-        near = py1 if down else py0
-        far = near + MOONLIGHT if down else near - MOONLIGHT
-        spread = MOONLIGHT * 0.45
-        bars = 3
-        span = (px1 - px0) / bars
-        for b in range(bars):
-            nx0 = px0 + b * span + 3
-            nx1 = px0 + (b + 1) * span - 3
-            sc.light(f"{key}_moon{i}_{b}",
-                     poly((nx0, near), (nx1, near),
-                          (nx1 + spread, far), (nx0 - spread, far)), C_MOON)
+        ly = (py1 + MOON_INSET) if down else (py0 - MOON_INSET)
+        sc.window_light(f"{key}_{i}", (px0 + px1) / 2, ly)
+    # 창가 조사(E) — 방마다 하나. 창마다 달면 층당 서른 개가 되는데,
+    # _find_interactable는 겹친 것 중 아무거나 돌려주므로 단서를 가로챈다.
+    if win_cells:
+        wy0 = min(c[1] for c in win_cells)
+        wy1 = max(c[3] for c in win_cells)
+        zw, zh = WINDOW_ZONE
+        pcx = (min(c[0] for c in win_cells) + max(c[2] for c in win_cells)) / 2
+        pcy = (wy1 + zh / 2) if wy0 < cy else (wy0 - zh / 2)
+        # 그래도 단서·은신처와 겹치면 그 방은 건너뛴다 — 창밖 묘사보다
+        # 진행 요소가 먼저다.
+        if not any(abs(px - pcx) <= zw / 2 and abs(py - pcy) <= zh / 2
+                   for px, py in sc.clue_pts):
+            sc.window_probe(key, pcx, pcy, window_text(sc.floor_no, key))
     # 스피커도 게시판과 같은 벽면에 붙는다. note_y[0]에서 아래로 재면 문 쪽
     # 벽이 아래일 때 벽을 파고든다 — 벽면 방향에 맞춰 앵커를 잡는다.
     spk_y = (wt, wt + 14) if door == "top" else (wb - 14, wb)
@@ -1342,19 +1447,46 @@ def _classroom(sc, key, x0, y0, x1, y1, door, keepout):
         return
     cols = max(1, int((gx1 - gx0 + CLASS_COL_GAP) // (unit_w + CLASS_COL_GAP)))
     total = cols * unit_w + (cols - 1) * CLASS_COL_GAP
+    slack = gx1 - gx0 - total
     ox = gx0 + (gx1 - gx0 - total) / 2
 
     aisle = CLASS_AISLE / 2
     door_lane = (cx - CLASS_DOOR_LANE / 2, y0, cx + CLASS_DOOR_LANE / 2, y1)
     idx = 0
-    for by0, by1, near in ((iy0, cy - aisle, door == "top"),
-                           (cy + aisle, iy1, door != "top")):
+    # 창가에 다가갈 길을 낸다(#274). 창 쪽 절반은 원래 책상이 빈틈없이 들어차
+    # 있어 플레이어가 아예 못 들어가는 죽은 공간이었다 — 열 사이 20px, 행 사이
+    # 22px은 플레이어(반경 8, 도달 격자에서 10으로 부풀림)가 지날 수 없다.
+    # 둘 중 하나로 길을 낸다.
+    #  ① 여유가 있으면 열 사이 한 자리를 넓힌다. 책상은 그대로 두는 대신
+    #     창 쪽 벽과 첫 행 사이도 CLASS_WIN_LANE만큼 비워야 통로가 창에 닿는다.
+    #  ② 여유가 없으면 가운데 열 하나를 뺀다. 그 자리가 그대로 창까지 이어지므로
+    #     창가 통로는 따로 필요 없다 — 행을 하나 더 살린다.
+    wide = cols >= 2 and CLASS_COL_GAP + slack >= CLASS_WALK
+    win_lane = CLASS_WIN_LANE if (cols < 2 or wide) else 0
+    dy0 = iy0 + (win_lane if door == "bottom" else 0)
+    dy1 = iy1 - (win_lane if door == "top" else 0)
+    for by0, by1, near in ((dy0, cy - aisle, door == "top"),
+                           (cy + aisle, dy1, door != "top")):
         rows = max(1, int((by1 - by0 + CLASS_ROW_GAP) // (dh + CLASS_ROW_GAP)))
         span = rows * dh + (rows - 1) * CLASS_ROW_GAP
         oy = by0 + (by1 - by0 - span) / 2
+        # 창 쪽 절반에는 통로를 **비우지 않고 열 사이 한 자리를 넓힌다**(#274).
+        # 처음엔 문 쪽처럼 가운데를 통째로 비웠는데, 교실은 열이 둘뿐이라
+        # 책상이 사분의 일 넘게 사라졌다 — 예전에 지적받은 '교실이 비어보인다'로
+        # 되돌아가는 셈이다. 남는 폭을 한 자리에 몰아주면 책상을 그대로 두고
+        # 통로가 난다. 그래도 좁으면(교실이 빠듯하면) 그 자리 열 하나를 뺀다.
         block = keepout + ([door_lane] if near else [])
-        for c in range(cols):
-            x = ox + c * (unit_w + CLASS_COL_GAP)
+        even = [ox + c * (unit_w + CLASS_COL_GAP) for c in range(cols)]
+        if near or cols < 2:
+            col_xs = even
+        elif wide:
+            col_xs, x = [], gx0
+            for c in range(cols):
+                col_xs.append(x)
+                x += unit_w + CLASS_COL_GAP + (slack if c == (cols - 1) // 2 else 0)
+        else:
+            col_xs = [v for c, v in enumerate(even) if c != (cols - 1) // 2]
+        for x in col_xs:
             for r in range(rows):
                 y = oy + r * (dh + CLASS_ROW_GAP)
                 desk = (x, y, x + dw, y + dh)
@@ -1944,11 +2076,8 @@ def room_floor(key, label):
 PLANK = 64            # 마루 널 폭
 PLANK_SEAM = 2        # 널 이음매 두께
 PLANK_JOINT = 560     # 널 이음매 간격(줄마다 엇갈림)
-CEIL_LIGHT = (190, 16)  # 꺼진 형광등(장식) 크기
-CEIL_LIGHT_GAP = 420    # 형광등 간격 — 620은 너무 성겨 복도 가운데가 비었다
-PIPE_T = 5              # 천장 배관 두께 — 7은 복도를 자르는 선처럼 보였다
-PIPE_BRACKET = 320      # 배관 걸이 간격
 SPRINK = 9              # 스프링클러 헤드 한 변
+SPRINK_GAP = 300        # 스프링클러 간격
 
 
 def add_ground(sc, corridors):
@@ -1967,35 +2096,31 @@ def add_ground(sc, corridors):
 
 
 def add_ceiling_lights(sc, corridors):
-    """복도 천장 요소(장식) — 꺼진 형광등 · 배관 · 스프링클러.
+    """복도 천장 요소(장식) — 스프링클러 헤드.
 
-    복도는 위아래 32px씩(사물함)만 쓰고 가운데 116px이 맨바닥이었다. 통행을
-    막는 물건을 가운데 두지 않기로 했으므로(사용자 결정) **위쪽을 채운다.**
-    전부 충돌 없는 장식이라 통행·수위 경로·도달성에 영향이 없다.
+    꺼진 형광등(190x16 회색 막대)은 걷어냈다(#274). 천장 등이라는 설정이었지만
+    화면에서는 복도에 누운 긴 막대였다 — #271에서 배관·바닥 유도선을 걷어낸
+    것과 같은 실패를 한 번 더 한 것이다.
 
-    형광등은 꺼져 있어 빛을 내지 않는다 — 손전등만이 광원이라는 규약을 지킨다.
+    **복도를 가로지르는 길고 납작한 도형은 무엇으로 이름 붙이든 바닥에 그은
+    선으로 읽힌다.** 위에서 내려다보는 화면에는 높이가 없어서, 천장에 달렸다는
+    사실을 그림만으로 전할 방법이 없다. 남길 수 있는 것은 끊긴 작은 덩어리뿐.
+
+    복도에는 광원을 두지 않는다 — 손전등만이 광원이라는 성격(#74)을 지킨다.
+    창문 달빛(#274)은 방 안에만 든다.
     """
-    lw, lh = CEIL_LIGHT
     for cy0, cy1 in corridors:
         tag = int(cy0)
         mid_y = (cy0 + cy1) / 2
-        # 배관과 바닥 유도선은 걷어냈다(#271). 복도를 끝에서 끝까지 가로지르는
-        # 선은 걸이를 달아도 "천장에 걸린 것"으로 안 읽히고 바닥에 그은 줄로
-        # 보인다. 복도 위쪽은 형광등·스프링클러처럼 **끊긴 덩어리**로만 채운다.
-        y = mid_y - lh / 2
-        spans = _corridor_clear(sc, y, y + lh, 40)
-        x = EDGE + CEIL_LIGHT_GAP / 2
+        spans = _corridor_clear(sc, mid_y - SPRINK, mid_y + SPRINK, 40)
+        x = EDGE + SPRINK_GAP / 2
         i = 0
-        while x + lw < W - EDGE:
-            if any(a <= x and x + lw <= b for a, b in spans):
-                sc.decor(f"Ceil_{tag}_{i}", rect(x, y, x + lw, y + lh), C_CEIL)
-            # 스프링클러 — 형광등 사이마다 하나.
-            sx = x + lw + (CEIL_LIGHT_GAP - lw) / 2
-            if any(a <= sx and sx + SPRINK <= b for a, b in spans):
+        while x + SPRINK < W - EDGE:
+            if any(a <= x and x + SPRINK <= b for a, b in spans):
                 sc.decor(f"Sprink_{tag}_{i}",
-                         rect(sx, mid_y - SPRINK / 2, sx + SPRINK,
+                         rect(x, mid_y - SPRINK / 2, x + SPRINK,
                               mid_y + SPRINK / 2), C_SPRINK)
-            x += CEIL_LIGHT_GAP
+            x += SPRINK_GAP
             i += 1
 
 
@@ -2074,11 +2199,13 @@ def add_corridor_floor_marks(sc, corridors):
 
 def build_common(fl, spec):
     sc = Scene()
+    sc.floor_no = fl
     sc.rect_shapes = [("RectangleShape2D_wall_h", f"Vector2({W}, 40)"),
                       ("RectangleShape2D_wall_v", f"Vector2(40, {H})")]
     sc.rect_shapes += [("RectangleShape2D_stair_zone", "Vector2(240, 56)"),
                        ("RectangleShape2D_key_zone", "Vector2(48, 48)"),
-                       ("RectangleShape2D_door_zone", "Vector2(140, 60)")]
+                       ("RectangleShape2D_door_zone", "Vector2(140, 60)"),
+                      ("RectangleShape2D_window_zone", "Vector2(170, 52)")]
 
     sc.node('[node name="SchoolFloor" type="Node2D"]\n' + TEX_FLAGS)
     sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, W, H))
@@ -2090,6 +2217,7 @@ def build_common(fl, spec):
     sc.node('[node name="Rooms" type="Node2D" parent="."]\n')
     sc.node('[node name="RoomMarks" type="Node2D" parent="."]\n')
     sc.node('[node name="Props" type="Node2D" parent="."]\n')
+    add_lights_root(sc)
     sc.node('[node name="Stairwells" type="Node2D" parent="."]\n')
     sc.node('[node name="Labels" type="Node2D" parent="WallGlow"]\n')
     sc.node('[node name="RoomWalls" type="StaticBody2D" parent="."]\n')
@@ -2156,11 +2284,13 @@ def build_common(fl, spec):
 
 def build_floor1():
     sc = Scene()
+    sc.floor_no = 1
     sc.rect_shapes = [("RectangleShape2D_wall_h", f"Vector2({W}, 40)"),
                       ("RectangleShape2D_wall_v", f"Vector2(40, {H})"),
                       ("RectangleShape2D_stair_zone", "Vector2(240, 56)"),
                       ("RectangleShape2D_key_zone", "Vector2(48, 48)"),
-                      ("RectangleShape2D_door_zone", "Vector2(140, 60)")]
+                      ("RectangleShape2D_door_zone", "Vector2(140, 60)"),
+                      ("RectangleShape2D_window_zone", "Vector2(170, 52)")]
     sc.node('[node name="SchoolFloor" type="Node2D"]\n' + TEX_FLAGS)
     sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, W, H))
     sc.node('[node name="Ground" type="Node2D" parent="."]\n')
@@ -2171,6 +2301,7 @@ def build_floor1():
     sc.node('[node name="Rooms" type="Node2D" parent="."]\n')
     sc.node('[node name="RoomMarks" type="Node2D" parent="."]\n')
     sc.node('[node name="Props" type="Node2D" parent="."]\n')
+    add_lights_root(sc)
     sc.node('[node name="Stairwells" type="Node2D" parent="."]\n')
     sc.node('[node name="Labels" type="Node2D" parent="WallGlow"]\n')
     sc.node('[node name="RoomWalls" type="StaticBody2D" parent="."]\n')
