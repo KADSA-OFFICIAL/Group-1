@@ -36,7 +36,19 @@ def parse(path):
             rooms[name] = poly
     size = re.search(r'name="Floor".*?polygon = PackedVector2Array\(([^)]*)\)', text, re.S)
     fp = [float(v) for v in size.group(1).split(",")]
-    return walls, rooms, (max(fp[0::2]), max(fp[1::2]))
+    return walls, rooms, (max(fp[0::2]), max(fp[1::2])), windows(text)
+
+
+window_re = re.compile(
+    r'\[node name="(Window_[^"]+)" type="Area2D" parent="\."\]\n'
+    r'position = Vector2\(([-\d.]+), ([-\d.]+)\)')
+
+
+def windows(text):
+    """창가 조사(#274)의 위치. 벽에 붙어 있어 verify_props의 여유 검사에서
+    빠지는 대신, 여기서 도달 격자로 실제로 다가갈 수 있는지 본다."""
+    return [(m.group(1), float(m.group(2)), float(m.group(3)))
+            for m in window_re.finditer(text)]
 
 
 def inside(poly, x, y):
@@ -147,7 +159,7 @@ def main():
     sizes = []
     for fl in (1, 2, 3, 4, 5):
         path = ROOT / f"scenes/background/school_floor_{fl}.tscn"
-        walls, rooms, (w, h) = parse(path)
+        walls, rooms, (w, h), wins = parse(path)
         sizes.append((w, h))
         blocked, cols, rows = build_grid(walls, w, h)
         # 시작: 북쪽 복도 한가운데(1층은 상단 복도)
@@ -165,6 +177,15 @@ def main():
                 print(f"   ✗ {name}: 막혀 있어야 하는데 도달됨"); bad += 1
             elif not want_closed and not reach:
                 print(f"   ✗ {name}: 도달 불가"); bad += 1
+
+        # 창가 조사(#274)에 다가갈 수 있는가. 플레이어의 InteractionArea는
+        # 24x24, 창가 조사 범위는 170x52 — 중심 간 거리가 (12+85, 12+26)
+        # 안이면 겹친다. 도달 가능한 셀 하나라도 그 안에 있으면 된다.
+        for name, px, py in wins:
+            if not any(abs((c + 0.5) * CELL - px) < 97
+                       and abs((r + 0.5) * CELL - py) < 38 for r, c in seen):
+                print(f"   ✗ {name}: 창가에 다가갈 수 없다 ({px:.0f},{py:.0f})")
+                bad += 1
     bad += check_camera(sizes)
     print("\n문제 없음" if bad == 0 else f"\n문제 {bad}건")
     return 1 if bad else 0

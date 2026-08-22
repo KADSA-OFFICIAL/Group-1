@@ -46,7 +46,7 @@ def main():
     arrive = (579, 692)   # main.tscn의 4층 시작 위치
 
     for fl in range(START_FLOOR, END_FLOOR - 1, -1):
-        walls, rooms, (w, h) = V.parse(ROOT / f"scenes/background/school_floor_{fl}.tscn")
+        walls, rooms, (w, h), _ = V.parse(ROOT / f"scenes/background/school_floor_{fl}.tscn")
         blocked, cols, rows = V.build_grid(walls, w, h)
         seen = V.flood(blocked, cols, rows, arrive)
         reach = lambda p: (int(p[1] // V.CELL), int(p[0] // V.CELL)) in seen
