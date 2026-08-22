@@ -55,10 +55,18 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT_DIR = ROOT / "assets" / "tiles"
 
 DOT = 2             # 무늬 최소 단위(월드 px)
-FLOOR = 32          # 바닥 타일 한 변(#259) — 쯔꾸르식 32칸. 48이던 것을 줄여
-                    # 격자가 더 자주 보이게 했다. 무늬 함수의 칸 크기(널 높이·장
-                    # 크기)는 FLOOR//DOT로 나누어떨어져야 이어붙는다 — 안 그러면
-                    # _check_periodic이 잡는다.
+FLOOR_CELL = 32     # 바닥 격자 한 칸(#259) — 쯔꾸르식 32칸. 널 폭·줄눈 간격·장
+                    # 크기가 이 값이다. 화면에서 보이는 격자는 여전히 이것이다.
+FLOOR = 256         # 바닥 타일 한 변(#283) — 한 장에 32px 칸이 8x8 들어간다.
+                    # 32이던 것을 키웠다. 타일 한 장이 곧 한 칸이면 그 안에
+                    # 담을 수 있는 것이 잔 결뿐이라, 얼룩을 넣는 순간 32px마다
+                    # 되풀이되는 벽지 무늬가 된다. 칸을 묶으니 닳은 자리·번진
+                    # 때처럼 **칸보다 큰 것**이 들어갈 자리가 생겼다.
+                    # 128도 해 봤는데 화면 폭(월드 1280px)에 열 번 반복돼 되풀이가
+                    # 눈에 띄었다. 256이면 다섯 번이라 안 보인다. 여섯 장 합쳐
+                    # 108KB, 굽는 데 8초 — 더 키울 여지는 있다.
+SUB = FLOOR_CELL // DOT   # 한 칸의 도트 수(16). 무늬 함수는 gw가 아니라 이걸 쓴다 —
+                          # gw를 칸 크기로 쓰면 타일을 키울 때 널이 같이 넓어진다.
 SMALL = 16          # 벽·얇은 장식 타일 한 변 — 벽 두께 T=16과 같아 두께 방향으로
                     # 딱 한 장 들어간다. **면 두께보다 큰 타일을 쓰면 안 된다** —
                     # UV가 월드 좌표라 얇은 면에는 타일의 일부만, 그것도 면의 y에
@@ -94,16 +102,58 @@ def jit(amp: float, *key: int) -> float:
 # 무늬 함수는 도트 격자 좌표(dx, dy)와 격자 크기(gw, gh)를 받아 곱셈 계수를 낸다.
 # 첫 줄에서 좌표를 격자 크기로 감싼다 — 이래야 타일이 이어붙는다.
 
+def blot(dx: int, dy: int, gw: int, gh: int, cell: int, seed: int) -> float:
+    """타일을 감싸는 부드러운 값 잡음 0..1 (#283).
+
+    `cell` 도트마다 격자점을 두고 이중선형으로 섞는다. `rnd`는 점 단위라
+    아무리 뿌려도 32px보다 큰 얼룩이 안 생긴다 — 넓게 번진 때·닳은 자리를
+    내려면 격자점 사이를 이어야 한다.
+
+    격자점 좌표를 `% n`으로 감싸야 타일이 이어붙는다(`_check_periodic`이 잡는다).
+    """
+    nx, ny = max(1, gw // cell), max(1, gh // cell)
+    gx, gy = dx // cell, dy // cell
+    fx = (dx % cell) / cell
+    fy = (dy % cell) / cell
+    fx = fx * fx * (3.0 - 2.0 * fx)                   # smoothstep — 격자점이 안 보이게
+    fy = fy * fy * (3.0 - 2.0 * fy)
+    a = (rnd(gx % nx, gy % ny, seed) * (1.0 - fx)
+         + rnd((gx + 1) % nx, gy % ny, seed) * fx)
+    b = (rnd(gx % nx, (gy + 1) % ny, seed) * (1.0 - fx)
+         + rnd((gx + 1) % nx, (gy + 1) % ny, seed) * fx)
+    return a * (1.0 - fy) + b * fy
+
+
+def wear(dx: int, dy: int, gw: int, gh: int, seed: int,
+         broad: float, fine: float) -> float:
+    """바닥이 닳고 때가 탄 정도를 밝기 보정값으로 낸다(#283).
+
+    두 배율을 겹친다 — 타일 절반쯤 되는 넓은 얼룩과 그 안의 잔 얼룩. 한 배율만
+    쓰면 구름처럼 뭉개지거나 자글거리기만 한다.
+    """
+    v = blot(dx, dy, gw, gh, gw // 2, seed) - 0.5
+    v = v * broad + (blot(dx, dy, gw, gh, max(2, gw // 8), seed + 1) - 0.5) * fine
+    return v
+
+
 def p_wood(dx: int, dy: int, gw: int, gh: int) -> float:
-    """교실·수위실 마루널. 널 높이 6도트(12px), 널마다 끝 맞댄 자리가 반 칸 어긋난다."""
+    """교실·교무실·수위실 마루널. 널 높이 6도트(12px), 널 끝이 칸마다 어긋난다.
+
+    타일에 칸이 여럿(#283)이라 칸마다 색이 달라진다 — 한 칸짜리였을 때는 같은
+    마루가 32px마다 그대로 되풀이됐다.
+    """
     dx, dy = dx % gw, dy % gh
-    ph = 8                                            # 널 높이(도트) — gh=16을 나눠야 이어붙는다
+    ph = 8                                            # 널 높이(도트) — SUB=16을 나눠야 한다
     plank = dy // ph
-    v = 0.86 + jit(0.07, plank, 11)                   # 널마다 색이 조금 다르다
+    cx, cy = dx // SUB, dy // SUB                     # 칸 좌표
+    v = 0.86 + jit(0.07, plank, cx, 11)               # 널마다·칸마다 색이 다르다
     v += jit(0.04, dx, dy, 12)                        # 잔 나뭇결
     if rnd(dx // 3, plank, 13) > 0.82:
         v -= 0.08                                     # 결 줄무늬(널 방향으로 길게)
-    if dx == (0 if plank % 2 == 0 else gw // 2):
+    v += wear(dx, dy, gw, gh, 14, 0.16, 0.06)         # 닳은 자리·때
+    if rnd(dx // 2, dy // 2, 15) > 0.988:
+        v -= 0.13                                     # 긁힌 자국
+    if dx % SUB == (0 if (plank + cy) % 2 == 0 else SUB // 2):
         v = 0.64                                      # 널 끝 맞댄 자리
     if dy % ph == ph - 1:
         v = 0.57                                      # 널 사이 이음매
@@ -116,20 +166,27 @@ def p_board(dx: int, dy: int, gw: int, gh: int) -> float:
 
     널 선을 폴리곤이 아니라 **여기 무늬에 넣는다**. #242는 복도 널을 64px마다
     Polygon2D로 그렸는데, 직각으로 돌리자 층당 150개가 넘게 생겼다(노드 예산
-    초과). 타일이 32px 주기로 이어붙으니 널 폭 32px은 공짜로 나오고, 월드
-    격자에 정확히 정렬되는 덤도 있다.
+    초과). 타일이 32px 칸으로 이어붙으니 널 폭 32px은 공짜로 나온다.
+
+    닳은 자국도 여기 있다(#283). #242가 바닥에 깔던 279x26 폴리곤은 사람이
+    다닌 흔적이 아니라 떨어진 판자로 보여서 #277에서 걷어냈다 — 바닥에 놓는
+    대신 **바닥 자체**로 만들면 그 문제가 없다.
     """
     dx, dy = dx % gw, dy % gh
-    v = 0.87 + jit(0.06, dx // (gw // 2), 141)        # 널마다 색이 조금 다르다
+    cx = dx // SUB                                    # 널 번호
+    v = 0.87 + jit(0.06, cx, 141)                     # 널마다 색이 조금 다르다
     v += jit(0.04, dx, dy, 142)                       # 잔 결
     if rnd(dx, dy // 3, 143) > 0.86:
         v -= 0.06                                     # 결 줄무늬(널 방향=세로)
     if rnd(dx, dy, 144) > 0.985:
         v -= 0.20                                     # 옹이
-    if dx == 0:
+    v += wear(dx, dy, gw, gh, 145, 0.20, 0.07)        # 닳은 자리·때
+    if rnd(dx // 2, dy // 3, 146) > 0.99:
+        v -= 0.15                                     # 끌린 자국
+    if dx % SUB == 0:
         v = 0.60                                      # 널 사이 이음매(세로)
     # 널 끝 맞댄 자리 — 널마다 다른 높이에 둬서 엇갈리게 보인다.
-    if dy == (gh // 3 if dx < gw // 2 else (2 * gh) // 3):
+    if dy % gh == (gh // 3 + cx * 5) % gh:
         v = 0.66
     return v
 
@@ -137,25 +194,30 @@ def p_board(dx: int, dy: int, gw: int, gh: int) -> float:
 def p_matte(dx: int, dy: int, gw: int, gh: int) -> float:
     """화장실 바닥 타일. 줄눈을 **여기 무늬에 넣는다**(#277).
 
-    예전에는 `FM_` 폴리곤으로 60px마다 그었다(#242). 타일이 32px 주기로
+    예전에는 `FM_` 폴리곤으로 60px마다 그었다(#242). 타일이 32px 칸으로
     이어붙는데 줄눈만 60px이라 두 격자가 어긋났고, 무엇보다 층당 46개의
-    2x328 막대가 바닥에 누워 있었다 — 복도 널을 무늬로 옮긴 것(#268)과
-    같은 이유로 여기도 무늬가 맞다. 노드 0개에 타일 격자와 정확히 맞는다.
+    2x328 막대가 바닥에 누워 있었다.
+
+    물때는 칸 단위로 번진다(#283) — 한 칸만 유난히 더러운 타일이 섞여야
+    화장실로 보인다.
     """
     dx, dy = dx % gw, dy % gh
-    v = 0.88 + jit(0.05, dx, dy, 151)
+    cx, cy = dx // SUB, dy // SUB
+    v = 0.88 + jit(0.04, cx, cy, 150)                 # 타일마다 미세하게 다른 색
+    v += jit(0.05, dx, dy, 151)
     r = rnd(dx, dy, 152)
     if r > 0.93:
         v -= 0.22                                     # 물때 얼룩
     elif r < 0.05:
         v += 0.07                                     # 광택 점
-    if dx == 0 or dy == 0:
+    v += wear(dx, dy, gw, gh, 153, 0.18, 0.05)        # 번진 물때
+    if dx % SUB == 0 or dy % SUB == 0:
         v = 0.62                                      # 줄눈
     return v
 
 
 def p_cement(dx: int, dy: int, gw: int, gh: int) -> float:
-    """창고·막힌 공간 시멘트. 거친 두 배율 잡음 + 드러난 골재."""
+    """창고·막힌 공간 시멘트. 거친 두 배율 잡음 + 드러난 골재 + 얼룩(#283)."""
     dx, dy = dx % gw, dy % gh
     v = 0.82 + jit(0.13, dx // 3, dy // 3, 41)        # 넓은 반죽 자국
     v += jit(0.07, dx, dy, 42)
@@ -164,15 +226,17 @@ def p_cement(dx: int, dy: int, gw: int, gh: int) -> float:
         v += 0.10                                     # 드러난 골재
     elif r < 0.07:
         v -= 0.16                                     # 파인 자리
+    v += wear(dx, dy, gw, gh, 44, 0.22, 0.08)         # 습기 자국
     return v
 
 
 def p_vinyl(dx: int, dy: int, gw: int, gh: int) -> float:
-    """실험실 데코타일. 16px 장에 대리석 흉내 얼룩이 섞여 있다."""
+    """실험실 데코타일. 16px 장에 대리석 흉내 얼룩, 장마다 색이 조금 다르다."""
     dx, dy = dx % gw, dy % gh
-    s = 8                                             # 장 크기(도트) — gw=16을 나눠야 한다
+    s = 8                                             # 장 크기(도트) — SUB=16을 나눠야 한다
     v = 0.86 + jit(0.05, dx // s, dy // s, 61)
     v += jit(0.09, dx // 2, dy // 2, 62)
+    v += wear(dx, dy, gw, gh, 63, 0.12, 0.05)         # 광택이 죽은 자리
     if dx % s == 0 or dy % s == 0:
         v = 0.62                                      # 장 이음매
     return v
@@ -181,10 +245,11 @@ def p_vinyl(dx: int, dy: int, gw: int, gh: int) -> float:
 def p_panel(dx: int, dy: int, gw: int, gh: int) -> float:
     """컴퓨터실 액세스플로어. 16px 패널 + 네 귀퉁이 나사."""
     dx, dy = dx % gw, dy % gh
-    s = 8                                             # 패널 크기(도트) — gw=16을 나눠야 한다
+    s = 8                                             # 패널 크기(도트) — SUB=16을 나눠야 한다
     ix, iy = dx % s, dy % s
     v = 0.85 + jit(0.04, dx // s, dy // s, 71)
     v += jit(0.03, dx, dy, 72)
+    v += wear(dx, dy, gw, gh, 73, 0.10, 0.04)         # 밟혀 닳은 자리
     if ix == 1 or iy == 1:
         v += 0.08                                     # 경계 옆 하이라이트
     if ix in (2, s - 3) and iy in (2, s - 3):
