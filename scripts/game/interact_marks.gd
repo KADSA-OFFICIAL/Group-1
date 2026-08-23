@@ -14,10 +14,10 @@ extends Node2D
 ## 아이템·열린 문이 사라지면 표시만 남으므로, 이름으로 임자를 찾아 없어졌으면
 ## 같이 끈다 — 그쪽 스크립트를 건드리지 않아도 된다.
 
-## 이 거리 안에 들어야 표시가 뜬다.
-const REVEAL_DISTANCE := 210.0
+## 이 거리 안에 들어야 뜬다. 방 이름(#307)은 더 멀리서 보여야 하므로 씬에서 올린다.
+@export var reveal_distance: float = 210.0
 ## 완전히 밝아지는 거리. 이 사이는 서서히 밝아진다.
-const FULL_DISTANCE := 120.0
+@export var full_distance: float = 120.0
 ## 거리를 다시 재는 주기(초). 매 프레임 잴 필요가 없다.
 const INTERVAL := 0.08
 ## 밝기가 따라붙는 속도. 튀지 않고 스미듯 나타나게 한다.
@@ -58,7 +58,12 @@ func _process(delta: float) -> void:
 
 ## 표시의 임자. `Mark_<이름>` 규칙으로 층 씬 루트에서 찾는다.
 ## 씬 루트는 `WallGlow/Marks`의 두 단계 위다.
+##
+## 앞머리가 `Mark_`가 아니면 임자가 없는 것이다(방 이름 라벨, #307) — 자기
+## 자신을 돌려줘 '늘 살아 있음'으로 친다.
 func _owner_of(mark: Node) -> Node:
+	if not String(mark.name).begins_with(PREFIX):
+		return mark
 	var root := get_parent().get_parent()
 	if root == null:
 		return null
@@ -79,12 +84,15 @@ func _refresh() -> void:
 		if owner_node == null:
 			_target[child] = 0.0       # 주웠거나 열려서 사라졌다
 			continue
-		var d := origin.distance_to((child as Node2D).global_position)
+		# 라벨은 Node2D가 아니라 Control이라 global_position이 좌상단이다.
+		var at: Vector2 = ((child as Control).get_global_rect().get_center()
+				  if child is Control else (child as Node2D).global_position)
+		var d := origin.distance_to(at)
 		var a := 0.0
-		if d <= FULL_DISTANCE:
+		if d <= full_distance:
 			a = 1.0
-		elif d < REVEAL_DISTANCE:
-			a = 1.0 - (d - FULL_DISTANCE) / (REVEAL_DISTANCE - FULL_DISTANCE)
+		elif d < reveal_distance:
+			a = 1.0 - (d - full_distance) / (reveal_distance - full_distance)
 		if a > 0.0 and owner_node.get("investigated") == true:
 			a *= READ_ALPHA
 		_target[child] = a
