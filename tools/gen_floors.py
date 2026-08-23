@@ -1949,10 +1949,7 @@ def add_clutter(sc):
     return placed
 
 
-# ── 집기 조사(#301) ──────────────────────────────────────────────
-# #289로 소품이 층당 400개까지 늘었지만 하나도 만질 수 없었다. 책상·사물함·
-# 칠판에 다가가도 아무 반응이 없어 방이 여전히 배경이었다.
-#
+# ── 집기 조사(#301, 문구는 #304에서 다시 씀) ─────────────────────
 # `add_clutter()`와 같은 방식으로 **이미 놓인 집기를 훑어** 조사 대상을 붙인다.
 # 진행에는 영향이 없다 — 플래그도 아이템도 주지 않는다.
 #
@@ -1960,83 +1957,215 @@ def add_clutter(sc):
 # 가로챈다 — `_find_interactable`는 우선순위가 같으면 가까운 쪽을 고른다(#301).
 EXAMINE_PRIORITY = 3
 EXAMINE_ZONE = (58, 50)      # 조사 범위
-EXAMINE_CHANCE = 18          # 집기가 조사 대상이 될 확률(%). 34로 했더니 층당 130개가
-                             # 넘어 같은 문구가 되풀이됐다 — 방마다 두셋이면 충분하다.
 EXAMINE_MIN = 26             # 이보다 작은 집기에는 안 붙인다
+# **한 방에 이만큼까지만.** #301에서 확률로만 걸렀더니 층당 71개가 되고 한 교실
+# 안에서 같은 문구가 두세 번 나왔다. 방마다 몇 개인지를 직접 세는 편이 낫다.
+EXAMINE_PER_ROOM = 2
 
-# 집기 색 -> (안내 문구, [묘사, ...]). 방 종류를 몰라도 집기 종류만으로 고른다.
+# 집기 색 -> 안내 문구
+EXAMINE_PROMPT = {
+    C_DESK: "책상 살펴보기",
+    C_LOCKER: "사물함 살펴보기",
+    C_SHELF: "선반 살펴보기",
+    C_CABINET: "캐비닛 살펴보기",
+    C_CLEAN: "청소도구함 살펴보기",
+    C_BIN: "쓰레기통 살펴보기",
+    C_SINK: "세면대 살펴보기",
+    C_BED: "침상 살펴보기",
+    C_RACK: "서버랙 살펴보기",
+    C_SOFA: "소파 살펴보기",
+    C_COPIER: "복사기 살펴보기",
+    C_STALL: "칸막이 살펴보기",
+}
+
+# (집기 색, 방 종류) -> [묘사, ...]. 방 종류가 없는 항목이 기본값이다.
+# **방 종류를 본다**(#304) — 교무실 책상이 교실 책상과 같은 말을 하면 방이
+# 어디든 똑같아 보인다. 종류는 `prop_kind()`가 내는 값이고 복도는 "corridor"다.
 EXAMINE_LINES = {
-    C_DESK: ("책상 살펴보기", [
-        "책상 서랍이 반쯤 열려 있다. 안에 지우개 가루뿐이다.",
-        "상판에 커터칼로 파 놓은 이름이 있다. 절반쯤 지워졌다.",
-        "누가 급하게 일어난 자리다. 의자가 비스듬히 밀려 있다.",
+    (C_DESK, "classroom"): [
+        "서랍이 반쯤 열려 있다. 지우개 가루뿐이다.",
+        "상판에 커터칼로 판 이름이 있다. 절반쯤 지워졌다.",
         "교과서가 펼쳐진 채다. 어제 날짜 진도까지 나갔다.",
-    ]),
-    C_LOCKER: ("사물함 살펴보기", [
-        "사물함 문이 잠겨 있다. 이름표는 떼어졌다.",
+        "의자가 비스듬히 밀려 있다. 급하게 일어난 자리다.",
+        "낙서가 빼곡하다. '3월 14일'에만 동그라미가 쳐져 있다.",
+        "받침대에 체육복 주머니가 걸려 있다. 이름표가 뜯겨 있다.",
+        "책상 밑에 씹던 껌이 굳어 있다. 아직 말랑하다.",
+    ],
+    (C_DESK, "office"): [
+        "결재판이 쌓여 있다. 맨 위 서류가 반려 도장을 받았다.",
+        "책상 유리 밑에 시간표가 끼워져 있다. 야간 순찰 칸이 비어 있다.",
+        "머그컵에 커피가 반쯤 남았다. 표면에 막이 앉았다.",
+        "달력에 이번 주가 통째로 X로 그어져 있다.",
+        "명패가 엎어져 있다. 뒤집어 보니 이름이 긁혀 지워졌다.",
+    ],
+    (C_DESK, "lab"): [
+        "실험대에 약품 자국이 남아 있다. 최근 것은 아니다.",
+        "기록지가 놓여 있다. 마지막 줄만 다른 필체다.",
+        "가스 밸브가 잠겨 있다. 손잡이에 청테이프가 감겨 있다.",
+    ],
+    (C_DESK, "janitor"): [
+        "작업 일지다. 날짜마다 '이상 없음'이 같은 글씨로 적혀 있다.",
+        "열쇠 몇 개가 흩어져 있다. 어느 문 것인지 표시가 없다.",
+    ],
+    (C_DESK, None): [
+        "쓴 지 오래된 책상이다. 먼지가 고르게 앉았다.",
+        "상판이 한쪽으로 기울어 있다. 다리 하나가 짧다.",
+    ],
+    (C_LOCKER, "classroom"): [
+        "문이 잠겨 있다. 이름표는 떼어졌다.",
         "문틈으로 체육복 소매가 삐져나와 있다.",
-        "번호만 남고 이름표가 없는 칸이 하나 있다.",
-    ]),
-    C_SHELF: ("선반 살펴보기", [
+        "번호만 남고 이름이 없는 칸이 하나 있다.",
+        "안에서 뭔가 굴러떨어지는 소리가 났다. 열어 볼 수는 없다.",
+        "자물쇠가 끊겨 있다. 끊은 자국이 새것이다.",
+    ],
+    (C_LOCKER, "corridor"): [
+        "복도 사물함이다. 몇 칸은 문이 아예 없다.",
+        "칸마다 붙은 이름표 중 다섯 장이 검은 테이프로 덮여 있다.",
+        "누가 발로 찬 자국이 있다. 안쪽까지 우그러졌다.",
+    ],
+    (C_LOCKER, None): [
+        "철제 사물함이다. 손잡이가 차갑다.",
+        "문을 당겨 봤지만 잠겨 있다.",
+    ],
+    (C_SHELF, "classroom"): [
         "학급문고. 표지가 다 해졌는데 대출 카드는 비어 있다.",
+        "책이 한 칸만 비어 있다. 먼지 자국으로 크기를 알 수 있다.",
+        "학급 문집이 꽂혀 있다. 한 해치만 없다.",
+        "맨 윗칸에 손이 닿은 자국이 있다. 최근이다.",
+    ],
+    (C_SHELF, "storage"): [
+        "상자가 연도별로 쌓여 있다. 올해 것만 없다.",
+        "맨 아래 칸이 젖어 있다. 종이가 부풀어 있다.",
+        "상자 하나가 밖으로 끌려 나온 자국이 있다.",
+        "라벨이 매직으로 지워져 있다. 밑에 다른 글씨가 비친다.",
+    ],
+    (C_SHELF, None): [
         "먼지가 고르게 앉았다. 한참 아무도 안 건드렸다.",
-    ]),
-    C_CABINET: ("캐비닛 살펴보기", [
+    ],
+    (C_CABINET, "office"): [
         "서류철이 연도별로 꽂혀 있다. 올해 것만 비어 있다.",
+        "'학교폭력 대책' 파일이 있다. 속은 비었다.",
         "잠금장치가 뜯긴 자국이 있다. 오래된 자국은 아니다.",
-    ]),
-    C_CLEAN: ("청소도구함 살펴보기", [
+    ],
+    (C_CABINET, None): [
+        "캐비닛 문이 어긋나 닫히지 않는다.",
+        "안쪽에서 종이 냄새가 난다.",
+    ],
+    (C_CLEAN, "classroom"): [
         "빗자루와 쓰레받기. 대걸레 자리만 비어 있다.",
-        "안쪽 벽에 청소 당번표가 붙어 있다. 이름이 하나 지워졌다.",
-    ]),
-    C_BIN: ("쓰레기통 살펴보기", [
+        "안쪽 벽에 청소 당번표가 붙어 있다. 이름 하나가 지워졌다.",
+    ],
+    (C_CLEAN, None): [
+        "세제 냄새가 훅 끼친다. 최근에 쓴 것이다.",
+    ],
+    (C_BIN, "classroom"): [
         "찢은 종이가 가득하다. 맞춰 볼 만한 조각은 없다.",
         "비운 지 오래됐다. 바닥에 뭔가 눌어붙어 있다.",
-    ]),
-    C_SINK: ("세면대 살펴보기", [
+    ],
+    (C_BIN, None): [
+        "안이 비어 있다. 봉투도 새것이다.",
+    ],
+    (C_SINK, "toilet"): [
         "수도꼭지에서 물이 한 방울씩 떨어진다.",
         "거울에 금이 가 있다. 얼굴이 두 조각으로 나뉜다.",
-    ]),
-    C_BED: ("침상 살펴보기", [
+        "배수구에 머리카락이 엉켜 있다.",
+        "거울에 김이 서린 자국이 남아 있다. 오늘 누가 썼다는 뜻이다.",
+        "비누가 반쯤 녹아 있다. 물에 오래 잠겨 있었다.",
+        "수도가 잠기지 않는다. 손잡이가 헛돈다.",
+        "타일 사이로 물이 스며 나온다. 어디서 오는지는 모르겠다.",
+        "세면대 밑에 젖은 발자국이 있다. 크기가 어른 것이다.",
+    ],
+    (C_SINK, None): [
+        "물때가 껴 있다. 오래 쓴 세면대다.",
+    ],
+    (C_BED, None): [
         "이불이 개켜져 있다. 누군가 최근까지 쓴 자리다.",
-    ]),
-    C_RACK: ("서버랙 살펴보기", [
+        "베개가 눌린 자국이 선명하다.",
+    ],
+    (C_RACK, None): [
         "표시등이 하나만 깜빡인다. 나머지는 꺼져 있다.",
-    ]),
-    C_SOFA: ("소파 살펴보기", [
+        "팬이 돌지 않는다. 그런데 본체는 따뜻하다.",
+    ],
+    (C_SOFA, "office"): [
         "가죽이 한쪽만 눌려 있다. 늘 같은 자리에 앉는 사람이 있다.",
-    ]),
-    C_COPIER: ("복사기 살펴보기", [
+    ],
+    (C_COPIER, "office"): [
         "용지함이 비었다. 마지막 출력 매수가 화면에 남아 있다.",
-    ]),
+    ],
+    (C_STALL, "toilet"): [
+        "칸막이 안쪽에 볼펜 낙서가 있다. 이름 다섯 개가 나란히 적혀 있다.",
+        "문고리가 안에서 부서져 있다.",
+        "칸 안쪽 벽에 손톱으로 긁은 자국이 있다.",
+        "문 아래 틈으로 먼지가 쓸려 들어가 있다. 오래 닫혀 있었다.",
+    ],
 }
+
+
+def _name_hash(name):
+    h = 2166136261
+    for ch in name:
+        h = ((h ^ ord(ch)) * 16777619) & 0xFFFFFFFF
+    return h
+
+
+def _room_kind(sc, room_key):
+    """집기 이름 앞머리로 방 종류를 찾는다. 복도 집기(`Corr_*`)는 "corridor"."""
+    if room_key == "Corr":
+        return "corridor"
+    meta = sc.room_meta.get(room_key)
+    if meta is None:
+        return None
+    return prop_kind(room_key, meta[0])
 
 
 def add_examine(sc):
     """집기를 훑어 조사 대상을 붙인다(#301). 놓은 개수를 돌려준다.
 
+    **방마다 `EXAMINE_PER_ROOM`개까지**, 그리고 **한 방에서 같은 문구를 두 번
+    쓰지 않는다**(#304). 확률로만 거르던 때는 층당 71개가 되고 한 교실 안에서
+    같은 말이 두세 번 나왔다.
+
     표시(`sc.mark`)를 함께 낸다 — 표시가 없으면 늘어난 조사 대상을 찾을
     방법이 없어 오히려 방만 어지러워진다.
     """
+    by_room = {}
+    for key, box, color in sc.prop_rects:
+        by_room.setdefault(key.split("_")[0], []).append((key, box, color))
+
     placed = 0
-    for key, box, color in list(sc.prop_rects):
-        table = EXAMINE_LINES.get(color)
-        if table is None:
-            continue
-        x0, y0, x1, y1 = box
-        if x1 - x0 < EXAMINE_MIN or y1 - y0 < EXAMINE_MIN:
-            continue
-        seed = _name_hash(key) ^ 0x5EED
-        if seed % 100 >= EXAMINE_CHANCE:
-            continue
-        prompt, lines = table
-        cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
-        # 단서 근처는 피한다 — 우선순위로 이기더라도 표시가 겹쳐 어지럽다.
-        if any(abs(px - cx) < 70 and abs(py - cy) < 70 for px, py in sc.clue_pts):
-            continue
-        sc.examine(f"Exam_{key}", cx, cy, prompt, lines[(seed // 11) % len(lines)])
-        placed += 1
+    for room_key in sorted(by_room):
+        kind = _room_kind(sc, room_key)
+        used = set()
+        count = 0
+        # 이름 해시로 정렬해 같은 방에서도 늘 같은 집기가 뽑히게 한다
+        # (재생성해도 결과가 같아야 한다).
+        for key, box, color in sorted(by_room[room_key],
+                                      key=lambda it: _name_hash(it[0])):
+            if count >= EXAMINE_PER_ROOM:
+                break
+            lines = EXAMINE_LINES.get((color, kind)) or EXAMINE_LINES.get((color, None))
+            if not lines:
+                continue
+            x0, y0, x1, y1 = box
+            if x1 - x0 < EXAMINE_MIN or y1 - y0 < EXAMINE_MIN:
+                continue
+            cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+            # 단서 근처는 피한다 — 우선순위로 이기더라도 표시가 겹쳐 어지럽다.
+            if any(abs(px - cx) < 70 and abs(py - cy) < 70 for px, py in sc.clue_pts):
+                continue
+            seed = _name_hash(key) ^ 0x5EED
+            pick = next((lines[(seed // 11 + k) % len(lines)]
+                         for k in range(len(lines))
+                         if lines[(seed // 11 + k) % len(lines)] not in used), None)
+            if pick is None:
+                continue
+            used.add(pick)
+            sc.examine(f"Exam_{key}", cx, cy,
+                       EXAMINE_PROMPT.get(color, "살펴보기"), pick)
+            count += 1
+            placed += 1
     return placed
+
 
 
 def add_sliding_doors(sc):
