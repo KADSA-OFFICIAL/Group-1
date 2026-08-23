@@ -276,7 +276,9 @@ def uv_for(polygon):
 TEXTURES = {f"tex_{stem}": f"{TEX_DIR}/{stem}.png"
             for stem in sorted(set(TEX.values()) | set(SPRITE.values()))}
 
-CANVAS_ITEM_ROOTS = ("WallGlow",)   # CanvasLayer 직속 = 텍스처 설정을 물려받을 부모가 없다
+# 텍스처 설정을 물려받을 부모가 없는 CanvasLayer 직속 노드. #307에서 벽·문·계단
+# 시각이 전부 레이어 0(`Structures`)으로 내려가면서 비었다 — 씬 루트에서 물려받는다.
+CANVAS_ITEM_ROOTS = ()
 
 # texture_filter = 1(Nearest): 도트가 보간돼 뭉개지지 않게. 프로젝트 기본값은 Linear다.
 # texture_repeat = 2(Enabled): UV가 폴리곤 좌표라 1을 넘어간다 — 감싸지 않으면 한 장만
@@ -560,7 +562,7 @@ class Scene:
         앞면이 보이는 것은 시선과 마주 보는 가로 벽뿐이다).
         """
         self.solid(f"WC_{key}", body, polygon)
-        self.poly2d(f"WV_{key}", "WallGlow/RoomWallVisuals", C_WALL, polygon)
+        self.poly2d(f"WV_{key}", "Structures", C_WALL, polygon)
         nums = [float(v) for v in
                 polygon[polygon.index("(") + 1:polygon.rindex(")")].split(",")]
         xs, ys = nums[0::2], nums[1::2]
@@ -569,11 +571,11 @@ class Scene:
             x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
             # 3단으로 나눈다 — 윗변 하이라이트 / 앞면 / 바닥에 닿는 그림자.
             # 면 하나만 두면 밝기가 같은 띠 두 개라 여전히 납작해 보인다(#271).
-            self.poly2d(f"WH_{key}", "WallGlow/RoomWallVisuals", C_WALL_TOP,
+            self.poly2d(f"WH_{key}", "Structures", C_WALL_TOP,
                         rect(x0, y0, x1, y0 + 3))
-            self.poly2d(f"WF_{key}", "WallGlow/RoomWallVisuals", C_FACE,
+            self.poly2d(f"WF_{key}", "Structures", C_FACE,
                         rect(x0, y1, x1, y1 + WALL_FACE - 4))
-            self.poly2d(f"WS_{key}", "WallGlow/RoomWallVisuals", C_WALL_SHADOW,
+            self.poly2d(f"WS_{key}", "Structures", C_WALL_SHADOW,
                         rect(x0, y1 + WALL_FACE - 4, x1, y1 + WALL_FACE))
 
     def prop(self, key, polygon, color):
@@ -698,7 +700,7 @@ class Scene:
         Props(레이어 0)에 두면 CanvasLayer인 WallGlow의 벽 시각이 덮어
         아예 안 보인다(#234와 같은 함정).
         """
-        self.poly2d(f"WD_{key}", "WallGlow/RoomWallVisuals", color, polygon, z=1)
+        self.poly2d(f"WD_{key}", "Structures", color, polygon, z=1)
 
     def floor_mark(self, key, polygon, color):
         """방 바닥 표시 — 방 바닥 위, 집기 아래. 가구 밑에 깔리는 것이 정상이라
@@ -836,13 +838,13 @@ def add_room(sc, key, label, x0, y0, x1, y1, door):
     if door == "top":
         sc.wall(f"{key}_topL", rect(x0, y0, dl, y0 + T))
         sc.wall(f"{key}_topR", rect(dr, y0, x1, y0 + T))
-        sc.poly2d(f"Door_{key}", "WallGlow/RoomWallVisuals", C_DOOR, rect(dl, y0, dr, y0 + T), z=1)
+        sc.poly2d(f"Door_{key}", "Structures", C_DOOR, rect(dl, y0, dr, y0 + T), z=1)
         sc.wall(f"{key}_bot", rect(x0, y1 - T, x1, y1))
     elif door == "bottom":
         sc.wall(f"{key}_top", rect(x0, y0, x1, y0 + T))
         sc.wall(f"{key}_botL", rect(x0, y1 - T, dl, y1))
         sc.wall(f"{key}_botR", rect(dr, y1 - T, x1, y1))
-        sc.poly2d(f"Door_{key}", "WallGlow/RoomWallVisuals", C_DOOR, rect(dl, y1 - T, dr, y1), z=1)
+        sc.poly2d(f"Door_{key}", "Structures", C_DOOR, rect(dl, y1 - T, dr, y1), z=1)
     else:   # 막힌 공간: 사방 폐쇄
         sc.wall(f"{key}_top", rect(x0, y0, x1, y0 + T))
         sc.wall(f"{key}_bot", rect(x0, y1 - T, x1, y1))
@@ -850,14 +852,14 @@ def add_room(sc, key, label, x0, y0, x1, y1, door):
     if door == "left":
         sc.wall(f"{key}_leftT", rect(x0, y0, x0 + T, dt))
         sc.wall(f"{key}_leftB", rect(x0, db, x0 + T, y1))
-        sc.poly2d(f"Door_{key}", "WallGlow/RoomWallVisuals", C_DOOR, rect(x0, dt, x0 + T, db), z=1)
+        sc.poly2d(f"Door_{key}", "Structures", C_DOOR, rect(x0, dt, x0 + T, db), z=1)
     else:
         sc.wall(f"{key}_left", rect(x0, y0, x0 + T, y1))
 
     if door == "right":
         sc.wall(f"{key}_rightT", rect(x1 - T, y0, x1, dt))
         sc.wall(f"{key}_rightB", rect(x1 - T, db, x1, y1))
-        sc.poly2d(f"Door_{key}", "WallGlow/RoomWallVisuals", C_DOOR, rect(x1 - T, dt, x1, db), z=1)
+        sc.poly2d(f"Door_{key}", "Structures", C_DOOR, rect(x1 - T, dt, x1, db), z=1)
     else:
         sc.wall(f"{key}_right", rect(x1 - T, y0, x1, y1))
 
@@ -882,7 +884,7 @@ def add_stair_markers(sc, name, x0, y0, x1, y1, floor):
             tri = poly((cx, cy - s), (cx + s * 0.9, cy + s * 0.6), (cx - s * 0.9, cy + s * 0.6))
         else:
             tri = poly((cx, cy + s), (cx + s * 0.9, cy - s * 0.6), (cx - s * 0.9, cy - s * 0.6))
-        sc.poly2d(f"Arrow_{name}_{tag}", "WallGlow", C_ARROW, tri, z=2)
+        sc.poly2d(f"Arrow_{name}_{tag}", "Structures", C_ARROW, tri, z=2)
         sc.label(f"{name}_{tag}", f"{target}층", cx, cy + 58)
 
 
@@ -1119,11 +1121,11 @@ def add_stair_locks(sc, floor, key_id, stairwells):
         if i in sealed:
             sc.node(f'[node name="{tag}Seal" type="StaticBody2D" parent="SealedStairs"]\n')
             sc.solid(f"{tag}SealCollision", f"SealedStairs/{tag}Seal", bar)
-            sc.poly2d(f"{tag}SealVisual", "WallGlow", C_SEAL, bar, z=2)
+            sc.poly2d(f"{tag}SealVisual", "Structures", C_SEAL, bar, z=2)
         else:
             sc.node(f'[node name="{tag}Barrier" type="StaticBody2D" parent="StairLocks"]\n')
             sc.solid(f"{tag}BarrierCollision", f"StairLocks/{tag}Barrier", bar)
-            sc.poly2d(f"{tag}BarrierVisual", "WallGlow", C_LOCK, bar, z=2)
+            sc.poly2d(f"{tag}BarrierVisual", "Structures", C_LOCK, bar, z=2)
             visual_paths.append(f'NodePath("../WallGlow/{tag}BarrierVisual")')
 
     open_tags = [tg for i, tg in enumerate(tags) if i not in sealed]
@@ -1189,7 +1191,7 @@ def add_stairwell(sc, name, x0, y0, x1, y1):
         (f"RC_{name}_M", rect(mid - T / 2, y0 + T, mid + T / 2, y1 - T)),
     ]:
         sc.solid(key, "StairWalls", p)
-        sc.poly2d(f"Rail_{name}_{key.split('_')[-1]}", "WallGlow", C_WALL, p)
+        sc.poly2d(f"Rail_{name}_{key.split('_')[-1]}", "Structures", C_WALL, p)
 
 
 # ── 방 내부 집기 · 복도 ──────────────────────────────────────
@@ -2230,7 +2232,7 @@ def add_sliding_doors(sc):
                 f'script = ExtResource("6_sliding")\n'
                 f'travel = {n(travel)}\n'
                 + (f'travel_y = {ty}\n' if float(ty) != 0.0 else "")
-                + f'leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_{key}")\n'
+                + f'leaf_visual = NodePath("../Structures/SDVis_{key}")\n'
                 # 방 창문 달빛은 이 문이 켠다(#292). 창 없는 방은 묶음이 없다.
                 + (f'room_lights = NodePath("../Lights/Room_{key}")\n'
                    if f'name="Room_{key}"' in text_of(sc) else ''))
@@ -2257,7 +2259,7 @@ def add_sliding_doors(sc):
         # 벽 시각이 z_index와 무관하게 덮어 문이 아예 안 보인다(#234). 같은 문의
         # Door_ 마커보다 뒤에 선언되므로 그 위에 그려지고, 열려서 밀리면 벽 시각
         # 뒤로 숨는다. 충돌·차단체와 같은 벽 두께 전체를 쓴다.
-        sc.poly2d(f"SDVis_{key}", "WallGlow/RoomWallVisuals",
+        sc.poly2d(f"SDVis_{key}", "Structures",
                   C_LEAF, poly((dl, yl), (dr, yr), (dr, yr + T), (dl, yl + T)), z=2)
 
 
@@ -2770,16 +2772,24 @@ def build_common(fl, spec):
     sc.node('[node name="Ground" type="Node2D" parent="."]\n')
     sc.node('[node name="WallGlow" type="CanvasLayer" parent="."]\n'
             'layer = 1\nfollow_viewport_enabled = true\n')
-    sc.node('[node name="RoomWallVisuals" type="Node2D" parent="WallGlow"]\n'
-            + TEX_FLAGS)
     sc.node('[node name="Rooms" type="Node2D" parent="."]\n')
     sc.node('[node name="RoomMarks" type="Node2D" parent="."]\n')
     sc.node('[node name="Props" type="Node2D" parent="."]\n')
     add_lights_root(sc)
     sc.node('[node name="Stairwells" type="Node2D" parent="."]\n')
+    # 벽·문·계단 시각은 **레이어 0**이다(#307). CanvasLayer(WallGlow)에
+    # 두면 어둠도 손전등도 안 받아 시야 밖에서도 100% 밝기로 보였다.
+    # Stairwells **뒤**라야 집기 위에 그려진다 — 선언 순서가 곧 레이어다.
+    sc.node('[node name="Structures" type="Node2D" parent="."]\n')
     sc.node('[node name="Marks" type="Node2D" parent="WallGlow"]\n'
             + 'script = ExtResource("8_marks")\n')
-    sc.node('[node name="Labels" type="Node2D" parent="WallGlow"]\n')
+    # 방 이름도 거리로 껐다 켠다(#307). 벽이 레이어 0으로 내려가 캄캄해졌는데
+    # 라벨만 허공에 떠 있으면 더 이상하다. 표시(Marks)보다 멀리서 보여야
+    # 어느 방인지 알고 다가갈 수 있으므로 반경을 키운다.
+    sc.node('[node name="Labels" type="Node2D" parent="WallGlow"]\n'
+            + 'script = ExtResource("8_marks")\n'
+            + 'reveal_distance = 420.0\n'
+            + 'full_distance = 300.0\n')
     sc.node('[node name="RoomWalls" type="StaticBody2D" parent="."]\n')
     sc.node('[node name="PropBodies" type="StaticBody2D" parent="."]\n')
     sc.node('[node name="StairWalls" type="StaticBody2D" parent="."]\n')
@@ -2858,16 +2868,24 @@ def build_floor1():
     sc.node('[node name="Ground" type="Node2D" parent="."]\n')
     sc.node('[node name="WallGlow" type="CanvasLayer" parent="."]\n'
             'layer = 1\nfollow_viewport_enabled = true\n')
-    sc.node('[node name="RoomWallVisuals" type="Node2D" parent="WallGlow"]\n'
-            + TEX_FLAGS)
     sc.node('[node name="Rooms" type="Node2D" parent="."]\n')
     sc.node('[node name="RoomMarks" type="Node2D" parent="."]\n')
     sc.node('[node name="Props" type="Node2D" parent="."]\n')
     add_lights_root(sc)
     sc.node('[node name="Stairwells" type="Node2D" parent="."]\n')
+    # 벽·문·계단 시각은 **레이어 0**이다(#307). CanvasLayer(WallGlow)에
+    # 두면 어둠도 손전등도 안 받아 시야 밖에서도 100% 밝기로 보였다.
+    # Stairwells **뒤**라야 집기 위에 그려진다 — 선언 순서가 곧 레이어다.
+    sc.node('[node name="Structures" type="Node2D" parent="."]\n')
     sc.node('[node name="Marks" type="Node2D" parent="WallGlow"]\n'
             + 'script = ExtResource("8_marks")\n')
-    sc.node('[node name="Labels" type="Node2D" parent="WallGlow"]\n')
+    # 방 이름도 거리로 껐다 켠다(#307). 벽이 레이어 0으로 내려가 캄캄해졌는데
+    # 라벨만 허공에 떠 있으면 더 이상하다. 표시(Marks)보다 멀리서 보여야
+    # 어느 방인지 알고 다가갈 수 있으므로 반경을 키운다.
+    sc.node('[node name="Labels" type="Node2D" parent="WallGlow"]\n'
+            + 'script = ExtResource("8_marks")\n'
+            + 'reveal_distance = 420.0\n'
+            + 'full_distance = 300.0\n')
     sc.node('[node name="RoomWalls" type="StaticBody2D" parent="."]\n')
     sc.node('[node name="PropBodies" type="StaticBody2D" parent="."]\n')
     sc.node('[node name="StairWalls" type="StaticBody2D" parent="."]\n')
@@ -2887,7 +2905,7 @@ def build_floor1():
 
     # 현관 정문 — 방 아래변(건물 바깥쪽)에 보이는 문. ExitDoor 상호작용도 이 앞이다.
     ex0, ey1, ex1 = 1600, 2480, 2000
-    sc.poly2d("Door_FrontGate", "WallGlow/RoomWallVisuals", C_DOOR,
+    sc.poly2d("Door_FrontGate", "Structures", C_DOOR,
               rect((ex0 + ex1) / 2 - DOOR / 2, ey1 - T, (ex0 + ex1) / 2 + DOOR / 2, ey1), z=1)
     add_furniture(sc, 1)
     add_story(sc, 1)

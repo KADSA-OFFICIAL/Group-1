@@ -267,7 +267,7 @@ func _rebuild_grid(floor_root: Node) -> void:
 
 
 ## 층 씬의 문에서 고정 순찰 루트를 만든다(#141).
-## 문 시각 노드는 WallGlow/RoomWallVisuals/Door_<방이름>, 대응하는 방 폴리곤은
+## 문 시각 노드는 Structures/Door_<방이름>(#307에서 레이어 0으로 내려옴), 대응하는 방 폴리곤은
 ## Rooms/<방이름>이다(tools/gen_floors.py가 이 규약으로 생성한다).
 ## 순서는 씬 순서의 첫 문에서 시작하는 최근접 이웃 — 씬 순서가 고정이라
 ## 층마다 항상 같은 루트가 나온다("정해진 순찰 루트").
@@ -277,7 +277,7 @@ func _build_route(floor_root: Node) -> void:
 	route_index = 0
 	route_step = 1
 
-	var visuals := floor_root.get_node_or_null("WallGlow/RoomWallVisuals")
+	var visuals := floor_root.get_node_or_null("Structures")
 	var rooms := floor_root.get_node_or_null("Rooms")
 	if visuals == null or rooms == null:
 		return
