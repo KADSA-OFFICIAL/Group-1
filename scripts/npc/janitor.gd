@@ -22,6 +22,9 @@ extends CharacterBody2D
 # 압박을 조절하려면 이 값만 움직이면 된다(250=여유, 320=직선 도주 무효).
 @export var patrol_speed: float = 130.0
 @export var chase_speed: float = 290.0
+## 숨는 것을 본 뒤 그 자리로 걸어가는 속도(#298). 뛰지 않는다 — 이미 어디
+## 들어갔는지 아니까 서두를 이유가 없고, 천천히 다가오는 편이 더 무섭다.
+@export var search_speed: float = 175.0
 # 플레이어가 수위를 알아볼 수 있는 거리. 플레이어 PointLight2D가 512×512 방사
 # 그라디언트(텍스처 반경 256) × texture_scale 1.3 ≈ 333px까지 비춘다.
 # 카메라(zoom 1.25, 1600×900)의 가시 반경은 360px이라 이 범위는 항상 화면 안이다.
@@ -59,6 +62,10 @@ const FAR_SPAWN_RATIO := 0.6    # 스폰 후보: 플레이어에게서 최대 �
 # 몸통이 벽에 끼어 도착 판정이 나지 않는다(몸통 반높이 15 + 벽 반두께 8 여유).
 const DOOR_APPROACH := 46.0
 const ROUTE_ARRIVE := 16.0      # 문 앞 도착 판정. 순찰은 정밀할 필요가 없어 넉넉히 잡는다
+
+# ── 은신 수색 (#298) ─────────────────────────────────────────────
+const SEARCH_SECONDS := 14.0        # 이 안에 못 닿으면 포기한다(길이 막힌 경우 대비)
+const SEARCH_OPEN_DISTANCE := 46.0  # 이만큼 다가가면 은신처를 연다
 const INSPECT_SECONDS := 1.8    # 문 앞에 멈춰 방을 확인하는 시간
 
 # ── 소리 단서 (#141) ─────────────────────────────────────────────
@@ -133,6 +140,13 @@ var sound_cooldown: float = 0.0
 var announced_chase: bool = false
 var announced_catch: bool = false
 
+# 숨는 것을 본 자리와 남은 수색 시간(#298). 0보다 크면 순찰 대신 이리로 간다.
+var search_point: Vector2 = Vector2.ZERO
+var search_timer: float = 0.0
+var announced_search: bool = false
+# 직전 프레임의 은신 여부. **숨는 순간**을 잡으려면 전이를 봐야 한다.
+var _player_hidden: bool = false
+
 var _game_state: Node = null
 
 # 잉크를 뒤집어써 앞을 못 보는 남은 시간(#169). 0보다 크면 추적·순찰·접촉
@@ -184,6 +198,10 @@ func _apply_active(active: bool) -> void:
 	sound_cooldown = 0.0
 	announced_chase = false
 	announced_catch = false
+	# 수색도 층을 넘기지 않는다(#298) — 3층에서 본 은신처를 2층에서 열러 갈 수 없다.
+	search_timer = 0.0
+	announced_search = false
+	_player_hidden = false
 	# 스턴(#169)도 층을 넘기지 않는다 — 3층에서 맞고 2층으로 내려가면 그 층의
 	# 수위는 멀쩡해야 한다(같은 노드를 층마다 재사용한다).
 	blind_timer = 0.0
@@ -490,18 +508,26 @@ func _physics_process(delta: float) -> void:
 
 	var chasing := _is_chasing()
 	if chasing:
+		# 직접 보이면 수색보다 추격이 먼저다 — 은신처를 열러 갈 이유가 없다.
+		search_timer = 0.0
 		if not announced_chase:
 			announced_chase = true
 			_say_line("…누구야?")
 			Sfx.play(&"spotted")
 		_move_chase(delta)
+	elif search_timer > 0.0:
+		announced_chase = false
+		_move_search(delta)
 	else:
 		announced_chase = false
 		_update_sound_cues()
 		_move_patrol(delta)
 
-	_update_footsteps(delta, chasing)
-	Sfx.set_chasing(chasing)
+	# 수색도 쫓기는 상황이다 — 걸어올 뿐 위치를 알고 오는 것이라 긴장은
+	# 추격과 같아야 한다. 음악과 발소리를 추격과 같이 취급한다.
+	var hunting := chasing or search_timer > 0.0
+	_update_footsteps(delta, hunting)
+	Sfx.set_chasing(hunting)
 
 	if debug_draw:
 		queue_redraw()
@@ -568,9 +594,24 @@ func _hold_blinded(delta: float) -> void:
 
 ## 발각 상태 갱신. 추적 여부는 chase_hold 하나로 결정된다.
 func _update_awareness(delta: float) -> void:
-	# 은신(#6)은 즉시 추적을 끊는다. 여기에 유지 시간을 주면 캐비넷에 숨은
+	var hidden: bool = player != null and player.get("is_hiding") == true
+
+	# **숨는 그 순간**에 보고 있었는지로 가른다(#298). 숨은 뒤에도
+	# player.position은 은신처에 남아 _can_be_seen()이 계속 참일 수 있으므로,
+	# 전이 프레임에서 직전 상태(chase_hold/seen_now)를 봐야 한다.
+	if hidden and not _player_hidden and (chase_hold > 0.0 or seen_now):
+		search_point = player.position
+		search_timer = SEARCH_SECONDS
+		announced_search = false
+		path_points = PackedVector2Array()
+		repath_timer = 0.0
+		stuck_time = 0.0
+	_player_hidden = hidden
+
+	# 은신(#6)은 추적을 즉시 끊는다. 여기에 유지 시간을 주면 캐비넷에 숨은
 	# 직후에도 수위가 들이닥쳐 접촉 판정(#4)으로 붙잡히므로 은신이 무의미해진다.
-	if player != null and player.get("is_hiding") == true:
+	# 봤을 때의 처리는 위 수색이 맡는다 — 그래서 이 즉시 해제를 남겨 둔다.
+	if hidden:
 		seen_time = 0.0
 		chase_hold = 0.0
 		seen_now = false
@@ -627,6 +668,63 @@ func _move_chase(delta: float) -> void:
 		_update_chase_path()
 
 	_step_toward(_next_point(player.position), chase_speed, delta)
+
+## 숨는 것을 본 자리로 걸어가 은신처를 연다(#298).
+##
+## 예전에는 은신이 **무조건** 추적을 끊었다(#6). 숨는 순간 보고 있었는지
+## 안 보고 있었는지를 구분하지 않아서, 눈앞에서 캐비닛에 들어가도 수위가
+## 아무 일 없었다는 듯 순찰로 돌아갔다.
+##
+## 목표가 고정이라 추격보다 경로를 자주 다시 계산할 일이 없다. 대신 **길이
+## 막히면 포기해야 한다** — 안 그러면 그 자리에 멈춰 순찰이 죽는다.
+func _move_search(delta: float) -> void:
+	search_timer -= delta
+	if not announced_search:
+		announced_search = true
+		_say_line("거기 들어갔지.")
+
+	if position.distance_to(search_point) <= SEARCH_OPEN_DISTANCE:
+		_open_hiding_spot()
+		return
+	if search_timer <= 0.0 or stuck_time >= STUCK_SECONDS:
+		_give_up_search()
+		return
+
+	repath_timer -= delta
+	if repath_timer <= 0.0:
+		repath_timer = REPATH_SECONDS
+		if grid_ready and not _clear_line(position, search_point):
+			path_points = astar_grid.get_point_path(
+				_nearest_free_cell(position), _nearest_free_cell(search_point))
+		else:
+			path_points = PackedVector2Array()
+
+	_step_toward(_next_point(search_point), search_speed, delta)
+
+
+## 은신처 앞에 닿았다 — 연다. 안에 있으면 끌어내 붙잡는다.
+func _open_hiding_spot() -> void:
+	search_timer = 0.0
+	velocity = Vector2.ZERO
+	path_points = PackedVector2Array()
+	door_sound.play()
+	var inside: bool = (player != null and player.get("is_hiding") == true
+			and player.position.distance_to(search_point) <= SEARCH_OPEN_DISTANCE)
+	if not inside:
+		_say_line("…없네. 잘못 봤나.")
+		return
+	# 숨은 채로 게임 오버 화면이 뜨면 앞뒤가 안 맞는다 — 먼저 끌어낸다.
+	player.call("set_hiding", false)
+	_catch_player()
+
+
+## 시간이 다 됐거나 길이 막혔다 — 순찰로 돌아간다.
+func _give_up_search() -> void:
+	search_timer = 0.0
+	stuck_time = 0.0
+	repath_timer = 0.0
+	path_points = PackedVector2Array()
+	_say_line("…어디 갔어.")
 
 
 ## 붙잡힘 통보. 접촉 상태가 유지되는 동안 매 프레임 불리지만
