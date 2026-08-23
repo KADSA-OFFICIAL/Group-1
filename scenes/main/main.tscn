@@ -13,7 +13,9 @@
 script = ExtResource("3_floor_manager")
 
 [node name="Darkness" type="CanvasModulate" parent="."]
-color = Color(0.1, 0.1, 0.13, 1)
+; 완전한 검정(#307). 예전 (0.1, 0.1, 0.13)은 손전등이 안 닿는 바닥·집기를
+; 10% 밝기로 남겨 어둠 속에서도 형체가 보였다.
+color = Color(0, 0, 0, 1)
 
 [node name="Background" parent="." instance=ExtResource("1_floor")]
 
