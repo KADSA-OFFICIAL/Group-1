@@ -80,7 +80,11 @@ main_menu → intro(프롤로그 컷신: street→back_gate→art_room→cabinet
 - UI: R 인벤토리 패널(5슬롯), 좌상단 HUD(목표/소지품)+층 표시, 하단 알림(game_state.request_notice).
 - 사운드(#9): 에셋을 받아오지 않고 **`tools/gen_sfx.py`가 8비트 톤으로 합성**해 `assets/audio/*.wav`로 커밋한다(표준 라이브러리만, 고정 시드라 재생성해도 바이트가 같다). 톤을 바꾸려면 그 스크립트의 `build_all()` 숫자를 고치고 다시 돌린다. 비위치 효과음은 autoload `Sfx`(`scripts/game/sound_manager.gd`)의 `Sfx.play(&"id")`, 위치가 정보인 소리(수위 발소리·열쇠·문)는 `janitor.tscn`의 AudioStreamPlayer2D가 낸다. **하단 알림 텍스트는 소리와 병행**한다 — 소리를 못 듣는 상황에서도 단서가 남아야 한다. 오디오 버스는 Master 하나뿐이고 음량은 `sound_manager.gd`의 `VOLUMES`에서 맞춘다.
 - 앰비언트·추격 BGM(#176): `tools/gen_music.py`가 만든다(루프라 위상을 루프 길이에 맞춰 고정하고, 이음매 불연속을 자체 검사한다). 본편 진입에 `Sfx.start_music()`, 체포·탈출에 `Sfx.stop_music()`. 수위가 `Sfx.set_chasing()`으로 매 프레임 추격 여부를 알리면 추격 BGM이 페이드 인하고 앰비언트가 낮아진다. **해제는 2.5초 미룬다** — `lose_sight_seconds`(1.5)보다 길어야 모퉁이에서 음악이 깜빡이지 않는다. 루프 지점은 `.import`가 아니라 런타임에 정한다(그 파일은 커밋에 빠질 수 있다).
-- 수위(#141): 4층은 안전 구간(`floor_manager.JANITOR_FREE_FLOOR`), 3·2·1층에서 활동. 순찰은 층 씬의 `Door_*`에서 뽑은 **문 앞 대기 지점을 최근접 이웃으로 이은 고정 루트를 왕복**하고, 문마다 1.8초 멈춰 방을 확인한다. 들리는 거리(720px) 안에서만 혼잣말·열쇠 소리, 420px 안이면 발소리를 하단 알림으로 낸다. 발각(접촉 30px) → 체포 게임 오버. 루트 점검은 `tools/verify_janitor_route.py`.
+- 수위(#141): 4층은 안전 구간(`floor_manager.JANITOR_FREE_FLOOR`), 3·2·1층에서 활동.
+  - **은신은 '못 봤을 때'만 통한다**(#298). 예전에는 `_update_awareness()`가 `is_hiding`만 보고 추적을 **무조건** 끊어서, 눈앞에서 캐비닛에 들어가도 수위가 순찰로 돌아갔다. 즉시 해제 자체는 #6의 옳은 판단이다(유예를 주면 숨은 직후 접촉 판정 #4에 붙잡혀 은신이 무의미해진다) — 빠져 있던 것은 **봤는지 안 봤는지의 구분**이다.
+    **숨는 그 순간**에 `chase_hold > 0` 또는 `seen_now`면 그 자리를 기억하고 수색에 들어간다(`search_point`·`search_timer`). 숨은 뒤에도 `player.position`은 은신처에 남아 `_can_be_seen()`이 계속 참일 수 있으므로 **전이 프레임에서만** 판정한다(`_player_hidden`).
+    수색은 `search_speed`(175, 순찰과 추격 사이)로 걸어가 `SEARCH_OPEN_DISTANCE`(46) 안에 들면 은신처를 연다 — 안에 있으면 **먼저 끌어낸 뒤**(`set_hiding(false)`) 붙잡는다(숨은 채로 게임 오버가 뜨면 앞뒤가 안 맞는다). 비어 있으면 순찰로 돌아간다. **길이 막히면 포기해야 한다**(`STUCK_SECONDS`) — 안 그러면 그 자리에 멈춰 순찰이 죽는다.
+    직접 보이면 추격이 수색보다 **우선**이고 그때 `search_timer`를 끈다. 음악·발소리는 수색도 추격과 같이 취급한다(`hunting`) — 위치를 알고 걸어오는 것이라 긴장이 같아야 한다. 수색 상태는 층을 넘기지 않는다. 순찰은 층 씬의 `Door_*`에서 뽑은 **문 앞 대기 지점을 최근접 이웃으로 이은 고정 루트를 왕복**하고, 문마다 1.8초 멈춰 방을 확인한다. 들리는 거리(720px) 안에서만 혼잣말·열쇠 소리, 420px 안이면 발소리를 하단 알림으로 낸다. 발각(접촉 30px) → 체포 게임 오버. 루트 점검은 `tools/verify_janitor_route.py`.
 
 ### 진행 요소 위치
 
