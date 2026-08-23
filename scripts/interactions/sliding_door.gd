@@ -32,6 +32,9 @@ extends Area2D
 @export var leaf_visual: NodePath
 ## 플레이어 안내 문구. 상태에 따라 바뀐다(player_controller가 매 프레임 읽는다).
 @export var prompt_text: String = "문 열기"
+## 이 문이 여는 방의 창문 달빛 묶음(#292). 닫힌 문 너머가 보이면 안 되므로
+## 방 광원은 평소에 꺼져 있고, 문이 열릴 때만 켠다. 창 없는 방은 비어 있다.
+@export var room_lights: NodePath
 
 const PROMPT_OPEN := "문 열기"
 const PROMPT_CLOSE := "문 닫기"
@@ -45,11 +48,13 @@ var _tween: Tween
 var _held_open: bool = false
 var _janitors: int = 0
 var _open: bool = false
+var _lights: Node = null
 
 
 func _ready() -> void:
 	_panel = get_node_or_null("SDPanel") as StaticBody2D
 	_leaf = get_node_or_null(leaf_visual) as Node2D
+	_lights = get_node_or_null(room_lights)
 	if _panel != null:
 		# 충돌 노드 이름이 방마다 다르다(<방키>DoorCollision) — 이름은
 		# verify_scenes의 벽↔차단체 1:1 검사에 편입되려고 그렇게 붙였다.
@@ -94,6 +99,10 @@ func _apply() -> void:
 	if want == _open or _panel == null:
 		return
 	_open = want
+	# 방 달빛은 문 상태를 따라간다(#292). 여기가 상태가 **바뀌는 순간**이라
+	# hold/release가 정확히 한 번씩 짝을 이룬다.
+	if _lights != null:
+		_lights.call("hold" if _open else "release")
 
 	# 열 때는 충돌부터 끈다 — 문에 붙어 선 채로 열면 미는 동안 몸이 낀다.
 	# 닫을 때는 다 닫힌 뒤에 켠다. 순서를 반대로 하면 닫히는 판이 플레이어를

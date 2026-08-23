@@ -1,9 +1,10 @@
-[gd_scene load_steps=219 format=3]
+[gd_scene load_steps=229 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 [ext_resource type="Script" path="res://scripts/interactions/sliding_door.gd" id="6_sliding"]
+[ext_resource type="Script" path="res://scripts/game/room_lights.gd" id="7_roomlights"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_board.png" id="tex_floor_board"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_cement.png" id="tex_floor_cement"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_matte.png" id="tex_floor_matte"]
@@ -42,6 +43,33 @@ size = Vector2(140, 60)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_window_zone"]
 size = Vector2(170, 52)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room_North1"]
+size = Vector2(420, 520)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room_North2"]
+size = Vector2(420, 520)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room_North3"]
+size = Vector2(420, 520)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room_North4"]
+size = Vector2(420, 520)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room_North5"]
+size = Vector2(420, 520)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room_North6"]
+size = Vector2(420, 520)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room_North7"]
+size = Vector2(420, 520)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room_North8"]
+size = Vector2(420, 520)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_room_EmptyClass"]
+size = Vector2(575, 420)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_WC_North1_top"]
 polygon = PackedVector2Array(20, 20, 440, 20, 440, 36, 20, 36)
@@ -4037,6 +4065,15 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3634, 0.3877, 0.4483, 1)
 polygon = PackedVector2Array(394, 428, 424, 428, 424, 468, 394, 468)
 
+[node name="Room_North1" type="Area2D" parent="Lights"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("7_roomlights")
+
+[node name="Zone" type="CollisionShape2D" parent="Lights/Room_North1"]
+position = Vector2(230, 280)
+shape = SubResource("RectangleShape2D_room_North1")
+
 [node name="WD_North1_win0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
@@ -4055,7 +4092,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(163, 36, 171, 36, 171, 56, 163, 56)
 
-[node name="WinLight_North1_0" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North1_0" type="PointLight2D" parent="Lights/Room_North1"]
 position = Vector2(127.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -4083,7 +4120,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(266, 36, 274, 36, 274, 56, 266, 56)
 
-[node name="WinLight_North1_1" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North1_1" type="PointLight2D" parent="Lights/Room_North1"]
 position = Vector2(230.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -4111,7 +4148,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(369, 36, 377, 36, 377, 56, 369, 56)
 
-[node name="WinLight_North1_2" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North1_2" type="PointLight2D" parent="Lights/Room_North1"]
 position = Vector2(333.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -4657,6 +4694,15 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3766, 0.4017, 0.4645, 1)
 polygon = PackedVector2Array(814, 428, 844, 428, 844, 468, 814, 468)
 
+[node name="Room_North2" type="Area2D" parent="Lights"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("7_roomlights")
+
+[node name="Zone" type="CollisionShape2D" parent="Lights/Room_North2"]
+position = Vector2(650, 280)
+shape = SubResource("RectangleShape2D_room_North2")
+
 [node name="WD_North2_win0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
@@ -4675,7 +4721,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(583, 36, 591, 36, 591, 56, 583, 56)
 
-[node name="WinLight_North2_0" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North2_0" type="PointLight2D" parent="Lights/Room_North2"]
 position = Vector2(547.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -4703,7 +4749,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(686, 36, 694, 36, 694, 56, 686, 56)
 
-[node name="WinLight_North2_1" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North2_1" type="PointLight2D" parent="Lights/Room_North2"]
 position = Vector2(650.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -4731,7 +4777,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(789, 36, 797, 36, 797, 56, 789, 56)
 
-[node name="WinLight_North2_2" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North2_2" type="PointLight2D" parent="Lights/Room_North2"]
 position = Vector2(753.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -5277,6 +5323,15 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3664, 0.3909, 0.452, 1)
 polygon = PackedVector2Array(1234, 428, 1264, 428, 1264, 468, 1234, 468)
 
+[node name="Room_North3" type="Area2D" parent="Lights"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("7_roomlights")
+
+[node name="Zone" type="CollisionShape2D" parent="Lights/Room_North3"]
+position = Vector2(1070, 280)
+shape = SubResource("RectangleShape2D_room_North3")
+
 [node name="WD_North3_win0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
@@ -5295,7 +5350,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(1003, 36, 1011, 36, 1011, 56, 1003, 56)
 
-[node name="WinLight_North3_0" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North3_0" type="PointLight2D" parent="Lights/Room_North3"]
 position = Vector2(967.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -5323,7 +5378,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(1106, 36, 1114, 36, 1114, 56, 1106, 56)
 
-[node name="WinLight_North3_1" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North3_1" type="PointLight2D" parent="Lights/Room_North3"]
 position = Vector2(1070.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -5351,7 +5406,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(1209, 36, 1217, 36, 1217, 56, 1209, 56)
 
-[node name="WinLight_North3_2" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North3_2" type="PointLight2D" parent="Lights/Room_North3"]
 position = Vector2(1173.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -5732,6 +5787,15 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.292, 0.2389, 0.1858, 1)
 polygon = PackedVector2Array(1205.5, 460, 1217.5, 460, 1217.5, 486, 1205.5, 486)
 
+[node name="Room_North4" type="Area2D" parent="Lights"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("7_roomlights")
+
+[node name="Zone" type="CollisionShape2D" parent="Lights/Room_North4"]
+position = Vector2(1490, 280)
+shape = SubResource("RectangleShape2D_room_North4")
+
 [node name="WD_North4_win0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
@@ -5750,7 +5814,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(1420, 36, 1428, 36, 1428, 56, 1420, 56)
 
-[node name="WinLight_North4_0" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North4_0" type="PointLight2D" parent="Lights/Room_North4"]
 position = Vector2(1384.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -5778,7 +5842,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(1526, 36, 1534, 36, 1534, 56, 1526, 56)
 
-[node name="WinLight_North4_1" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North4_1" type="PointLight2D" parent="Lights/Room_North4"]
 position = Vector2(1490.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -5806,7 +5870,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(1632, 36, 1640, 36, 1640, 56, 1632, 56)
 
-[node name="WinLight_North4_2" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North4_2" type="PointLight2D" parent="Lights/Room_North4"]
 position = Vector2(1596.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -6447,6 +6511,15 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3732, 0.3981, 0.4603, 1)
 polygon = PackedVector2Array(2074, 428, 2104, 428, 2104, 468, 2074, 468)
 
+[node name="Room_North5" type="Area2D" parent="Lights"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("7_roomlights")
+
+[node name="Zone" type="CollisionShape2D" parent="Lights/Room_North5"]
+position = Vector2(1910, 280)
+shape = SubResource("RectangleShape2D_room_North5")
+
 [node name="WD_North5_win0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
@@ -6465,7 +6538,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(1843, 36, 1851, 36, 1851, 56, 1843, 56)
 
-[node name="WinLight_North5_0" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North5_0" type="PointLight2D" parent="Lights/Room_North5"]
 position = Vector2(1807.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -6493,7 +6566,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(1946, 36, 1954, 36, 1954, 56, 1946, 56)
 
-[node name="WinLight_North5_1" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North5_1" type="PointLight2D" parent="Lights/Room_North5"]
 position = Vector2(1910.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -6521,7 +6594,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(2049, 36, 2057, 36, 2057, 56, 2049, 56)
 
-[node name="WinLight_North5_2" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North5_2" type="PointLight2D" parent="Lights/Room_North5"]
 position = Vector2(2013.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -7067,6 +7140,15 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3738, 0.3988, 0.4611, 1)
 polygon = PackedVector2Array(2494, 428, 2524, 428, 2524, 468, 2494, 468)
 
+[node name="Room_North6" type="Area2D" parent="Lights"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("7_roomlights")
+
+[node name="Zone" type="CollisionShape2D" parent="Lights/Room_North6"]
+position = Vector2(2330, 280)
+shape = SubResource("RectangleShape2D_room_North6")
+
 [node name="WD_North6_win0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
@@ -7085,7 +7167,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(2263, 36, 2271, 36, 2271, 56, 2263, 56)
 
-[node name="WinLight_North6_0" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North6_0" type="PointLight2D" parent="Lights/Room_North6"]
 position = Vector2(2227.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -7113,7 +7195,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(2366, 36, 2374, 36, 2374, 56, 2366, 56)
 
-[node name="WinLight_North6_1" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North6_1" type="PointLight2D" parent="Lights/Room_North6"]
 position = Vector2(2330.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -7141,7 +7223,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(2469, 36, 2477, 36, 2477, 56, 2469, 56)
 
-[node name="WinLight_North6_2" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North6_2" type="PointLight2D" parent="Lights/Room_North6"]
 position = Vector2(2433.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -7687,6 +7769,15 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3984, 0.425, 0.4914, 1)
 polygon = PackedVector2Array(2914, 428, 2944, 428, 2944, 468, 2914, 468)
 
+[node name="Room_North7" type="Area2D" parent="Lights"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("7_roomlights")
+
+[node name="Zone" type="CollisionShape2D" parent="Lights/Room_North7"]
+position = Vector2(2750, 280)
+shape = SubResource("RectangleShape2D_room_North7")
+
 [node name="WD_North7_win0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
@@ -7705,7 +7796,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(2683, 36, 2691, 36, 2691, 56, 2683, 56)
 
-[node name="WinLight_North7_0" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North7_0" type="PointLight2D" parent="Lights/Room_North7"]
 position = Vector2(2647.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -7733,7 +7824,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(2786, 36, 2794, 36, 2794, 56, 2786, 56)
 
-[node name="WinLight_North7_1" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North7_1" type="PointLight2D" parent="Lights/Room_North7"]
 position = Vector2(2750.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -7761,7 +7852,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(2889, 36, 2897, 36, 2897, 56, 2889, 56)
 
-[node name="WinLight_North7_2" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North7_2" type="PointLight2D" parent="Lights/Room_North7"]
 position = Vector2(2853.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -8307,6 +8398,15 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3885, 0.4144, 0.4792, 1)
 polygon = PackedVector2Array(3334, 428, 3364, 428, 3364, 468, 3334, 468)
 
+[node name="Room_North8" type="Area2D" parent="Lights"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("7_roomlights")
+
+[node name="Zone" type="CollisionShape2D" parent="Lights/Room_North8"]
+position = Vector2(3170, 280)
+shape = SubResource("RectangleShape2D_room_North8")
+
 [node name="WD_North8_win0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
@@ -8325,7 +8425,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(3103, 36, 3111, 36, 3111, 56, 3103, 56)
 
-[node name="WinLight_North8_0" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North8_0" type="PointLight2D" parent="Lights/Room_North8"]
 position = Vector2(3067.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -8353,7 +8453,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(3206, 36, 3214, 36, 3214, 56, 3206, 56)
 
-[node name="WinLight_North8_1" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North8_1" type="PointLight2D" parent="Lights/Room_North8"]
 position = Vector2(3170.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -8381,7 +8481,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(3309, 36, 3317, 36, 3317, 56, 3309, 56)
 
-[node name="WinLight_North8_2" type="PointLight2D" parent="Lights"]
+[node name="WinLight_North8_2" type="PointLight2D" parent="Lights/Room_North8"]
 position = Vector2(3273.0, 80.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -10731,6 +10831,15 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3998, 0.4265, 0.4931, 1)
 polygon = PackedVector2Array(3334, 1809, 3364, 1809, 3364, 1849, 3334, 1849)
 
+[node name="Room_EmptyClass" type="Area2D" parent="Lights"]
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("7_roomlights")
+
+[node name="Zone" type="CollisionShape2D" parent="Lights/Room_EmptyClass"]
+position = Vector2(3092.5, 1730)
+shape = SubResource("RectangleShape2D_room_EmptyClass")
+
 [node name="WD_EmptyClass_win0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_glass")
@@ -10749,7 +10858,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(2986.8, 1916, 2994.8, 1916, 2994.8, 1924, 2986.8, 1924)
 
-[node name="WinLight_EmptyClass_0" type="PointLight2D" parent="Lights"]
+[node name="WinLight_EmptyClass_0" type="PointLight2D" parent="Lights/Room_EmptyClass"]
 position = Vector2(2950.8, 1892.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -10777,7 +10886,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(3128.5, 1916, 3136.5, 1916, 3136.5, 1924, 3128.5, 1924)
 
-[node name="WinLight_EmptyClass_1" type="PointLight2D" parent="Lights"]
+[node name="WinLight_EmptyClass_1" type="PointLight2D" parent="Lights/Room_EmptyClass"]
 position = Vector2(3092.5, 1892.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -10805,7 +10914,7 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
 polygon = PackedVector2Array(3270.2, 1916, 3278.2, 1916, 3278.2, 1924, 3270.2, 1924)
 
-[node name="WinLight_EmptyClass_2" type="PointLight2D" parent="Lights"]
+[node name="WinLight_EmptyClass_2" type="PointLight2D" parent="Lights/Room_EmptyClass"]
 position = Vector2(3234.2, 1892.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
@@ -14518,6 +14627,7 @@ collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
 leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North1")
+room_lights = NodePath("../Lights/Room_North1")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_North1"]
 position = Vector2(230, 532)
@@ -14544,6 +14654,7 @@ collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
 leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North2")
+room_lights = NodePath("../Lights/Room_North2")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_North2"]
 position = Vector2(650, 532)
@@ -14570,6 +14681,7 @@ collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
 leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North3")
+room_lights = NodePath("../Lights/Room_North3")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_North3"]
 position = Vector2(1070, 532)
@@ -14596,6 +14708,7 @@ collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
 leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North4")
+room_lights = NodePath("../Lights/Room_North4")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_North4"]
 position = Vector2(1490, 532)
@@ -14622,6 +14735,7 @@ collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
 leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North5")
+room_lights = NodePath("../Lights/Room_North5")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_North5"]
 position = Vector2(1910, 532)
@@ -14648,6 +14762,7 @@ collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
 leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North6")
+room_lights = NodePath("../Lights/Room_North6")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_North6"]
 position = Vector2(2330, 532)
@@ -14674,6 +14789,7 @@ collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
 leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North7")
+room_lights = NodePath("../Lights/Room_North7")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_North7"]
 position = Vector2(2750, 532)
@@ -14700,6 +14816,7 @@ collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
 leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_North8")
+room_lights = NodePath("../Lights/Room_North8")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_North8"]
 position = Vector2(3170, 532)
@@ -14960,6 +15077,7 @@ collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
 leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_EmptyClass")
+room_lights = NodePath("../Lights/Room_EmptyClass")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_EmptyClass"]
 position = Vector2(3092.5, 1528)
