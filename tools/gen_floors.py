@@ -1777,6 +1777,112 @@ def add_ground(sc, corridors):
                 k += 1
 
 
+# ── 빈 구역 메우기 (#295) ───────────────────────────────────
+# 복도 마루는 가로 직사각형 띠로만 깔리고, 방은 띠 안에서 x 구간을 차지한다.
+# 그래서 (1) 사선 방 위 쐐기 (2) 띠 안에서 방이 없는 x 구간 (3) 중앙다리와
+# 그 접근로가 바닥칠도 실체도 없이 남았다. 남북으로 이어지는 통로는 마루를
+# 깔고, 나머지 막다른 구역은 채워서 들어가지 못하게 한다.
+def gaps_in(spans, lo, hi, min_w=8):
+    """[lo,hi]에서 spans(x0,x1 목록)가 덮지 않은 구간. 붙어 있는 방은 걸러진다."""
+    out, x = [], lo
+    for a, b in sorted(spans):
+        if a - x >= min_w:
+            out.append((x, a))
+        x = max(x, b)
+    if hi - x >= min_w:
+        out.append((x, hi))
+    return out
+
+
+def ground_area(sc, key, y0, y1, left, right, anchor):
+    """빈 통로에 복도와 같은 마루를 깐다.
+
+    left/right는 y를 받아 그 줄의 좌·우 끝을 준다 — 사선 쐐기가 사다리꼴이라
+    상수로는 안 된다. 널 이음매는 맞닿은 복도 띠의 시작 y(anchor)에서 PLANK
+    간격을 이어받아, 복도와 널 줄이 어긋나 보이지 않게 한다.
+    """
+    sc.ground(f"Fill_{key}", poly((left(y0), y0), (right(y0), y0),
+                                  (right(y1), y1), (left(y1), y1)), C_CORRIDOR)
+    k = int((y0 - anchor) // PLANK) + 1
+    i = 0
+    while anchor + k * PLANK < y1 - PLANK_SEAM:
+        y = anchor + k * PLANK
+        if y > y0 and right(y) - left(y) > PLANK_SEAM:
+            sc.ground(f"Fill_{key}_p{i}", rect(left(y), y, right(y), y + PLANK_SEAM),
+                      C_SEAM)
+            i += 1
+        k += 1
+
+
+def add_infill(sc, fl, spec):
+    """층마다 남은 빈 구역을 마루(통로) 또는 실체(막다른 곳)로 메운다."""
+    if fl == 1:
+        # 1층 건물은 아래쪽 절반뿐이라 남북 통로가 없다 — 전부 막다른 구역이다.
+        band = [(x0, x1) for _, _, x0, y0, x1, _, _ in FLOOR1["rooms"] if y0 == 1020]
+        sx0, _sy0, sx1, _sy1 = FLOOR1["staff"]
+        band.append((sx0, sx1))
+        for i, (gx0, gx1) in enumerate(gaps_in(band, EDGE, W - EDGE)):
+            fill_gap(sc, f"GapMid{i}", gx0, gx1, lambda _x: 1020.0, lambda _x: 1500.0)
+        # 교무실(사선) 위 쐐기 — 위는 1층 북쪽 봉인벽, 아래는 교무실 윗변
+        fill_gap(sc, "GapStaff", sx0, W - EDGE, lambda _x: 1020.0,
+                 lambda x: slope_y(x, 1020))
+        bot = [(x0, x1) for _, _, x0, y0, x1, _, _ in FLOOR1["rooms"] if y0 == BOT_Y0]
+        stx0, _sty0, stx1, sty1 = FLOOR1["stair"]
+        bot.append((stx0, stx1))
+        for i, (gx0, gx1) in enumerate(gaps_in(bot, EDGE, W - EDGE)):
+            fill_gap(sc, f"GapBot{i}", gx0, gx1,
+                     lambda _x: float(BOT_Y0), lambda _x: float(BOT_Y1))
+        # 계단실은 2440에서 끝나는데 하단 띠는 2480까지다 — 그 아래 띠를 메운다.
+        fill_gap(sc, "GapStair", stx0, stx1,
+                 lambda _x: float(sty1), lambda _x: float(BOT_Y1))
+        return
+
+    def bridge_lane(gx0, gx1):
+        """중앙다리 x 구간을 품은 틈만 남북 통로다 — 나머지는 막다른 곳."""
+        return gx0 < BRIDGE_X1 and gx1 > BRIDGE_X0
+
+    # 중간 띠 — 계단실·화장실·창고 사이의 틈
+    mid = [(STAIR_A[0], STAIR_A[2])] + [(x0, x1) for _, _, x0, x1 in MID_LEFT + MID_RIGHT]
+    for i, (gx0, gx1) in enumerate(gaps_in(mid, EDGE, W - EDGE)):
+        if bridge_lane(gx0, gx1):
+            ground_area(sc, f"MidLane{i}", MID_Y0, MID_Y1,
+                        lambda _y, a=gx0: a, lambda _y, b=gx1: b, NORTH_Y1)
+        else:
+            fill_gap(sc, f"GapMid{i}", gx0, gx1,
+                     lambda _x: float(MID_Y0), lambda _x: float(MID_Y1))
+
+    # 사선 띠 위 쐐기 — 북쪽 복도가 오른쪽으로 갈수록 넓어지는 자리다.
+    # 왼쪽 변이 방 윗벽과 같은 기울기라 벽과 정확히 맞물린다(오른쪽 외벽에서
+    # 폭 0으로 끝나는 삼각형).
+    ground_area(sc, "Wedge", MID_Y0, slope_y(W - EDGE, MID_Y0),
+                lambda y: RIGHT_X0 + (y - MID_Y0) / SLOPE,
+                lambda _y: W - EDGE, NORTH_Y1)
+
+    # 중앙다리 — 공백 구역을 가로지르는 유일한 남북 통로
+    ground_area(sc, "Bridge", MID_Y1, VOID_Y1,
+                lambda _y: BRIDGE_X0, lambda _y: BRIDGE_X1, NORTH_Y1)
+
+    # 남쪽 특별실동 — 다리에서 아래 복도로 이어지는 칸만 통로다
+    south = [(x0, x1) for _, _, x0, x1 in spec["south_left"] + spec["south_right"]]
+    for i, (gx0, gx1) in enumerate(gaps_in(south, EDGE, W - EDGE)):
+        if bridge_lane(gx0, gx1):
+            ground_area(sc, f"SouthLane{i}", SOUTH_Y0, SOUTH_Y1,
+                        lambda _y, a=gx0: a, lambda _y, b=gx1: b, VOID_Y1)
+        else:
+            fill_gap(sc, f"GapSouth{i}", gx0, gx1,
+                     lambda _x: float(SOUTH_Y0), lambda _x: float(SOUTH_Y1))
+
+    # 하단 띠 — 방과 계단실 사이의 빈 구간(전부 막다른 곳)
+    bot = [(STAIR_B[0], STAIR_B[2])] + [(x0, x1) for _, _, x0, x1
+                                        in spec["bottom_left"] + BOTTOM_RIGHT]
+    for i, (gx0, gx1) in enumerate(gaps_in(bot, EDGE, W - EDGE)):
+        fill_gap(sc, f"GapBot{i}", gx0, gx1,
+                 lambda _x: float(BOT_Y0), lambda _x: float(BOT_Y1))
+    # 계단실 아래 남는 띠(계단실 2440 < 하단 띠 2480)
+    fill_gap(sc, "GapStair", STAIR_B[0], STAIR_B[2],
+             lambda _x: float(STAIR_B[3]), lambda _x: float(BOT_Y1))
+
+
 def add_ceiling_lights(sc, corridors):
     """복도 천장 형광등(장식). 꺼져 있어 빛을 내지 않는다 — 손전등만이 광원이라는
     규약을 지키면서 복도가 통로임을 알려주는 표시로만 쓴다."""
@@ -1865,6 +1971,7 @@ def build_common(fl, spec):
     add_hiding(sc, fl)
     corridors = [(NORTH_Y1, MID_Y0), (VOID_Y1, SOUTH_Y0), (SOUTH_Y1, BOT_Y0)]
     add_ground(sc, corridors)
+    add_infill(sc, fl, spec)
     add_props(sc, corridors)
     add_ceiling_lights(sc, corridors)
     add_sliding_doors(sc)
@@ -1918,6 +2025,7 @@ def build_floor1():
     # 1층은 아래쪽 절반만 건물이라 큰 홀 하나가 복도 역할을 한다.
     corridors = [(1500, BOT_Y0)]
     add_ground(sc, corridors)
+    add_infill(sc, 1, None)
     add_props(sc, corridors)
     add_ceiling_lights(sc, corridors)
     add_sliding_doors(sc)
@@ -1926,22 +2034,23 @@ def build_floor1():
     return sc
 
 
-def fill_void(sc, key, x0, x1, top_fn, y_bottom, step=100):
-    """건물 밖 구역을 실체(충돌+광원차단)로 메운다.
+def fill_gap(sc, key, x0, x1, top_fn, bot_fn):
+    """빈 구역을 실체(충돌+광원차단)로 메운다.
 
     벽으로 둘러싸기만 하면 그 안쪽 칸이 여전히 "통행 가능"으로 잡혀서,
     수위 스폰 후보(corridor_cells)에 들어간다 → 플레이어가 닿을 수 없는
     빈 구역에 수위가 나타나 영영 안 보인다(#159 F5: 1층에 수위 미등장).
-    사선 경계는 좁은 세로 띠로 나눠 채운다."""
-    x = x0
-    i = 0
-    while x < x1:
-        right = min(x + step, x1)
-        top = max(top_fn(x), top_fn(right))
-        if y_bottom - top > 1.0:
-            sc.solid(f"WC_{key}{i}", "RoomWalls", rect(x, top, right, y_bottom))
-            i += 1
-        x = right
+
+    위·아래 경계는 직선이므로 사다리꼴 하나로 정확히 덮는다. 예전처럼 세로 띠로
+    잘라 채우면 사선 경계마다 띠 폭 × 기울기만큼(100×0.26 = 26px) 삼각형이
+    남아, 그 조각들이 다시 "바닥 없는 통행 칸"이 된다(#295)."""
+    sc.solid(f"WC_{key}", "RoomWalls",
+             poly((x0, top_fn(x0)), (x1, top_fn(x1)), (x1, bot_fn(x1)), (x0, bot_fn(x0))))
+
+
+def fill_void(sc, key, x0, x1, top_fn, y_bottom):
+    """아래가 수평인 빈 구역 채우기(중앙 공백·1층 북쪽 절반)."""
+    fill_gap(sc, key, x0, x1, top_fn, lambda _x: float(y_bottom))
 
 
 def add_outer(sc):
