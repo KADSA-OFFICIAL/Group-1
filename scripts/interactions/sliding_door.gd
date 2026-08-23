@@ -32,6 +32,8 @@ extends Area2D
 @export var leaf_visual: NodePath
 ## 플레이어 안내 문구. 상태에 따라 바뀐다(player_controller가 매 프레임 읽는다).
 @export var prompt_text: String = "문 열기"
+## 문은 늘 겹치는 자리에 있어 단서·아이템보다 낮아야 한다(#301).
+@export var interact_priority: int = 4
 ## 이 문이 여는 방의 창문 달빛 묶음(#292). 닫힌 문 너머가 보이면 안 되므로
 ## 방 광원은 평소에 꺼져 있고, 문이 열릴 때만 켠다. 창 없는 방은 비어 있다.
 @export var room_lights: NodePath
