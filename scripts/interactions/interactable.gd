@@ -11,6 +11,12 @@ signal interacted(player: Node)
 @export var required_item_id: String = ""
 @export_multiline var locked_message: String = "아직 열 수 없다."
 @export var prompt_text: String = "조사"
+## 겹쳤을 때 누가 이기는가(#301). 단서는 기본값 그대로 두고, 분위기용 조사
+## 대상은 씬에서 낮춰 준다 — 안 그러면 책상이 단서를 가로챈다.
+@export var interact_priority: int = 15
+
+## 한 번이라도 조사했는가. 상호작용 표시(#301)가 읽은 것을 흐리게 하는 데 쓴다.
+var investigated: bool = false
 
 
 func interact(player: Node) -> void:
@@ -34,4 +40,5 @@ func interact(player: Node) -> void:
 	# 아이템을 준 조사는 획득음, 읽기만 하는 조사는 조사음.
 	Sfx.play(&"pickup" if not grants_item_id.is_empty() else &"investigate")
 
+	investigated = true
 	interacted.emit(player)

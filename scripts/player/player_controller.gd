@@ -35,6 +35,9 @@ const INK_SPAWN_OFFSET := 24.0
 @onready var interact_prompt: Label = $Visuals/Anchor/InteractPrompt
 @onready var player_light: PointLight2D = $PlayerLight
 
+## `interact_priority`가 없는 상호작용의 기본값(#301).
+const DEFAULT_INTERACT_PRIORITY := 5
+
 var facing_direction: Vector2 = Vector2.DOWN
 var is_hiding: bool = false
 var _light_energy: float = 1.0
@@ -44,6 +47,9 @@ var _bob_time: float = 0.0
 
 
 func _ready() -> void:
+	# 상호작용 표시(#301)가 거리를 재려고 찾는다. 플레이어는 조립 씬(main)
+	# 소속이라 층 씬에서 이름으로는 못 찾는다.
+	add_to_group("player")
 	_light_energy = player_light.energy
 	visuals.global_position = global_position
 
@@ -158,11 +164,28 @@ func _throw_ink() -> bool:
 	return true
 
 
+## 겹친 상호작용 중 하나를 고른다 — **우선순위가 먼저, 같으면 가까운 쪽**(#301).
+##
+## 예전에는 겹친 것 중 첫 번째를 돌려줬는데, 그 순서가 노드 선언 순이라
+## 사실상 임의였다. 조사 대상을 늘리면 잡동사니가 단서를 가로챈다 — #274에서
+## 창가 조사를 방마다 하나로 제한한 것도 같은 이유였다.
 func _find_interactable() -> Area2D:
+	var best: Area2D = null
+	var best_prio := -1
+	var best_dist := INF
 	for area in interaction_area.get_overlapping_areas():
-		if area.has_method("interact"):
-			return area
-	return null
+		if not area.has_method("interact"):
+			continue
+		var prio := DEFAULT_INTERACT_PRIORITY
+		var value = area.get("interact_priority")
+		if value is int:
+			prio = value
+		var dist := global_position.distance_squared_to(area.global_position)
+		if prio > best_prio or (prio == best_prio and dist < best_dist):
+			best = area
+			best_prio = prio
+			best_dist = dist
+	return best
 
 
 func _update_interact_prompt() -> void:

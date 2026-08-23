@@ -191,7 +191,9 @@ def check(fl: int) -> None:
     # 어떤 좌표를 골라도 이 여유를 못 만든다.
     # 대신 실제로 다가갈 수 있는지는 verify_floor_reach가 도달 격자로 본다.
     for name, px, py in clues:
-        if name.startswith("Window_"):
+        # 집기 조사(Exam_, #301)도 뺀다 — **집기 위에 있는 것이 정상**이다.
+        # 그 집기를 조사하라고 붙인 것이라 떨어져 있으면 오히려 이상하다.
+        if name.startswith(("Window_", "Exam_")):
             continue
         for key, (x0, y0, x1, y1) in sorted(props.items()):
             if (x0 - CLUE_CLEAR < px < x1 + CLUE_CLEAR

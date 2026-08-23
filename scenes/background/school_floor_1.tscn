@@ -1,4 +1,4 @@
-[gd_scene load_steps=147 format=3]
+[gd_scene load_steps=149 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="5_hiding"]
 [ext_resource type="Script" path="res://scripts/interactions/sliding_door.gd" id="6_sliding"]
 [ext_resource type="Script" path="res://scripts/game/room_lights.gd" id="7_roomlights"]
+[ext_resource type="Script" path="res://scripts/game/interact_marks.gd" id="8_marks"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_board.png" id="tex_floor_board"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_cement.png" id="tex_floor_cement"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_matte.png" id="tex_floor_matte"]
@@ -46,6 +47,9 @@ size = Vector2(140, 60)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_window_zone"]
 size = Vector2(170, 52)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_exam_zone"]
+size = Vector2(58, 50)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_room_Class1"]
 size = Vector2(455, 480)
@@ -418,6 +422,9 @@ texture_repeat = 2
 [node name="Lights" type="Node2D" parent="."]
 
 [node name="Stairwells" type="Node2D" parent="."]
+
+[node name="Marks" type="Node2D" parent="WallGlow"]
+script = ExtResource("8_marks")
 
 [node name="Labels" type="Node2D" parent="WallGlow"]
 
@@ -2040,6 +2047,12 @@ texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(1745, 2464, 1855, 2464, 1855, 2480, 1745, 2480)
 
+[node name="Mark_PrincipalLetter" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2665, 1317.6)
+z_index = 5
+color = Color(1.00, 0.78, 0.32, 1)
+polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
+
 [node name="PrincipalLetter" type="Area2D" parent="."]
 position = Vector2(2665, 1317.6)
 collision_layer = 2
@@ -2059,6 +2072,12 @@ polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
 [node name="PrincipalLetterZone" type="CollisionShape2D" parent="PrincipalLetter"]
 shape = SubResource("RectangleShape2D_key_zone")
 
+
+[node name="Mark_PhotoWall" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2158, 2343.2)
+z_index = 5
+color = Color(1.00, 0.78, 0.32, 1)
+polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
 
 [node name="PhotoWall" type="Area2D" parent="."]
 position = Vector2(2158, 2343.2)
@@ -2080,6 +2099,12 @@ polygon = PackedVector2Array(-16, -10, 16, -10, 16, 10, -16, 10)
 shape = SubResource("RectangleShape2D_key_zone")
 
 
+[node name="Mark_StudentCards" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2266, 2343.2)
+z_index = 5
+color = Color(1.00, 0.78, 0.32, 1)
+polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
+
 [node name="StudentCards" type="Area2D" parent="."]
 position = Vector2(2266, 2343.2)
 collision_layer = 2
@@ -2099,6 +2124,12 @@ polygon = PackedVector2Array(-14, -8, 14, -8, 14, 8, -14, 8)
 [node name="StudentCardsZone" type="CollisionShape2D" parent="StudentCards"]
 shape = SubResource("RectangleShape2D_key_zone")
 
+
+[node name="Mark_JanitorNotebook" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2374, 2343.2)
+z_index = 5
+color = Color(1.00, 0.78, 0.32, 1)
+polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
 
 [node name="JanitorNotebook" type="Area2D" parent="."]
 position = Vector2(2374, 2343.2)
@@ -2120,6 +2151,12 @@ polygon = PackedVector2Array(-12, -10, 12, -10, 12, 10, -12, 10)
 shape = SubResource("RectangleShape2D_key_zone")
 
 
+[node name="Mark_JanitorSafe" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2482, 2343.2)
+z_index = 5
+color = Color(1.00, 0.78, 0.32, 1)
+polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
+
 [node name="JanitorSafe" type="Area2D" parent="."]
 position = Vector2(2482, 2343.2)
 collision_layer = 0
@@ -2139,6 +2176,12 @@ polygon = PackedVector2Array(-12, -12, 12, -12, 12, 12, -12, 12)
 [node name="SafeZone" type="CollisionShape2D" parent="JanitorSafe"]
 shape = SubResource("RectangleShape2D_key_zone")
 
+
+[node name="Mark_StairKey" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2785, 2343.2)
+z_index = 5
+color = Color(1.00, 0.78, 0.32, 1)
+polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
 
 [node name="StairKey" type="Area2D" parent="."]
 position = Vector2(2785, 2343.2)
@@ -2160,6 +2203,12 @@ polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
 shape = SubResource("RectangleShape2D_key_zone")
 
 
+[node name="Mark_ExitDoor" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1800, 2432)
+z_index = 5
+color = Color(1.00, 0.78, 0.32, 1)
+polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
+
 [node name="ExitDoor" type="Area2D" parent="."]
 position = Vector2(1800, 2432)
 collision_layer = 2
@@ -2170,6 +2219,12 @@ script = ExtResource("4_exit")
 [node name="ExitZone" type="CollisionShape2D" parent="ExitDoor"]
 shape = SubResource("RectangleShape2D_stair_zone")
 
+
+[node name="Mark_HideClass1_1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(247.5, 1317.6)
+z_index = 5
+color = Color(1.00, 0.78, 0.32, 1)
+polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
 
 [node name="HideClass1_1" type="Area2D" parent="."]
 position = Vector2(247.5, 1317.6)
@@ -2190,6 +2245,12 @@ polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
 shape = SubResource("RectangleShape2D_key_zone")
 
 
+[node name="Mark_HideMusicRoom" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1100, 1317.6)
+z_index = 5
+color = Color(1.00, 0.78, 0.32, 1)
+polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
+
 [node name="HideMusicRoom" type="Area2D" parent="."]
 position = Vector2(1100, 1317.6)
 collision_layer = 2
@@ -2208,6 +2269,12 @@ polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
 [node name="HideMusicRoomZone" type="CollisionShape2D" parent="HideMusicRoom"]
 shape = SubResource("RectangleShape2D_key_zone")
 
+
+[node name="Mark_HideEmptyRoom" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(3180, 2343.2)
+z_index = 5
+color = Color(1.00, 0.78, 0.32, 1)
+polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
 
 [node name="HideEmptyRoom" type="Area2D" parent="."]
 position = Vector2(3180, 2343.2)
@@ -2245,6 +2312,12 @@ polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
 [node name="HideStorage1Zone" type="CollisionShape2D" parent="HideStorage1"]
 shape = SubResource("RectangleShape2D_key_zone")
 
+[node name="Mark_HideStorage1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2720, 2228)
+z_index = 5
+color = Color(0.42, 0.86, 0.82, 1)
+polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
+
 [node name="HideWomensRoom1" type="Area2D" parent="."]
 position = Vector2(1408.3, 2228)
 collision_layer = 2
@@ -2262,6 +2335,12 @@ polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
 
 [node name="HideWomensRoom1Zone" type="CollisionShape2D" parent="HideWomensRoom1"]
 shape = SubResource("RectangleShape2D_key_zone")
+
+[node name="Mark_HideWomensRoom1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1408.3, 2228)
+z_index = 5
+color = Color(0.42, 0.86, 0.82, 1)
+polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
 
 [node name="G_Corridor_1500" type="Polygon2D" parent="Ground"]
 texture = ExtResource("tex_floor_board")
@@ -2527,6 +2606,12 @@ prompt_text = "창밖 보기"
 
 [node name="Window_Class1Zone" type="CollisionShape2D" parent="Window_Class1"]
 shape = SubResource("RectangleShape2D_window_zone")
+
+[node name="Mark_Window_Class1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(247.5, 1082)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
 [node name="WD_Class1_spk0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -3012,6 +3097,12 @@ prompt_text = "창밖 보기"
 [node name="Window_Class2Zone" type="CollisionShape2D" parent="Window_Class2"]
 shape = SubResource("RectangleShape2D_window_zone")
 
+[node name="Mark_Window_Class2" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(650, 1082)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
 [node name="WD_Class2_spk0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
 texture = ExtResource("tex_prop_metal")
@@ -3401,6 +3492,12 @@ prompt_text = "창밖 보기"
 
 [node name="Window_Class3Zone" type="CollisionShape2D" parent="Window_Class3"]
 shape = SubResource("RectangleShape2D_window_zone")
+
+[node name="Mark_Window_Class3" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1100, 1082)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
 [node name="WD_Class3_spk0" type="Polygon2D" parent="WallGlow/RoomWallVisuals"]
 z_index = 1
@@ -4530,6 +4627,12 @@ prompt_text = "창밖 보기"
 
 [node name="Window_StaffRoomZone" type="CollisionShape2D" parent="Window_StaffRoom"]
 shape = SubResource("RectangleShape2D_window_zone")
+
+[node name="Mark_Window_StaffRoom" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2665, 1082)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
 [node name="PC_StaffRoom_desk0_0" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(2298, 1170, 2382, 1170, 2382, 1206, 2298, 1206)
@@ -6366,6 +6469,492 @@ polygon = PackedVector2Array(3116.4, 1526, 3157, 1526, 3157, 1530, 3116.4, 1530)
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.7051, 0.6923, 0.641, 1)
 polygon = PackedVector2Array(3176.7, 1523, 3217.3, 1523, 3217.3, 1527, 3176.7, 1527)
+
+[node name="Exam_Class1_shelf1" type="Area2D" parent="."]
+position = Vector2(76, 1426)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "먼지가 고르게 앉았다. 한참 아무도 안 건드렸다."
+prompt_text = "선반 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Class1_shelf1"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Class1_shelf1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(76, 1426)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Class1_back6" type="Area2D" parent="."]
+position = Vector2(444, 1405)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "사물함 문이 잠겨 있다. 이름표는 떼어졌다."
+prompt_text = "사물함 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Class1_back6"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Class1_back6" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(444, 1405)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Class2_clean" type="Area2D" parent="."]
+position = Vector2(794, 1079)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "빗자루와 쓰레받기. 대걸레 자리만 비어 있다."
+prompt_text = "청소도구함 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Class2_clean"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Class2_clean" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(794, 1079)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Class2_back5" type="Area2D" parent="."]
+position = Vector2(794, 1359)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "사물함 문이 잠겨 있다. 이름표는 떼어졌다."
+prompt_text = "사물함 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Class2_back5"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Class2_back5" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(794, 1359)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Class2_back6" type="Area2D" parent="."]
+position = Vector2(794, 1405)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "문틈으로 체육복 소매가 삐져나와 있다."
+prompt_text = "사물함 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Class2_back6"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Class2_back6" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(794, 1405)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Class2_d3" type="Area2D" parent="."]
+position = Vector2(721.5, 1176)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "교과서가 펼쳐진 채다. 어제 날짜 진도까지 나갔다."
+prompt_text = "책상 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Class2_d3"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Class2_d3" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(721.5, 1176)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Class3_back1" type="Area2D" parent="."]
+position = Vector2(1344, 1175)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "사물함 문이 잠겨 있다. 이름표는 떼어졌다."
+prompt_text = "사물함 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Class3_back1"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Class3_back1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1344, 1175)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Class3_back6" type="Area2D" parent="."]
+position = Vector2(1344, 1405)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "번호만 남고 이름표가 없는 칸이 하나 있다."
+prompt_text = "사물함 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Class3_back6"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Class3_back6" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1344, 1405)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Class3_d4" type="Area2D" parent="."]
+position = Vector2(1062, 1120)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "누가 급하게 일어난 자리다. 의자가 비스듬히 밀려 있다."
+prompt_text = "책상 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Class3_d4"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Class3_d4" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1062, 1120)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Class3_d13" type="Area2D" parent="."]
+position = Vector2(965.5, 1410)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "교과서가 펼쳐진 채다. 어제 날짜 진도까지 나갔다."
+prompt_text = "책상 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Class3_d13"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Class3_d13" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(965.5, 1410)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_MensRoom1_sink2" type="Area2D" parent="."]
+position = Vector2(937, 2285)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "수도꼭지에서 물이 한 방울씩 떨어진다."
+prompt_text = "세면대 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_MensRoom1_sink2"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_MensRoom1_sink2" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(937, 2285)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_WomensRoom1_sink4" type="Area2D" parent="."]
+position = Vector2(1212, 2373)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "거울에 금이 가 있다. 얼굴이 두 조각으로 나뉜다."
+prompt_text = "세면대 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_WomensRoom1_sink4"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_WomensRoom1_sink4" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1212, 2373)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_JanitorRoom_1" type="Area2D" parent="."]
+position = Vector2(2471.5, 2212.9)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "책상 서랍이 반쯤 열려 있다. 안에 지우개 가루뿐이다."
+prompt_text = "책상 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_JanitorRoom_1"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_JanitorRoom_1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2471.5, 2212.9)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Storage2_1" type="Area2D" parent="."]
+position = Vector2(3296.5, 2212.9)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "학급문고. 표지가 다 해졌는데 대출 카드는 비어 있다."
+prompt_text = "선반 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Storage2_1"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Storage2_1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(3296.5, 2212.9)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_StaffRoom_desk5_1" type="Area2D" parent="."]
+position = Vector2(2990, 1230)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "책상 서랍이 반쯤 열려 있다. 안에 지우개 가루뿐이다."
+prompt_text = "책상 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_StaffRoom_desk5_1"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_StaffRoom_desk5_1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2990, 1230)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_StaffRoom_desk11_0" type="Area2D" parent="."]
+position = Vector2(2990, 1364)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "누가 급하게 일어난 자리다. 의자가 비스듬히 밀려 있다."
+prompt_text = "책상 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_StaffRoom_desk11_0"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_StaffRoom_desk11_0" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2990, 1364)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_StaffRoom_shelfL0" type="Area2D" parent="."]
+position = Vector2(2004, 1375)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "먼지가 고르게 앉았다. 한참 아무도 안 건드렸다."
+prompt_text = "선반 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_StaffRoom_shelfL0"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_StaffRoom_shelfL0" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2004, 1375)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_StaffRoom_cabR0" type="Area2D" parent="."]
+position = Vector2(3323, 1313)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "서류철이 연도별로 꽂혀 있다. 올해 것만 비어 있다."
+prompt_text = "캐비닛 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_StaffRoom_cabR0"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_StaffRoom_cabR0" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(3323, 1313)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Corr_Class3_1500_0" type="Area2D" parent="."]
+position = Vector2(887, 1536)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "문틈으로 체육복 소매가 삐져나와 있다."
+prompt_text = "사물함 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Corr_Class3_1500_0"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Corr_Class3_1500_0" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(887, 1536)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Corr_YardExit_1500_1" type="Area2D" parent="."]
+position = Vector2(1815.8, 1536)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "사물함 문이 잠겨 있다. 이름표는 떼어졌다."
+prompt_text = "사물함 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Corr_YardExit_1500_1"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Corr_YardExit_1500_1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1815.8, 1536)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Corr_WomensRoom1_1500_0" type="Area2D" parent="."]
+position = Vector2(1220, 2104)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "사물함 문이 잠겨 있다. 이름표는 떼어졌다."
+prompt_text = "사물함 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Corr_WomensRoom1_1500_0"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Corr_WomensRoom1_1500_0" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1220, 2104)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Corr_JanitorRoom_1500_0" type="Area2D" parent="."]
+position = Vector2(2169.5, 2104)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "사물함 문이 잠겨 있다. 이름표는 떼어졌다."
+prompt_text = "사물함 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Corr_JanitorRoom_1500_0"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Corr_JanitorRoom_1500_0" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2169.5, 2104)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Corr_JanitorRoom_1500_1" type="Area2D" parent="."]
+position = Vector2(2464.5, 2104)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "번호만 남고 이름표가 없는 칸이 하나 있다."
+prompt_text = "사물함 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Corr_JanitorRoom_1500_1"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Corr_JanitorRoom_1500_1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2464.5, 2104)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Corr_Storage2_1500_0" type="Area2D" parent="."]
+position = Vector2(3037.5, 2104)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "사물함 문이 잠겨 있다. 이름표는 떼어졌다."
+prompt_text = "사물함 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Corr_Storage2_1500_0"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Corr_Storage2_1500_0" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(3037.5, 2104)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Corr_StaffRoom_1500_0" type="Area2D" parent="."]
+position = Vector2(2001, 1536)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "번호만 남고 이름표가 없는 칸이 하나 있다."
+prompt_text = "사물함 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Corr_StaffRoom_1500_0"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Corr_StaffRoom_1500_0" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2001, 1536)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Corr_StaffRoom_1500_3" type="Area2D" parent="."]
+position = Vector2(2199, 1536)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "문틈으로 체육복 소매가 삐져나와 있다."
+prompt_text = "사물함 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Corr_StaffRoom_1500_3"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Corr_StaffRoom_1500_3" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2199, 1536)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Corr_StaffRoom_1500_11" type="Area2D" parent="."]
+position = Vector2(2933, 1536)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "문틈으로 체육복 소매가 삐져나와 있다."
+prompt_text = "사물함 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Corr_StaffRoom_1500_11"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Corr_StaffRoom_1500_11" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2933, 1536)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
 [node name="SlideDoor_Class1" type="Area2D" parent="."]
 collision_layer = 2
