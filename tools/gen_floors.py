@@ -584,7 +584,7 @@ class Scene:
         self.poly2d(f"PV_{key}", "Props", color, polygon)
         self.prop_rects.append((key, _poly_box(polygon), color))
 
-    def window_light(self, key, x, y):
+    def window_light(self, key, x, y, room):
         """창으로 드는 달빛 — 진짜 광원(#274).
 
         `Lights`(Node2D, 씬 루트)에 둔다. **WallGlow에 두면 안 된다** —
@@ -596,7 +596,7 @@ class Scene:
         대여섯 개뿐이다.
         """
         self.node(NL.join([
-            f'[node name="WinLight_{key}" type="PointLight2D" parent="Lights"]',
+            f'[node name="WinLight_{key}" type="PointLight2D" parent="Lights/Room_{room}"]',
             f"position = Vector2({x:.1f}, {y:.1f})",
             f"color = {C_MOON_LIGHT}",
             f"energy = {MOON_ENERGY}",
@@ -605,6 +605,29 @@ class Scene:
             "shadow_filter_smooth = 4.0",
             'texture = SubResource("GradientTexture2D_moon")',
             f"texture_scale = {MOON_SCALE}",
+            ""]))
+    def room_lights(self, key, x0, y0, x1, y1):
+        """방 창문 달빛을 묶는 Area2D(#292). 평소에는 꺼져 있다.
+
+        광원을 늘 켜 두면 **닫힌 문 너머 방 안이 다 보인다** — Godot 2D에는
+        시야 판정이 없어서, 켜진 자리는 플레이어가 어디 있든 화면에 그려진다.
+        벽·문짝 차단체는 빛이 방 밖으로 새는 것만 막는다.
+
+        방 감지에 `CollisionPolygon2D`를 쓰면 안 된다 — `verify_props`가
+        `PropBodies` 밖의 모든 폴리곤 충돌을 **벽**으로 세고
+        `verify_floor_reach`가 그것을 막힌 것으로 봐서 방이 통행 불가가 된다.
+        """
+        sid = f"RectangleShape2D_room_{key}"
+        self.rect_shapes.append((sid, f"Vector2({n(x1 - x0)}, {n(y1 - y0)})"))
+        self.node(NL.join([
+            f'[node name="Room_{key}" type="Area2D" parent="Lights"]',
+            "collision_layer = 0",
+            "collision_mask = 1",
+            'script = ExtResource("7_roomlights")',
+            "",
+            f'[node name="Zone" type="CollisionShape2D" parent="Lights/Room_{key}"]',
+            f"position = Vector2({n((x0 + x1) / 2)}, {n((y0 + y1) / 2)})",
+            f'shape = SubResource("{sid}")',
             ""]))
 
     def window_probe(self, key, x, y, message):
@@ -828,6 +851,7 @@ SCRIPTS = {
     "4_exit": "res://scripts/interactions/exit_door.gd",
     "5_hiding": "res://scripts/interactions/hiding_spot.gd",
     "6_sliding": "res://scripts/interactions/sliding_door.gd",
+    "7_roomlights": "res://scripts/game/room_lights.gd",
 }
 
 
@@ -1357,7 +1381,7 @@ def _spread(a0, a1, size, count, fixed0, fixed1, horizontal=True):
     return out
 
 
-def _windows(sc, key, ix0, ix1, cy, win_y, count=3):
+def _windows(sc, key, room, ix0, ix1, cy, win_y, count=3):
     """창문 + 커튼 + 달빛 광원 + 창가 조사(#274). 교실과 교무실이 함께 쓴다.
 
     `win_y`는 창이 붙을 벽면 띠 (y0, y1)다. 문 반대쪽 벽 — 그쪽이 건물
@@ -1365,6 +1389,10 @@ def _windows(sc, key, ix0, ix1, cy, win_y, count=3):
     창가 통로를 낼 수 있다.
     """
     cells = list(_spread(ix0, ix1, 72, count, *win_y))
+    if not cells:
+        return cells
+    # 광원 묶음을 먼저 낸다 — 자식보다 앞에 선언돼야 한다.
+    sc.room_lights(key, *room)
     for i, (px0, py0, px1, py1) in enumerate(cells):
         sc.wall_decor(f"{key}_win{i}", rect(px0, py0, px1, py1), C_WINDOW)
         sc.wall_decor(f"{key}_curtainL{i}", rect(px0 - 8, py0, px0, py1), C_CURTAIN)
@@ -1373,7 +1401,7 @@ def _windows(sc, key, ix0, ix1, cy, win_y, count=3):
         # 광원으로 바꿨다. 벽(LO_)에 막히므로 방 밖으로 새지 않는다.
         down = py0 < cy
         ly = (py1 + MOON_INSET) if down else (py0 - MOON_INSET)
-        sc.window_light(f"{key}_{i}", (px0 + px1) / 2, ly)
+        sc.window_light(f"{key}_{i}", (px0 + px1) / 2, ly, key)
     # 창가 조사(E) — 방마다 하나. 창마다 달면 층당 서른 개가 되는데,
     # _find_interactable는 겹친 것 중 아무거나 돌려주므로 단서를 가로챈다.
     if cells:
@@ -1476,7 +1504,7 @@ def _classroom(sc, key, x0, y0, x1, y1, door, keepout):
         win_y, note_y = bot_band, top_band
     else:
         win_y, note_y = top_band, bot_band
-    win_cells = _windows(sc, key, ix0, ix1, cy, win_y)
+    win_cells = _windows(sc, key, (x0, y0, x1, y1), ix0, ix1, cy, win_y)
     # 스피커도 게시판과 같은 벽면에 붙는다. note_y[0]에서 아래로 재면 문 쪽
     # 벽이 아래일 때 벽을 파고든다 — 벽면 방향에 맞춰 앵커를 잡는다.
     spk_y = (wt, wt + 14) if door == "top" else (wb - 14, wb)
@@ -1653,7 +1681,8 @@ def _office(sc, key, x0, y0, x1, y1, door, keepout):
 
     # ── 창문 + 달빛 + 창가 조사 ────────────────────────────────
     win_y = (wt, wt + WALL_FACE) if win_top else (wb - CLASS_WALL_DECOR_D, wb)
-    _windows(sc, key, ix0, ix1, cy, win_y, max(3, int((ix1 - ix0) // 210)))
+    _windows(sc, key, (x0, y0, x1, y1), ix0, ix1, cy, win_y,
+             max(3, int((ix1 - ix0) // 210)))
 
     # ── 작업 구역: 창가 통로를 뺀 나머지 ───────────────────────
     ay0 = iy0 + (OFFICE_WIN_LANE if win_top else 0)
@@ -1934,7 +1963,10 @@ def add_sliding_doors(sc):
                 f'script = ExtResource("6_sliding")\n'
                 f'travel = {n(travel)}\n'
                 + (f'travel_y = {ty}\n' if float(ty) != 0.0 else "")
-                + f'leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_{key}")\n')
+                + f'leaf_visual = NodePath("../WallGlow/RoomWallVisuals/SDVis_{key}")\n'
+                # 방 창문 달빛은 이 문이 켠다(#292). 창 없는 방은 묶음이 없다.
+                + (f'room_lights = NodePath("../Lights/Room_{key}")\n'
+                   if f'name="Room_{key}"' in text_of(sc) else ''))
         sc.node(f'[node name="Zone" type="CollisionShape2D" parent="{root}"]\n'
                 f'position = Vector2({n(cx)}, {n(my)})\n'
                 f'shape = SubResource("RectangleShape2D_door_zone")\n')
