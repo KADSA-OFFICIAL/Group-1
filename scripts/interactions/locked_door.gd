@@ -9,6 +9,8 @@ extends Area2D
 @export_multiline var open_message: String = "문이 열렸다."
 @export var barrier_path: NodePath
 @export var prompt_text: String = "문 열기"
+## 잠긴 문은 무엇보다 먼저 잡혀야 한다(#301).
+@export var interact_priority: int = 20
 @export var door_id: String = ""
 @export var consume_key: bool = false
 @export var also_remove_paths: Array[NodePath] = []

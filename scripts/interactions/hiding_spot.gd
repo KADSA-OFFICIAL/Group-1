@@ -8,6 +8,8 @@ extends Area2D
 ## 영원히 갇히므로, 플레이어 쪽에서 E를 먼저 받아 항상 나올 수 있게 한다.
 
 @export var prompt_text: String = "숨기"
+## 쫓길 때 눌러야 하는 것이라 잡동사니보다 높다(#301).
+@export var interact_priority: int = 12
 @export_multiline var message: String = "몸을 접어 넣고 숨을 죽였다."
 
 

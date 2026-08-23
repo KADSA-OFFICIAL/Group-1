@@ -133,7 +133,11 @@ C_PARTITION = "Color(0.31, 0.29, 0.26, 1)"   # 마주 본 책상 사이 칸막�
 C_BAG = "Color(0.30, 0.26, 0.32, 1)"         # 책가방(#289)
 C_CUP = "Color(0.66, 0.65, 0.60, 1)"         # 컵·비누
 C_CASE = "Color(0.44, 0.32, 0.22, 1)"        # 필통·도구함
-C_CLOTHES = "Color(0.35, 0.38, 0.42, 1)"     # 체육복·담요·쿠션        # 안내판(장식)
+C_CLOTHES = "Color(0.35, 0.38, 0.42, 1)"     # 체육복·담요·쿠션
+# 상호작용 표시(#301). 어둠을 안 받는 WallGlow에 있어 색이 그대로 나온다.
+C_MARK_KEY = "Color(1.00, 0.78, 0.32, 1)"    # 진행에 필요한 것 — 단서·열쇠·잠긴 문
+C_MARK_HIDE = "Color(0.42, 0.86, 0.82, 1)"   # 은신처
+C_MARK_FLAVOR = "Color(0.60, 0.68, 0.78, 1)" # 그 밖의 조사(창밖·집기)        # 안내판(장식)
 
 # ── 도트 타일 텍스처 (#246, 원안 #243) ───────────────────────
 # 바닥·벽·집기는 단색 면이었다. `tools/gen_tiles.py`가 구운 회색조 도트 무늬를
@@ -629,6 +633,44 @@ class Scene:
             f"position = Vector2({n((x0 + x1) / 2)}, {n((y0 + y1) / 2)})",
             f'shape = SubResource("{sid}")',
             ""]))
+    def mark(self, owner, x, y, color, size=7.0):
+        """상호작용 표시(#301). 임자 이름을 붙여 `WallGlow/Marks`에 낸다.
+
+        **어둠을 받으면 안 되므로 CanvasLayer 안에 둔다** — 레이어 0에 두면
+        손전등이 정확히 그 위를 비출 때만 보인다. 대신 늘 보이게 되므로
+        `interact_marks.gd`가 거리로 껐다 켠다(#292와 같은 이유).
+
+        이름이 `Mark_<임자>`인 것은 규약이다 — 주웠거나 열려서 임자가 사라지면
+        표시도 같이 꺼져야 하는데, 그쪽 스크립트를 건드리지 않으려고 이름으로
+        찾는다.
+        """
+        # 폴리곤을 **원점 기준**으로 내고 자리는 position에 준다. 다른 노드처럼
+        # 절대 좌표로 내면 노드의 global_position이 (0,0)이라 거리 계산이 전부
+        # 빗나가 표시가 하나도 안 켜진다.
+        self.node(NL.join([
+            f'[node name="Mark_{owner}" type="Polygon2D" parent="WallGlow/Marks"]',
+            f"position = Vector2({n(x)}, {n(y)})",
+            "z_index = 5",
+            f"color = {color}",
+            f"polygon = {poly((0, -size), (size, 0), (0, size), (-size, 0))}",
+            ""]))
+
+    def examine(self, key, x, y, prompt, message):
+        """집기 조사 대상(#301) — 진행에 영향 없는 분위기용."""
+        self.node(NL.join([
+            f'[node name="{key}" type="Area2D" parent="."]',
+            f"position = Vector2({n(x)}, {n(y)})",
+            "collision_layer = 2",
+            "collision_mask = 0",
+            'script = ExtResource("3_interactable")',
+            f"interact_priority = {EXAMINE_PRIORITY}",
+            f'message = "{message}"',
+            f'prompt_text = "{prompt}"',
+            "",
+            f'[node name="Zone" type="CollisionShape2D" parent="{key}"]',
+            'shape = SubResource("RectangleShape2D_exam_zone")',
+            ""]))
+        self.mark(key, x, y, C_MARK_FLAVOR, 5.0)
 
     def window_probe(self, key, x, y, message):
         """창가 조사(E) — 방마다 하나.
@@ -852,6 +894,7 @@ SCRIPTS = {
     "5_hiding": "res://scripts/interactions/hiding_spot.gd",
     "6_sliding": "res://scripts/interactions/sliding_door.gd",
     "7_roomlights": "res://scripts/game/room_lights.gd",
+    "8_marks": "res://scripts/game/interact_marks.gd",
 }
 
 
@@ -1026,6 +1069,8 @@ def add_hiding(sc, floor):
         sc.poly2d(f"{name}Visual", name, C_LOCKER, rect(-18, -26, 18, 26), z=1)
         sc.node(f'[node name="{name}Zone" type="CollisionShape2D" parent="{name}"]\n'
                 f'shape = SubResource("RectangleShape2D_key_zone")\n')
+        # 은신처는 청록 — 쫓길 때 눈으로 바로 찾아야 한다(#301).
+        sc.mark(name, cx, cy, C_MARK_HIDE)
 
 
 def add_story(sc, floor):
@@ -1048,6 +1093,8 @@ def add_story(sc, floor):
                           f"position = Vector2({n(cx)}, {n(cy)})",
                           nodes[name]["body"], count=1, flags=re.M)
             sc.clue_pts.append((cx, cy))
+            # 진행에 필요한 것은 호박색으로 눈에 띄게(#301).
+            sc.mark(name, cx, cy, C_MARK_KEY)
             if name in AUTO_PICKUP:
                 body = to_pickup(body)
             sc.node(body if body.endswith("\n") else body + "\n")
@@ -1415,6 +1462,7 @@ def _windows(sc, key, room, ix0, ix1, cy, win_y, count=3):
         if not any(abs(px - pcx) <= zw / 2 and abs(py - pcy) <= zh / 2
                    for px, py in sc.clue_pts):
             sc.window_probe(key, pcx, pcy, window_text(sc.floor_no, key))
+            sc.mark(f"Window_{key}", pcx, pcy, C_MARK_FLAVOR, 5.0)
     return cells
 
 
@@ -1898,6 +1946,96 @@ def add_clutter(sc):
                 continue
             sc.overlay(f"{key}_{name}{i}", rect(*cell), col)
             placed += 1
+    return placed
+
+
+# ── 집기 조사(#301) ──────────────────────────────────────────────
+# #289로 소품이 층당 400개까지 늘었지만 하나도 만질 수 없었다. 책상·사물함·
+# 칠판에 다가가도 아무 반응이 없어 방이 여전히 배경이었다.
+#
+# `add_clutter()`와 같은 방식으로 **이미 놓인 집기를 훑어** 조사 대상을 붙인다.
+# 진행에는 영향이 없다 — 플래그도 아이템도 주지 않는다.
+#
+# 우선순위를 낮게(`EXAMINE_PRIORITY`) 준다. 안 그러면 단서 옆 책상이 E를
+# 가로챈다 — `_find_interactable`는 우선순위가 같으면 가까운 쪽을 고른다(#301).
+EXAMINE_PRIORITY = 3
+EXAMINE_ZONE = (58, 50)      # 조사 범위
+EXAMINE_CHANCE = 18          # 집기가 조사 대상이 될 확률(%). 34로 했더니 층당 130개가
+                             # 넘어 같은 문구가 되풀이됐다 — 방마다 두셋이면 충분하다.
+EXAMINE_MIN = 26             # 이보다 작은 집기에는 안 붙인다
+
+# 집기 색 -> (안내 문구, [묘사, ...]). 방 종류를 몰라도 집기 종류만으로 고른다.
+EXAMINE_LINES = {
+    C_DESK: ("책상 살펴보기", [
+        "책상 서랍이 반쯤 열려 있다. 안에 지우개 가루뿐이다.",
+        "상판에 커터칼로 파 놓은 이름이 있다. 절반쯤 지워졌다.",
+        "누가 급하게 일어난 자리다. 의자가 비스듬히 밀려 있다.",
+        "교과서가 펼쳐진 채다. 어제 날짜 진도까지 나갔다.",
+    ]),
+    C_LOCKER: ("사물함 살펴보기", [
+        "사물함 문이 잠겨 있다. 이름표는 떼어졌다.",
+        "문틈으로 체육복 소매가 삐져나와 있다.",
+        "번호만 남고 이름표가 없는 칸이 하나 있다.",
+    ]),
+    C_SHELF: ("선반 살펴보기", [
+        "학급문고. 표지가 다 해졌는데 대출 카드는 비어 있다.",
+        "먼지가 고르게 앉았다. 한참 아무도 안 건드렸다.",
+    ]),
+    C_CABINET: ("캐비닛 살펴보기", [
+        "서류철이 연도별로 꽂혀 있다. 올해 것만 비어 있다.",
+        "잠금장치가 뜯긴 자국이 있다. 오래된 자국은 아니다.",
+    ]),
+    C_CLEAN: ("청소도구함 살펴보기", [
+        "빗자루와 쓰레받기. 대걸레 자리만 비어 있다.",
+        "안쪽 벽에 청소 당번표가 붙어 있다. 이름이 하나 지워졌다.",
+    ]),
+    C_BIN: ("쓰레기통 살펴보기", [
+        "찢은 종이가 가득하다. 맞춰 볼 만한 조각은 없다.",
+        "비운 지 오래됐다. 바닥에 뭔가 눌어붙어 있다.",
+    ]),
+    C_SINK: ("세면대 살펴보기", [
+        "수도꼭지에서 물이 한 방울씩 떨어진다.",
+        "거울에 금이 가 있다. 얼굴이 두 조각으로 나뉜다.",
+    ]),
+    C_BED: ("침상 살펴보기", [
+        "이불이 개켜져 있다. 누군가 최근까지 쓴 자리다.",
+    ]),
+    C_RACK: ("서버랙 살펴보기", [
+        "표시등이 하나만 깜빡인다. 나머지는 꺼져 있다.",
+    ]),
+    C_SOFA: ("소파 살펴보기", [
+        "가죽이 한쪽만 눌려 있다. 늘 같은 자리에 앉는 사람이 있다.",
+    ]),
+    C_COPIER: ("복사기 살펴보기", [
+        "용지함이 비었다. 마지막 출력 매수가 화면에 남아 있다.",
+    ]),
+}
+
+
+def add_examine(sc):
+    """집기를 훑어 조사 대상을 붙인다(#301). 놓은 개수를 돌려준다.
+
+    표시(`sc.mark`)를 함께 낸다 — 표시가 없으면 늘어난 조사 대상을 찾을
+    방법이 없어 오히려 방만 어지러워진다.
+    """
+    placed = 0
+    for key, box, color in list(sc.prop_rects):
+        table = EXAMINE_LINES.get(color)
+        if table is None:
+            continue
+        x0, y0, x1, y1 = box
+        if x1 - x0 < EXAMINE_MIN or y1 - y0 < EXAMINE_MIN:
+            continue
+        seed = _name_hash(key) ^ 0x5EED
+        if seed % 100 >= EXAMINE_CHANCE:
+            continue
+        prompt, lines = table
+        cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+        # 단서 근처는 피한다 — 우선순위로 이기더라도 표시가 겹쳐 어지럽다.
+        if any(abs(px - cx) < 70 and abs(py - cy) < 70 for px, py in sc.clue_pts):
+            continue
+        sc.examine(f"Exam_{key}", cx, cy, prompt, lines[(seed // 11) % len(lines)])
+        placed += 1
     return placed
 
 
@@ -2494,7 +2632,9 @@ def build_common(fl, spec):
     sc.rect_shapes += [("RectangleShape2D_stair_zone", "Vector2(240, 56)"),
                        ("RectangleShape2D_key_zone", "Vector2(48, 48)"),
                        ("RectangleShape2D_door_zone", "Vector2(140, 60)"),
-                      ("RectangleShape2D_window_zone", "Vector2(170, 52)")]
+                      ("RectangleShape2D_window_zone", "Vector2(170, 52)"),
+                      ("RectangleShape2D_exam_zone",
+                       f"Vector2({EXAMINE_ZONE[0]}, {EXAMINE_ZONE[1]})")]
 
     sc.node('[node name="SchoolFloor" type="Node2D"]\n' + TEX_FLAGS)
     sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, W, H))
@@ -2508,6 +2648,8 @@ def build_common(fl, spec):
     sc.node('[node name="Props" type="Node2D" parent="."]\n')
     add_lights_root(sc)
     sc.node('[node name="Stairwells" type="Node2D" parent="."]\n')
+    sc.node('[node name="Marks" type="Node2D" parent="WallGlow"]\n'
+            + 'script = ExtResource("8_marks")\n')
     sc.node('[node name="Labels" type="Node2D" parent="WallGlow"]\n')
     sc.node('[node name="RoomWalls" type="StaticBody2D" parent="."]\n')
     sc.node('[node name="PropBodies" type="StaticBody2D" parent="."]\n')
@@ -2565,6 +2707,7 @@ def build_common(fl, spec):
     add_ground(sc, corridors)
     add_props(sc, corridors)
     add_clutter(sc)
+    add_examine(sc)
     add_sliding_doors(sc)
     add_outer(sc)
     return sc
@@ -2578,7 +2721,9 @@ def build_floor1():
                       ("RectangleShape2D_stair_zone", "Vector2(240, 56)"),
                       ("RectangleShape2D_key_zone", "Vector2(48, 48)"),
                       ("RectangleShape2D_door_zone", "Vector2(140, 60)"),
-                      ("RectangleShape2D_window_zone", "Vector2(170, 52)")]
+                      ("RectangleShape2D_window_zone", "Vector2(170, 52)"),
+                      ("RectangleShape2D_exam_zone",
+                       f"Vector2({EXAMINE_ZONE[0]}, {EXAMINE_ZONE[1]})")]
     sc.node('[node name="SchoolFloor" type="Node2D"]\n' + TEX_FLAGS)
     sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, W, H))
     sc.node('[node name="Ground" type="Node2D" parent="."]\n')
@@ -2591,6 +2736,8 @@ def build_floor1():
     sc.node('[node name="Props" type="Node2D" parent="."]\n')
     add_lights_root(sc)
     sc.node('[node name="Stairwells" type="Node2D" parent="."]\n')
+    sc.node('[node name="Marks" type="Node2D" parent="WallGlow"]\n'
+            + 'script = ExtResource("8_marks")\n')
     sc.node('[node name="Labels" type="Node2D" parent="WallGlow"]\n')
     sc.node('[node name="RoomWalls" type="StaticBody2D" parent="."]\n')
     sc.node('[node name="PropBodies" type="StaticBody2D" parent="."]\n')
@@ -2621,6 +2768,7 @@ def build_floor1():
     add_ground(sc, corridors)
     add_props(sc, corridors)
     add_clutter(sc)
+    add_examine(sc)
     add_sliding_doors(sc)
 
     add_outer(sc)
