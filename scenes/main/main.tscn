@@ -28,7 +28,12 @@ layer = 1
 follow_viewport_enabled = true
 
 [node name="Mask" type="Sprite2D" parent="WallFade"]
-scale = Vector2(7, 7)
+; 반경 = 512(텍스처 반지름) x scale. 2면 1024px 반경이고, 그라디언트가
+; 195px까지 투명 / 389px에서 완전히 검다 — 손전등 반경 333px에 맞춘 값이다(#304).
+; 7이던 것을 줄였다: 반경 3584px에 609px에서야 검어져 화면(반폭 640px) 안이
+; 거의 다 투명했다. 화면 대각선 반지름 734px보다 스프라이트가 커야 모서리가
+; 안 뚫리므로 1024 밑으로는 내리지 말 것.
+scale = Vector2(2, 2)
 texture = ExtResource("7_fade_mask")
 script = ExtResource("8_fade_mask")
 
