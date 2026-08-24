@@ -129,10 +129,95 @@ const MOVING_SPEED_EPSILON := 10.0   # 이보다 느리면 멈춘 것으로 본�
 # 자막에 붙는 화자 이름. 프롤로그(intro.gd)의 표기와 같아야 한다.
 const SPEAKER_NAME := "수위"
 
+# ── 대사·소리 단서 (#330) ────────────────────────────────────────
+# 상황마다 문장이 하나씩이라 한 판에 같은 말을 수십 번 들었다(발소리 단서는
+# 9초 쿨다운마다 뜬다). 상황별로 풀을 두고 **바로 앞에 쓴 것을 피해서** 고른다
+# — 3~5개짜리에서 pick_random()만 쓰면 같은 말이 두 번 연달아 나오기 쉽다.
+#
+# 소리 단서는 **지문 톤**(무엇이 들리는지)이고 수위 대사는 **말투**다. 박종태는
+# 딸을 잃고 스스로 심판을 집행하는 인물이라 히스테릭하지 않고 담담해야 한다.
 const MUTTERS := [
 	"…오늘도 아무도 없지.",
 	"시우야, 아빠 순찰 중이야.",
 	"다 끝나면 올라갈게.",
+	"불은 다 껐고… 창문도 봤고.",
+	"요즘 애들은 문을 안 닫아.",
+	"이 시간엔 아무도 없어야 하는데.",
+]
+
+## 발소리(420px 안). 지문이다 — 수위가 하는 말이 아니라 들리는 소리다.
+const FOOTSTEP_LINES := [
+	"발소리. 복도 저쪽에서. 느릿느릿.",
+	"뚜벅. 뚜벅. 일정한 간격으로.",
+	"바닥이 삐걱인다. 누가 걷고 있다.",
+	"발소리가 멎었다가, 다시 이어진다.",
+	"복도 어딘가에서 신발 끄는 소리.",
+]
+
+## 열쇠 소리(720px 안).
+const KEY_LINES := [
+	"— 찰랑. 열쇠꾸러미 소리. 가까워지고 있다.",
+	"쇠끼리 부딪는 소리가 났다.",
+	"찰그랑. 허리춤에서 나는 소리다.",
+	"열쇠 소리가 한 번, 그리고 조용해졌다.",
+]
+
+## 문 확인(지문).
+const DOOR_CHECK_LINES := [
+	"문이 열리는 소리. 수위가 방을 확인하고 있다.",
+	"손잡이 돌아가는 소리가 들린다.",
+	"문틈으로 불빛이 훑고 지나간다.",
+	"문이 닫혔다. 다음 문으로 가는 소리.",
+]
+
+## 발각.
+const SPOT_LINES := [
+	"…누구야?",
+	"거기 서.",
+	"학생이지. 봤어.",
+	"이 시간에 뭐 하는 거야.",
+]
+
+## 은신처 수색 시작.
+const SEARCH_LINES := [
+	"거기 들어갔지.",
+	"봤어. 나와.",
+	"숨는다고 없어지나.",
+]
+
+## 은신처를 열었는데 비었을 때.
+const SEARCH_EMPTY_LINES := [
+	"…없네. 잘못 봤나.",
+	"여기가 아니었나.",
+	"눈이 침침해졌어.",
+]
+
+## 수색을 포기할 때.
+const SEARCH_GIVEUP_LINES := [
+	"…어디 갔어.",
+	"멀리는 못 갔을 텐데.",
+	"문 다 잠가 놨는데 어디로.",
+]
+
+## 붙잡았을 때.
+const CATCH_LINES := [
+	"학생이네. 나와. 같이 수위실로 가자.",
+	"잡았다. 이리 와.",
+	"왜 여기 있어. 부모님 연락처 대.",
+]
+
+## 잉크를 맞았을 때(#169).
+const BLIND_LINES := [
+	"으윽— 뭐야, 뭐야 이거!",
+	"눈이— 이게 뭐야!",
+	"뭘 던진 거야, 이 자식이!",
+]
+
+## 잉크가 풀렸을 때(지문).
+const BLIND_END_LINES := [
+	"수위가 눈을 문지르며 다시 걷기 시작한다.",
+	"소매로 얼굴을 훔치고는 고개를 든다.",
+	"한참 눈을 깜빡이더니 다시 움직인다.",
 ]
 
 var player: CharacterBody2D = null
@@ -200,6 +285,8 @@ var announced_search: bool = false
 var _player_hidden: bool = false
 
 var _game_state: Node = null
+## 풀마다 마지막에 쓴 문장. 연속 반복만 막는다(#330).
+var _last_line: Dictionary = {}
 
 # 잉크를 뒤집어써 앞을 못 보는 남은 시간(#169). 0보다 크면 추적·순찰·접촉
 # 판정이 전부 멈춘다.
@@ -685,7 +772,7 @@ func _physics_process(delta: float) -> void:
 			_end_sweep(false)
 		if not announced_chase:
 			announced_chase = true
-			_say_line("…누구야?")
+			_say_line(_pick(SPOT_LINES))
 			Sfx.play(&"spotted")
 		_move_chase(delta)
 	elif search_timer > 0.0:
@@ -745,7 +832,7 @@ func blind(seconds: float) -> void:
 	announced_chase = false
 	body.modulate = BLIND_MODULATE
 
-	_say_line("으윽— 뭐야, 뭐야 이거!")
+	_say_line(_pick(BLIND_LINES))
 
 
 ## 스턴 동안은 제자리에 선다. move_and_slide를 계속 부르는 것은 플레이어가
@@ -761,7 +848,7 @@ func _hold_blinded(delta: float) -> void:
 		blind_timer = 0.0
 		body.modulate = _body_modulate
 		repath_timer = 0.0
-		_say("수위가 눈을 문지르며 다시 걷기 시작한다.")
+		_say(_pick(BLIND_END_LINES))
 
 	if debug_draw:
 		queue_redraw()
@@ -856,7 +943,7 @@ func _move_search(delta: float) -> void:
 	search_timer -= delta
 	if not announced_search:
 		announced_search = true
-		_say_line("거기 들어갔지.")
+		_say_line(_pick(SEARCH_LINES))
 
 	if position.distance_to(search_point) <= SEARCH_OPEN_DISTANCE:
 		_open_hiding_spot()
@@ -886,7 +973,7 @@ func _open_hiding_spot() -> void:
 	var inside: bool = (player != null and player.get("is_hiding") == true
 			and player.position.distance_to(search_point) <= SEARCH_OPEN_DISTANCE)
 	if not inside:
-		_say_line("…없네. 잘못 봤나.")
+		_say_line(_pick(SEARCH_EMPTY_LINES))
 		return
 	# 숨은 채로 게임 오버 화면이 뜨면 앞뒤가 안 맞는다 — 먼저 끌어낸다.
 	player.call("set_hiding", false)
@@ -899,7 +986,7 @@ func _give_up_search() -> void:
 	stuck_time = 0.0
 	repath_timer = 0.0
 	path_points = PackedVector2Array()
-	_say_line("…어디 갔어.")
+	_say_line(_pick(SEARCH_GIVEUP_LINES))
 
 
 ## 붙잡힘 통보. 접촉 상태가 유지되는 동안 매 프레임 불리지만
@@ -907,7 +994,7 @@ func _give_up_search() -> void:
 func _catch_player() -> void:
 	if not announced_catch:
 		announced_catch = true
-		_say_line("학생이네. 나와. 같이 수위실로 가자.")
+		_say_line(_pick(CATCH_LINES))
 		Sfx.play(&"caught")
 
 	var game_state = get_tree().get_first_node_in_group("game_state")
@@ -1067,7 +1154,7 @@ func _move_sweep(delta: float) -> void:
 			sweep_look = SWEEP_LOOK_SECONDS
 			velocity = Vector2.ZERO
 			path_points = PackedVector2Array()
-			_say_line(SWEEP_LINES.pick_random())
+			_say_line(_pick(SWEEP_LINES))
 		else:
 			_end_sweep(true)
 		return
@@ -1135,6 +1222,23 @@ func _move_wander(delta: float) -> void:
 
 # ── 소리 단서·혼잣말 (#141) ──────────────────────────────────────
 
+## 같은 문장을 연달아 쓰지 않고 고른다(#330).
+##
+## `pick_random()`만 쓰면 3~5개짜리 풀에서 같은 말이 두 번 이어 나오는 일이
+## 잦다 — 한 판에 수십 번 뜨는 소리 단서에서 특히 눈에 띈다. 풀마다 마지막에
+## 쓴 것을 기억해 그것만 피한다(완전한 비반복은 아니고, 연속만 막는다).
+func _pick(pool: Array) -> String:
+	if pool.is_empty():
+		return ""
+	var key := str(pool[0])
+	var last: String = _last_line.get(key, "")
+	var text: String = pool.pick_random()
+	if pool.size() > 1 and text == last:
+		text = pool[(pool.find(text) + 1) % pool.size()]
+	_last_line[key] = text
+	return text
+
+
 func _say(text: String) -> void:
 	if _refresh_game_state():
 		_game_state.call("request_notice", text)
@@ -1162,10 +1266,10 @@ func _update_sound_cues() -> void:
 	var distance := position.distance_to(player.position)
 	if distance <= FOOTSTEP_RANGE:
 		sound_cooldown = SOUND_COOLDOWN
-		_say("발소리. 복도 저쪽에서. 느릿느릿.")
+		_say(_pick(FOOTSTEP_LINES))
 	elif distance <= EARSHOT:
 		sound_cooldown = SOUND_COOLDOWN
-		_say("— 찰랑. 열쇠꾸러미 소리. 가까워지고 있다.")
+		_say(_pick(KEY_LINES))
 
 
 ## 방을 확인할 때의 연출. 들리는 거리 안에서만 나온다.
@@ -1177,10 +1281,10 @@ func _notice_inspection() -> void:
 
 	if mutter_cooldown <= 0.0:
 		mutter_cooldown = MUTTER_COOLDOWN
-		_say_line(MUTTERS.pick_random())
+		_say_line(_pick(MUTTERS))
 	elif sound_cooldown <= 0.0:
 		sound_cooldown = SOUND_COOLDOWN
-		_say("문이 열리는 소리. 수위가 방을 확인하고 있다.")
+		_say(_pick(DOOR_CHECK_LINES))
 
 
 ## 경로 다듬기: 시야가 트인 가장 먼 지점으로 건너뛴다(격자 계단 현상 완화).
