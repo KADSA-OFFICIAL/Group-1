@@ -276,6 +276,11 @@ def uv_for(polygon):
 TEXTURES = {f"tex_{stem}": f"{TEX_DIR}/{stem}.png"
             for stem in sorted(set(TEX.values()) | set(SPRITE.values()))}
 
+# 열쇠 도트 스프라이트(#333). 타일 무늬가 아니라 그림 한 장이라 TEX/SPRITE 표와
+# 따로 둔다 — 경로도 assets/tiles가 아니라 assets/sprites다.
+# 굽는 곳은 tools/gen_key_sprite.py, 쓰는 곳은 story_objects.json의 열쇠 시각 노드다.
+SPRITE_TEXTURES = {"9_key": "res://assets/sprites/key.png"}
+
 # 텍스처 설정을 물려받을 부모가 없는 CanvasLayer 직속 노드. #307에서 벽·문·계단
 # 시각이 전부 레이어 0(`Structures`)으로 내려가면서 비었다가, #318에서 문
 # (Door_/SDVis_)만 다시 WallGlow 아래로 올라와 여기 하나가 남았다 — CanvasLayer는
@@ -915,7 +920,8 @@ def ext_for(body):
     out = [f'[ext_resource type="Script" path="{path}" id="{rid}"]'
            for rid, path in SCRIPTS.items() if f'ExtResource("{rid}")' in body]
     out += [f'[ext_resource type="Texture2D" path="{path}" id="{rid}"]'
-            for rid, path in TEXTURES.items() if f'ExtResource("{rid}")' in body]
+            for rid, path in {**TEXTURES, **SPRITE_TEXTURES}.items()
+            if f'ExtResource("{rid}")' in body]
     return out
 
 
@@ -1224,21 +1230,6 @@ def add_stair_locks(sc, floor, key_id, stairwells):
             f'also_remove_paths = Array[NodePath]([{", ".join(removes)}])\n')
         sc.node(f'[node name="{tag}LockZone" type="CollisionShape2D" parent="{tag}Lock"]\n'
                 f'shape = SubResource("RectangleShape2D_stair_zone")\n')
-
-
-def add_keys(sc, floor):
-    for name, item_id, x, y, msg in KEYS.get(floor, []):
-        sc.node(f'[node name="{name}" type="Area2D" parent="."]\n'
-                f'position = Vector2({n(x)}, {n(y)})\n'
-                f'collision_layer = 0\ncollision_mask = 1\n'
-                f'script = ExtResource("2_pickup")\n'
-                f'item_id = "{item_id}"\nmessage = "{msg}"\n'
-                f'pickup_id = "{item_id}_taken"\n')
-        sc.node(f'[node name="{name}Visual" type="Polygon2D" parent="{name}"]\n'
-                f'z_index = 2\ncolor = {C_KEY}\n'
-                f'polygon = {rect(-11, -5, 11, 5)}\n')
-        sc.node(f'[node name="{name}Zone" type="CollisionShape2D" parent="{name}"]\n'
-                f'shape = SubResource("RectangleShape2D_key_zone")\n')
 
 
 def add_stairwell(sc, name, x0, y0, x1, y1):

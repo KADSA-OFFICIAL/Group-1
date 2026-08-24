@@ -1,4 +1,4 @@
-[gd_scene load_steps=242 format=3]
+[gd_scene load_steps=243 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
@@ -29,6 +29,7 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_grain.png" id="tex_prop_grain"]
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_metal.png" id="tex_prop_metal"]
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
+[ext_resource type="Texture2D" path="res://assets/sprites/key.png" id="9_key"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(3400, 40)
@@ -4130,10 +4131,10 @@ message = "고리에 걸린 열쇠. 꼬리표에 '3F 계단'이라고 적혀 있
 item_id = "stair_key_3"
 pickup_id = "sparekeyhook_taken"
 
-[node name="SpareKeyHookVisual" type="Polygon2D" parent="SpareKeyHook"]
+[node name="SpareKeyHookVisual" type="Sprite2D" parent="SpareKeyHook"]
 z_index = 1
-color = Color(0.62, 0.55, 0.28, 1)
-polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
+texture_filter = 1
+texture = ExtResource("9_key")
 
 
 [node name="SpareKeyHookZone" type="CollisionShape2D" parent="SpareKeyHook"]

@@ -15,7 +15,7 @@
   "StairKey": {
    "body": "[node name=\"StairKey\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(830, 1220)\ncollision_layer = 0\ncollision_mask = 1\nscript = ExtResource(\"2_pickup\")\nitem_id = \"stair_key_1\"\nmessage = \"창고 선반 위에서 1층 계단 열쇠를 주웠다.\"\npickup_id = \"stair_key_1_taken\"\n\n",
    "kids": [
-    "[node name=\"StairKeyVisual\" type=\"Polygon2D\" parent=\"StairKey\"]\nz_index = 1\ncolor = Color(0.62, 0.55, 0.28, 1)\npolygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)\n\n",
+    "[node name=\"StairKeyVisual\" type=\"Sprite2D\" parent=\"StairKey\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"9_key\")\n\n",
     "[node name=\"StairKeyZone\" type=\"CollisionShape2D\" parent=\"StairKey\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
    ]
   },
@@ -112,7 +112,7 @@
   "DrainKey": {
    "body": "[node name=\"DrainKey\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(720, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"배수구 뚜껑이 어긋나 있다. 손을 넣어 보니 젖은 열쇠가 잡혔다. '2F 계단'.\"\nprompt_text = \"배수구 뒤지기\"\ngrants_item_id = \"stair_key_2\"\ngrants_flag = \"found_drain_key\"\n\n",
    "kids": [
-    "[node name=\"DrainKeyVisual\" type=\"Polygon2D\" parent=\"DrainKey\"]\nz_index = 1\ncolor = Color(0.62, 0.55, 0.28, 1)\npolygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)\n\n",
+    "[node name=\"DrainKeyVisual\" type=\"Sprite2D\" parent=\"DrainKey\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"9_key\")\n\n",
     "[node name=\"DrainKeyZone\" type=\"CollisionShape2D\" parent=\"DrainKey\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
    ]
   },
@@ -189,7 +189,7 @@
   "SpareKeyHook": {
    "body": "[node name=\"SpareKeyHook\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(1160, 380)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"고리에 걸린 열쇠. 꼬리표에 '3F 계단'이라고 적혀 있다. 챙겼다.\"\nprompt_text = \"열쇠 챙기기\"\ngrants_item_id = \"stair_key_3\"\n\n",
    "kids": [
-    "[node name=\"SpareKeyHookVisual\" type=\"Polygon2D\" parent=\"SpareKeyHook\"]\nz_index = 1\ncolor = Color(0.62, 0.55, 0.28, 1)\npolygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)\n\n",
+    "[node name=\"SpareKeyHookVisual\" type=\"Sprite2D\" parent=\"SpareKeyHook\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"9_key\")\n\n",
     "[node name=\"SpareKeyHookZone\" type=\"CollisionShape2D\" parent=\"SpareKeyHook\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
    ]
   },
@@ -231,7 +231,7 @@
   "StairKey": {
    "body": "[node name=\"StairKey\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(2090, 1220)\ncollision_layer = 0\ncollision_mask = 1\nscript = ExtResource(\"2_pickup\")\nitem_id = \"stair_key_4\"\nmessage = \"컴퓨터실 책상 아래에서 4층 계단 열쇠를 주웠다.\"\npickup_id = \"stair_key_4_taken\"\n\n",
    "kids": [
-    "[node name=\"StairKeyVisual\" type=\"Polygon2D\" parent=\"StairKey\"]\nz_index = 1\ncolor = Color(0.62, 0.55, 0.28, 1)\npolygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)\n\n",
+    "[node name=\"StairKeyVisual\" type=\"Sprite2D\" parent=\"StairKey\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"9_key\")\n\n",
     "[node name=\"StairKeyZone\" type=\"CollisionShape2D\" parent=\"StairKey\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
    ]
   },
@@ -245,7 +245,7 @@
   "DasanStairKey": {
    "body": "[node name=\"DasanStairKey\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(1950, 1620)\ncollision_layer = 0\ncollision_mask = 1\nscript = ExtResource(\"2_pickup\")\nitem_id = \"stair_key_4\"\nmessage = \"다산7실 사물함 위에서 4층 계단 열쇠를 주웠다.\"\npickup_id = \"stair_key_4_dasan_taken\"\n\n",
    "kids": [
-    "[node name=\"DasanStairKeyVisual\" type=\"Polygon2D\" parent=\"DasanStairKey\"]\nz_index = 1\ncolor = Color(0.62, 0.55, 0.28, 1)\npolygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)\n\n",
+    "[node name=\"DasanStairKeyVisual\" type=\"Sprite2D\" parent=\"DasanStairKey\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"9_key\")\n\n",
     "[node name=\"DasanStairKeyZone\" type=\"CollisionShape2D\" parent=\"DasanStairKey\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
    ]
   },
@@ -321,7 +321,7 @@
   "StairKey": {
    "body": "[node name=\"StairKey\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(1636, 380)\ncollision_layer = 0\ncollision_mask = 1\nscript = ExtResource(\"2_pickup\")\nitem_id = \"stair_key_5\"\nmessage = \"미술창고 선반에서 5층 계단 열쇠를 주웠다.\"\npickup_id = \"stair_key_5_taken\"\n\n",
    "kids": [
-    "[node name=\"StairKeyVisual\" type=\"Polygon2D\" parent=\"StairKey\"]\nz_index = 1\ncolor = Color(0.62, 0.55, 0.28, 1)\npolygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)\n\n",
+    "[node name=\"StairKeyVisual\" type=\"Sprite2D\" parent=\"StairKey\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"9_key\")\n\n",
     "[node name=\"StairKeyZone\" type=\"CollisionShape2D\" parent=\"StairKey\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
    ]
   },

@@ -1,4 +1,4 @@
-[gd_scene load_steps=231 format=3]
+[gd_scene load_steps=232 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
@@ -26,6 +26,7 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_grain.png" id="tex_prop_grain"]
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_metal.png" id="tex_prop_metal"]
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
+[ext_resource type="Texture2D" path="res://assets/sprites/key.png" id="9_key"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(3400, 40)
@@ -3920,10 +3921,10 @@ message = "미술창고 선반에서 5층 계단 열쇠를 주웠다."
 pickup_id = "stair_key_5_taken"
 
 
-[node name="StairKeyVisual" type="Polygon2D" parent="StairKey"]
+[node name="StairKeyVisual" type="Sprite2D" parent="StairKey"]
 z_index = 1
-color = Color(0.62, 0.55, 0.28, 1)
-polygon = PackedVector2Array(-10, -5, 10, -5, 10, 5, -10, 5)
+texture_filter = 1
+texture = ExtResource("9_key")
 
 
 [node name="StairKeyZone" type="CollisionShape2D" parent="StairKey"]
