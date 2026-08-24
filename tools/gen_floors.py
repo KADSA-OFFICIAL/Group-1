@@ -1034,43 +1034,107 @@ def to_pickup(body):
 # 추가 은신처(#172 후속): 층마다 두 곳씩 더 둔다. 기존 은신처는
 # story_objects.json에서 오고, 여기 있는 것은 새로 만드는 것이다.
 # 방 안 위쪽(0.3 지점)에 놓아 단서 오브젝트(0.62 지점)와 겹치지 않게 한다.
+# 은신처 종류(#324) — 이름 -> (색, 반폭, 반높이). 종류마다 다르게 보여야 한다.
+# 예전에는 전부 C_LOCKER 36x52 상자였다: 약품장도 장비함도 화장실 칸도 같은
+# 회색 사물함으로 그려졌다.
+HIDE_KINDS = {
+    "locker":  (C_LOCKER, 18, 26),    # 사물함
+    "clean":   (C_CLEAN, 15, 24),     # 청소함
+    "chem":    (C_CABINET, 20, 22),   # 약품장
+    "files":   (C_SHELF, 22, 20),     # 서류함·적재함
+    "gear":    (C_METAL, 24, 24),     # 장비함
+    "stall":   (C_STALLDOOR, 20, 28), # 화장실 칸
+    "curtain": (C_CURTAIN, 12, 30),   # 커튼 뒤
+    "desk":    (C_DESK, 26, 18),      # 교탁·큰 책상 밑
+}
+
+# 층 -> [(노드 이름, 방, 종류, 안내, 묘사)]. `story_objects.json`이 층당 3곳을
+# 따로 두므로 여기 것을 더하면 층당 8곳쯤 된다(#324).
+# 방 안 자리를 손으로 잡아야 하는 은신처(#324) — (층, 이름) -> (가로 비율, 세로 비율).
+# 교무실·부서실은 책상 섬이 방 가운데를 차지해 자동 배치가 집기에 막힌다
+# (`verify_hiding_spots`가 계단에서 걸어 닿는지 본다). 옆벽 쪽으로 밀어 준다.
+HIDE_POS = {
+    (2, "HidePEDept"): (0.667, 0.30),
+    (3, "HideCareerDept"): (0.667, 0.30),
+}
+
 EXTRA_HIDING = {
-    4: [("HideInfoDept", "InfoDept", "사물함에 숨기",
+    4: [("HideInfoDept", "InfoDept", "locker", "사물함에 숨기",
          "정보부실 사물함. 종이 냄새와 먼지 사이에 몸을 접었다."),
-        ("HideDasan6", "Dasan6", "청소함에 숨기",
+        ("HideDasan6", "Dasan6", "clean", "청소함에 숨기",
          "청소함 안. 대걸레 자루가 어깨를 누른다.")],
-    3: [("HideScienceLab1", "ScienceLab1", "약품장에 숨기",
+    3: [("HideScienceLab1", "ScienceLab1", "chem", "약품장에 숨기",
          "약품장 아래 칸. 시큼한 냄새에 숨이 막힌다."),
-        ("HideCareerDept", "CareerDept", "서류함에 숨기",
-         "서류함 뒤 빈 공간. 파일 더미에 등을 붙였다.")],
-    2: [("HideEduRoom", "EduRoom", "사물함에 숨기",
+        ("HideCareerDept", "CareerDept", "files", "서류함에 숨기",
+         "서류함 뒤 빈 공간. 파일 더미에 등을 붙였다."),
+        ("HideNorth3", "North3", "curtain", "커튼 뒤에 숨기",
+         "창가 커튼 뒤. 유리에 닿은 등이 서늘하다."),
+        ("HideStorageR", "StorageR", "files", "적재함에 숨기",
+         "쌓인 상자 사이. 무릎을 끌어안고 앉았다."),
+        ("HideMensRoomB", "MensRoomB", "stall", "칸에 숨기",
+         "맨 끝 칸. 발을 변기 위로 올렸다."),
+        ("HideScienceLab2", "ScienceLab2", "desk", "실험대 밑에 숨기",
+         "실험대 밑. 가스 배관에 등이 닿는다.")],
+    2: [("HideEduRoom", "EduRoom", "locker", "사물함에 숨기",
          "교육실 사물함. 문틈으로 복도가 가늘게 보인다."),
-        ("HidePEDept", "PEDept", "장비함에 숨기",
-         "체육 장비함. 공 사이에 몸을 밀어 넣었다.")],
-    1: [("HideStorage1", "Storage1", "적재함에 숨기",
+        ("HidePEDept", "PEDept", "gear", "장비함에 숨기",
+         "체육 장비함. 공 사이에 몸을 밀어 넣었다."),
+        ("HideNorth7", "North7", "curtain", "커튼 뒤에 숨기",
+         "커튼과 창 사이. 숨을 죽이자 유리가 김으로 흐려진다."),
+        ("HidePEStorage", "PEStorage", "gear", "매트 뒤에 숨기",
+         "세워 둔 매트 뒤. 곰팡내가 코를 막는다."),
+        ("HideWomensRoomR", "WomensRoomR", "stall", "칸에 숨기",
+         "가운데 칸. 문틈으로 세면대가 보인다."),
+        ("HideComputerRoom", "ComputerRoom", "desk", "책상 밑에 숨기",
+         "컴퓨터 책상 밑. 케이블 뭉치에 발이 걸린다.")],
+    1: [("HideStorage1", "Storage1", "files", "적재함에 숨기",
          "창고 적재함 뒤. 먼지가 목을 긁는다."),
-        ("HideWomensRoom1", "WomensRoom1", "칸에 숨기",
-         "화장실 칸 안. 문고리를 안에서 붙잡았다.")],
+        ("HideWomensRoom1", "WomensRoom1", "stall", "칸에 숨기",
+         "화장실 칸 안. 문고리를 안에서 붙잡았다."),
+        ("HideClass3", "Class3", "clean", "청소함에 숨기",
+         "교실3 청소함. 빗자루 사이로 문이 보인다."),
+        ("HideStaffRoom", "StaffRoom", "files", "서류 캐비닛에 숨기",
+         "교무실 캐비닛 사이. 결재판 냄새가 난다."),
+        ("HideStorage2", "Storage2", "gear", "적재 선반에 숨기",
+         "선반 맨 아래 칸. 무릎이 턱에 닿는다."),
+        ("HideMensRoom1", "MensRoom1", "stall", "칸에 숨기",
+         "남자 화장실 끝 칸. 물 떨어지는 소리만 들린다.")],
 }
 
 
 def add_hiding(sc, floor):
-    """은신처 Area2D + 캐비닛 시각 + 상호작용 존을 방 안에 만든다."""
+    """은신처 Area2D + 종류별 시각 + 상호작용 존을 방 안에 만든다.
+
+    **종류마다 색과 크기가 다르다**(#324). 예전에는 전부 `C_LOCKER` 36x52라
+    약품장도 장비함도 화장실 칸도 같은 회색 사물함으로 보였다.
+    """
     spots = EXTRA_HIDING.get(floor, [])
-    for i, (name, room_key, prompt, message) in enumerate(spots):
+    # **방 안에서의 자리는 그 방에 몇 개가 들어가는지로 정한다**(#324). 예전에는
+    # 층 전체 목록의 순번으로 나눠서, 층에 은신처를 더하면 **이미 있던 것까지
+    # 자리가 밀렸다** — 교무실처럼 집기가 빽빽한 방에서 새 자리가 막혀
+    # verify_hiding_spots에 걸렸다.
+    per_room = {}
+    for spot in spots:
+        per_room.setdefault(spot[1], []).append(spot[0])
+    for name, room_key, kind, prompt, message in spots:
         if room_key not in sc.rooms:
             raise SystemExit(f"floor{floor}: 은신처 대상 방 {room_key}가 없다")
         x0, y0, x1, y1 = sc.rooms[room_key]
-        cx = x0 + (i + 1) * (x1 - x0) / (len(spots) + 1)
-        cy = y0 + (y1 - y0) * 0.30
+        mates = per_room[room_key]
+        j = mates.index(name)
+        fx, fy = HIDE_POS.get((floor, name), (None, 0.30))
+        if fx is None:
+            fx = (j + 1) / (len(mates) + 1)
+        cx = x0 + (x1 - x0) * fx
+        cy = y0 + (y1 - y0) * fy
         sc.clue_pts.append((cx, cy))
         sc.node(f'[node name="{name}" type="Area2D" parent="."]\n'
                 f'position = Vector2({n(cx)}, {n(cy)})\n'
                 f'collision_layer = 2\ncollision_mask = 0\n'
                 f'script = ExtResource("5_hiding")\n'
                 f'prompt_text = "{prompt}"\nmessage = "{message}"\n')
-        # 사물함·청소함 상자 — 색을 C_LOCKER로 맞춰 다른 금속 집기와 같은 타일을 받는다.
-        sc.poly2d(f"{name}Visual", name, C_LOCKER, rect(-18, -26, 18, 26), z=1)
+        color, hw, hh = HIDE_KINDS[kind]
+        sc.poly2d(f"{name}Visual", name, color, rect(-hw, -hh, hw, hh), z=1)
         sc.node(f'[node name="{name}Zone" type="CollisionShape2D" parent="{name}"]\n'
                 f'shape = SubResource("RectangleShape2D_key_zone")\n')
         # 은신처는 청록 — 쫓길 때 눈으로 바로 찾아야 한다(#301).
