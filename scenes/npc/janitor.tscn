@@ -1,9 +1,10 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 
 [ext_resource type="Script" path="res://scripts/npc/janitor.gd" id="1_janitor_script"]
 [ext_resource type="AudioStream" path="res://assets/audio/janitor_step.wav" id="2_step"]
 [ext_resource type="AudioStream" path="res://assets/audio/keys.wav" id="3_keys"]
 [ext_resource type="AudioStream" path="res://assets/audio/door_open.wav" id="4_door"]
+[ext_resource type="Texture2D" path="res://assets/sprites/janitor_sheet.png" id="5_sheet"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_janitor"]
 radius = 9.0
@@ -13,9 +14,12 @@ height = 30.0
 motion_mode = 1
 script = ExtResource("1_janitor_script")
 
-[node name="Body" type="Polygon2D" parent="."]
-color = Color(0.62, 0.54, 0.38, 1)
-polygon = PackedVector2Array(0, -20, 11, -7, 8, 16, -8, 16, -11, -7)
+[node name="Body" type="Sprite2D" parent="."]
+texture_filter = 1
+offset = Vector2(0, -24)
+texture = ExtResource("5_sheet")
+hframes = 3
+vframes = 4
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CapsuleShape2D_janitor")
