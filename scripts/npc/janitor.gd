@@ -387,8 +387,9 @@ func _prune_route_to_reachable() -> void:
 
 
 ## 층 씬의 문에서 고정 순찰 루트를 만든다(#141).
-## 문 시각 노드는 Structures/Door_<방이름>(#307에서 레이어 0으로 내려옴), 대응하는 방 폴리곤은
-## Rooms/<방이름>이다(tools/gen_floors.py가 이 규약으로 생성한다).
+## 문 시각 노드는 WallGlow/Doors/Door_<방이름>(#318 — 복도에서 문이 보이도록
+## 어둠 영향이 없는 WallGlow로 옮겼다), 대응하는 방 폴리곤은 Rooms/<방이름>이다
+## (tools/gen_floors.py가 이 규약으로 생성한다).
 ## 순서는 씬 순서의 첫 문에서 시작하는 최근접 이웃 — 씬 순서가 고정이라
 ## 층마다 항상 같은 루트가 나온다("정해진 순찰 루트").
 func _build_route(floor_root: Node) -> void:
@@ -397,7 +398,7 @@ func _build_route(floor_root: Node) -> void:
 	route_index = 0
 	route_step = 1
 
-	var visuals := floor_root.get_node_or_null("Structures")
+	var visuals := floor_root.get_node_or_null("WallGlow/Doors")
 	var rooms := floor_root.get_node_or_null("Rooms")
 	if visuals == null or rooms == null:
 		return
@@ -473,8 +474,9 @@ func _is_free_point(point: Vector2) -> bool:
 
 
 ## Polygon2D의 점들을 감싸는 전역 좌표 사각형.
-## 문(WallGlow 아래)과 방(Rooms 아래)은 부모가 다르지만, CanvasLayer는 CanvasItem이
-## 아니라 to_global 체인에 끼지 않고 층 씬 루트도 원점에 있어 둘 다 맵 좌표로 나온다.
+## 문(WallGlow/Doors 아래)과 방(Rooms 아래)은 부모가 다르지만, CanvasLayer는
+## CanvasItem이 아니라 to_global 체인에 끼지 않고 층 씬 루트도 원점에 있어
+## 둘 다 맵 좌표로 나온다.
 func _polygon_rect(node: Polygon2D) -> Rect2:
 	var polygon := node.polygon
 	var rect := Rect2(node.to_global(polygon[0]), Vector2.ZERO)

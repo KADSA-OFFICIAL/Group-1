@@ -69,6 +69,29 @@ func _owner_of(mark: Node) -> Node:
 		return null
 	return root.get_node_or_null(String(mark.name).trim_prefix(PREFIX))
 
+## 자식의 화면상 중심. **좌표 규약이 셋이라 한곳에서 흡수한다.**
+##
+##   * 라벨(`Control`) — `global_position`이 좌상단이라 사각형 중심을 쓴다.
+##   * 표시(`Mark_*`) — 폴리곤이 원점 기준이고 자리는 `position`에 있다(#301).
+##   * 문(`Door_*`/`SDVis_*`) — 폴리곤이 **절대 좌표**이고 `position`은 (0,0)이다.
+##
+## 마지막 것을 `global_position`으로 재면 전부 원점으로 계산돼 **하나도 안 켜진다**
+## — #301에서 표시가 그랬고, #318에서 문이 같은 함정에 걸렸다. 폴리곤이 있으면
+## 무게중심을 쓰면 두 규약이 모두 맞는다(원점 기준 폴리곤은 무게중심이 0이라
+## `to_global`이 곧 `position`이다).
+func _center_of(item: CanvasItem) -> Vector2:
+	if item is Control:
+		return (item as Control).get_global_rect().get_center()
+	var node := item as Node2D
+	if item is Polygon2D:
+		var poly: PackedVector2Array = (item as Polygon2D).polygon
+		if poly.size() > 0:
+			var acc := Vector2.ZERO
+			for v in poly:
+				acc += v
+			return node.to_global(acc / poly.size())
+	return node.global_position
+
 
 func _refresh() -> void:
 	if _player == null or not is_instance_valid(_player):
@@ -84,10 +107,7 @@ func _refresh() -> void:
 		if owner_node == null:
 			_target[child] = 0.0       # 주웠거나 열려서 사라졌다
 			continue
-		# 라벨은 Node2D가 아니라 Control이라 global_position이 좌상단이다.
-		var at: Vector2 = ((child as Control).get_global_rect().get_center()
-				  if child is Control else (child as Node2D).global_position)
-		var d := origin.distance_to(at)
+		var d := origin.distance_to(_center_of(child))
 		var a := 0.0
 		if d <= full_distance:
 			a = 1.0
