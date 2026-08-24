@@ -119,6 +119,24 @@ const MUTTERS := [
 	"다 끝나면 올라갈게.",
 ]
 
+## 순찰 중 같은 층에서 들리는 소리 단서(#315). 화자 이름 없는 지문 알림이라
+## 수위가 직접 하는 말이 아니라 "무엇이 들리는지"를 전한다 — 여러 개를
+## 무작위로 골라 9초 쿨다운마다 뜨는 알림이 금방 뻔해지지 않게 한다.
+const FOOTSTEP_LINES := [
+	"발소리. 복도 저쪽에서. 느릿느릿.",
+	"가까이서 발소리가 들린다. 점점 또렷해진다.",
+	"삐걱— 마룻바닥 밟는 소리가 바로 근처에서 난다.",
+	"발소리가 멈췄다가, 다시 이어진다.",
+	"숨죽인 발소리. 아주 가깝다.",
+]
+const KEY_JINGLE_LINES := [
+	"— 찰랑. 열쇠꾸러미 소리. 가까워지고 있다.",
+	"저 멀리서 열쇠 부딪히는 소리가 들린다.",
+	"찰랑찰랑. 열쇠 소리가 복도를 타고 온다.",
+	"희미하게 열쇠꾸러미 소리가 들린다.",
+	"어딘가에서 열쇠 소리. 아직 멀지만, 이쪽으로 오는 듯하다.",
+]
+
 var player: CharacterBody2D = null
 var my_floor: int = -1
 var player_floor: int = -1
@@ -901,10 +919,10 @@ func _update_sound_cues() -> void:
 	var distance := position.distance_to(player.position)
 	if distance <= FOOTSTEP_RANGE:
 		sound_cooldown = SOUND_COOLDOWN
-		_say("발소리. 복도 저쪽에서. 느릿느릿.")
+		_say(FOOTSTEP_LINES.pick_random())
 	elif distance <= EARSHOT:
 		sound_cooldown = SOUND_COOLDOWN
-		_say("— 찰랑. 열쇠꾸러미 소리. 가까워지고 있다.")
+		_say(KEY_JINGLE_LINES.pick_random())
 
 
 ## 방을 확인할 때의 연출. 들리는 거리 안에서만 나온다.
