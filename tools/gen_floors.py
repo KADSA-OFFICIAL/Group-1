@@ -277,8 +277,10 @@ TEXTURES = {f"tex_{stem}": f"{TEX_DIR}/{stem}.png"
             for stem in sorted(set(TEX.values()) | set(SPRITE.values()))}
 
 # 텍스처 설정을 물려받을 부모가 없는 CanvasLayer 직속 노드. #307에서 벽·문·계단
-# 시각이 전부 레이어 0(`Structures`)으로 내려가면서 비었다 — 씬 루트에서 물려받는다.
-CANVAS_ITEM_ROOTS = ()
+# 시각이 전부 레이어 0(`Structures`)으로 내려가면서 비었다가, #318에서 문
+# (Door_/SDVis_)만 다시 WallGlow 아래로 올라와 여기 하나가 남았다 — CanvasLayer는
+# CanvasItem이 아니라 부모의 texture_filter/repeat를 물려받지 못한다.
+CANVAS_ITEM_ROOTS = ("WallGlow/Doors",)
 
 # texture_filter = 1(Nearest): 도트가 보간돼 뭉개지지 않게. 프로젝트 기본값은 Linear다.
 # texture_repeat = 2(Enabled): UV가 폴리곤 좌표라 1을 넘어간다 — 감싸지 않으면 한 장만
@@ -838,13 +840,13 @@ def add_room(sc, key, label, x0, y0, x1, y1, door):
     if door == "top":
         sc.wall(f"{key}_topL", rect(x0, y0, dl, y0 + T))
         sc.wall(f"{key}_topR", rect(dr, y0, x1, y0 + T))
-        sc.poly2d(f"Door_{key}", "Structures", C_DOOR, rect(dl, y0, dr, y0 + T), z=1)
+        sc.poly2d(f"Door_{key}", "WallGlow/Doors", C_DOOR, rect(dl, y0, dr, y0 + T), z=1)
         sc.wall(f"{key}_bot", rect(x0, y1 - T, x1, y1))
     elif door == "bottom":
         sc.wall(f"{key}_top", rect(x0, y0, x1, y0 + T))
         sc.wall(f"{key}_botL", rect(x0, y1 - T, dl, y1))
         sc.wall(f"{key}_botR", rect(dr, y1 - T, x1, y1))
-        sc.poly2d(f"Door_{key}", "Structures", C_DOOR, rect(dl, y1 - T, dr, y1), z=1)
+        sc.poly2d(f"Door_{key}", "WallGlow/Doors", C_DOOR, rect(dl, y1 - T, dr, y1), z=1)
     else:   # 막힌 공간: 사방 폐쇄
         sc.wall(f"{key}_top", rect(x0, y0, x1, y0 + T))
         sc.wall(f"{key}_bot", rect(x0, y1 - T, x1, y1))
@@ -852,14 +854,14 @@ def add_room(sc, key, label, x0, y0, x1, y1, door):
     if door == "left":
         sc.wall(f"{key}_leftT", rect(x0, y0, x0 + T, dt))
         sc.wall(f"{key}_leftB", rect(x0, db, x0 + T, y1))
-        sc.poly2d(f"Door_{key}", "Structures", C_DOOR, rect(x0, dt, x0 + T, db), z=1)
+        sc.poly2d(f"Door_{key}", "WallGlow/Doors", C_DOOR, rect(x0, dt, x0 + T, db), z=1)
     else:
         sc.wall(f"{key}_left", rect(x0, y0, x0 + T, y1))
 
     if door == "right":
         sc.wall(f"{key}_rightT", rect(x1 - T, y0, x1, dt))
         sc.wall(f"{key}_rightB", rect(x1 - T, db, x1, y1))
-        sc.poly2d(f"Door_{key}", "Structures", C_DOOR, rect(x1 - T, dt, x1, db), z=1)
+        sc.poly2d(f"Door_{key}", "WallGlow/Doors", C_DOOR, rect(x1 - T, dt, x1, db), z=1)
     else:
         sc.wall(f"{key}_right", rect(x1 - T, y0, x1, y1))
 
@@ -2232,7 +2234,7 @@ def add_sliding_doors(sc):
                 f'script = ExtResource("6_sliding")\n'
                 f'travel = {n(travel)}\n'
                 + (f'travel_y = {ty}\n' if float(ty) != 0.0 else "")
-                + f'leaf_visual = NodePath("../Structures/SDVis_{key}")\n'
+                + f'leaf_visual = NodePath("../WallGlow/Doors/SDVis_{key}")\n'
                 # 방 창문 달빛은 이 문이 켠다(#292). 창 없는 방은 묶음이 없다.
                 + (f'room_lights = NodePath("../Lights/Room_{key}")\n'
                    if f'name="Room_{key}"' in text_of(sc) else ''))
@@ -2255,11 +2257,12 @@ def add_sliding_doors(sc):
         # 틈이 남아 그리로 빛이 샌다.
         sc.solid(f"{key}DoorCollision", f"{root}/SDPanel",
                  poly((dl, yl), (dr, yr), (dr, yr + T), (dl, yl + T)))
-        # 시각은 WallGlow 안에. 레이어 0에 두면 CanvasLayer(layer=1)의 문 표식·
-        # 벽 시각이 z_index와 무관하게 덮어 문이 아예 안 보인다(#234). 같은 문의
-        # Door_ 마커보다 뒤에 선언되므로 그 위에 그려지고, 열려서 밀리면 벽 시각
-        # 뒤로 숨는다. 충돌·차단체와 같은 벽 두께 전체를 쓴다.
-        sc.poly2d(f"SDVis_{key}", "Structures",
+        # 시각은 WallGlow/Doors 안에(#318) — 벽은 손전등이 있어야 보이지만 문은
+        # 복도에서 위치를 알 수 있어야 한다(#292로 방 내부를 숨기는 것과는
+        # 다른 문제). 광원 차단체는 위 SDPanel(층 씬 루트)에 그대로 남아 방
+        # 내부가 계속 안 보인다. 같은 문의 Door_ 마커보다 z가 높아 그 위에
+        # 그려지고, 열려서 밀리면 벽 시각 뒤로 숨는다.
+        sc.poly2d(f"SDVis_{key}", "WallGlow/Doors",
                   C_LEAF, poly((dl, yl), (dr, yr), (dr, yr + T), (dl, yl + T)), z=2)
 
 
@@ -2790,6 +2793,14 @@ def build_common(fl, spec):
             + 'script = ExtResource("8_marks")\n'
             + 'reveal_distance = 420.0\n'
             + 'full_distance = 300.0\n')
+    # 문(#318)은 벽과 달리 손전등 없이도 보여야 한다 — 안 그러면 복도에서 문의
+    # 위치를 알 수 없다. 방 내부를 숨기는 것(#292)과는 다른 문제라 라벨과 같은
+    # 반경으로 WallGlow에 둔다. 광원 차단체(방 내부를 가리는 쪽)는 그대로
+    # 층 씬 루트(SlideDoor_<key>/SDPanel)에 남아 어둠 규칙에 영향을 주지 않는다.
+    sc.node('[node name="Doors" type="Node2D" parent="WallGlow"]\n'
+            + 'script = ExtResource("8_marks")\n'
+            + 'reveal_distance = 420.0\n'
+            + 'full_distance = 300.0\n')
     sc.node('[node name="RoomWalls" type="StaticBody2D" parent="."]\n')
     sc.node('[node name="PropBodies" type="StaticBody2D" parent="."]\n')
     sc.node('[node name="StairWalls" type="StaticBody2D" parent="."]\n')
@@ -2886,6 +2897,14 @@ def build_floor1():
             + 'script = ExtResource("8_marks")\n'
             + 'reveal_distance = 420.0\n'
             + 'full_distance = 300.0\n')
+    # 문(#318)은 벽과 달리 손전등 없이도 보여야 한다 — 안 그러면 복도에서 문의
+    # 위치를 알 수 없다. 방 내부를 숨기는 것(#292)과는 다른 문제라 라벨과 같은
+    # 반경으로 WallGlow에 둔다. 광원 차단체(방 내부를 가리는 쪽)는 그대로
+    # 층 씬 루트(SlideDoor_<key>/SDPanel)에 남아 어둠 규칙에 영향을 주지 않는다.
+    sc.node('[node name="Doors" type="Node2D" parent="WallGlow"]\n'
+            + 'script = ExtResource("8_marks")\n'
+            + 'reveal_distance = 420.0\n'
+            + 'full_distance = 300.0\n')
     sc.node('[node name="RoomWalls" type="StaticBody2D" parent="."]\n')
     sc.node('[node name="PropBodies" type="StaticBody2D" parent="."]\n')
     sc.node('[node name="StairWalls" type="StaticBody2D" parent="."]\n')
@@ -2905,7 +2924,7 @@ def build_floor1():
 
     # 현관 정문 — 방 아래변(건물 바깥쪽)에 보이는 문. ExitDoor 상호작용도 이 앞이다.
     ex0, ey1, ex1 = 1600, 2480, 2000
-    sc.poly2d("Door_FrontGate", "Structures", C_DOOR,
+    sc.poly2d("Door_FrontGate", "WallGlow/Doors", C_DOOR,
               rect((ex0 + ex1) / 2 - DOOR / 2, ey1 - T, (ex0 + ex1) / 2 + DOOR / 2, ey1), z=1)
     add_furniture(sc, 1)
     add_story(sc, 1)
