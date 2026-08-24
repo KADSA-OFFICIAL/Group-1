@@ -69,6 +69,21 @@ const SEARCH_SECONDS := 14.0        # 이 안에 못 닿으면 포기한다(길�
 const SEARCH_OPEN_DISTANCE := 46.0  # 이만큼 다가가면 은신처를 연다
 const INSPECT_SECONDS := 1.8    # 문 앞에 멈춰 방을 확인하는 시간
 
+# ── 순찰 중 방 진입 (#321) ───────────────────────────────────────
+# #313에서 순찰을 복도로 한정한 뒤로 **방 안이 완전 안전지대**가 됐다. 수위가
+# 방에 들어오는 것은 직접 봤을 때(추격)와 숨는 것을 봤을 때(수색, #298)뿐인데
+# 둘 다 '이미 들킨 뒤'다. 들키지만 않으면 방에서 무한정 뒤질 수 있었다.
+const SWEEP_CHANCE := 32        # 문 확인이 끝났을 때 방에 들어가 볼 확률(%)
+const SWEEP_DEPTH := 130.0      # 문에서 방 안쪽으로 들어가는 깊이
+const SWEEP_LOOK_SECONDS := 1.5 # 방 안에 서서 둘러보는 시간
+const SWEEP_LIMIT := 8.0        # 들어가고 나오는 데 쓸 수 있는 총 시간
+const SWEEP_LINES := [
+	"…안에 누구 있나.",
+	"문이 열려 있었나?",
+	"불 끄고 가랬는데.",
+	"…아무도 없네.",
+]
+
 # ── 소리 단서 (#141) ─────────────────────────────────────────────
 # 하단 알림으로 존재감을 전한다. 화면 밖·벽 너머의 수위를 플레이어가 감지할
 # 유일한 수단이다. 알림은 서로를 덮어쓰므로(hud.gd의 notice_token) 쿨다운을
@@ -163,6 +178,13 @@ var route_index: int = 0
 var route_step: int = 1        # 왕복 방향(+1 정방향 / -1 역방향)
 var inspect_timer: float = 0.0
 
+# 순찰 중 방 진입(#321). 0=안 함 / 1=들어가는 중 / 2=둘러보는 중 / 3=나오는 중
+var sweep_phase: int = 0
+var sweep_point: Vector2 = Vector2.ZERO   # 방 안 목표
+var sweep_exit: Vector2 = Vector2.ZERO    # 되돌아 나올 문 앞 대기 지점
+var sweep_timer: float = 0.0
+var sweep_look: float = 0.0
+
 var mutter_cooldown: float = 0.0
 var sound_cooldown: float = 0.0
 # 발각 대사는 추적이 시작될 때 한 번만. 시야가 끊겼다 붙을 때마다 다시 외치면
@@ -238,6 +260,9 @@ func _apply_active(active: bool) -> void:
 	search_timer = 0.0
 	announced_search = false
 	_player_hidden = false
+	# 방 진입(#321)도 층을 넘기지 않는다 — 3층에서 들어가던 방을 2층에서 이어
+	# 나올 수 없다.
+	_end_sweep(false)
 	# 스턴(#169)도 층을 넘기지 않는다 — 3층에서 맞고 2층으로 내려가면 그 층의
 	# 수위는 멀쩡해야 한다(같은 노드를 층마다 재사용한다).
 	blind_timer = 0.0
@@ -654,8 +679,10 @@ func _physics_process(delta: float) -> void:
 
 	var chasing := _is_chasing()
 	if chasing:
-		# 직접 보이면 수색보다 추격이 먼저다 — 은신처를 열러 갈 이유가 없다.
+		# 직접 보이면 수색·방 진입보다 추격이 먼저다.
 		search_timer = 0.0
+		if sweep_phase > 0:
+			_end_sweep(false)
 		if not announced_chase:
 			announced_chase = true
 			_say_line("…누구야?")
@@ -907,6 +934,10 @@ func _move_patrol(delta: float) -> void:
 		_move_wander(delta)   # 문을 못 찾은 층 폴백(#141 이전 동작)
 		return
 
+	if sweep_phase > 0:
+		_move_sweep(delta)
+		return
+
 	if inspect_timer > 0.0:
 		_hold_at_door(delta)
 		return
@@ -963,7 +994,112 @@ func _hold_at_door(delta: float) -> void:
 		_face(facing)
 
 	inspect_timer -= delta
-	if inspect_timer <= 0.0:
+	if inspect_timer > 0.0:
+		return
+	# 문만 보고 지나가면 방 안이 안전지대가 된다(#321). 가끔 들어가 본다.
+	if _try_begin_sweep():
+		return
+	_advance_route()
+
+## 문 확인이 끝났다 — 방에 들어가 볼까. 들어가기로 했으면 true.
+##
+## 순찰은 `patrol_grid`(복도 전용)를 쓰므로 방 안으로 가는 경로가 없다.
+## 진입·복귀만 `astar_grid`(전체)로 찾는다.
+func _try_begin_sweep() -> bool:
+	if not grid_ready or route.is_empty() or route_index >= route_doors.size():
+		return false
+	if randi() % 100 >= SWEEP_CHANCE:
+		return false
+
+	var stop := route[route_index]
+	var door := route_doors[route_index]
+	var inward := stop.direction_to(door)
+	if inward == Vector2.ZERO:
+		return false
+
+	# 문 너머가 복도면(관통 문) 들어갈 방이 없다.
+	var want := door + inward * SWEEP_DEPTH
+	var cell := _nearest_free_cell(want)
+	if corridor_lookup.has(cell):
+		return false
+
+	var path := astar_grid.get_point_path(_nearest_free_cell(position), cell)
+	if path.size() < 2:
+		return false
+
+	sweep_point = path[path.size() - 1]
+	sweep_exit = stop
+	sweep_phase = 1
+	sweep_timer = SWEEP_LIMIT
+	sweep_look = 0.0
+	stuck_time = 0.0
+	repath_timer = REPATH_SECONDS
+	path_points = path
+	inspect_timer = 0.0
+	door_sound.play()
+	return true
+
+
+## 방에 들어가 둘러보고 나온다(#321).
+##
+## 시간이 다 되거나 길이 막히면 **나오는 단계로 넘긴다** — 그 자리에서 끝내도
+## `_corridor_path()`가 복도까지 데려다 주긴 하지만(#313), 들어간 길로 걸어
+## 나오는 편이 보기에 자연스럽다.
+func _move_sweep(delta: float) -> void:
+	sweep_timer -= delta
+	var give_up: bool = sweep_timer <= 0.0 or stuck_time >= STUCK_SECONDS
+
+	if sweep_phase == 2:
+		velocity = Vector2.ZERO
+		move_and_slide()
+		sweep_look -= delta
+		if sweep_look <= 0.0 or give_up:
+			sweep_phase = 3
+			path_points = PackedVector2Array()
+			repath_timer = 0.0
+			stuck_time = 0.0
+		return
+
+	var target: Vector2 = sweep_point if sweep_phase == 1 else sweep_exit
+	if position.distance_to(target) <= ROUTE_ARRIVE:
+		if sweep_phase == 1:
+			sweep_phase = 2
+			sweep_look = SWEEP_LOOK_SECONDS
+			velocity = Vector2.ZERO
+			path_points = PackedVector2Array()
+			_say_line(SWEEP_LINES.pick_random())
+		else:
+			_end_sweep(true)
+		return
+
+	if give_up:
+		if sweep_phase == 1:
+			sweep_phase = 3
+			sweep_timer = SWEEP_LIMIT * 0.5
+			path_points = PackedVector2Array()
+			repath_timer = 0.0
+			stuck_time = 0.0
+			return
+		_end_sweep(true)   # 나오다가도 막히면 순찰에 맡긴다(#313이 데려다 준다)
+		return
+
+	repath_timer -= delta
+	if repath_timer <= 0.0:
+		repath_timer = REPATH_SECONDS
+		path_points = astar_grid.get_point_path(
+			_nearest_free_cell(position), _nearest_free_cell(target))
+	_step_toward(_next_point(target), patrol_speed, delta)
+
+
+## 방 진입을 끝낸다. `advance`가 참이면 순찰을 다음 문으로 넘긴다.
+func _end_sweep(advance: bool) -> void:
+	sweep_phase = 0
+	sweep_timer = 0.0
+	sweep_look = 0.0
+	stuck_time = 0.0
+	path_points = PackedVector2Array()
+	repath_timer = 0.0
+	if advance:
 		_advance_route()
 
 
