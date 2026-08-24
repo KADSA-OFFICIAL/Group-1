@@ -1,4 +1,4 @@
-[gd_scene load_steps=243 format=3]
+[gd_scene load_steps=249 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
@@ -594,6 +594,24 @@ polygon = PackedVector2Array(2545, 2120, 2561, 2120, 2561, 2480, 2545, 2480)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_WC_WomensRoomB_right"]
 polygon = PackedVector2Array(2804, 2120, 2820, 2120, 2820, 2480, 2804, 2480)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_GapMid0"]
+polygon = PackedVector2Array(20, 720, 300, 720, 300, 1000, 20, 1000)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_GapMid1"]
+polygon = PackedVector2Array(740, 720, 800, 720, 800, 1000, 740, 1000)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_GapBot0"]
+polygon = PackedVector2Array(1200, 2120, 1450, 2120, 1450, 2480, 1200, 2480)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_GapBot1"]
+polygon = PackedVector2Array(1890, 2120, 2270, 2120, 2270, 2480, 1890, 2480)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_GapBot2"]
+polygon = PackedVector2Array(2820, 2120, 3380, 2120, 3380, 2480, 2820, 2480)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_GapStairB"]
+polygon = PackedVector2Array(1450, 2440, 1890, 2440, 1890, 2480, 1450, 2480)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_North1DoorCollision"]
 polygon = PackedVector2Array(151.7, 524, 261.7, 524, 261.7, 540, 151.7, 540)
@@ -4398,6 +4416,57 @@ polygon = PackedVector2Array(20, 1400, 3380, 1400, 3380, 1520, 20, 1520)
 texture = ExtResource("tex_floor_board")
 color = Color(0.2513, 0.2051, 0.1538, 1)
 polygon = PackedVector2Array(20, 1940, 3380, 1940, 3380, 2120, 20, 2120)
+
+[node name="WC_GapMid0" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(20, 720, 300, 720, 300, 1000, 20, 1000)
+
+[node name="LO_WC_GapMid0" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_GapMid0")
+
+[node name="WC_GapMid1" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(740, 720, 800, 720, 800, 1000, 740, 1000)
+
+[node name="LO_WC_GapMid1" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_GapMid1")
+
+[node name="G_MidLane2" type="Polygon2D" parent="Ground"]
+texture = ExtResource("tex_floor_board")
+color = Color(0.2513, 0.2051, 0.1538, 1)
+polygon = PackedVector2Array(1640, 720, 1920, 720, 1920, 1000, 1640, 1000)
+
+[node name="G_Bridge" type="Polygon2D" parent="Ground"]
+texture = ExtResource("tex_floor_board")
+color = Color(0.2513, 0.2051, 0.1538, 1)
+polygon = PackedVector2Array(1670, 1000, 1890, 1000, 1890, 1400, 1670, 1400)
+
+[node name="G_SouthLane0" type="Polygon2D" parent="Ground"]
+texture = ExtResource("tex_floor_board")
+color = Color(0.2513, 0.2051, 0.1538, 1)
+polygon = PackedVector2Array(1640, 1520, 1920, 1520, 1920, 1940, 1640, 1940)
+
+[node name="WC_GapBot0" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1200, 2120, 1450, 2120, 1450, 2480, 1200, 2480)
+
+[node name="LO_WC_GapBot0" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_GapBot0")
+
+[node name="WC_GapBot1" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1890, 2120, 2270, 2120, 2270, 2480, 1890, 2480)
+
+[node name="LO_WC_GapBot1" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_GapBot1")
+
+[node name="WC_GapBot2" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(2820, 2120, 3380, 2120, 3380, 2480, 2820, 2480)
+
+[node name="LO_WC_GapBot2" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_GapBot2")
+
+[node name="WC_GapStairB" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1450, 2440, 1890, 2440, 1890, 2480, 1450, 2480)
+
+[node name="LO_WC_GapStairB" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_GapStairB")
 
 [node name="PD_North1_board" type="Polygon2D" parent="Props"]
 color = Color(0.13, 0.19, 0.16, 1)
