@@ -118,6 +118,10 @@ main_menu → intro(프롤로그 컷신: street→back_gate→art_room→cabinet
 - UI: R 인벤토리 패널(5슬롯), 좌상단 HUD(목표/소지품)+층 표시, 하단 알림(game_state.request_notice).
 - 사운드(#9): 에셋을 받아오지 않고 **`tools/gen_sfx.py`가 8비트 톤으로 합성**해 `assets/audio/*.wav`로 커밋한다(표준 라이브러리만, 고정 시드라 재생성해도 바이트가 같다). 톤을 바꾸려면 그 스크립트의 `build_all()` 숫자를 고치고 다시 돌린다. 비위치 효과음은 autoload `Sfx`(`scripts/game/sound_manager.gd`)의 `Sfx.play(&"id")`, 위치가 정보인 소리(수위 발소리·열쇠·문)는 `janitor.tscn`의 AudioStreamPlayer2D가 낸다. **하단 알림 텍스트는 소리와 병행**한다 — 소리를 못 듣는 상황에서도 단서가 남아야 한다. 오디오 버스는 Master 하나뿐이고 음량은 `sound_manager.gd`의 `VOLUMES`에서 맞춘다.
 - 앰비언트·추격 BGM(#176): `tools/gen_music.py`가 만든다(루프라 위상을 루프 길이에 맞춰 고정하고, 이음매 불연속을 자체 검사한다). 본편 진입에 `Sfx.start_music()`, 체포·탈출에 `Sfx.stop_music()`. 수위가 `Sfx.set_chasing()`으로 매 프레임 추격 여부를 알리면 추격 BGM이 페이드 인하고 앰비언트가 낮아진다. **해제는 2.5초 미룬다** — `lose_sight_seconds`(1.5)보다 길어야 모퉁이에서 음악이 깜빡이지 않는다. 루프 지점은 `.import`가 아니라 런타임에 정한다(그 파일은 커밋에 빠질 수 있다).
+- 은신처(#204·#324): `EXTRA_HIDING`(층별 손배치) + `story_objects.json`의 것으로 **1~3층 층당 9곳**이다. **종류마다 색·크기가 다르다**(`HIDE_KINDS`) — 예전에는 전부 `C_LOCKER` 36x52라 약품장도 장비함도 화장실 칸도 같은 회색 사물함으로 보였다.
+  - 방 안 자리는 **그 방에 몇 개가 들어가는지로** 정한다. 층 전체 목록의 순번으로 나누면 층에 은신처를 더할 때 **이미 있던 것까지 자리가 밀려** 집기에 막힌다(`verify_hiding_spots`가 계단에서 걸어 닿는지 본다).
+  - 교무실·부서실은 책상 섬이 방 가운데를 차지해 자동 배치가 막힌다 — `HIDE_POS`에 자리를 손으로 적는다.
+  - 은신처는 `sc.clue_pts`에 들어가 집기가 그 자리를 피한다. 늘리면 그만큼 집기가 줄어든다.
 - 수위(#141): 4층은 안전 구간(`floor_manager.JANITOR_FREE_FLOOR`), 3·2·1층에서 활동.
   - **은신은 '못 봤을 때'만 통한다**(#298). 예전에는 `_update_awareness()`가 `is_hiding`만 보고 추적을 **무조건** 끊어서, 눈앞에서 캐비닛에 들어가도 수위가 순찰로 돌아갔다. 즉시 해제 자체는 #6의 옳은 판단이다(유예를 주면 숨은 직후 접촉 판정 #4에 붙잡혀 은신이 무의미해진다) — 빠져 있던 것은 **봤는지 안 봤는지의 구분**이다.
     **숨는 그 순간**에 `chase_hold > 0` 또는 `seen_now`면 그 자리를 기억하고 수색에 들어간다(`search_point`·`search_timer`). 숨은 뒤에도 `player.position`은 은신처에 남아 `_can_be_seen()`이 계속 참일 수 있으므로 **전이 프레임에서만** 판정한다(`_player_hidden`).
