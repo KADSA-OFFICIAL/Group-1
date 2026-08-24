@@ -2813,6 +2813,87 @@ def add_ground(sc, corridors):
                   C_CORRIDOR)
 
 
+# ── 빈 구역 메우기 (#295) ──────────────────────────────────────────
+# 방도 복도도 아닌 빈 구역이 층마다 수십만 px² 남는다. 복도 마루는 가로
+# 직사각형 띠로만 깔리는데, 방은 그 띠 안에서 x 구간 일부만 차지해서
+# (1) 중간·남쪽·하단 띠에서 방이 없는 x 구간과 (2) 중앙다리 본체가
+# 바닥칠도 실체도 없이 남는다. #265로 모든 방이 축정렬이 된 뒤로는 사선
+# 경계도 사다리꼴도 필요 없다 — 직사각형 하나로 끝난다.
+def gaps_in(spans, lo, hi, min_w=8):
+    """[lo,hi]에서 spans(x0,x1 목록)가 덮지 않은 구간. 붙어 있는 방은 걸러진다."""
+    out, x = [], lo
+    for a, b in sorted(spans):
+        if a - x >= min_w:
+            out.append((x, a))
+        x = max(x, b)
+    if hi - x >= min_w:
+        out.append((x, hi))
+    return out
+
+
+def fill_band_gap(sc, key, x0, x1, y0, y1):
+    """막다른 구역을 실체(충돌+광원차단)로 메운다 — 수위 스폰 후보에서 뺀다(#159)."""
+    sc.solid(f"WC_{key}", "RoomWalls", rect(x0, y0, x1, y1))
+
+
+def ground_band_gap(sc, key, x0, x1, y0, y1):
+    """남북으로 이어지는 통로 구간에 복도와 같은 마루를 깐다.
+
+    널 이음매는 `floor_board` 무늬가 32px 주기로 낸다(#268) — 복도 바닥과
+    똑같이 `sc.ground()`를 쓰면 이어붙는 선까지 저절로 맞는다.
+    """
+    sc.ground(key, rect(x0, y0, x1, y1), C_CORRIDOR)
+
+
+def add_infill(sc, fl, spec):
+    """층마다 남은 빈 구역을 마루(통로) 또는 실체(막다른 곳)로 메운다.
+
+    중앙다리는 공백 구역을 가로지르는 유일한 남북 통로다(중간 띠 접근로 →
+    다리 본체 → 남쪽 띠 접근로). 그 x 구간에 걸리는 틈은 마루를 깔고,
+    나머지는 다시 걸어 들어갈 수 없게 막는다.
+    """
+    if fl == 1:
+        stx0, _sty0, stx1, sty1 = FLOOR1["stair"]
+        bottom = [(stx0, stx1)] + [(x0, x1) for _, _, x0, y0, x1, _y1, _d
+                                    in FLOOR1["rooms"] if y0 == BOT_Y0]
+        for i, (gx0, gx1) in enumerate(gaps_in(bottom, EDGE, W - EDGE)):
+            fill_band_gap(sc, f"GapBot{i}", gx0, gx1, BOT_Y0, BOT_Y1)
+        # 계단실은 2440에서 끝나는데 하단 띠는 2480까지다 — 그 아래 띠를 메운다.
+        fill_band_gap(sc, "GapStair", stx0, stx1, sty1, BOT_Y1)
+        return
+
+    def bridge_lane(gx0, gx1):
+        """중앙다리 x 구간을 품은 틈만 남북 통로다 — 나머지는 막다른 곳."""
+        return gx0 < BRIDGE_X1 and gx1 > BRIDGE_X0
+
+    # 중간 띠 — 계단실 A + 화장실·막힌공간 사이의 틈.
+    mid = [(STAIR_A[0], STAIR_A[2])] + [(x0, x1) for _, _, x0, x1 in MID_LEFT + MID_RIGHT]
+    for i, (gx0, gx1) in enumerate(gaps_in(mid, EDGE, W - EDGE)):
+        if bridge_lane(gx0, gx1):
+            ground_band_gap(sc, f"MidLane{i}", gx0, gx1, MID_Y0, MID_Y1)
+        else:
+            fill_band_gap(sc, f"GapMid{i}", gx0, gx1, MID_Y0, MID_Y1)
+
+    # 중앙다리 본체 — BridgeL/R 벽으로 이미 둘러싸여 있으니 마루만 깐다.
+    ground_band_gap(sc, "Bridge", BRIDGE_X0, BRIDGE_X1, BRIDGE_Y0, BRIDGE_Y1)
+
+    # 남쪽 특별실동 — 다리에서 아래 복도로 이어지는 구간만 통로다.
+    south = [(x0, x1) for _, _, x0, x1 in spec["south_left"] + spec["south_right"]]
+    for i, (gx0, gx1) in enumerate(gaps_in(south, EDGE, W - EDGE)):
+        if bridge_lane(gx0, gx1):
+            ground_band_gap(sc, f"SouthLane{i}", gx0, gx1, SOUTH_Y0, SOUTH_Y1)
+        else:
+            fill_band_gap(sc, f"GapSouth{i}", gx0, gx1, SOUTH_Y0, SOUTH_Y1)
+
+    # 하단 띠 — 방과 계단실 B 사이의 빈 구간(전부 막다른 곳).
+    bot = [(STAIR_B[0], STAIR_B[2])] + [(x0, x1) for _, _, x0, x1
+                                         in spec["bottom_left"] + BOTTOM_RIGHT]
+    for i, (gx0, gx1) in enumerate(gaps_in(bot, EDGE, W - EDGE)):
+        fill_band_gap(sc, f"GapBot{i}", gx0, gx1, BOT_Y0, BOT_Y1)
+    # 계단실 B 아래 남는 띠(계단실 2440 < 하단 띠 2480).
+    fill_band_gap(sc, "GapStairB", STAIR_B[0], STAIR_B[2], STAIR_B[3], BOT_Y1)
+
+
 def build_common(fl, spec):
     sc = Scene()
     sc.floor_no = fl
@@ -2910,6 +2991,7 @@ def build_common(fl, spec):
     add_hiding(sc, fl)
     corridors = [(NORTH_Y1, MID_Y0), (VOID_Y1, SOUTH_Y0), (SOUTH_Y1, BOT_Y0)]
     add_ground(sc, corridors)
+    add_infill(sc, fl, spec)
     add_props(sc, corridors)
     add_clutter(sc)
     add_examine(sc)
@@ -2987,6 +3069,7 @@ def build_floor1():
     # 1층은 아래쪽 절반만 건물이라 큰 홀 하나가 복도 역할을 한다.
     corridors = [(1500, BOT_Y0)]
     add_ground(sc, corridors)
+    add_infill(sc, 1, None)
     add_props(sc, corridors)
     add_clutter(sc)
     add_examine(sc)
