@@ -681,6 +681,11 @@ script = ExtResource("8_marks")
 reveal_distance = 420.0
 full_distance = 300.0
 
+[node name="Doors" type="Node2D" parent="WallGlow"]
+script = ExtResource("8_marks")
+reveal_distance = 420.0
+full_distance = 300.0
+
 [node name="RoomWalls" type="StaticBody2D" parent="."]
 
 [node name="PropBodies" type="StaticBody2D" parent="."]
@@ -773,8 +778,10 @@ polygon = PackedVector2Array(285, 540, 440, 540, 440, 556, 285, 556)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(285, 556, 440, 556, 440, 560, 285, 560)
 
-[node name="Door_North1" type="Polygon2D" parent="Structures"]
+[node name="Door_North1" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(175, 524, 285, 524, 285, 540, 175, 540)
@@ -887,8 +894,10 @@ polygon = PackedVector2Array(705, 540, 860, 540, 860, 556, 705, 556)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(705, 556, 860, 556, 860, 560, 705, 560)
 
-[node name="Door_North2" type="Polygon2D" parent="Structures"]
+[node name="Door_North2" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(595, 524, 705, 524, 705, 540, 595, 540)
@@ -1001,8 +1010,10 @@ polygon = PackedVector2Array(1125, 540, 1280, 540, 1280, 556, 1125, 556)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(1125, 556, 1280, 556, 1280, 560, 1125, 560)
 
-[node name="Door_North3" type="Polygon2D" parent="Structures"]
+[node name="Door_North3" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(1015, 524, 1125, 524, 1125, 540, 1015, 540)
@@ -1115,8 +1126,10 @@ polygon = PackedVector2Array(1545, 540, 1700, 540, 1700, 556, 1545, 556)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(1545, 556, 1700, 556, 1700, 560, 1545, 560)
 
-[node name="Door_North4" type="Polygon2D" parent="Structures"]
+[node name="Door_North4" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(1435, 524, 1545, 524, 1545, 540, 1435, 540)
@@ -1229,8 +1242,10 @@ polygon = PackedVector2Array(1965, 540, 2120, 540, 2120, 556, 1965, 556)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(1965, 556, 2120, 556, 2120, 560, 1965, 560)
 
-[node name="Door_North5" type="Polygon2D" parent="Structures"]
+[node name="Door_North5" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(1855, 524, 1965, 524, 1965, 540, 1855, 540)
@@ -1343,8 +1358,10 @@ polygon = PackedVector2Array(2385, 540, 2540, 540, 2540, 556, 2385, 556)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(2385, 556, 2540, 556, 2540, 560, 2385, 560)
 
-[node name="Door_North6" type="Polygon2D" parent="Structures"]
+[node name="Door_North6" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(2275, 524, 2385, 524, 2385, 540, 2275, 540)
@@ -1457,8 +1474,10 @@ polygon = PackedVector2Array(2805, 540, 2960, 540, 2960, 556, 2805, 556)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(2805, 556, 2960, 556, 2960, 560, 2805, 560)
 
-[node name="Door_North7" type="Polygon2D" parent="Structures"]
+[node name="Door_North7" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(2695, 524, 2805, 524, 2805, 540, 2695, 540)
@@ -1571,8 +1590,10 @@ polygon = PackedVector2Array(3225, 540, 3380, 540, 3380, 556, 3225, 556)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(3225, 556, 3380, 556, 3380, 560, 3225, 560)
 
-[node name="Door_North8" type="Polygon2D" parent="Structures"]
+[node name="Door_North8" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(3115, 524, 3225, 524, 3225, 540, 3115, 540)
@@ -1662,8 +1683,10 @@ polygon = PackedVector2Array(992.5, 736, 1075, 736, 1075, 752, 992.5, 752)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(992.5, 752, 1075, 752, 1075, 756, 992.5, 756)
 
-[node name="Door_MensRoomL" type="Polygon2D" parent="Structures"]
+[node name="Door_MensRoomL" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(882.5, 720, 992.5, 720, 992.5, 736, 882.5, 736)
@@ -1776,8 +1799,10 @@ polygon = PackedVector2Array(1275, 736, 1365, 736, 1365, 752, 1275, 752)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(1275, 752, 1365, 752, 1365, 756, 1275, 756)
 
-[node name="Door_WomensRoomL" type="Polygon2D" parent="Structures"]
+[node name="Door_WomensRoomL" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(1165, 720, 1275, 720, 1275, 736, 1165, 736)
@@ -1963,8 +1988,10 @@ polygon = PackedVector2Array(2162.5, 736, 2295, 736, 2295, 752, 2162.5, 752)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(2162.5, 752, 2295, 752, 2295, 756, 2162.5, 756)
 
-[node name="Door_StorageR" type="Polygon2D" parent="Structures"]
+[node name="Door_StorageR" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(2052.5, 720, 2162.5, 720, 2162.5, 736, 2052.5, 736)
@@ -2150,8 +2177,10 @@ polygon = PackedVector2Array(2995, 736, 3075, 736, 3075, 752, 2995, 752)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(2995, 752, 3075, 752, 3075, 756, 2995, 756)
 
-[node name="Door_MensRoomR" type="Polygon2D" parent="Structures"]
+[node name="Door_MensRoomR" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(2885, 720, 2995, 720, 2995, 736, 2885, 736)
@@ -2264,8 +2293,10 @@ polygon = PackedVector2Array(3282.5, 736, 3380, 736, 3380, 752, 3282.5, 752)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(3282.5, 752, 3380, 752, 3380, 756, 3282.5, 756)
 
-[node name="Door_WomensRoomR" type="Polygon2D" parent="Structures"]
+[node name="Door_WomensRoomR" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(3172.5, 720, 3282.5, 720, 3282.5, 736, 3172.5, 736)
@@ -2964,8 +2995,10 @@ polygon = PackedVector2Array(432.5, 1536, 735, 1536, 735, 1552, 432.5, 1552)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(432.5, 1552, 735, 1552, 735, 1556, 432.5, 1556)
 
-[node name="Door_ArtRoom" type="Polygon2D" parent="Structures"]
+[node name="Door_ArtRoom" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(322.5, 1520, 432.5, 1520, 432.5, 1536, 322.5, 1536)
@@ -3078,8 +3111,10 @@ polygon = PackedVector2Array(1242.5, 1536, 1640, 1536, 1640, 1552, 1242.5, 1552)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(1242.5, 1552, 1640, 1552, 1640, 1556, 1242.5, 1556)
 
-[node name="Door_MusicPrep" type="Polygon2D" parent="Structures"]
+[node name="Door_MusicPrep" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(1132.5, 1520, 1242.5, 1520, 1242.5, 1536, 1132.5, 1536)
@@ -3192,8 +3227,10 @@ polygon = PackedVector2Array(2222.5, 1536, 2415, 1536, 2415, 1552, 2222.5, 1552)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(2222.5, 1552, 2415, 1552, 2415, 1556, 2222.5, 1556)
 
-[node name="Door_AVRoom" type="Polygon2D" parent="Structures"]
+[node name="Door_AVRoom" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(2112.5, 1520, 2222.5, 1520, 2222.5, 1536, 2112.5, 1536)
@@ -3306,8 +3343,10 @@ polygon = PackedVector2Array(2665, 1536, 2805, 1536, 2805, 1552, 2665, 1552)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(2665, 1552, 2805, 1552, 2805, 1556, 2665, 1556)
 
-[node name="Door_Storage2" type="Polygon2D" parent="Structures"]
+[node name="Door_Storage2" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(2555, 1520, 2665, 1520, 2665, 1536, 2555, 1536)
@@ -3420,8 +3459,10 @@ polygon = PackedVector2Array(3147.5, 1536, 3380, 1536, 3380, 1552, 3147.5, 1552)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(3147.5, 1552, 3380, 1552, 3380, 1556, 3147.5, 1556)
 
-[node name="Door_EmptyClass" type="Polygon2D" parent="Structures"]
+[node name="Door_EmptyClass" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(3037.5, 1520, 3147.5, 1520, 3147.5, 1536, 3037.5, 1536)
@@ -3534,8 +3575,10 @@ polygon = PackedVector2Array(665, 2136, 1200, 2136, 1200, 2152, 665, 2152)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(665, 2152, 1200, 2152, 1200, 2156, 665, 2156)
 
-[node name="Door_ArtStorage" type="Polygon2D" parent="Structures"]
+[node name="Door_ArtStorage" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(555, 2120, 665, 2120, 665, 2136, 555, 2136)
@@ -3648,8 +3691,10 @@ polygon = PackedVector2Array(2462.5, 2136, 2545, 2136, 2545, 2152, 2462.5, 2152)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(2462.5, 2152, 2545, 2152, 2545, 2156, 2462.5, 2156)
 
-[node name="Door_MensRoomB" type="Polygon2D" parent="Structures"]
+[node name="Door_MensRoomB" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(2352.5, 2120, 2462.5, 2120, 2462.5, 2136, 2352.5, 2136)
@@ -3762,8 +3807,10 @@ polygon = PackedVector2Array(2737.5, 2136, 2820, 2136, 2820, 2152, 2737.5, 2152)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(2737.5, 2152, 2820, 2152, 2820, 2156, 2737.5, 2156)
 
-[node name="Door_WomensRoomB" type="Polygon2D" parent="Structures"]
+[node name="Door_WomensRoomB" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 1
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(2627.5, 2120, 2737.5, 2120, 2737.5, 2136, 2627.5, 2136)
@@ -15398,7 +15445,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_North1")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_North1")
 room_lights = NodePath("../Lights/Room_North1")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_North1"]
@@ -15413,8 +15460,10 @@ polygon = PackedVector2Array(175, 524, 285, 524, 285, 540, 175, 540)
 [node name="LO_North1DoorCollision" type="LightOccluder2D" parent="SlideDoor_North1/SDPanel"]
 occluder = SubResource("Occ_North1DoorCollision")
 
-[node name="SDVis_North1" type="Polygon2D" parent="Structures"]
+[node name="SDVis_North1" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8608, 0.7564, 0.5738, 1)
@@ -15425,7 +15474,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_North2")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_North2")
 room_lights = NodePath("../Lights/Room_North2")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_North2"]
@@ -15440,8 +15489,10 @@ polygon = PackedVector2Array(595, 524, 705, 524, 705, 540, 595, 540)
 [node name="LO_North2DoorCollision" type="LightOccluder2D" parent="SlideDoor_North2/SDPanel"]
 occluder = SubResource("Occ_North2DoorCollision")
 
-[node name="SDVis_North2" type="Polygon2D" parent="Structures"]
+[node name="SDVis_North2" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8219, 0.7223, 0.5479, 1)
@@ -15452,7 +15503,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_North3")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_North3")
 room_lights = NodePath("../Lights/Room_North3")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_North3"]
@@ -15467,8 +15518,10 @@ polygon = PackedVector2Array(1015, 524, 1125, 524, 1125, 540, 1015, 540)
 [node name="LO_North3DoorCollision" type="LightOccluder2D" parent="SlideDoor_North3/SDPanel"]
 occluder = SubResource("Occ_North3DoorCollision")
 
-[node name="SDVis_North3" type="Polygon2D" parent="Structures"]
+[node name="SDVis_North3" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8846, 0.7774, 0.5897, 1)
@@ -15479,7 +15532,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_North4")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_North4")
 room_lights = NodePath("../Lights/Room_North4")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_North4"]
@@ -15494,8 +15547,10 @@ polygon = PackedVector2Array(1435, 524, 1545, 524, 1545, 540, 1435, 540)
 [node name="LO_North4DoorCollision" type="LightOccluder2D" parent="SlideDoor_North4/SDPanel"]
 occluder = SubResource("Occ_North4DoorCollision")
 
-[node name="SDVis_North4" type="Polygon2D" parent="Structures"]
+[node name="SDVis_North4" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8457, 0.7432, 0.5638, 1)
@@ -15506,7 +15561,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_North5")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_North5")
 room_lights = NodePath("../Lights/Room_North5")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_North5"]
@@ -15521,8 +15576,10 @@ polygon = PackedVector2Array(1855, 524, 1965, 524, 1965, 540, 1855, 540)
 [node name="LO_North5DoorCollision" type="LightOccluder2D" parent="SlideDoor_North5/SDPanel"]
 occluder = SubResource("Occ_North5DoorCollision")
 
-[node name="SDVis_North5" type="Polygon2D" parent="Structures"]
+[node name="SDVis_North5" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8069, 0.709, 0.5379, 1)
@@ -15533,7 +15590,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_North6")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_North6")
 room_lights = NodePath("../Lights/Room_North6")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_North6"]
@@ -15548,8 +15605,10 @@ polygon = PackedVector2Array(2275, 524, 2385, 524, 2385, 540, 2275, 540)
 [node name="LO_North6DoorCollision" type="LightOccluder2D" parent="SlideDoor_North6/SDPanel"]
 occluder = SubResource("Occ_North6DoorCollision")
 
-[node name="SDVis_North6" type="Polygon2D" parent="Structures"]
+[node name="SDVis_North6" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8696, 0.7641, 0.5797, 1)
@@ -15560,7 +15619,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_North7")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_North7")
 room_lights = NodePath("../Lights/Room_North7")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_North7"]
@@ -15575,8 +15634,10 @@ polygon = PackedVector2Array(2695, 524, 2805, 524, 2805, 540, 2695, 540)
 [node name="LO_North7DoorCollision" type="LightOccluder2D" parent="SlideDoor_North7/SDPanel"]
 occluder = SubResource("Occ_North7DoorCollision")
 
-[node name="SDVis_North7" type="Polygon2D" parent="Structures"]
+[node name="SDVis_North7" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8307, 0.7299, 0.5537, 1)
@@ -15587,7 +15648,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_North8")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_North8")
 room_lights = NodePath("../Lights/Room_North8")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_North8"]
@@ -15602,8 +15663,10 @@ polygon = PackedVector2Array(3115, 524, 3225, 524, 3225, 540, 3115, 540)
 [node name="LO_North8DoorCollision" type="LightOccluder2D" parent="SlideDoor_North8/SDPanel"]
 occluder = SubResource("Occ_North8DoorCollision")
 
-[node name="SDVis_North8" type="Polygon2D" parent="Structures"]
+[node name="SDVis_North8" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8934, 0.785, 0.5955, 1)
@@ -15614,7 +15677,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_MensRoomL")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_MensRoomL")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_MensRoomL"]
 position = Vector2(937.5, 728)
@@ -15628,8 +15691,10 @@ polygon = PackedVector2Array(882.5, 720, 992.5, 720, 992.5, 736, 882.5, 736)
 [node name="LO_MensRoomLDoorCollision" type="LightOccluder2D" parent="SlideDoor_MensRoomL/SDPanel"]
 occluder = SubResource("Occ_MensRoomLDoorCollision")
 
-[node name="SDVis_MensRoomL" type="Polygon2D" parent="Structures"]
+[node name="SDVis_MensRoomL" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8769, 0.7705, 0.5845, 1)
@@ -15640,7 +15705,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_WomensRoomL")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_WomensRoomL")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_WomensRoomL"]
 position = Vector2(1220, 728)
@@ -15654,8 +15719,10 @@ polygon = PackedVector2Array(1165, 720, 1275, 720, 1275, 736, 1165, 736)
 [node name="LO_WomensRoomLDoorCollision" type="LightOccluder2D" parent="SlideDoor_WomensRoomL/SDPanel"]
 occluder = SubResource("Occ_WomensRoomLDoorCollision")
 
-[node name="SDVis_WomensRoomL" type="Polygon2D" parent="Structures"]
+[node name="SDVis_WomensRoomL" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8513, 0.7481, 0.5675, 1)
@@ -15666,7 +15733,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_StorageR")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_StorageR")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_StorageR"]
 position = Vector2(2107.5, 728)
@@ -15680,8 +15747,10 @@ polygon = PackedVector2Array(2052.5, 720, 2162.5, 720, 2162.5, 736, 2052.5, 736)
 [node name="LO_StorageRDoorCollision" type="LightOccluder2D" parent="SlideDoor_StorageR/SDPanel"]
 occluder = SubResource("Occ_StorageRDoorCollision")
 
-[node name="SDVis_StorageR" type="Polygon2D" parent="Structures"]
+[node name="SDVis_StorageR" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8285, 0.728, 0.5523, 1)
@@ -15692,7 +15761,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_MensRoomR")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_MensRoomR")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_MensRoomR"]
 position = Vector2(2940, 728)
@@ -15706,8 +15775,10 @@ polygon = PackedVector2Array(2885, 720, 2995, 720, 2995, 736, 2885, 736)
 [node name="LO_MensRoomRDoorCollision" type="LightOccluder2D" parent="SlideDoor_MensRoomR/SDPanel"]
 occluder = SubResource("Occ_MensRoomRDoorCollision")
 
-[node name="SDVis_MensRoomR" type="Polygon2D" parent="Structures"]
+[node name="SDVis_MensRoomR" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8943, 0.7859, 0.5962, 1)
@@ -15718,7 +15789,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = -110
-leaf_visual = NodePath("../Structures/SDVis_WomensRoomR")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_WomensRoomR")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_WomensRoomR"]
 position = Vector2(3227.5, 728)
@@ -15732,8 +15803,10 @@ polygon = PackedVector2Array(3172.5, 720, 3282.5, 720, 3282.5, 736, 3172.5, 736)
 [node name="LO_WomensRoomRDoorCollision" type="LightOccluder2D" parent="SlideDoor_WomensRoomR/SDPanel"]
 occluder = SubResource("Occ_WomensRoomRDoorCollision")
 
-[node name="SDVis_WomensRoomR" type="Polygon2D" parent="Structures"]
+[node name="SDVis_WomensRoomR" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8338, 0.7327, 0.5558, 1)
@@ -15744,7 +15817,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_ArtRoom")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_ArtRoom")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_ArtRoom"]
 position = Vector2(377.5, 1528)
@@ -15758,8 +15831,10 @@ polygon = PackedVector2Array(322.5, 1520, 432.5, 1520, 432.5, 1536, 322.5, 1536)
 [node name="LO_ArtRoomDoorCollision" type="LightOccluder2D" parent="SlideDoor_ArtRoom/SDPanel"]
 occluder = SubResource("Occ_ArtRoomDoorCollision")
 
-[node name="SDVis_ArtRoom" type="Polygon2D" parent="Structures"]
+[node name="SDVis_ArtRoom" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8485, 0.7456, 0.5656, 1)
@@ -15770,7 +15845,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_MusicPrep")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_MusicPrep")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_MusicPrep"]
 position = Vector2(1187.5, 1528)
@@ -15784,8 +15859,10 @@ polygon = PackedVector2Array(1132.5, 1520, 1242.5, 1520, 1242.5, 1536, 1132.5, 1
 [node name="LO_MusicPrepDoorCollision" type="LightOccluder2D" parent="SlideDoor_MusicPrep/SDPanel"]
 occluder = SubResource("Occ_MusicPrepDoorCollision")
 
-[node name="SDVis_MusicPrep" type="Polygon2D" parent="Structures"]
+[node name="SDVis_MusicPrep" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8114, 0.713, 0.5409, 1)
@@ -15796,7 +15873,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_AVRoom")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_AVRoom")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_AVRoom"]
 position = Vector2(2167.5, 1528)
@@ -15810,8 +15887,10 @@ polygon = PackedVector2Array(2112.5, 1520, 2222.5, 1520, 2222.5, 1536, 2112.5, 1
 [node name="LO_AVRoomDoorCollision" type="LightOccluder2D" parent="SlideDoor_AVRoom/SDPanel"]
 occluder = SubResource("Occ_AVRoomDoorCollision")
 
-[node name="SDVis_AVRoom" type="Polygon2D" parent="Structures"]
+[node name="SDVis_AVRoom" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8406, 0.7386, 0.5603, 1)
@@ -15822,7 +15901,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_Storage2")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_Storage2")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_Storage2"]
 position = Vector2(2610, 1528)
@@ -15836,8 +15915,10 @@ polygon = PackedVector2Array(2555, 1520, 2665, 1520, 2665, 1536, 2555, 1536)
 [node name="LO_Storage2DoorCollision" type="LightOccluder2D" parent="SlideDoor_Storage2/SDPanel"]
 occluder = SubResource("Occ_Storage2DoorCollision")
 
-[node name="SDVis_Storage2" type="Polygon2D" parent="Structures"]
+[node name="SDVis_Storage2" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8031, 0.7057, 0.5354, 1)
@@ -15848,7 +15929,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_EmptyClass")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_EmptyClass")
 room_lights = NodePath("../Lights/Room_EmptyClass")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_EmptyClass"]
@@ -15863,8 +15944,10 @@ polygon = PackedVector2Array(3037.5, 1520, 3147.5, 1520, 3147.5, 1536, 3037.5, 1
 [node name="LO_EmptyClassDoorCollision" type="LightOccluder2D" parent="SlideDoor_EmptyClass/SDPanel"]
 occluder = SubResource("Occ_EmptyClassDoorCollision")
 
-[node name="SDVis_EmptyClass" type="Polygon2D" parent="Structures"]
+[node name="SDVis_EmptyClass" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8093, 0.7112, 0.5395, 1)
@@ -15875,7 +15958,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_ArtStorage")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_ArtStorage")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_ArtStorage"]
 position = Vector2(610, 2128)
@@ -15889,8 +15972,10 @@ polygon = PackedVector2Array(555, 2120, 665, 2120, 665, 2136, 555, 2136)
 [node name="LO_ArtStorageDoorCollision" type="LightOccluder2D" parent="SlideDoor_ArtStorage/SDPanel"]
 occluder = SubResource("Occ_ArtStorageDoorCollision")
 
-[node name="SDVis_ArtStorage" type="Polygon2D" parent="Structures"]
+[node name="SDVis_ArtStorage" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.798, 0.7013, 0.532, 1)
@@ -15901,7 +15986,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_MensRoomB")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_MensRoomB")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_MensRoomB"]
 position = Vector2(2407.5, 2128)
@@ -15915,8 +16000,10 @@ polygon = PackedVector2Array(2352.5, 2120, 2462.5, 2120, 2462.5, 2136, 2352.5, 2
 [node name="LO_MensRoomBDoorCollision" type="LightOccluder2D" parent="SlideDoor_MensRoomB/SDPanel"]
 occluder = SubResource("Occ_MensRoomBDoorCollision")
 
-[node name="SDVis_MensRoomB" type="Polygon2D" parent="Structures"]
+[node name="SDVis_MensRoomB" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8054, 0.7078, 0.5369, 1)
@@ -15927,7 +16014,7 @@ collision_layer = 2
 collision_mask = 1
 script = ExtResource("6_sliding")
 travel = 110
-leaf_visual = NodePath("../Structures/SDVis_WomensRoomB")
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_WomensRoomB")
 
 [node name="Zone" type="CollisionShape2D" parent="SlideDoor_WomensRoomB"]
 position = Vector2(2682.5, 2128)
@@ -15941,8 +16028,10 @@ polygon = PackedVector2Array(2627.5, 2120, 2737.5, 2120, 2737.5, 2136, 2627.5, 2
 [node name="LO_WomensRoomBDoorCollision" type="LightOccluder2D" parent="SlideDoor_WomensRoomB/SDPanel"]
 occluder = SubResource("Occ_WomensRoomBDoorCollision")
 
-[node name="SDVis_WomensRoomB" type="Polygon2D" parent="Structures"]
+[node name="SDVis_WomensRoomB" type="Polygon2D" parent="WallGlow/Doors"]
 z_index = 2
+texture_filter = 1
+texture_repeat = 2
 texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8211, 0.7216, 0.5474, 1)

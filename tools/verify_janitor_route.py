@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """수위 순찰 루트(#141) 검증 — Godot 없이 루트가 실제로 걸을 수 있는지 대조한다.
 
-janitor.gd는 층 씬의 문(Structures/Door_<방>)에서 "문 앞 대기
+janitor.gd는 층 씬의 문(WallGlow/Doors/Door_<방>, #318에서 어둠 영향이 없는
+WallGlow로 옮겼다)에서 "문 앞 대기
 지점"을 뽑아 최근접 이웃으로 이어 고정 순찰 루트를 만든다. 이 환경에는 Godot
 바이너리가 없어 F5로 확인할 수 없으므로, 같은 규칙을 파이썬으로 재현해서
 확인한다.
@@ -269,7 +270,7 @@ def build_route(floor: int, solid, grid_w: int, grid_h: int):
 
     반환: (루트, 건너뛴 문). 루트 항목 = (방 이름, 대기 지점, 문 중심).
     """
-    doors = load_polygons(floor, "Structures")
+    doors = load_polygons(floor, "WallGlow/Doors")
     rooms = load_polygons(floor, "Rooms")
 
     stops = []

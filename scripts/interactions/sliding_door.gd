@@ -13,8 +13,8 @@ extends Area2D
 ## (janitor._collect_blockers·verify_floor_reach·verify_janitor_route·
 ## verify_hiding_spots) 격자와 실제가 어긋나 문 앞에서 끼인다.
 ##
-## 문짝 시각은 몸체 안이 아니라 WallGlow(CanvasLayer) 안에 있다 — 레이어 0에
-## 두면 문 표식·벽 시각이 z_index와 무관하게 덮어 문이 아예 안 보인다(#234).
+## 문짝 시각은 몸체 안이 아니라 WallGlow/Doors(CanvasLayer) 안에 있다(#318) —
+## 벽은 손전등이 있어야 보이지만 문은 복도에서 위치를 알 수 있어야 한다.
 ## 몸체와 시각을 NodePath로 이어 붙이고 같은 트윈으로 함께 민다.
 ##
 ## 문짝에는 광원 차단체가 붙는다(#256). 없을 때는 문 틈이 벽 없는 구간이라
