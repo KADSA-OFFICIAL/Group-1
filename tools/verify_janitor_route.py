@@ -10,6 +10,8 @@ janitor.gd는 층 씬의 문(Structures/Door_<방>)에서 "문 앞 대기
   2. 대기 지점이 벽 안에 박히지 않는가(_is_free_point와 같은 판정)
   3. 대기 지점이 계단 도착 지점에서 걸어서 닿는가(격자 연결성)
   4. 루트가 층의 방을 실제로 도는가(연속 구간이 지나치게 길지 않은가)
+  5. 스폰·순찰이 복도로 한정되는가(#313) — 복도망(복도 칸의 가장 큰 연결 성분)에
+     계단실·방 안쪽 칸이 없고, 모든 대기 지점이 그 안에 있는가
 
 격자·몸통·벽 수집 규칙은 scripts/npc/janitor.gd와 같게 맞췄다. 격자 크기는
 janitor.gd처럼 Floor 폴리곤에서 계산한다 — 상수로 박아 두면 맵이 커졌을 때
@@ -313,6 +315,83 @@ def build_route(floor: int, solid, grid_w: int, grid_h: int):
     return route, skipped
 
 
+def corridor_pool(floor: int, solid, grid_w: int, grid_h: int):
+    """janitor._collect_patrol_cells 재현 — 복도 칸의 가장 큰 연결 성분.
+
+    복도 칸 = 통행 가능한 칸 − (Rooms ∪ Stairwells) 안쪽. 계단실을 빼는 것이
+    #313의 핵심이다 — 계단실 바닥은 Rooms에 없어서 예전에는 복도로 분류됐고,
+    잠긴 계단은 닫힌 상자라 거기서 스폰된 수위가 갇혔다.
+
+    반환: (복도망, 복도 칸 전체, 실내 사각형, 계단실 사각형)
+    """
+    indoor = list(load_polygons(floor, "Rooms").values())
+    stairwells = list(load_polygons(floor, "Stairwells").values())
+    indoor += stairwells
+
+    corridor: set[tuple[int, int]] = set()
+    for cx in range(grid_w):
+        for cy in range(grid_h):
+            cell = (cx, cy)
+            if cell in solid:
+                continue
+            px, py = cell_center(cx, cy)
+            if any(x0 <= px <= x1 and y0 <= py <= y1 for x0, y0, x1, y1 in indoor):
+                continue
+            corridor.add(cell)
+
+    seen: set[tuple[int, int]] = set()
+    best: set[tuple[int, int]] = set()
+    for start in corridor:
+        if start in seen:
+            continue
+        component: set[tuple[int, int]] = {start}
+        queue = collections.deque([start])
+        seen.add(start)
+        while queue:
+            cx, cy = queue.popleft()
+            for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                nxt = (cx + dx, cy + dy)
+                if nxt in seen or nxt not in corridor:
+                    continue
+                seen.add(nxt)
+                component.add(nxt)
+                queue.append(nxt)
+        if len(component) > len(best):
+            best = component
+    return best, corridor, indoor, stairwells
+
+
+def check_corridor(floor: int, solid, grid_w: int, grid_h: int, route) -> None:
+    """스폰·순찰이 복도로 한정되는지(#313)."""
+    pool, corridor, indoor, stairwells = corridor_pool(floor, solid, grid_w, grid_h)
+
+    if not pool:
+        fail(f"{floor}층: 복도망이 비었다 — 수위가 스폰할 자리가 없다")
+        return
+
+    inside = [cell for cell in pool
+              if any(x0 <= cell_center(*cell)[0] <= x1 and y0 <= cell_center(*cell)[1] <= y1
+                     for x0, y0, x1, y1 in indoor)]
+    if inside:
+        fail(f"{floor}층: 스폰 후보에 실내 칸 {len(inside)}개가 섞였다")
+
+    # 계단실 칸이 후보에 남아 있으면 갇힘이 재발한다.
+    stair_cells = [cell for cell in pool
+                   if any(x0 <= cell_center(*cell)[0] <= x1 and y0 <= cell_center(*cell)[1] <= y1
+                          for x0, y0, x1, y1 in stairwells)]
+    if stair_cells:
+        fail(f"{floor}층: 스폰 후보에 계단실 칸 {len(stair_cells)}개 — 갇힌다")
+
+    outside = [name for name, stop, _door in route if cell_of(*stop) not in pool]
+    if outside:
+        fail(f"{floor}층: 복도망에서 닿지 않는 대기 지점 {len(outside)}개 "
+             f"— {', '.join(outside)}")
+
+    pockets = len(corridor) - len(pool)
+    print(f"        복도망 {len(pool)}칸 (스폰 후보), 떨어진 복도 칸 {pockets}개, "
+          f"계단실 제외 {sum(1 for cx in range(grid_w) for cy in range(grid_h) if (cx, cy) not in solid and any(x0 <= cell_center(cx, cy)[0] <= x1 and y0 <= cell_center(cx, cy)[1] <= y1 for x0, y0, x1, y1 in stairwells))}칸")
+
+
 def check_floor(floor: int, stairs, show_list: bool) -> None:
     extent_x, extent_y = floor_extent(floor)
     grid_w = int(math.ceil(extent_x / CELL))
@@ -358,6 +437,8 @@ def check_floor(floor: int, stairs, show_list: bool) -> None:
     if skipped:
         print("        건너뜀: "
               + ", ".join(f"{n}({x:.0f},{y:.0f})" for n, (x, y) in skipped))
+    check_corridor(floor, solid, grid_w, grid_h, route)
+
     if show_list:
         for i, (name, stop, _door) in enumerate(route):
             print(f"        {i + 1:2d}. {name:20s} ({stop[0]:7.0f},{stop[1]:7.0f})")

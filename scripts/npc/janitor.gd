@@ -53,6 +53,7 @@ const BODY_PROBE_MARGIN := 1.0
 # (#159로 3400×2500) 격자가 왼쪽 위만 덮어 바깥 구역이 통째로 경로탐색에서
 # 빠졌다 — 1층 현관·수위실 띠(y 2120~2480)가 격자 밖이었다.
 const CELL := 25.0
+const NEIGHBORS := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
 const GRID_FALLBACK := Vector2i(136, 100)
 const PATH_LOOKAHEAD := 12      # 경로 다듬기에서 앞쪽 몇 지점까지 시야를 볼지
 const FAR_SPAWN_RATIO := 0.6    # 스폰 후보: 플레이어에게서 최대 거리의 이 비율 이상인 칸
@@ -128,10 +129,18 @@ var player_floor: int = -1
 var debug_draw: bool = false
 
 var astar_grid := AStarGrid2D.new()
+## 복도만 통행 가능한 격자. 순찰·배회는 이걸로 길을 찾아 방·계단실에 들어가지
+## 않는다(#313). 추격·수색은 astar_grid를 쓴다 — 방에 숨은 플레이어를 쫓아야 한다.
+var patrol_grid := AStarGrid2D.new()
 var grid_size: Vector2i = GRID_FALLBACK
 var grid_ready: bool = false
 var walkable_cells: Array[Vector2i] = []
-var corridor_cells: Array[Vector2i] = []   # 순찰은 복도만 돈다(방 폴리곤 외부)
+var corridor_cells: Array[Vector2i] = []   # 순찰은 복도만 돈다(방·계단실 폴리곤 외부)
+var corridor_lookup: Dictionary = {}       # Vector2i -> true. 복도 칸 조회
+## 순찰 루트에서 걸어서 닿는 복도 칸. 스폰·배회 후보를 여기서만 뽑는다 —
+## 계단실처럼 닫힌 공간에서 등장하면 나올 길이 없어 갇힌다(#313).
+var patrol_cells: Array[Vector2i] = []
+var patrol_lookup: Dictionary = {}         # Vector2i -> true. 복도망 칸 조회
 
 # 플레이어 시야에 연속으로 노출된 시간. reveal_delay를 넘기면 추적이 시작된다.
 var seen_time: float = 0.0
@@ -276,26 +285,105 @@ func _rebuild_grid(floor_root: Node) -> void:
 			if not astar_grid.is_point_solid(cell):
 				walkable_cells.append(cell)
 
-	# 순찰용 복도 칸: 방 폴리곤 안에 들어가는 칸을 뺀다.
-	var rooms: Array[Rect2] = []
-	_collect_room_rects(floor_root, rooms)
+	# 순찰용 복도 칸: 방·계단실 폴리곤 안에 들어가는 칸을 뺀다.
+	var indoor: Array[Rect2] = []
+	_collect_indoor_rects(floor_root, indoor)
 	corridor_cells.clear()
+	corridor_lookup.clear()
 	for cell in walkable_cells:
 		var center := _cell_center(cell)
-		var in_room := false
-		for room in rooms:
-			if room.has_point(center):
-				in_room = true
+		var inside := false
+		for rect in indoor:
+			if rect.has_point(center):
+				inside = true
 				break
-		if not in_room:
+		if not inside:
 			corridor_cells.append(cell)
+			corridor_lookup[cell] = true
 	if corridor_cells.is_empty():
 		corridor_cells = walkable_cells.duplicate()
+		for cell in corridor_cells:
+			corridor_lookup[cell] = true
 
+	_build_patrol_grid()
 	_build_route(floor_root)
+	_collect_patrol_cells()
+	_prune_route_to_reachable()
 
 	# 경로탐색과 순찰 목표가 모두 준비된 뒤에 사용 가능으로 표시한다.
 	grid_ready = not walkable_cells.is_empty()
+
+
+## 복도 밖(방·계단실)을 통행 불가로 막은 순찰 전용 격자.
+## 벽 정보는 astar_grid와 같아야 하므로 설정값을 그대로 복사한다.
+func _build_patrol_grid() -> void:
+	patrol_grid.clear()
+	patrol_grid.region = astar_grid.region
+	patrol_grid.cell_size = astar_grid.cell_size
+	patrol_grid.offset = astar_grid.offset
+	patrol_grid.diagonal_mode = astar_grid.diagonal_mode
+	patrol_grid.update()
+
+	for cell_x in grid_size.x:
+		for cell_y in grid_size.y:
+			var cell := Vector2i(cell_x, cell_y)
+			if not corridor_lookup.has(cell):
+				patrol_grid.set_point_solid(cell, true)
+
+
+## 층의 복도망 = 복도 칸의 **가장 큰 연결 성분**. 스폰·배회 후보는 여기서만 뽑는다.
+## 계단실처럼 배리어로 둘러싸인 자투리 복도 칸은 자동으로 빠진다 — 갇히는 자리를
+## 이름으로 예외 처리하지 않아도 기하가 바뀌면 따라온다(#313).
+func _collect_patrol_cells() -> void:
+	patrol_cells.clear()
+	patrol_lookup.clear()
+	if corridor_cells.is_empty():
+		return
+
+	var seen: Dictionary = {}
+	var best: Array[Vector2i] = []
+	for start in corridor_cells:
+		if seen.has(start):
+			continue
+		var component: Array[Vector2i] = []
+		var queue: Array[Vector2i] = [start]
+		seen[start] = true
+		while not queue.is_empty():
+			var cell: Vector2i = queue.pop_back()
+			component.append(cell)
+			for step in NEIGHBORS:
+				var probe: Vector2i = cell + step
+				if seen.has(probe) or not corridor_lookup.has(probe):
+					continue
+				seen[probe] = true
+				queue.append(probe)
+		if component.size() > best.size():
+			best = component
+
+	patrol_cells = best
+	for cell in patrol_cells:
+		patrol_lookup[cell] = true
+
+
+## 복도망에서 닿지 않는 문 앞 지점은 루트에서 뺀다. 남겨 두면 순찰이 그 문으로
+## 가려다 막혀 STUCK_SECONDS를 버리고 넘어가는 멈칫거림이 생긴다.
+func _prune_route_to_reachable() -> void:
+	if patrol_lookup.is_empty() or route.is_empty():
+		return
+
+	var kept: Array[Vector2] = []
+	var kept_doors: Array[Vector2] = []
+	for i in route.size():
+		if patrol_lookup.has(_cell_of(route[i])):
+			kept.append(route[i])
+			kept_doors.append(route_doors[i])
+	if kept.is_empty():
+		return   # 전부 빠지는 층이면 기존 루트를 그대로 둔다(배회보다는 낫다)
+
+	route = kept
+	route_doors = kept_doors
+	route_index = 0
+	route_step = 1
 
 
 ## 층 씬의 문에서 고정 순찰 루트를 만든다(#141).
@@ -331,6 +419,9 @@ func _build_route(floor_root: Node) -> void:
 		var stop := door_center + _outward(door_rect, _polygon_rect(room)) * DOOR_APPROACH
 		# 봉인된 방·건물 밖으로 밀려난 문은 대기 지점이 벽 안에 들어간다 — 건너뛴다.
 		if not _is_free_point(stop):
+			continue
+		# 대기 지점은 복도여야 한다 — 방 안이면 순찰이 실내로 들어간다(#313).
+		if not corridor_lookup.is_empty() and not corridor_lookup.has(_cell_of(stop)):
 			continue
 		stops.append(stop)
 		doors.append(door_center)
@@ -403,16 +494,20 @@ func _grid_size_for(floor_root: Node) -> Vector2i:
 	return Vector2i(int(ceil(extent.x / CELL)), int(ceil(extent.y / CELL)))
 
 
-## 층 씬의 Rooms 아래 방 폴리곤 영역(순찰에서 제외할 실내)을 모은다.
-func _collect_room_rects(floor_root: Node, out: Array[Rect2]) -> void:
-	var rooms := floor_root.get_node_or_null("Rooms")
-	if rooms == null:
-		return
-	for child in rooms.get_children():
-		if child is Polygon2D:
-			if (child as Polygon2D).polygon.size() == 0:
-				continue
-			out.append(_polygon_rect(child as Polygon2D))
+## 순찰에서 제외할 실내 영역 — 방(Rooms)과 계단실(Stairwells)이다.
+## **계단실을 빼면 안 된다**(#313): 계단실 바닥은 Rooms에 없어서 복도로 분류됐고,
+## 잠긴 계단은 StairWalls + StairLocks 배리어로 둘러싸인 닫힌 상자라 거기서
+## 스폰된 수위가 층 내내 갇혀 있었다.
+func _collect_indoor_rects(floor_root: Node, out: Array[Rect2]) -> void:
+	for parent_name in ["Rooms", "Stairwells"]:
+		var parent := floor_root.get_node_or_null(parent_name)
+		if parent == null:
+			continue
+		for child in parent.get_children():
+			if child is Polygon2D:
+				if (child as Polygon2D).polygon.size() == 0:
+					continue
+				out.append(_polygon_rect(child as Polygon2D))
 
 
 ## 층 씬에서 StaticBody2D 하위 충돌 도형만 모은다(Area2D 상호작용 존은 제외).
@@ -451,10 +546,25 @@ func _cell_center(cell: Vector2i) -> Vector2:
 ## 격자 밖이거나 벽 안인 지점은 가장 가까운 통행 가능 칸으로 보정한다.
 ## (플레이어가 벽에 붙어 있으면 그 칸이 막힌 것으로 표시돼 A*가 실패한다)
 func _nearest_free_cell(point: Vector2) -> Vector2i:
+	return _nearest_cell(point, false)
+
+
+## 같은 보정을 복도 칸으로 한정해서 한다(순찰 목표·스폰 기준점).
+func _nearest_corridor_cell(point: Vector2) -> Vector2i:
+	return _nearest_cell(point, true)
+
+
+func _cell_allowed(cell: Vector2i, corridor_only: bool) -> bool:
+	if corridor_only:
+		return corridor_lookup.has(cell)
+	return not astar_grid.is_point_solid(cell)
+
+
+func _nearest_cell(point: Vector2, corridor_only: bool) -> Vector2i:
 	var cell := _cell_of(point)
 	cell.x = clampi(cell.x, 0, grid_size.x - 1)
 	cell.y = clampi(cell.y, 0, grid_size.y - 1)
-	if not astar_grid.is_point_solid(cell):
+	if _cell_allowed(cell, corridor_only):
 		return cell
 
 	for radius in range(1, 8):
@@ -468,7 +578,7 @@ func _nearest_free_cell(point: Vector2) -> Vector2i:
 				if probe.x < 0 or probe.y < 0 \
 						or probe.x >= grid_size.x or probe.y >= grid_size.y:
 					continue
-				if astar_grid.is_point_solid(probe):
+				if not _cell_allowed(probe, corridor_only):
 					continue
 				var distance := _cell_center(probe).distance_squared_to(point)
 				if distance < best_distance:
@@ -483,14 +593,16 @@ func _spawn_away_from(player_position: Vector2) -> void:
 	if not grid_ready:
 		return
 
-	# 순찰이 기본 상태이므로 복도에서 등장한다.
+	# 순찰이 기본 상태이므로 복도에서 등장한다. 루트에서 걸어서 닿는 칸만 쓴다 —
+	# 계단실 같은 닫힌 복도 칸에서 나오면 그 층 내내 갇힌다(#313).
+	var pool: Array[Vector2i] = patrol_cells if not patrol_cells.is_empty() else corridor_cells
 	var max_distance := 0.0
-	for cell in corridor_cells:
+	for cell in pool:
 		max_distance = maxf(max_distance, _cell_center(cell).distance_to(player_position))
 
 	# 가장 먼 한 칸만 쓰면 매번 같은 구석에서 나온다 — 충분히 먼 칸 중 무작위.
 	var candidates: Array[Vector2i] = []
-	for cell in corridor_cells:
+	for cell in pool:
 		if _cell_center(cell).distance_to(player_position) >= max_distance * FAR_SPAWN_RATIO:
 			candidates.append(cell)
 	if candidates.is_empty():
@@ -811,10 +923,21 @@ func _move_patrol(delta: float) -> void:
 	repath_timer -= delta
 	if repath_timer <= 0.0:
 		repath_timer = REPATH_SECONDS
-		path_points = astar_grid.get_point_path(
-			_nearest_free_cell(position), _nearest_free_cell(patrol_target))
+		path_points = _corridor_path(patrol_target)
 
 	_step_toward(_next_point(patrol_target), patrol_speed, delta)
+
+
+## 복도만 지나는 경로(#313). 방·계단실 안에 서 있으면(추격이 방 안에서 끝난
+## 경우) 먼저 전체 격자로 가장 가까운 복도 칸까지 나온 뒤 복도 격자로 넘어간다.
+func _corridor_path(target: Vector2) -> PackedVector2Array:
+	var here := _cell_of(position)
+	if not corridor_lookup.has(here):
+		# 목표를 다음 문이 아니라 **가장 가까운 복도 칸**으로 둔다 — 그러지 않으면
+		# 실내를 가로질러 문까지 걸어간다. 복도에 나오면 아래 분기로 넘어간다.
+		return astar_grid.get_point_path(_nearest_free_cell(position),
+			_nearest_corridor_cell(position))
+	return patrol_grid.get_point_path(here, _nearest_corridor_cell(target))
 
 
 ## 문 앞에 도착 — 멈춰서 방 안을 확인한다.
@@ -865,9 +988,9 @@ func _move_wander(delta: float) -> void:
 			or position.distance_to(patrol_target) <= ARRIVE_DISTANCE:
 		stuck_time = 0.0
 		repath_timer = REPATH_SECONDS
-		patrol_target = _cell_center(corridor_cells.pick_random())
-		path_points = astar_grid.get_point_path(
-			_nearest_free_cell(position), _nearest_free_cell(patrol_target))
+		var pool: Array[Vector2i] = patrol_cells if not patrol_cells.is_empty() else corridor_cells
+		patrol_target = _cell_center(pool.pick_random())
+		path_points = _corridor_path(patrol_target)
 
 	_step_toward(_next_point(patrol_target), patrol_speed, delta)
 
