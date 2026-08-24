@@ -77,8 +77,29 @@ const FOOTSTEP_RANGE := 420.0   # 이 안이면 발소리로 더 급하게 알�
 const MUTTER_COOLDOWN := 15.0
 const SOUND_COOLDOWN := 9.0
 
-# 잉크를 뒤집어쓴 동안의 몸 색. 왜 멈춰 있는지 한눈에 보이게 한다(#169).
-const BLIND_BODY_COLOR := Color(0.2, 0.2, 0.3, 1.0)
+# 잉크를 뒤집어쓴 동안 몸에 덧씌우는 색. 왜 멈춰 있는지 한눈에 보이게 한다(#169).
+# Polygon2D 시절에는 색을 통째로 갈아 끼웠지만 스프라이트는 그림이 있으므로
+# modulate로 어둡게 죽인다 — 잉크를 뒤집어썼다는 것이 그림 위에 얹혀 보인다.
+const BLIND_MODULATE := Color(0.34, 0.34, 0.5, 1.0)
+
+# ── 스프라이트 (#310) ────────────────────────────────────────────
+# assets/sprites/janitor_sheet.png = 3열 x 4행. 열이 걸음 프레임, 행이 방향.
+# 사람 그림이라 이동 각도로 회전시키지 않는다(플레이어 #210과 같은 규약) —
+# 방향은 행을 바꿔서 나타낸다.
+const ROW_DOWN := 0
+const ROW_LEFT := 1
+const ROW_RIGHT := 2
+const ROW_UP := 3
+## 걸음 순환은 [기본, 왼발, 기본, 오른발]. 기본 프레임을 사이에 끼워야
+## 두 걸음 사이에 몸이 지나가는 순간이 생긴다.
+const WALK_CYCLE := [0, 1, 0, 2]
+## 한 프레임이 유지되는 이동 거리. 시간이 아니라 거리로 재야 순찰(130)과
+## 추격(290)에서 따로 맞추지 않아도 발이 미끄러지지 않는다.
+const WALK_STRIDE := 26.0
+## 뒷모습은 원본 그림이 한 장뿐이라(#310) 세 열이 모두 같다 — 위로 걸을
+## 때만 1px 위아래로 흔들어 걸음을 만든다(플레이어의 BOB과 같은 방법).
+const UP_BOB_STRIDE := 20.0
+const SPRITE_OFFSET_Y := -24.0   # 발끝을 충돌 캡슐 바닥(y=15)에 맞추는 값
 
 # ── 발소리·열쇠 소리 (#9) ────────────────────────────────────────
 # 하단 알림 텍스트(위 EARSHOT/FOOTSTEP_RANGE)는 그대로 두고 소리를 더한다.
@@ -152,12 +173,18 @@ var _game_state: Node = null
 # 잉크를 뒤집어써 앞을 못 보는 남은 시간(#169). 0보다 크면 추적·순찰·접촉
 # 판정이 전부 멈춘다.
 var blind_timer: float = 0.0
-var _body_color: Color = Color.WHITE
+var _body_modulate: Color = Color.WHITE
+
+## 마지막으로 향한 방향(#310). 멈춰도 그대로 두어야 서 있는 동안 보던 쪽을
+## 계속 본다 — velocity로 매 프레임 다시 구하면 멈추는 순간 정면으로 돌아간다.
+var _facing: Vector2 = Vector2.DOWN
+## 걸음 프레임을 고르는 누적 이동 거리.
+var _walk_distance: float = 0.0
 
 var step_timer: float = 0.0
 var step_count: int = 0
 
-@onready var body: Polygon2D = $Body
+@onready var body: Sprite2D = $Body
 @onready var collision_shape: CollisionShape2D = $CollisionShape2D
 @onready var step_sound: AudioStreamPlayer2D = $StepSound
 @onready var key_sound: AudioStreamPlayer2D = $KeySound
@@ -170,7 +197,7 @@ func _enter_tree() -> void:
 
 
 func _ready() -> void:
-	_body_color = body.color
+	_body_modulate = body.modulate
 	_apply_active(false)
 
 
@@ -205,7 +232,12 @@ func _apply_active(active: bool) -> void:
 	# 스턴(#169)도 층을 넘기지 않는다 — 3층에서 맞고 2층으로 내려가면 그 층의
 	# 수위는 멀쩡해야 한다(같은 노드를 층마다 재사용한다).
 	blind_timer = 0.0
-	body.color = _body_color
+	body.modulate = _body_modulate
+	# 층을 옮기면 방향·걸음도 처음으로. 스폰 직후 이전 층에서 걷던 프레임이
+	# 남아 있으면 서 있는데 다리가 벌어져 있다.
+	_facing = Vector2.DOWN
+	_walk_distance = 0.0
+	_update_sprite()
 	Sfx.set_chasing(false)
 	if active and player != null:
 		_spawn_away_from(player.position)
@@ -527,6 +559,7 @@ func _physics_process(delta: float) -> void:
 	# 추격과 같아야 한다. 음악과 발소리를 추격과 같이 취급한다.
 	var hunting := chasing or search_timer > 0.0
 	_update_footsteps(delta, hunting)
+	_advance_sprite(delta)
 	Sfx.set_chasing(hunting)
 
 	if debug_draw:
@@ -569,7 +602,7 @@ func blind(seconds: float) -> void:
 	path_points = PackedVector2Array()
 	velocity = Vector2.ZERO
 	announced_chase = false
-	body.color = BLIND_BODY_COLOR
+	body.modulate = BLIND_MODULATE
 
 	_say_line("으윽— 뭐야, 뭐야 이거!")
 
@@ -580,11 +613,12 @@ func blind(seconds: float) -> void:
 func _hold_blinded(delta: float) -> void:
 	velocity = Vector2.ZERO
 	move_and_slide()
+	_advance_sprite(delta)
 
 	blind_timer -= delta
 	if blind_timer <= 0.0:
 		blind_timer = 0.0
-		body.color = _body_color
+		body.modulate = _body_modulate
 		repath_timer = 0.0
 		_say("수위가 눈을 문지르며 다시 걷기 시작한다.")
 
@@ -653,7 +687,7 @@ func _is_chasing() -> bool:
 func _move_chase(delta: float) -> void:
 	if position.distance_to(player.position) <= CONTACT_DISTANCE:
 		velocity = Vector2.ZERO
-		body.rotation = position.direction_to(player.position).angle() - Vector2.UP.angle()
+		_face(position.direction_to(player.position))
 		stuck_time = 0.0
 		_catch_player()
 		return
@@ -801,7 +835,7 @@ func _hold_at_door(delta: float) -> void:
 
 	var facing := position.direction_to(route_doors[route_index])
 	if facing != Vector2.ZERO:
-		body.rotation = facing.angle() - Vector2.UP.angle()
+		_face(facing)
 
 	inspect_timer -= delta
 	if inspect_timer <= 0.0:
@@ -918,7 +952,7 @@ func _step_toward(target: Vector2, move_speed: float, delta: float) -> void:
 	var before := position
 	velocity = direction * move_speed
 	move_and_slide()
-	body.rotation = direction.angle() - Vector2.UP.angle()
+	_face(direction)
 
 	# 막힘은 "가려던 방향으로 실제로 나아간 양"으로 판정한다.
 	# 이동량 크기로 보면 벽을 따라 옆으로 밀려나는 것도 전진으로 세고,
@@ -928,6 +962,49 @@ func _step_toward(target: Vector2, move_speed: float, delta: float) -> void:
 		stuck_time += delta
 	else:
 		stuck_time = 0.0
+
+
+# ── 스프라이트 (#310) ────────────────────────────────────────────
+
+## 바라보는 방향을 기억한다. 멈춰도 지우지 않는 것은, 문 앞에서 방을 확인하는
+## 동안이나 붙잡는 순간에 계속 그쪽을 보고 있어야 하기 때문이다.
+func _face(direction: Vector2) -> void:
+	if direction != Vector2.ZERO:
+		_facing = direction
+
+
+## 걸음 프레임을 이동 거리로 굴린다. 시간으로 굴리면 순찰(130)과 추격(290)에서
+## 발이 미끄러지므로, 실제로 나아간 거리를 세어 WALK_STRIDE마다 한 칸 넘긴다.
+func _advance_sprite(delta: float) -> void:
+	var speed := velocity.length()
+	if speed < MOVING_SPEED_EPSILON:
+		# 멈추면 걸음을 처음으로 되돌린다 — 늘 같은 발부터 나가야 문 앞에 섰다
+		# 다시 걸을 때 다리가 튀지 않는다.
+		_walk_distance = 0.0
+	else:
+		_walk_distance += speed * delta
+	_update_sprite()
+
+
+## 방향은 시트의 행, 걸음은 열. 가로가 세로보다 크면 옆모습을 쓴다 — 대각선
+## 이동에서 정면·뒷모습이 깜빡이지 않게 한쪽으로 확실히 기울인다.
+func _update_sprite() -> void:
+	var row := ROW_DOWN
+	if absf(_facing.x) > absf(_facing.y):
+		row = ROW_RIGHT if _facing.x > 0.0 else ROW_LEFT
+	elif _facing.y < 0.0:
+		row = ROW_UP
+
+	var step := int(_walk_distance / WALK_STRIDE)
+	body.frame = row * body.hframes + int(WALK_CYCLE[step % WALK_CYCLE.size()])
+
+	# 뒷모습은 원본이 한 장뿐이라 세 열이 같은 그림이다 — 프레임만 굴리면 멈춰
+	# 선 채 미끄러지는 것처럼 보이므로 위로 걸을 때만 1px 흔든다.
+	var bob := 0.0
+	if row == ROW_UP and _walk_distance > 0.0 \
+			and int(_walk_distance / UP_BOB_STRIDE) % 2 == 1:
+		bob = 1.0
+	body.offset = Vector2(0.0, SPRITE_OFFSET_Y - bob)
 
 
 # ── 시야 판정 ────────────────────────────────────────────────────
