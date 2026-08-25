@@ -9,47 +9,46 @@ const HIDDEN_LIGHT_ENERGY := 0.5
 const HIDDEN_PROMPT := "나오기"
 
 ## 스프라이트(#210): 서 있을 땐 정면 대기 포즈, 움직이면 걷기 사이클.
-## 걷기 그림은 셋 다 오른쪽을 보고 있어 왼쪽으로 갈 때만 뒤집는다.
-## 네 장 모두 tools/gen_player_sprites.py가 원본 아트에서 만든다.
+## 걷기 그림은 열두 장 모두 오른쪽을 보고 있어 왼쪽으로 갈 때만 뒤집는다.
+## tools/gen_player_sprites.py가 원본 아트에서 만든다.
 ##
 ## **위아래로 걸을 때도 측면 걷기가 나온다.** 수위는 원본 열 장으로 정면·좌·우·뒷모습
 ## 네 행을 갖지만(janitor.gd의 ROW_*) 플레이어는 측면 그림뿐이다 — 뒷모습 원본이
 ## 생기면 수위처럼 방향에 따라 그림을 바꿀 수 있다.
 const IDLE_TEXTURE := preload("res://assets/sprites/player_idle.png")
-## 걷기 그림 3장 + 순환 4칸(#375). **수위(`janitor.gd`)와 같은 구조**다 —
-## `[기본, 걸음A, 기본, 걸음B]`. 수위 쪽 주석에 이유가 적혀 있다: "기본 프레임을
-## 사이에 끼워야 두 걸음 사이에 몸이 지나가는 순간이 생긴다." 좌우 다리를 구분할
-## 표식이 없는 그림이라 걸음 A/B가 수위의 "왼발/오른발"을 대신하고, 한 바퀴가
-## **두 걸음**이 된다.
+## 걷기 **12프레임**(#384). 사용자가 걷기 사이클 전체(두 걸음, 2행×6열 시트)를
+## 직접 그렸다 — 프레임마다 다른 실제 포즈이므로 수위(#375)처럼 반복되는 "기본
+## 프레임"을 끼우는 인덱스 표가 필요 없다. `player_walk_1 → 2 → … → 12 → (루프) 1`을
+## 그대로 순서대로 돈다. 1~6이 한 걸음, 7~12가 반대쪽 다리의 같은 걸음이다(발끝이
+## 캔버스 바닥에서 거의 안 움직이는 접지 프레임의 오프셋이 1번과 7번에서 정확히
+## 같다 — 대칭 확인됨).
 ##
-## #372까지는 네 장을 1→2→3→4로 단조 진행시켰다(한 바퀴에 한 걸음). 다리가 모이기만
-## 하다 루프에서 되돌아와 두 걸음 사이의 통과 순간이 없었다.
-##
-## 세 장은 **원본 아트를 그대로 줄인 것**이다(#378). #372·#375에는 다리를 모으고
-## 엉덩이를 올리고 팔을 당기는 합성이 있었는데, 그때 원본이 그 움직임을 담고 있지
-## 않았기 때문이다. 새 원본에는 셋 다 들어 있다 — 통과 포즈가 접지보다 1px 높고
-## 팔이 몸에 붙어 있다.
+## #365→#368→#372→#375→#378→#381까지는 프레임이 3~4장뿐이라 어떤 조합도 매끄럽게
+## 안 읽혔다. 코드 합성(#372·#375)도 세 번 다 "다리 윤곽이 거칠다"로 끝났다 — 프레임
+## 수 자체가 부족했던 것이지 포즈 선택의 문제가 아니었다.
 const WALK_TEXTURES := [
-	preload("res://assets/sprites/player_walk_0.png"),
 	preload("res://assets/sprites/player_walk_1.png"),
 	preload("res://assets/sprites/player_walk_2.png"),
+	preload("res://assets/sprites/player_walk_3.png"),
+	preload("res://assets/sprites/player_walk_4.png"),
+	preload("res://assets/sprites/player_walk_5.png"),
+	preload("res://assets/sprites/player_walk_6.png"),
+	preload("res://assets/sprites/player_walk_7.png"),
+	preload("res://assets/sprites/player_walk_8.png"),
+	preload("res://assets/sprites/player_walk_9.png"),
+	preload("res://assets/sprites/player_walk_10.png"),
+	preload("res://assets/sprites/player_walk_11.png"),
+	preload("res://assets/sprites/player_walk_12.png"),
 ]
-const WALK_CYCLE := [0, 1, 0, 2]
-## 74x76 스프라이트(중앙 정렬)의 발끝을 충돌 캡슐 바닥(y=13)에 맞추는 오프셋.
-## 캔버스 높이를 바꾸면 (발끝 y 14) - (높이/2)로 다시 계산할 것 — 76에서는 14-38.
-## 가로는 중앙 정렬이라 값이 필요 없다(폭은 gen_player_sprites.py의 CANVAS_W가
-## 정하고, #381에서 활보 폭이 넓어져 60 → 74로 늘었다). 캔버스 높이가 인물 키(72)보다
-## 4칸 큰 것은 엉덩이를 올릴 자리다(#372). **홀수 높이는 안 된다** — 중앙 정렬이
-## 반 칸에 걸려 이 값이 .5로 떨어지고 스프라이트가 떨린다.
 const SPRITE_OFFSET_Y := -24.0
+## 한 걸음(6프레임)의 물리적 거리. 인물 키(72)의 0.72배로 잡았다 — #375에서 수위
+## (52/80 = 0.65배)에 맞춰 검증됐던 비율을 그대로 이어받는다. 12프레임 사이클로
+## 바뀌어도 **걸음 길이 자체는 프레임 수와 무관하게 유지해야** 발이 안 미끄러진다.
+const WALK_STEP_PX := 52.0
 ## 한 프레임이 유지되는 이동 거리. 시간이 아니라 거리로 재야 벽에 스쳐 느려질 때
-## 발이 미끄러지지 않는다(수위 #310과 같은 규약).
-##
-## **수위와 같은 값이어야 한다**(#375). 한 걸음이 2칸이므로 걸음 길이는 2×26 = 52px,
-## 인물 키(72)의 0.72배다 — 수위는 52/80 = 0.65배로 사실상 같다. 34였을 때는 한
-## 바퀴가 한 걸음이라 걸음 길이가 4×34 = 136px, **키의 1.89배**였다. 다리 길이로
-## 닿을 수 없는 거리라 프레임을 어떻게 다듬어도 발이 땅에서 미끄러졌다.
-const WALK_STRIDE := 26.0
+## 발이 미끄러지지 않는다(수위 #310과 같은 규약). 12프레임이 두 걸음이므로 한 걸음은
+## 6프레임 — WALK_STEP_PX를 6으로 나눈다.
+const WALK_STRIDE := WALK_STEP_PX / 6.0
 
 ## 잉크통 던지기(#169). 손에서 조금 앞에 놓고 던져야 벽에 붙어 있을 때
 ## 자기 발밑에서 터지지 않는다.
@@ -74,7 +73,8 @@ var is_hiding: bool = false
 var _light_energy: float = 1.0
 ## 위아래로만 움직일 땐 직전 좌우를 유지한다(스프라이트가 제자리에서 뒤집히지 않게).
 var _facing_right: bool = true
-## 이번 판에서 걸은 거리. WALK_STRIDE로 나눈 나머지가 걷기 프레임 번호다.
+## 이번 판에서 걸은 거리. WALK_STRIDE로 나눈 몫을 WALK_TEXTURES.size()로 나눈
+## 나머지가 걷기 프레임 번호다.
 var _walk_distance: float = 0.0
 
 
@@ -147,8 +147,8 @@ func _update_sprite(moving: bool, moved: float) -> void:
 	# 벽을 밀고 있으면 moved가 0이라 프레임이 그 자리에 멈춘다 — 대기 포즈로
 	# 돌아가면 방향키를 누른 채 정면을 보는 것처럼 보인다.
 	_walk_distance += moved
-	var step := int(_walk_distance / WALK_STRIDE) % WALK_CYCLE.size()
-	body.texture = WALK_TEXTURES[WALK_CYCLE[step]]
+	var frame := int(_walk_distance / WALK_STRIDE) % WALK_TEXTURES.size()
+	body.texture = WALK_TEXTURES[frame]
 	body.flip_h = not _facing_right
 
 
