@@ -12,19 +12,24 @@ const HIDDEN_PROMPT := "나오기"
 ## 걷기 그림은 셋 다 오른쪽을 보고 있어 왼쪽으로 갈 때만 뒤집는다.
 ## 네 장 모두 tools/gen_player_sprites.py가 원본 아트에서 만든다.
 const IDLE_TEXTURE := preload("res://assets/sprites/player_idle.png")
-## 걷기 3프레임(#365). **뒷다리 순서가 곧 걸음이다** — 뒤로 뻗음 → 들리기 시작 →
-## 높이 들림. 순서를 바꾸면 뒤로 걷는 것처럼 보인다.
+## 걷기 4프레임(#365, passing pose #368). **뒷다리 순서가 곧 걸음이다** —
+## 뒤로 뻗음 → 들리기 시작 → 높이 들림 → 몸 아래 통과. 순서를 바꾸면 뒤로 걷는
+## 것처럼 보인다. 좌우 다리를 구분할 표식이 없는 그림이라, 마지막 컷 다음의 루프가
+## "지나간 다리가 앞다리가 된 활보"로 자연히 이어진다 — 그 컷이 없던 #365에서는
+## 뒷다리가 올라가다 뚝 되돌아와 걸음이 아니라 다리 떨림으로 보였다.
 const WALK_TEXTURES := [
 	preload("res://assets/sprites/player_walk_1.png"),
 	preload("res://assets/sprites/player_walk_2.png"),
 	preload("res://assets/sprites/player_run.png"),
+	preload("res://assets/sprites/player_walk_pass.png"),
 ]
 ## 60x72 스프라이트(중앙 정렬)의 발끝을 충돌 캡슐 바닥(y=13)에 맞추는 오프셋.
 ## 캔버스 높이를 바꾸면 (발끝 y 14) - (높이/2)로 다시 계산할 것.
 const SPRITE_OFFSET_Y := -22.0
 ## 한 프레임이 유지되는 이동 거리. 시간이 아니라 거리로 재야 벽에 스쳐 느려질 때
 ## 발이 미끄러지지 않는다(수위 #310과 같은 규약). 속도 320에서 초당 9.4칸 —
-## 3프레임 한 바퀴가 0.32초로, 걷어낸 1px 흔들기(0.28초)와 같은 박자다.
+## 4프레임 한 바퀴가 0.43초다. **프레임을 더해도 이 값은 그대로 둔다** — 한 칸이
+## 유지되는 거리가 곧 발이 땅에 붙어 있는 거리이므로, 바퀴가 길어지는 것이 맞다.
 const WALK_STRIDE := 34.0
 
 ## 잉크통 던지기(#169). 손에서 조금 앞에 놓고 던져야 벽에 붙어 있을 때

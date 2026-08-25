@@ -8,15 +8,19 @@
 
 이 도구가 배경을 지우고 게임 크기로 줄여 아래 네 장을 만든다.
 
-    assets/sprites/player_idle.png     대기(정면)
-    assets/sprites/player_walk_1.png   걷기 1 — 뒷다리를 뒤로 뻗음
-    assets/sprites/player_walk_2.png   걷기 2 — 뒷발이 들리기 시작
-    assets/sprites/player_run.png      걷기 3 — 뒷발이 높이 들림
+    assets/sprites/player_idle.png        대기(정면)
+    assets/sprites/player_walk_1.png     걷기 1 — 뒷다리를 뒤로 뻗음
+    assets/sprites/player_walk_2.png     걷기 2 — 뒷발이 들리기 시작
+    assets/sprites/player_run.png        걷기 3 — 뒷발이 높이 들림
+    assets/sprites/player_walk_pass.png  걷기 4 — 다리가 몸 아래를 지남 (#368, 합성)
 
-이동 중에는 walk_1 → walk_2 → run 순으로 순환한다(`player_controller.gd`).
-뒷다리가 뒤로 뻗음 → 들리기 시작 → 높이 들림으로 이어져야 걸음으로 읽히므로
-**순서를 바꾸려면 그림의 뒷다리를 먼저 볼 것**. 세 장 모두 오른쪽을 보고 있어
-왼쪽으로 갈 때만 flip_h 한다.
+이동 중에는 walk_1 → walk_2 → run → walk_pass 순으로 순환한다
+(`player_controller.gd`). 뒷다리가 뒤로 뻗음 → 들리기 시작 → 높이 들림 → 몸 아래
+통과로 한 바퀴를 돌아야 걸음으로 읽히므로 **순서를 바꾸려면 그림의 뒷다리를 먼저
+볼 것**. 네 장 모두 오른쪽을 보고 있어 왼쪽으로 갈 때만 flip_h 한다.
+
+마지막 한 장은 원본 아트가 없어 `passing_pose()`가 walk_1에서 합성한다(#368) —
+**손으로 그린 컷이 생기면 이 단계를 지우고 그 그림으로 갈아탈 것**.
 
 원본이 있는 폴더에는 `.gdignore`를 뒀다 — 1254x1254 / 1650x953 원본까지 Godot이
 임포트해 빌드에 실을 이유가 없다(이 도구는 파일시스템에서 직접 읽는다).
@@ -74,6 +78,18 @@ WALK_POSES = (
 # 걷기 두 포즈의 키가 이만큼(원본 px) 넘게 다르면 멈춘다. 배율을 첫 포즈에서 잡아
 # 둘 다에 쓰므로, 키가 다르면 프레임이 바뀔 때 몸집이 커졌다 작아진다.
 WALK_HEIGHT_TOLERANCE = 2
+
+# ── passing pose 합성 (#368) ────────────────────────────────────────────────
+# 다리를 엉덩이 축으로 이 비율까지 모은다(1.0이면 그대로, 0.0이면 한 줄로 겹침).
+# 0.5는 눈으로 고른 값이다 — 더 조이면 두 다리가 한 덩어리로 뭉쳐 무엇이 무엇인지
+# 알 수 없고, 덜 조이면 walk_1과 구별이 안 돼 컷을 넣은 의미가 없다.
+PASS_CLOSE = 0.5
+# 치마로 볼 어두운 픽셀 수의 하한(한 행 기준). 구두도 어둡지만 한 행에 4~6칸뿐이라
+# 걸리지 않는다 — 치마는 15칸이 넘는다.
+PASS_SKIRT_RUN = 10
+# 치마 밑단이 이 구간 밖이면 멈춘다. 캔버스 72칸 중 다리는 늘 아래 1/3이므로,
+# 밑단을 잘못 잡으면(구두를 치마로 봤다든지) 몸통을 다리로 알고 뭉갠다.
+PASS_HEM_BAND = (38, 56)
 
 
 # --------------------------------------------------------------------------- PNG
@@ -267,19 +283,101 @@ def shrink(width: int, height: int, rgba: bytearray, mask: bytearray,
     return out
 
 
+# ------------------------------------------------------- passing pose 합성 (#368)
+
+def _skirt_hem(px: bytearray) -> tuple[int, float]:
+    """치마 밑단의 y와 그 행의 가로 중심(= 엉덩이 축)을 찾는다.
+
+    치마는 캔버스에서 가장 넓은 어두운 띠다. 그 아래는 전부 다리·구두이므로,
+    밑단 한 줄만 알면 "몸통은 그대로, 다리만 옮긴다"를 좌표로 나눌 수 있다.
+    """
+    hem = -1
+    hip = 0.0
+    for y in range(CANVAS_H):
+        dark = [x for x in range(CANVAS_W)
+                if px[(y * CANVAS_W + x) * 4 + 3]
+                and px[(y * CANVAS_W + x) * 4] + px[(y * CANVAS_W + x) * 4 + 1]
+                + px[(y * CANVAS_W + x) * 4 + 2] < 220]
+        if len(dark) >= PASS_SKIRT_RUN:
+            hem = y
+            hip = (min(dark) + max(dark)) / 2.0
+    if not PASS_HEM_BAND[0] <= hem <= PASS_HEM_BAND[1]:
+        raise SystemExit(f"치마 밑단을 y={hem}에서 찾았다 — {PASS_HEM_BAND} 밖이라 "
+                         "다리와 몸통을 가를 수 없다. PASS_SKIRT_RUN을 확인할 것")
+    return hem, hip
+
+
+def passing_pose(px: bytearray) -> bytearray:
+    """다리를 엉덩이 축으로 모아 "몸 아래를 지나는" 컷을 만든다(#368).
+
+    원본 아트가 두 포즈뿐이라 빠진 박자를 그림 없이 채워야 한다. 몸통·팔·머리는
+    손대지 않고 치마 밑단 아래만 옮기므로 프레임이 바뀔 때 상체가 흔들리지 않는다.
+
+    **행마다 정수로 밀고, 배율을 걸지 않는다.** 가로로 눌러 줄이면 다리가 그만큼
+    얇아져 젓가락이 되고, 회전시키면 접지한 다리가 캔버스 바닥을 뚫는다(발이 바닥에
+    닿아 있으므로 세우면 몸이 떠올라야 하는데 머리 위에 1px밖에 없다). 행을 통째로
+    미는 것은 다리 두께를 그대로 두고 기울기만 세우는 방법이다.
+
+    한 행에서 엉덩이 축의 좌/우를 각각 한 다리로 보고, 그 행의 중심을 축 쪽으로
+    (1 - PASS_CLOSE)만큼 당긴다. 축에서 멀리 나간 행이 더 많이 당겨지므로 다리가
+    통째로 세워진다.
+    """
+    hem, hip = _skirt_hem(px)
+    out = bytearray(px)
+    for y in range(hem + 1, CANVAS_H):
+        for x in range(CANVAS_W):
+            j = (y * CANVAS_W + x) * 4
+            out[j:j + 4] = b"\0\0\0\0"
+
+    for y in range(hem + 1, CANVAS_H):
+        for near_side in (True, False):
+            xs = [x for x in range(CANVAS_W)
+                  if px[(y * CANVAS_W + x) * 4 + 3]
+                  and ((x < hip) if near_side else (x >= hip))]
+            if not xs:
+                continue
+            center = (min(xs) + max(xs)) / 2.0
+            shift = int(round((hip - center) * (1.0 - PASS_CLOSE)))
+            for x in xs:
+                nx = x + shift
+                if 0 <= nx < CANVAS_W:
+                    j = (y * CANVAS_W + x) * 4
+                    k = (y * CANVAS_W + nx) * 4
+                    out[k:k + 4] = px[j:j + 4]
+
+    # 발끝은 바닥선에 그대로 있어야 한다 — 세로로 손대지 않았으므로 어긋나면
+    # 다리가 캔버스 밖으로 밀려 나갔다는 뜻이다(발이 공중에 뜬 컷이 나온다).
+    if _floor_row(out) != _floor_row(px):
+        raise SystemExit(f"passing pose의 발끝이 y={_floor_row(out)}로 옮겨졌다 "
+                         f"(원본 {_floor_row(px)}) — PASS_CLOSE를 확인할 것")
+    return out
+
+
+def _floor_row(px: bytearray) -> int:
+    """칠해진 가장 아래 행 = 발끝이 닿는 바닥선."""
+    for y in range(CANVAS_H - 1, -1, -1):
+        if any(px[(y * CANVAS_W + x) * 4 + 3] for x in range(CANVAS_W)):
+            return y
+    return -1
+
+
 def _bake(name: str, width: int, height: int, rgba: bytearray, mask: bytearray,
           box: tuple[int, int, int, int], xlim: tuple[int, int], anchor: float,
-          scale: float) -> None:
-    """한 포즈를 잘라 CANVAS_W x CANVAS_H PNG로 굽는다."""
+          scale: float) -> bytearray:
+    """한 포즈를 잘라 CANVAS_W x CANVAS_H PNG로 굽고, 그 픽셀을 돌려준다."""
     _check_fits(name, box, anchor, scale)
     px = shrink(width, height, rgba, mask, xlim, anchor, box[3], scale)
+    _write(name, px, f"원본 {box[1] - box[0] + 1}x{box[3] - box[2] + 1}  "
+                     f"배율 1px = 원본 {scale:.2f}px")
+    return px
+
+
+def _write(name: str, px: bytearray, note: str) -> None:
     opaque = sum(1 for i in range(CANVAS_W * CANVAS_H) if px[i * 4 + 3])
     if opaque < 200:
         raise SystemExit(f"{name}: 칠해진 칸이 {opaque}개뿐이다 — 잘라낼 위치를 확인할 것")
     write_png(OUT_DIR / f"{name}.png", CANVAS_W, CANVAS_H, px)
-    print(f"{name}.png  {CANVAS_W}x{CANVAS_H}  칠한 칸 {opaque}  "
-          f"원본 {box[1] - box[0] + 1}x{box[3] - box[2] + 1}  "
-          f"배율 1px = 원본 {scale:.2f}px")
+    print(f"{name}.png  {CANVAS_W}x{CANVAS_H}  칠한 칸 {opaque}  {note}")
 
 
 def build_all() -> None:
@@ -316,8 +414,15 @@ def build_all() -> None:
                          "몸집이 커졌다 작아진다. 원본을 확인할 것")
     walk_scale = heights[0] / run_canvas_h
 
+    baked = {}
     for (name, xlim, wanchor), box in zip(WALK_POSES, boxes):
-        _bake(name, wwidth, wheight, wrgba, wmask, box, xlim, wanchor, walk_scale)
+        baked[name] = _bake(name, wwidth, wheight, wrgba, wmask, box, xlim,
+                            wanchor, walk_scale)
+
+    # 다리가 몸 아래를 지나는 컷(#368). 원본 아트가 없어 walk_1에서 합성한다 —
+    # 활보 컷의 다리를 모으면 되므로 몸통을 다시 자를 필요가 없다.
+    _write("player_walk_pass", passing_pose(baked["player_walk_1"]),
+           f"player_walk_1에서 합성  다리 모음 {PASS_CLOSE}")
 
 
 def _check_fits(name: str, box: tuple[int, int, int, int], anchor_x: float,
