@@ -4270,7 +4270,7 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 
 [node name="HideInfoDept" type="Area2D" parent="."]
-position = Vector2(3092.5, 1646)
+position = Vector2(2861, 1730)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("5_hiding")
@@ -4282,19 +4282,19 @@ z_index = 1
 texture = ExtResource("tex_obj_locker")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3968, 0.4233, 0.4895, 1)
-polygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)
+polygon = PackedVector2Array(-40, -26, -4, -26, -4, 26, -40, 26)
 
 [node name="HideInfoDeptZone" type="CollisionShape2D" parent="HideInfoDept"]
 shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="Mark_HideInfoDept" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(3092.5, 1646)
+position = Vector2(2861, 1730)
 z_index = 5
 color = Color(0.42, 0.86, 0.82, 1)
 polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
 
 [node name="HideDasan6" type="Area2D" parent="."]
-position = Vector2(610, 2228)
+position = Vector2(73, 2300)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("5_hiding")
@@ -4306,13 +4306,13 @@ z_index = 1
 texture = ExtResource("tex_obj_cabinet")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.252, 0.3448, 0.3183, 1)
-polygon = PackedVector2Array(-15, -24, 15, -24, 15, 24, -15, 24)
+polygon = PackedVector2Array(-37, -24, -7, -24, -7, 24, -37, 24)
 
 [node name="HideDasan6Zone" type="CollisionShape2D" parent="HideDasan6"]
 shape = SubResource("RectangleShape2D_key_zone")
 
 [node name="Mark_HideDasan6" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(610, 2228)
+position = Vector2(73, 2300)
 z_index = 5
 color = Color(0.42, 0.86, 0.82, 1)
 polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
@@ -11365,22 +11365,22 @@ color = Color(0.3846, 0.4359, 0.4872, 1)
 polygon = PackedVector2Array(2565, 1916, 2655, 1916, 2655, 1924, 2565, 1924)
 
 [node name="PC_InfoDept_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2862.2, 1572.1, 3002.2, 1572.1, 3002.2, 1610.1, 2862.2, 1610.1)
+polygon = PackedVector2Array(2937, 1572.1, 3011.5, 1572.1, 3011.5, 1610.1, 2937, 1610.1)
 
 [node name="PV_InfoDept_0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.375, 0.2975, 0.2198, 1)
-polygon = PackedVector2Array(2862.2, 1572.1, 3002.2, 1572.1, 3002.2, 1610.1, 2862.2, 1610.1)
+polygon = PackedVector2Array(2937, 1572.1, 3011.5, 1572.1, 3011.5, 1610.1, 2937, 1610.1)
 
 [node name="PC_InfoDept_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2862.2, 1636.1, 3002.2, 1636.1, 3002.2, 1674.1, 2862.2, 1674.1)
+polygon = PackedVector2Array(2937, 1636.1, 3011.5, 1636.1, 3011.5, 1674.1, 2937, 1674.1)
 
 [node name="PV_InfoDept_1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3579, 0.2839, 0.2098, 1)
-polygon = PackedVector2Array(2862.2, 1636.1, 3002.2, 1636.1, 3002.2, 1674.1, 2862.2, 1674.1)
+polygon = PackedVector2Array(2937, 1636.1, 3011.5, 1636.1, 3011.5, 1674.1, 2937, 1674.1)
 
 [node name="PC_InfoDept_2" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(3182.8, 1572.1, 3322.8, 1572.1, 3322.8, 1610.1, 3182.8, 1610.1)
@@ -11401,70 +11401,52 @@ color = Color(0.3684, 0.2922, 0.2159, 1)
 polygon = PackedVector2Array(3182.8, 1636.1, 3322.8, 1636.1, 3322.8, 1674.1, 3182.8, 1674.1)
 
 [node name="PC_InfoDept_4" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2853, 1785.9, 2920.7, 1785.9, 2920.7, 1823.9, 2853, 1823.9)
+polygon = PackedVector2Array(3072.7, 1785.9, 3112.3, 1785.9, 3112.3, 1823.9, 3072.7, 1823.9)
 
 [node name="PV_InfoDept_4" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3513, 0.2787, 0.2059, 1)
-polygon = PackedVector2Array(2853, 1785.9, 2920.7, 1785.9, 2920.7, 1823.9, 2853, 1823.9)
+polygon = PackedVector2Array(3072.7, 1785.9, 3112.3, 1785.9, 3112.3, 1823.9, 3072.7, 1823.9)
 
 [node name="PC_InfoDept_5" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2853, 1849.9, 2920.7, 1849.9, 2920.7, 1887.9, 2853, 1887.9)
+polygon = PackedVector2Array(3072.7, 1849.9, 3112.3, 1849.9, 3112.3, 1887.9, 3072.7, 1887.9)
 
 [node name="PV_InfoDept_5" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3789, 0.3005, 0.222, 1)
-polygon = PackedVector2Array(2853, 1849.9, 2920.7, 1849.9, 2920.7, 1887.9, 2853, 1887.9)
+polygon = PackedVector2Array(3072.7, 1849.9, 3112.3, 1849.9, 3112.3, 1887.9, 3072.7, 1887.9)
 
 [node name="PC_InfoDept_6" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(3072.7, 1785.9, 3112.3, 1785.9, 3112.3, 1823.9, 3072.7, 1823.9)
+polygon = PackedVector2Array(3264.3, 1785.9, 3332, 1785.9, 3332, 1823.9, 3264.3, 1823.9)
 
 [node name="PV_InfoDept_6" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3618, 0.287, 0.212, 1)
-polygon = PackedVector2Array(3072.7, 1785.9, 3112.3, 1785.9, 3112.3, 1823.9, 3072.7, 1823.9)
+polygon = PackedVector2Array(3264.3, 1785.9, 3332, 1785.9, 3332, 1823.9, 3264.3, 1823.9)
 
 [node name="PC_InfoDept_7" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(3072.7, 1849.9, 3112.3, 1849.9, 3112.3, 1887.9, 3072.7, 1887.9)
+polygon = PackedVector2Array(3264.3, 1849.9, 3332, 1849.9, 3332, 1887.9, 3264.3, 1887.9)
 
 [node name="PV_InfoDept_7" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3893, 0.3088, 0.2282, 1)
-polygon = PackedVector2Array(3072.7, 1849.9, 3112.3, 1849.9, 3112.3, 1887.9, 3072.7, 1887.9)
-
-[node name="PC_InfoDept_8" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(3264.3, 1785.9, 3332, 1785.9, 3332, 1823.9, 3264.3, 1823.9)
-
-[node name="PV_InfoDept_8" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_desk")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3722, 0.2953, 0.2182, 1)
-polygon = PackedVector2Array(3264.3, 1785.9, 3332, 1785.9, 3332, 1823.9, 3264.3, 1823.9)
-
-[node name="PC_InfoDept_9" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(3264.3, 1849.9, 3332, 1849.9, 3332, 1887.9, 3264.3, 1887.9)
-
-[node name="PV_InfoDept_9" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_desk")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3552, 0.2817, 0.2081, 1)
 polygon = PackedVector2Array(3264.3, 1849.9, 3332, 1849.9, 3332, 1887.9, 3264.3, 1887.9)
 
 [node name="PT_InfoDept_sink0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_sink")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3807, 0.4188, 0.4441, 1)
-polygon = PackedVector2Array(2918.2, 1579.7, 2946.2, 1579.7, 2946.2, 1602.5, 2918.2, 1602.5)
+polygon = PackedVector2Array(2966.8, 1579.7, 2981.7, 1579.7, 2981.7, 1602.5, 2966.8, 1602.5)
 
 [node name="PT_InfoDept_sink1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_sink")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3983, 0.4382, 0.4647, 1)
-polygon = PackedVector2Array(2918.2, 1643.7, 2946.2, 1643.7, 2946.2, 1666.5, 2918.2, 1666.5)
+polygon = PackedVector2Array(2966.8, 1643.7, 2981.7, 1643.7, 2981.7, 1666.5, 2966.8, 1666.5)
 
 [node name="PT_InfoDept_sink2" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_sink")
@@ -11482,36 +11464,24 @@ polygon = PackedVector2Array(3238.8, 1643.7, 3266.8, 1643.7, 3266.8, 1666.5, 323
 texture = ExtResource("tex_obj_sink")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.4023, 0.4426, 0.4693, 1)
-polygon = PackedVector2Array(2880.1, 1793.5, 2893.6, 1793.5, 2893.6, 1816.3, 2880.1, 1816.3)
+polygon = PackedVector2Array(3088.5, 1793.5, 3096.5, 1793.5, 3096.5, 1816.3, 3088.5, 1816.3)
 
 [node name="PT_InfoDept_sink5" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_sink")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3738, 0.4112, 0.4361, 1)
-polygon = PackedVector2Array(2880.1, 1857.5, 2893.6, 1857.5, 2893.6, 1880.3, 2880.1, 1880.3)
+polygon = PackedVector2Array(3088.5, 1857.5, 3096.5, 1857.5, 3096.5, 1880.3, 3088.5, 1880.3)
 
 [node name="PT_InfoDept_sink6" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_sink")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3669, 0.4037, 0.4281, 1)
-polygon = PackedVector2Array(3088.5, 1793.5, 3096.5, 1793.5, 3096.5, 1816.3, 3088.5, 1816.3)
+polygon = PackedVector2Array(3291.4, 1793.5, 3304.9, 1793.5, 3304.9, 1816.3, 3291.4, 1816.3)
 
 [node name="PT_InfoDept_sink7" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_sink")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3846, 0.4231, 0.4487, 1)
-polygon = PackedVector2Array(3088.5, 1857.5, 3096.5, 1857.5, 3096.5, 1880.3, 3088.5, 1880.3)
-
-[node name="PT_InfoDept_sink8" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_sink")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3835, 0.4219, 0.4475, 1)
-polygon = PackedVector2Array(3291.4, 1793.5, 3304.9, 1793.5, 3304.9, 1816.3, 3291.4, 1816.3)
-
-[node name="PT_InfoDept_sink9" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_sink")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.4012, 0.4414, 0.4681, 1)
 polygon = PackedVector2Array(3291.4, 1857.5, 3304.9, 1857.5, 3304.9, 1880.3, 3291.4, 1880.3)
 
 [node name="PD_InfoDept_wboard" type="Polygon2D" parent="Props"]
@@ -11551,57 +11521,6 @@ polygon = PackedVector2Array(36, 2142, 50, 2142, 50, 2170, 36, 2170)
 texture = ExtResource("tex_prop_glass")
 color = Color(0.1282, 0.141, 0.1667, 1)
 polygon = PackedVector2Array(36, 2394, 52, 2394, 52, 2430, 36, 2430)
-
-[node name="PC_Dasan6_teacher" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(60, 2257, 92, 2257, 92, 2343, 60, 2343)
-
-[node name="PV_Dasan6_teacher" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_desk")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3719, 0.295, 0.2179, 1)
-polygon = PackedVector2Array(60, 2257, 92, 2257, 92, 2343, 60, 2343)
-
-[node name="PT_Dasan6_papers" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_prop_cloth")
-color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(66, 2288, 84, 2288, 84, 2312, 66, 2312)
-
-[node name="PC_Dasan6_tchair" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(98, 2284, 114, 2284, 114, 2316, 98, 2316)
-
-[node name="PV_Dasan6_tchair" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_chair")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.2672, 0.2186, 0.17, 1)
-polygon = PackedVector2Array(98, 2284, 114, 2284, 114, 2316, 98, 2316)
-
-[node name="PC_Dasan6_shelf0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(60, 2160, 92, 2160, 92, 2228, 60, 2228)
-
-[node name="PV_Dasan6_shelf0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_shelf")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3051, 0.2653, 0.2122, 1)
-polygon = PackedVector2Array(60, 2160, 92, 2160, 92, 2228, 60, 2228)
-
-[node name="PT_Dasan6_books0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_prop_grain")
-color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(65, 2166, 87, 2166, 87, 2178, 65, 2178)
-
-[node name="PC_Dasan6_shelf1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(60, 2372, 92, 2372, 92, 2440, 60, 2440)
-
-[node name="PV_Dasan6_shelf1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_shelf")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.2916, 0.2535, 0.2028, 1)
-polygon = PackedVector2Array(60, 2372, 92, 2372, 92, 2440, 60, 2440)
-
-[node name="PT_Dasan6_books1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_prop_grain")
-color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(65, 2378, 87, 2378, 87, 2390, 65, 2390)
 
 [node name="PC_Dasan6_clean" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1154, 2160, 1184, 2160, 1184, 2198, 1154, 2198)
@@ -11792,281 +11711,281 @@ color = Color(0.4359, 0.3718, 0.2692, 1)
 polygon = PackedVector2Array(870.5, 2136, 948.5, 2136, 948.5, 2156, 870.5, 2156)
 
 [node name="PC_Dasan6_d0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(147.5, 2191, 173.5, 2191, 173.5, 2235, 147.5, 2235)
+polygon = PackedVector2Array(210.5, 2191, 236.5, 2191, 236.5, 2235, 210.5, 2235)
 
 [node name="PV_Dasan6_d0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3674, 0.2914, 0.2153, 1)
-polygon = PackedVector2Array(147.5, 2191, 173.5, 2191, 173.5, 2235, 147.5, 2235)
+polygon = PackedVector2Array(210.5, 2191, 236.5, 2191, 236.5, 2235, 210.5, 2235)
 
 [node name="PC_Dasan6_c0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(178.5, 2200, 190.5, 2200, 190.5, 2226, 178.5, 2226)
+polygon = PackedVector2Array(241.5, 2200, 253.5, 2200, 253.5, 2226, 241.5, 2226)
 
 [node name="PV_Dasan6_c0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2891, 0.2365, 0.1839, 1)
-polygon = PackedVector2Array(178.5, 2200, 190.5, 2200, 190.5, 2226, 178.5, 2226)
+polygon = PackedVector2Array(241.5, 2200, 253.5, 2200, 253.5, 2226, 241.5, 2226)
 
 [node name="PT_Dasan6_txt0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(151.5, 2200, 169.5, 2200, 169.5, 2226, 151.5, 2226)
+polygon = PackedVector2Array(214.5, 2200, 232.5, 2200, 232.5, 2226, 214.5, 2226)
 
 [node name="PC_Dasan6_d1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(210.5, 2191, 236.5, 2191, 236.5, 2235, 210.5, 2235)
+polygon = PackedVector2Array(273.5, 2191, 299.5, 2191, 299.5, 2235, 273.5, 2235)
 
 [node name="PV_Dasan6_d1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3503, 0.2778, 0.2053, 1)
-polygon = PackedVector2Array(210.5, 2191, 236.5, 2191, 236.5, 2235, 210.5, 2235)
+polygon = PackedVector2Array(273.5, 2191, 299.5, 2191, 299.5, 2235, 273.5, 2235)
 
 [node name="PC_Dasan6_c1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(241.5, 2200, 253.5, 2200, 253.5, 2226, 241.5, 2226)
+polygon = PackedVector2Array(304.5, 2200, 316.5, 2200, 316.5, 2226, 304.5, 2226)
 
 [node name="PV_Dasan6_c1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2682, 0.2194, 0.1706, 1)
-polygon = PackedVector2Array(241.5, 2200, 253.5, 2200, 253.5, 2226, 241.5, 2226)
+polygon = PackedVector2Array(304.5, 2200, 316.5, 2200, 316.5, 2226, 304.5, 2226)
 
 [node name="PC_Dasan6_d2" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(273.5, 2191, 299.5, 2191, 299.5, 2235, 273.5, 2235)
+polygon = PackedVector2Array(336.5, 2191, 362.5, 2191, 362.5, 2235, 336.5, 2235)
 
 [node name="PV_Dasan6_d2" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3778, 0.2997, 0.2214, 1)
-polygon = PackedVector2Array(273.5, 2191, 299.5, 2191, 299.5, 2235, 273.5, 2235)
+polygon = PackedVector2Array(336.5, 2191, 362.5, 2191, 362.5, 2235, 336.5, 2235)
 
 [node name="PC_Dasan6_c2" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(304.5, 2200, 316.5, 2200, 316.5, 2226, 304.5, 2226)
+polygon = PackedVector2Array(367.5, 2200, 379.5, 2200, 379.5, 2226, 367.5, 2226)
 
 [node name="PV_Dasan6_c2" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.297, 0.243, 0.189, 1)
-polygon = PackedVector2Array(304.5, 2200, 316.5, 2200, 316.5, 2226, 304.5, 2226)
+polygon = PackedVector2Array(367.5, 2200, 379.5, 2200, 379.5, 2226, 367.5, 2226)
 
 [node name="PC_Dasan6_d3" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(336.5, 2191, 362.5, 2191, 362.5, 2235, 336.5, 2235)
+polygon = PackedVector2Array(399.5, 2191, 425.5, 2191, 425.5, 2235, 399.5, 2235)
 
 [node name="PV_Dasan6_d3" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3608, 0.2861, 0.2114, 1)
-polygon = PackedVector2Array(336.5, 2191, 362.5, 2191, 362.5, 2235, 336.5, 2235)
+polygon = PackedVector2Array(399.5, 2191, 425.5, 2191, 425.5, 2235, 399.5, 2235)
 
 [node name="PC_Dasan6_c3" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(367.5, 2200, 379.5, 2200, 379.5, 2226, 367.5, 2226)
+polygon = PackedVector2Array(430.5, 2200, 442.5, 2200, 442.5, 2226, 430.5, 2226)
 
 [node name="PV_Dasan6_c3" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2761, 0.2259, 0.1757, 1)
-polygon = PackedVector2Array(367.5, 2200, 379.5, 2200, 379.5, 2226, 367.5, 2226)
+polygon = PackedVector2Array(430.5, 2200, 442.5, 2200, 442.5, 2226, 430.5, 2226)
 
 [node name="PT_Dasan6_txt3" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(340.5, 2200, 358.5, 2200, 358.5, 2226, 340.5, 2226)
+polygon = PackedVector2Array(403.5, 2200, 421.5, 2200, 421.5, 2226, 403.5, 2226)
 
 [node name="PC_Dasan6_d4" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(399.5, 2191, 425.5, 2191, 425.5, 2235, 399.5, 2235)
+polygon = PackedVector2Array(462.5, 2191, 488.5, 2191, 488.5, 2235, 462.5, 2235)
 
 [node name="PV_Dasan6_d4" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3883, 0.308, 0.2276, 1)
-polygon = PackedVector2Array(399.5, 2191, 425.5, 2191, 425.5, 2235, 399.5, 2235)
+polygon = PackedVector2Array(462.5, 2191, 488.5, 2191, 488.5, 2235, 462.5, 2235)
 
 [node name="PC_Dasan6_c4" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(430.5, 2200, 442.5, 2200, 442.5, 2226, 430.5, 2226)
+polygon = PackedVector2Array(493.5, 2200, 505.5, 2200, 505.5, 2226, 493.5, 2226)
 
 [node name="PV_Dasan6_c4" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2732, 0.2235, 0.1738, 1)
-polygon = PackedVector2Array(430.5, 2200, 442.5, 2200, 442.5, 2226, 430.5, 2226)
+polygon = PackedVector2Array(493.5, 2200, 505.5, 2200, 505.5, 2226, 493.5, 2226)
 
 [node name="PC_Dasan6_d5" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(462.5, 2191, 488.5, 2191, 488.5, 2235, 462.5, 2235)
+polygon = PackedVector2Array(525.5, 2191, 551.5, 2191, 551.5, 2235, 525.5, 2235)
 
 [node name="PV_Dasan6_d5" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3712, 0.2944, 0.2176, 1)
-polygon = PackedVector2Array(462.5, 2191, 488.5, 2191, 488.5, 2235, 462.5, 2235)
+polygon = PackedVector2Array(525.5, 2191, 551.5, 2191, 551.5, 2235, 525.5, 2235)
 
 [node name="PC_Dasan6_c5" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(493.5, 2200, 505.5, 2200, 505.5, 2226, 493.5, 2226)
+polygon = PackedVector2Array(556.5, 2200, 568.5, 2200, 568.5, 2226, 556.5, 2226)
 
 [node name="PV_Dasan6_c5" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2862, 0.2341, 0.1821, 1)
-polygon = PackedVector2Array(493.5, 2200, 505.5, 2200, 505.5, 2226, 493.5, 2226)
+polygon = PackedVector2Array(556.5, 2200, 568.5, 2200, 568.5, 2226, 556.5, 2226)
 
 [node name="PC_Dasan6_d6" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(714.5, 2191, 740.5, 2191, 740.5, 2235, 714.5, 2235)
+polygon = PackedVector2Array(651.5, 2191, 677.5, 2191, 677.5, 2235, 651.5, 2235)
 
 [node name="PV_Dasan6_d6" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3541, 0.2809, 0.2075, 1)
-polygon = PackedVector2Array(714.5, 2191, 740.5, 2191, 740.5, 2235, 714.5, 2235)
+polygon = PackedVector2Array(651.5, 2191, 677.5, 2191, 677.5, 2235, 651.5, 2235)
 
 [node name="PC_Dasan6_c6" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(745.5, 2200, 757.5, 2200, 757.5, 2226, 745.5, 2226)
+polygon = PackedVector2Array(682.5, 2200, 694.5, 2200, 694.5, 2226, 682.5, 2226)
 
 [node name="PV_Dasan6_c6" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2812, 0.23, 0.1789, 1)
-polygon = PackedVector2Array(745.5, 2200, 757.5, 2200, 757.5, 2226, 745.5, 2226)
+polygon = PackedVector2Array(682.5, 2200, 694.5, 2200, 694.5, 2226, 682.5, 2226)
 
 [node name="PT_Dasan6_txt6" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(718.5, 2200, 736.5, 2200, 736.5, 2226, 718.5, 2226)
+polygon = PackedVector2Array(655.5, 2200, 673.5, 2200, 673.5, 2226, 655.5, 2226)
 
 [node name="PC_Dasan6_d7" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(777.5, 2191, 803.5, 2191, 803.5, 2235, 777.5, 2235)
+polygon = PackedVector2Array(714.5, 2191, 740.5, 2191, 740.5, 2235, 714.5, 2235)
 
 [node name="PV_Dasan6_d7" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3817, 0.3027, 0.2237, 1)
-polygon = PackedVector2Array(777.5, 2191, 803.5, 2191, 803.5, 2235, 777.5, 2235)
+polygon = PackedVector2Array(714.5, 2191, 740.5, 2191, 740.5, 2235, 714.5, 2235)
 
 [node name="PC_Dasan6_c7" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(808.5, 2200, 820.5, 2200, 820.5, 2226, 808.5, 2226)
+polygon = PackedVector2Array(745.5, 2200, 757.5, 2200, 757.5, 2226, 745.5, 2226)
 
 [node name="PV_Dasan6_c7" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2941, 0.2406, 0.1871, 1)
-polygon = PackedVector2Array(808.5, 2200, 820.5, 2200, 820.5, 2226, 808.5, 2226)
+polygon = PackedVector2Array(745.5, 2200, 757.5, 2200, 757.5, 2226, 745.5, 2226)
 
 [node name="PC_Dasan6_d8" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(840.5, 2191, 866.5, 2191, 866.5, 2235, 840.5, 2235)
+polygon = PackedVector2Array(777.5, 2191, 803.5, 2191, 803.5, 2235, 777.5, 2235)
 
 [node name="PV_Dasan6_d8" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3702, 0.2936, 0.2169, 1)
-polygon = PackedVector2Array(840.5, 2191, 866.5, 2191, 866.5, 2235, 840.5, 2235)
+polygon = PackedVector2Array(777.5, 2191, 803.5, 2191, 803.5, 2235, 777.5, 2235)
 
 [node name="PC_Dasan6_c8" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(871.5, 2200, 883.5, 2200, 883.5, 2226, 871.5, 2226)
+polygon = PackedVector2Array(808.5, 2200, 820.5, 2200, 820.5, 2226, 808.5, 2226)
 
 [node name="PV_Dasan6_c8" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2912, 0.2383, 0.1853, 1)
-polygon = PackedVector2Array(871.5, 2200, 883.5, 2200, 883.5, 2226, 871.5, 2226)
+polygon = PackedVector2Array(808.5, 2200, 820.5, 2200, 820.5, 2226, 808.5, 2226)
 
 [node name="PC_Dasan6_d9" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(903.5, 2191, 929.5, 2191, 929.5, 2235, 903.5, 2235)
+polygon = PackedVector2Array(840.5, 2191, 866.5, 2191, 866.5, 2235, 840.5, 2235)
 
 [node name="PV_Dasan6_d9" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3531, 0.2801, 0.2069, 1)
-polygon = PackedVector2Array(903.5, 2191, 929.5, 2191, 929.5, 2235, 903.5, 2235)
+polygon = PackedVector2Array(840.5, 2191, 866.5, 2191, 866.5, 2235, 840.5, 2235)
 
 [node name="PC_Dasan6_c9" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(934.5, 2200, 946.5, 2200, 946.5, 2226, 934.5, 2226)
+polygon = PackedVector2Array(871.5, 2200, 883.5, 2200, 883.5, 2226, 871.5, 2226)
 
 [node name="PV_Dasan6_c9" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2703, 0.2211, 0.172, 1)
-polygon = PackedVector2Array(934.5, 2200, 946.5, 2200, 946.5, 2226, 934.5, 2226)
+polygon = PackedVector2Array(871.5, 2200, 883.5, 2200, 883.5, 2226, 871.5, 2226)
 
 [node name="PT_Dasan6_txt9" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(907.5, 2200, 925.5, 2200, 925.5, 2226, 907.5, 2226)
+polygon = PackedVector2Array(844.5, 2200, 862.5, 2200, 862.5, 2226, 844.5, 2226)
 
 [node name="PC_Dasan6_d10" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(966.5, 2191, 992.5, 2191, 992.5, 2235, 966.5, 2235)
+polygon = PackedVector2Array(903.5, 2191, 929.5, 2191, 929.5, 2235, 903.5, 2235)
 
 [node name="PV_Dasan6_d10" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3926, 0.3114, 0.2301, 1)
-polygon = PackedVector2Array(966.5, 2191, 992.5, 2191, 992.5, 2235, 966.5, 2235)
+polygon = PackedVector2Array(903.5, 2191, 929.5, 2191, 929.5, 2235, 903.5, 2235)
 
 [node name="PC_Dasan6_c10" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(997.5, 2200, 1009.5, 2200, 1009.5, 2226, 997.5, 2226)
+polygon = PackedVector2Array(934.5, 2200, 946.5, 2200, 946.5, 2226, 934.5, 2226)
 
 [node name="PV_Dasan6_c10" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2899, 0.2372, 0.1845, 1)
-polygon = PackedVector2Array(997.5, 2200, 1009.5, 2200, 1009.5, 2226, 997.5, 2226)
+polygon = PackedVector2Array(934.5, 2200, 946.5, 2200, 946.5, 2226, 934.5, 2226)
 
 [node name="PC_Dasan6_d11" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1029.5, 2191, 1055.5, 2191, 1055.5, 2235, 1029.5, 2235)
+polygon = PackedVector2Array(966.5, 2191, 992.5, 2191, 992.5, 2235, 966.5, 2235)
 
 [node name="PV_Dasan6_d11" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.365, 0.2895, 0.2139, 1)
-polygon = PackedVector2Array(1029.5, 2191, 1055.5, 2191, 1055.5, 2235, 1029.5, 2235)
+polygon = PackedVector2Array(966.5, 2191, 992.5, 2191, 992.5, 2235, 966.5, 2235)
 
 [node name="PC_Dasan6_c11" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1060.5, 2200, 1072.5, 2200, 1072.5, 2226, 1060.5, 2226)
+polygon = PackedVector2Array(997.5, 2200, 1009.5, 2200, 1009.5, 2226, 997.5, 2226)
 
 [node name="PV_Dasan6_c11" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2769, 0.2266, 0.1762, 1)
-polygon = PackedVector2Array(1060.5, 2200, 1072.5, 2200, 1072.5, 2226, 1060.5, 2226)
+polygon = PackedVector2Array(997.5, 2200, 1009.5, 2200, 1009.5, 2226, 997.5, 2226)
 
 [node name="PC_Dasan6_d12" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1092.5, 2191, 1118.5, 2191, 1118.5, 2235, 1092.5, 2235)
+polygon = PackedVector2Array(1029.5, 2191, 1055.5, 2191, 1055.5, 2235, 1029.5, 2235)
 
 [node name="PV_Dasan6_d12" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3821, 0.3031, 0.224, 1)
-polygon = PackedVector2Array(1092.5, 2191, 1118.5, 2191, 1118.5, 2235, 1092.5, 2235)
+polygon = PackedVector2Array(1029.5, 2191, 1055.5, 2191, 1055.5, 2235, 1029.5, 2235)
 
 [node name="PC_Dasan6_c12" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1123.5, 2200, 1135.5, 2200, 1135.5, 2226, 1123.5, 2226)
+polygon = PackedVector2Array(1060.5, 2200, 1072.5, 2200, 1072.5, 2226, 1060.5, 2226)
 
 [node name="PV_Dasan6_c12" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2978, 0.2437, 0.1895, 1)
-polygon = PackedVector2Array(1123.5, 2200, 1135.5, 2200, 1135.5, 2226, 1123.5, 2226)
+polygon = PackedVector2Array(1060.5, 2200, 1072.5, 2200, 1072.5, 2226, 1060.5, 2226)
 
 [node name="PT_Dasan6_txt12" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(1096.5, 2200, 1114.5, 2200, 1114.5, 2226, 1096.5, 2226)
+polygon = PackedVector2Array(1033.5, 2200, 1051.5, 2200, 1051.5, 2226, 1033.5, 2226)
 
 [node name="PC_Dasan6_d13" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(118, 2355, 144, 2355, 144, 2399, 118, 2399)
+polygon = PackedVector2Array(1092.5, 2191, 1118.5, 2191, 1118.5, 2235, 1092.5, 2235)
 
 [node name="PV_Dasan6_d13" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3546, 0.2812, 0.2078, 1)
-polygon = PackedVector2Array(118, 2355, 144, 2355, 144, 2399, 118, 2399)
+polygon = PackedVector2Array(1092.5, 2191, 1118.5, 2191, 1118.5, 2235, 1092.5, 2235)
 
 [node name="PC_Dasan6_c13" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(149, 2364, 161, 2364, 161, 2390, 149, 2390)
+polygon = PackedVector2Array(1123.5, 2200, 1135.5, 2200, 1135.5, 2226, 1123.5, 2226)
 
 [node name="PV_Dasan6_c13" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2849, 0.2331, 0.1813, 1)
-polygon = PackedVector2Array(149, 2364, 161, 2364, 161, 2390, 149, 2390)
+polygon = PackedVector2Array(1123.5, 2200, 1135.5, 2200, 1135.5, 2226, 1123.5, 2226)
 
 [node name="PC_Dasan6_d14" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(181, 2355, 207, 2355, 207, 2399, 181, 2399)
@@ -14925,39 +14844,13 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.7051, 0.6923, 0.641, 1)
 polygon = PackedVector2Array(2694, 1635.1, 2736.2, 1635.1, 2736.2, 1642.3, 2694, 1642.3)
 
-[node name="PT_InfoDept_0_note0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_prop_cloth")
-color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(2948.8, 1576.6, 2999.2, 1576.6, 2999.2, 1586.5, 2948.8, 1586.5)
-
 [node name="PT_InfoDept_1_cup1" type="Polygon2D" parent="Props"]
 color = Color(0.66, 0.65, 0.60, 1)
-polygon = PackedVector2Array(2865.2, 1642.1, 2886.2, 1642.1, 2886.2, 1649.7, 2865.2, 1649.7)
+polygon = PackedVector2Array(2940, 1642.1, 2951.2, 1642.1, 2951.2, 1649.7, 2940, 1649.7)
 
 [node name="PT_InfoDept_3_cup1" type="Polygon2D" parent="Props"]
 color = Color(0.66, 0.65, 0.60, 1)
 polygon = PackedVector2Array(3185.8, 1639.1, 3206.8, 1639.1, 3206.8, 1646.7, 3185.8, 1646.7)
-
-[node name="PT_InfoDept_8_cup0" type="Polygon2D" parent="Props"]
-color = Color(0.66, 0.65, 0.60, 1)
-polygon = PackedVector2Array(3318.8, 1791.9, 3329, 1791.9, 3329, 1799.5, 3318.8, 1799.5)
-
-[node name="PT_InfoDept_8_cup1" type="Polygon2D" parent="Props"]
-color = Color(0.66, 0.65, 0.60, 1)
-polygon = PackedVector2Array(3267.3, 1790.4, 3277.5, 1790.4, 3277.5, 1798, 3267.3, 1798)
-
-[node name="PT_InfoDept_9_cup1" type="Polygon2D" parent="Props"]
-color = Color(0.66, 0.65, 0.60, 1)
-polygon = PackedVector2Array(3267.3, 1852.9, 3277.5, 1852.9, 3277.5, 1860.5, 3267.3, 1860.5)
-
-[node name="PT_Dasan6_teacher_note0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_prop_cloth")
-color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(63, 2261.5, 74.5, 2261.5, 74.5, 2283.9, 63, 2283.9)
-
-[node name="PT_Dasan6_teacher_cup1" type="Polygon2D" parent="Props"]
-color = Color(0.66, 0.65, 0.60, 1)
-polygon = PackedVector2Array(83, 2263, 89, 2263, 89, 2280.2, 83, 2280.2)
 
 [node name="PT_Dasan6_clean_tag0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
@@ -14972,51 +14865,51 @@ polygon = PackedVector2Array(1160, 2359, 1181, 2359, 1181, 2363, 1160, 2363)
 [node name="PT_Dasan6_d1_book0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(213.5, 2195.5, 223.9, 2195.5, 223.9, 2210.5, 213.5, 2210.5)
+polygon = PackedVector2Array(276.5, 2195.5, 286.9, 2195.5, 286.9, 2210.5, 276.5, 2210.5)
 
 [node name="PT_Dasan6_d2_note0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(276.5, 2194, 285.9, 2194, 285.9, 2205.4, 276.5, 2205.4)
+polygon = PackedVector2Array(339.5, 2194, 348.9, 2194, 348.9, 2205.4, 339.5, 2205.4)
 
 [node name="PT_Dasan6_d4_case0" type="Polygon2D" parent="Props"]
 color = Color(0.44, 0.32, 0.22, 1)
-polygon = PackedVector2Array(408.1, 2194, 416.9, 2194, 416.9, 2201.9, 408.1, 2201.9)
+polygon = PackedVector2Array(471.1, 2194, 479.9, 2194, 479.9, 2201.9, 471.1, 2201.9)
 
 [node name="PT_Dasan6_d5_bottle0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
 color = Color(0.3077, 0.3846, 0.4359, 1)
-polygon = PackedVector2Array(479.5, 2197, 485.5, 2197, 485.5, 2208.4, 479.5, 2208.4)
+polygon = PackedVector2Array(542.5, 2197, 548.5, 2197, 548.5, 2208.4, 542.5, 2208.4)
 
 [node name="PT_Dasan6_d5_bottle1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
 color = Color(0.3077, 0.3846, 0.4359, 1)
-polygon = PackedVector2Array(472.5, 2194, 478.5, 2194, 478.5, 2205.4, 472.5, 2205.4)
+polygon = PackedVector2Array(535.5, 2194, 541.5, 2194, 541.5, 2205.4, 535.5, 2205.4)
 
 [node name="PT_Dasan6_d7_book0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(790.1, 2194, 800.5, 2194, 800.5, 2209.0, 790.1, 2209.0)
+polygon = PackedVector2Array(727.1, 2194, 737.5, 2194, 737.5, 2209.0, 727.1, 2209.0)
 
 [node name="PT_Dasan6_d8_book0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(843.5, 2195.5, 853.9, 2195.5, 853.9, 2210.5, 843.5, 2210.5)
+polygon = PackedVector2Array(780.5, 2195.5, 790.9, 2195.5, 790.9, 2210.5, 780.5, 2210.5)
 
 [node name="PT_Dasan6_d10_book0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(974.3, 2197, 984.7, 2197, 984.7, 2212.0, 974.3, 2212.0)
+polygon = PackedVector2Array(911.3, 2197, 921.7, 2197, 921.7, 2212.0, 911.3, 2212.0)
 
 [node name="PT_Dasan6_d11_note0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(1032.5, 2194, 1041.9, 2194, 1041.9, 2205.4, 1032.5, 2205.4)
+polygon = PackedVector2Array(969.5, 2194, 978.9, 2194, 978.9, 2205.4, 969.5, 2205.4)
 
 [node name="PT_Dasan6_d13_note0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(121, 2359.5, 130.4, 2359.5, 130.4, 2370.9, 121, 2370.9)
+polygon = PackedVector2Array(1095.5, 2195.5, 1104.9, 2195.5, 1104.9, 2206.9, 1095.5, 2206.9)
 
 [node name="PT_Dasan6_d16_book0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_grain")
@@ -15299,38 +15192,38 @@ z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
-[node name="Exam_Dasan6_shelf1" type="Area2D" parent="."]
-position = Vector2(76, 2406)
+[node name="Exam_Dasan6_back0" type="Area2D" parent="."]
+position = Vector2(1169, 2238)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
 interact_priority = 3
-message = "맨 윗칸에 손이 닿은 자국이 있다. 최근이다."
-prompt_text = "선반 살펴보기"
+message = "자물쇠가 끊겨 있다. 끊은 자국이 새것이다."
+prompt_text = "사물함 살펴보기"
 
-[node name="Zone" type="CollisionShape2D" parent="Exam_Dasan6_shelf1"]
+[node name="Zone" type="CollisionShape2D" parent="Exam_Dasan6_back0"]
 shape = SubResource("RectangleShape2D_exam_zone")
 
-[node name="Mark_Exam_Dasan6_shelf1" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(76, 2406)
+[node name="Mark_Exam_Dasan6_back0" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1169, 2238)
 z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
-[node name="Exam_Dasan6_shelf0" type="Area2D" parent="."]
-position = Vector2(76, 2194)
+[node name="Exam_Dasan6_back1" type="Area2D" parent="."]
+position = Vector2(1169, 2284)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
 interact_priority = 3
-message = "학급문고. 표지가 다 해졌는데 대출 카드는 비어 있다."
-prompt_text = "선반 살펴보기"
+message = "문이 잠겨 있다. 이름표는 떼어졌다."
+prompt_text = "사물함 살펴보기"
 
-[node name="Zone" type="CollisionShape2D" parent="Exam_Dasan6_shelf0"]
+[node name="Zone" type="CollisionShape2D" parent="Exam_Dasan6_back1"]
 shape = SubResource("RectangleShape2D_exam_zone")
 
-[node name="Mark_Exam_Dasan6_shelf0" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(76, 2194)
+[node name="Mark_Exam_Dasan6_back1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1169, 2284)
 z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
@@ -15371,8 +15264,8 @@ z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
-[node name="Exam_InfoDept_9" type="Area2D" parent="."]
-position = Vector2(3298.2, 1868.9)
+[node name="Exam_InfoDept_3" type="Area2D" parent="."]
+position = Vector2(3252.8, 1655.1)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
@@ -15380,17 +15273,17 @@ interact_priority = 3
 message = "가스 밸브가 잠겨 있다. 손잡이에 청테이프가 감겨 있다."
 prompt_text = "책상 살펴보기"
 
-[node name="Zone" type="CollisionShape2D" parent="Exam_InfoDept_9"]
+[node name="Zone" type="CollisionShape2D" parent="Exam_InfoDept_3"]
 shape = SubResource("RectangleShape2D_exam_zone")
 
-[node name="Mark_Exam_InfoDept_9" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(3298.2, 1868.9)
+[node name="Mark_Exam_InfoDept_3" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(3252.8, 1655.1)
 z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
-[node name="Exam_InfoDept_8" type="Area2D" parent="."]
-position = Vector2(3298.2, 1804.9)
+[node name="Exam_InfoDept_2" type="Area2D" parent="."]
+position = Vector2(3252.8, 1591.1)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
@@ -15398,11 +15291,11 @@ interact_priority = 3
 message = "실험대에 약품 자국이 남아 있다. 최근 것은 아니다."
 prompt_text = "책상 살펴보기"
 
-[node name="Zone" type="CollisionShape2D" parent="Exam_InfoDept_8"]
+[node name="Zone" type="CollisionShape2D" parent="Exam_InfoDept_2"]
 shape = SubResource("RectangleShape2D_exam_zone")
 
-[node name="Mark_Exam_InfoDept_8" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(3298.2, 1804.9)
+[node name="Mark_Exam_InfoDept_2" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(3252.8, 1591.1)
 z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)

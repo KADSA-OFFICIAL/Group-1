@@ -946,18 +946,16 @@ PLACEMENT = {
     3: [("North4", ["NayeonClue"]),                               # 생활지도부 ← 방송실
         ("North5", ["JanitorWarning", "KeyCabinet", "SpareKeyHook"]),  # 2학년부 ← 교무실
         ("CareerRoom", ["ReportFlyer"]),                          # 진로실 ← 학생회실
-        ("North2", ["HideClass2"]), ("North7", ["HideClass5"]),
-        ("Storage2", ["HideBroadcastRoom"])],
+        ],
     2: [("PEStorage", ["YujinClue"]),                             # 체육창고 ← 체육관 입구
-        ("MensRoomB", ["ShowerMarks", "DrainKey", "HideShower"]), # 화장실 ← 샤워실
+        ("MensRoomB", ["ShowerMarks", "DrainKey"]),   # 화장실 ← 샤워실
         ("EduRoom", ["SeunghoClue"]),                             # 교육실 ← 2층 교무실
-        ("North1", ["HideClass1"]), ("North7", ["HideClass6"])],
+        ],
     1: [("StaffRoom", ["PrincipalLetter"]),                       # 교무실 ← 교장실
         ("JanitorRoom", ["PhotoWall", "StudentCards", "JanitorNotebook", "JanitorSafe"]),
         ("Storage1", ["StairKey"]),                               # 창고 ← 행정실
         ("Entrance", ["ExitDoor"]),
-        ("Class1", ["HideClass1_1"]), ("Class3", ["HideMusicRoom"]),
-        ("Storage2", ["HideEmptyRoom"])],
+        ],
     5: [("ArtRoom", ["Blackboard", "ArtRoomDoorLock"]),
         ("ArtStorage", ["StairKey"])],
 }
@@ -1056,23 +1054,34 @@ HIDE_KINDS = {
 
 # 층 -> [(노드 이름, 방, 종류, 안내, 묘사)]. `story_objects.json`이 층당 3곳을
 # 따로 두므로 여기 것을 더하면 층당 8곳쯤 된다(#324).
-# 방 안 자리를 손으로 잡아야 하는 은신처(#324) — (층, 이름) -> (가로 비율, 세로 비율).
-# 교무실·부서실은 책상 섬이 방 가운데를 차지해 자동 배치가 집기에 막힌다
-# (`verify_hiding_spots`가 계단에서 걸어 닿는지 본다). 옆벽 쪽으로 밀어 준다.
-HIDE_POS = {
-    (2, "HidePEDept"): (0.667, 0.30),
-    (3, "HideCareerDept"): (0.667, 0.30),
-}
+# 자리를 손으로 잡아야 하는 은신처 — (층, 이름) -> (벽, 세로 비율).
+# 벽은 "L"(왼쪽) 또는 "R"(오른쪽). 자동 배치가 집기에 막히는 방만 적는다
+# (`verify_hiding_spots`가 계단에서 걸어 닿는지 본다).
+# 자리를 손으로 잡아야 하는 은신처 — (층, 이름) -> (벽, 세로 비율).
+# **교무실·부서실에는 은신처를 두지 않는다**(#342). `_office`가 양쪽 옆벽을
+# 서류 캐비닛 줄로 채우므로 벽에 붙일 자리가 없고, 가운데는 책상 섬이다.
+# 억지로 넣으면 `verify_hiding_spots`가 '걸어서 닿을 수 없다'로 잡는다.
+HIDE_POS = {}
+# 노드 중심을 벽면에서 이만큼 띄운다(#342). **시각은 벽에 붙이고 중심만 띄운다** —
+# 도달성 격자가 벽을 플레이어 반경(10)만큼 부풀리므로 중심이 벽에 딱 붙으면
+# 부풀린 벽 안에 들어가 `verify_hiding_spots`가 '걸어서 닿을 수 없다'로 잡는다.
+HIDE_STANDOFF = 22
 
 EXTRA_HIDING = {
     4: [("HideInfoDept", "InfoDept", "locker", "사물함에 숨기",
          "정보부실 사물함. 종이 냄새와 먼지 사이에 몸을 접었다."),
         ("HideDasan6", "Dasan6", "clean", "청소함에 숨기",
          "청소함 안. 대걸레 자루가 어깨를 누른다.")],
-    3: [("HideScienceLab1", "ScienceLab1", "chem", "약품장에 숨기",
+    3: [("HideClass2", "North2", "locker", "사물함에 숨기",
+         "2반 뒤 사물함. 문틈으로 복도가 가늘게 보인다."),
+        ("HideClass5", "North7", "clean", "청소함에 숨기",
+         "5반 청소함. 대걸레 자루가 어깨를 누른다."),
+        ("HideBroadcastRoom", "Storage2", "files", "적재함에 숨기",
+         "창고 적재함 뒤. 상자 틈으로 문이 보인다."),
+        ("HideScienceLab1", "ScienceLab1", "chem", "약품장에 숨기",
          "약품장 아래 칸. 시큼한 냄새에 숨이 막힌다."),
-        ("HideCareerDept", "CareerDept", "files", "서류함에 숨기",
-         "서류함 뒤 빈 공간. 파일 더미에 등을 붙였다."),
+        ("HideCareerRoom", "CareerRoom", "files", "서류함에 숨기",
+         "진로실 서류함 뒤. 전단 뭉치에 등을 붙였다."),
         ("HideNorth3", "North3", "curtain", "커튼 뒤에 숨기",
          "창가 커튼 뒤. 유리에 닿은 등이 서늘하다."),
         ("HideStorageR", "StorageR", "files", "적재함에 숨기",
@@ -1081,10 +1090,16 @@ EXTRA_HIDING = {
          "맨 끝 칸. 발을 변기 위로 올렸다."),
         ("HideScienceLab2", "ScienceLab2", "desk", "실험대 밑에 숨기",
          "실험대 밑. 가스 배관에 등이 닿는다.")],
-    2: [("HideEduRoom", "EduRoom", "locker", "사물함에 숨기",
+    2: [("HideClass1", "North1", "locker", "사물함에 숨기",
+         "1반 뒤 사물함. 안쪽에서 문을 붙잡았다."),
+        ("HideClass6", "North7", "clean", "청소함에 숨기",
+         "6반 청소함. 세제 냄새가 코를 찌른다."),
+        ("HideShower", "MensRoomB", "stall", "칸에 숨기",
+         "샤워칸 안. 타일에 등을 붙이자 서늘하다."),
+        ("HideEduRoom", "EduRoom", "locker", "사물함에 숨기",
          "교육실 사물함. 문틈으로 복도가 가늘게 보인다."),
-        ("HidePEDept", "PEDept", "gear", "장비함에 숨기",
-         "체육 장비함. 공 사이에 몸을 밀어 넣었다."),
+        ("HideStorage2b", "Storage2", "gear", "장비함에 숨기",
+         "창고 장비함. 공 사이에 몸을 밀어 넣었다."),
         ("HideNorth7", "North7", "curtain", "커튼 뒤에 숨기",
          "커튼과 창 사이. 숨을 죽이자 유리가 김으로 흐려진다."),
         ("HidePEStorage", "PEStorage", "gear", "매트 뒤에 숨기",
@@ -1093,7 +1108,13 @@ EXTRA_HIDING = {
          "가운데 칸. 문틈으로 세면대가 보인다."),
         ("HideComputerRoom", "ComputerRoom", "desk", "책상 밑에 숨기",
          "컴퓨터 책상 밑. 케이블 뭉치에 발이 걸린다.")],
-    1: [("HideStorage1", "Storage1", "files", "적재함에 숨기",
+    1: [("HideClass1_1", "Class1", "locker", "사물함에 숨기",
+         "교실1 뒤 사물함. 문이 반쯤 어긋나 닫힌다."),
+        ("HideMusicRoom", "Class3", "curtain", "커튼 뒤에 숨기",
+         "교실3 창가 커튼 뒤. 유리에 닿은 등이 서늘하다."),
+        ("HideEmptyRoom", "Storage2", "files", "적재함에 숨기",
+         "창고 구석 적재함. 먼지가 목을 긁는다."),
+        ("HideStorage1", "Storage1", "files", "적재함에 숨기",
          "창고 적재함 뒤. 먼지가 목을 긁는다."),
         ("HideWomensRoom1", "WomensRoom1", "stall", "칸에 숨기",
          "화장실 칸 안. 문고리를 안에서 붙잡았다."),
@@ -1128,10 +1149,20 @@ def add_hiding(sc, floor):
         x0, y0, x1, y1 = sc.rooms[room_key]
         mates = per_room[room_key]
         j = mates.index(name)
-        fx, fy = HIDE_POS.get((floor, name), (None, 0.30))
-        if fx is None:
-            fx = (j + 1) / (len(mates) + 1)
-        cx = x0 + (x1 - x0) * fx
+        color, hw, hh = HIDE_KINDS[kind]
+        # **벽면에 등을 붙인다**(#342). 예전에는 방 안쪽 30% 높이 허공에 놓여
+        # 사물함·청소함·약품장이 놓다 만 상자처럼 보였다 — 전부 벽에 붙는
+        # 물건이다. 왼쪽·오른쪽 벽을 번갈아 쓰고 세로 위치만 나눈다.
+        side, fy = HIDE_POS.get((floor, name), (None, None))
+        if side is None:
+            side = "L" if j % 2 == 0 else "R"
+        if fy is None:
+            # 방 위아래 끝을 피해 가운데 절반에 나눠 세운다 — 모서리에 붙이면
+            # 옆벽 집기와 겹치고 도달성도 아슬아슬해진다.
+            fy = 0.3 + 0.4 * (j / max(1.0, len(mates) - 1.0)) if len(mates) > 1 else 0.5
+        lean = -1 if side == "L" else 1     # 시각이 기울어 붙을 방향
+        cx = ((x0 + T + hw + HIDE_STANDOFF) if side == "L"
+              else (x1 - T - hw - HIDE_STANDOFF))
         cy = y0 + (y1 - y0) * fy
         sc.clue_pts.append((cx, cy))
         sc.node(f'[node name="{name}" type="Area2D" parent="."]\n'
@@ -1139,8 +1170,11 @@ def add_hiding(sc, floor):
                 f'collision_layer = 2\ncollision_mask = 0\n'
                 f'script = ExtResource("5_hiding")\n'
                 f'prompt_text = "{prompt}"\nmessage = "{message}"\n')
-        color, hw, hh = HIDE_KINDS[kind]
-        sc.poly2d(f"{name}Visual", name, color, rect(-hw, -hh, hw, hh), z=1)
+        # 시각만 벽 쪽으로 밀어 벽면에 딱 붙인다 — 노드 중심은 통행 가능한
+        # 자리에 남는다.
+        vx = lean * HIDE_STANDOFF
+        sc.poly2d(f"{name}Visual", name, color,
+                  rect(vx - hw, -hh, vx + hw, hh), z=1)
         sc.node(f'[node name="{name}Zone" type="CollisionShape2D" parent="{name}"]\n'
                 f'shape = SubResource("RectangleShape2D_key_zone")\n')
         # 은신처는 청록 — 쫓길 때 눈으로 바로 찾아야 한다(#301).
