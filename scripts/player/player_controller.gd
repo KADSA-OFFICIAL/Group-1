@@ -8,17 +8,24 @@ extends CharacterBody2D
 const HIDDEN_LIGHT_ENERGY := 0.5
 const HIDDEN_PROMPT := "나오기"
 
-## 스프라이트(#210): 서 있을 땐 정면 대기 포즈, 움직이면 달리기 포즈.
-## 달리기 그림은 오른쪽을 보고 있어 왼쪽으로 갈 때만 뒤집는다.
-## 두 장 모두 tools/gen_player_sprites.py가 원본 아트에서 만든다.
+## 스프라이트(#210): 서 있을 땐 정면 대기 포즈, 움직이면 걷기 사이클.
+## 걷기 그림은 셋 다 오른쪽을 보고 있어 왼쪽으로 갈 때만 뒤집는다.
+## 네 장 모두 tools/gen_player_sprites.py가 원본 아트에서 만든다.
 const IDLE_TEXTURE := preload("res://assets/sprites/player_idle.png")
-const RUN_TEXTURE := preload("res://assets/sprites/player_run.png")
+## 걷기 3프레임(#365). **뒷다리 순서가 곧 걸음이다** — 뒤로 뻗음 → 들리기 시작 →
+## 높이 들림. 순서를 바꾸면 뒤로 걷는 것처럼 보인다.
+const WALK_TEXTURES := [
+	preload("res://assets/sprites/player_walk_1.png"),
+	preload("res://assets/sprites/player_walk_2.png"),
+	preload("res://assets/sprites/player_run.png"),
+]
 ## 60x72 스프라이트(중앙 정렬)의 발끝을 충돌 캡슐 바닥(y=13)에 맞추는 오프셋.
 ## 캔버스 높이를 바꾸면 (발끝 y 14) - (높이/2)로 다시 계산할 것.
 const SPRITE_OFFSET_Y := -22.0
-## 달리기 포즈가 한 장뿐이라 1px 위아래로 흔들어 걸음을 만든다.
-const BOB_INTERVAL := 0.14
-const BOB_HEIGHT := 1.0
+## 한 프레임이 유지되는 이동 거리. 시간이 아니라 거리로 재야 벽에 스쳐 느려질 때
+## 발이 미끄러지지 않는다(수위 #310과 같은 규약). 속도 320에서 초당 9.4칸 —
+## 3프레임 한 바퀴가 0.32초로, 걷어낸 1px 흔들기(0.28초)와 같은 박자다.
+const WALK_STRIDE := 34.0
 
 ## 잉크통 던지기(#169). 손에서 조금 앞에 놓고 던져야 벽에 붙어 있을 때
 ## 자기 발밑에서 터지지 않는다.
@@ -43,7 +50,8 @@ var is_hiding: bool = false
 var _light_energy: float = 1.0
 ## 위아래로만 움직일 땐 직전 좌우를 유지한다(스프라이트가 제자리에서 뒤집히지 않게).
 var _facing_right: bool = true
-var _bob_time: float = 0.0
+## 이번 판에서 걸은 거리. WALK_STRIDE로 나눈 나머지가 걷기 프레임 번호다.
+var _walk_distance: float = 0.0
 
 
 func _ready() -> void:
@@ -73,7 +81,7 @@ func set_hiding(value: bool) -> void:
 	player_light.energy = HIDDEN_LIGHT_ENERGY if is_hiding else _light_energy
 
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	if is_hiding:
 		# 숨은 자리에 고정. 프롬프트만 갱신해 "나오기" 안내를 유지한다.
 		velocity = Vector2.ZERO
@@ -87,30 +95,37 @@ func _physics_process(delta: float) -> void:
 		if not is_zero_approx(direction.x):
 			_facing_right = direction.x > 0.0
 
-	_update_sprite(direction != Vector2.ZERO, delta)
-
 	velocity = direction * speed
+	var before := global_position
 	move_and_slide()
+	# 프레임을 넘길 거리는 입력이 아니라 **실제로 나아간 거리**로 센다 — 벽에
+	# 붙어 밀고 있을 때 제자리에서 발만 젓지 않게.
+	_update_sprite(direction != Vector2.ZERO, global_position.distance_to(before))
 
 	interaction_area.position = facing_direction * 22.0
 	_update_interact_prompt()
 
 
-## 대기/달리기 포즈 전환. 사람 그림이라 이동 각도로 회전시키면 안 된다
+## 대기/걷기 포즈 전환. 사람 그림이라 이동 각도로 회전시키면 안 된다
 ## (예전 삼각형 도형은 회전으로 방향을 나타냈다).
-func _update_sprite(moving: bool, delta: float) -> void:
-	body.texture = RUN_TEXTURE if moving else IDLE_TEXTURE
-	# 대기 포즈는 정면이라 좌우가 없다 — 달릴 때만 뒤집는다.
-	body.flip_h = moving and not _facing_right
+func _update_sprite(moving: bool, moved: float) -> void:
+	body.offset = Vector2(0.0, SPRITE_OFFSET_Y)
 
-	var bob := 0.0
-	if moving:
-		_bob_time += delta
-		if fmod(_bob_time, BOB_INTERVAL * 2.0) < BOB_INTERVAL:
-			bob = BOB_HEIGHT
-	else:
-		_bob_time = 0.0
-	body.offset = Vector2(0.0, SPRITE_OFFSET_Y - bob)
+	if not moving:
+		# 멈추면 정면 대기 포즈. 걸음을 처음으로 되돌려야 다시 걸을 때 늘 같은
+		# 발부터 나간다(수위 _advance_sprite와 같은 이유).
+		_walk_distance = 0.0
+		body.texture = IDLE_TEXTURE
+		# 대기 포즈는 정면이라 좌우가 없다.
+		body.flip_h = false
+		return
+
+	# 벽을 밀고 있으면 moved가 0이라 프레임이 그 자리에 멈춘다 — 대기 포즈로
+	# 돌아가면 방향키를 누른 채 정면을 보는 것처럼 보인다.
+	_walk_distance += moved
+	var frame := int(_walk_distance / WALK_STRIDE) % WALK_TEXTURES.size()
+	body.texture = WALK_TEXTURES[frame]
+	body.flip_h = not _facing_right
 
 
 func _unhandled_input(event: InputEvent) -> void:
