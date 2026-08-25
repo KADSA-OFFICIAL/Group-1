@@ -1,15 +1,25 @@
 #!/usr/bin/env python3
-"""플레이어(이설) 스프라이트 생성기 (#210).
+"""플레이어(이설) 스프라이트 생성기 (#210, 걷기 프레임 #365).
 
-원본 캐릭터 아트 `assets/sprites/source/player_design.png` 한 장에
-두 포즈(왼쪽=달리기 측면, 오른쪽=대기 정면)가 같은 축척으로 그려져 있다.
-이 도구가 배경을 지우고 게임 크기로 줄여 아래 두 장을 만든다.
+원본이 두 장이다.
 
-    assets/sprites/player_idle.png   대기(정면)
-    assets/sprites/player_run.png    이동(달리기, 오른쪽을 봄 — 왼쪽은 flip_h)
+`player_design.png`  두 포즈(왼쪽=달리기 측면, 오른쪽=대기 정면)가 같은 축척으로 있다.
+`player_walk_design.png`  측면 걷기 두 포즈(왼쪽=넓은 활보, 오른쪽=뒷발 들기).
 
-원본이 있는 폴더에는 `.gdignore`를 뒀다 — 1254x1254 원본까지 Godot이 임포트해
-빌드에 실을 이유가 없다(이 도구는 파일시스템에서 직접 읽는다).
+이 도구가 배경을 지우고 게임 크기로 줄여 아래 네 장을 만든다.
+
+    assets/sprites/player_idle.png     대기(정면)
+    assets/sprites/player_walk_1.png   걷기 1 — 뒷다리를 뒤로 뻗음
+    assets/sprites/player_walk_2.png   걷기 2 — 뒷발이 들리기 시작
+    assets/sprites/player_run.png      걷기 3 — 뒷발이 높이 들림
+
+이동 중에는 walk_1 → walk_2 → run 순으로 순환한다(`player_controller.gd`).
+뒷다리가 뒤로 뻗음 → 들리기 시작 → 높이 들림으로 이어져야 걸음으로 읽히므로
+**순서를 바꾸려면 그림의 뒷다리를 먼저 볼 것**. 세 장 모두 오른쪽을 보고 있어
+왼쪽으로 갈 때만 flip_h 한다.
+
+원본이 있는 폴더에는 `.gdignore`를 뒀다 — 1254x1254 / 1650x953 원본까지 Godot이
+임포트해 빌드에 실을 이유가 없다(이 도구는 파일시스템에서 직접 읽는다).
 
 gen_sfx.py / gen_music.py와 같은 규약: **표준 라이브러리만 쓰고 결정론적**이다.
 톤이 아니라 크기·잘라낼 위치를 바꾸려면 아래 상수만 고치고 다시 돌리면 된다.
@@ -28,9 +38,10 @@ from collections import deque
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / "assets" / "sprites" / "source" / "player_design.png"
+SRC_WALK = ROOT / "assets" / "sprites" / "source" / "player_walk_design.png"
 OUT_DIR = ROOT / "assets" / "sprites"
 
-# 출력 캔버스. 두 포즈가 같은 크기여야 Sprite2D 오프셋을 하나로 쓸 수 있다.
+# 출력 캔버스. 네 포즈가 같은 크기여야 Sprite2D 오프셋(SPRITE_OFFSET_Y)을 하나로 쓸 수 있다.
 # 폭은 달리기 포즈(뒤로 뻗은 다리 + 앞으로 뻗은 팔)가 잘리지 않을 만큼 필요하다
 # — 높이 72에서는 59가 최소치라 여유를 두고 60으로 잡았다(_check_fits가 검사한다).
 CANVAS_W = 60
@@ -42,14 +53,27 @@ BG_LUMA = 40
 # 한 칸의 절반 이상이 캐릭터일 때만 칠한다 — 실루엣이 흐려지지 않게.
 COVER = 0.5
 
-# 원본에서 두 포즈가 놓인 x 구간(서로 침범하지 않도록 잘라내는 창).
+# 원본에서 각 포즈가 놓인 x 구간(서로 침범하지 않도록 잘라내는 창).
 RUN_X = (61, 768)
 IDLE_X = (872, 1138)
 
-# 가로 기준점 = 몸통(재킷) 중심. 전체 bbox 중심을 쓰면 뻗은 팔다리 때문에
-# 달릴 때 몸이 한쪽으로 쏠린다.
+# 가로 기준점 = **머리 중심**(머리 bbox의 가운데). 전체 bbox 중심을 쓰면 뻗은 팔다리
+# 때문에 걸을 때 몸이 좌우로 쏠린다 — 걷기 사이클에서 팔다리는 움직이지만 머리는
+# 몸통 위에 그대로 있으므로 프레임이 바뀌어도 몸이 튀지 않는다.
 RUN_ANCHOR_X = (380 + 603) / 2.0
 IDLE_ANCHOR_X = (902 + 1117) / 2.0
+
+# 걷기 원본(#365). 두 인물 사이에 넉넉한 빈 띠(x 676~944)가 있어 가운데서 자른다.
+# 값은 (출력 이름, 잘라낼 창, 머리 중심). 창은 배경뿐인 여백을 넉넉히 물어도 되지만
+# 옆 인물을 물면 안 된다.
+WALK_POSES = (
+    ("player_walk_1", (0, 810), (421 + 566) / 2.0),
+    ("player_walk_2", (811, 1649), (1121 + 1269) / 2.0),
+)
+
+# 걷기 두 포즈의 키가 이만큼(원본 px) 넘게 다르면 멈춘다. 배율을 첫 포즈에서 잡아
+# 둘 다에 쓰므로, 키가 다르면 프레임이 바뀔 때 몸집이 커졌다 작아진다.
+WALK_HEIGHT_TOLERANCE = 2
 
 
 # --------------------------------------------------------------------------- PNG
@@ -243,9 +267,27 @@ def shrink(width: int, height: int, rgba: bytearray, mask: bytearray,
     return out
 
 
+def _bake(name: str, width: int, height: int, rgba: bytearray, mask: bytearray,
+          box: tuple[int, int, int, int], xlim: tuple[int, int], anchor: float,
+          scale: float) -> None:
+    """한 포즈를 잘라 CANVAS_W x CANVAS_H PNG로 굽는다."""
+    _check_fits(name, box, anchor, scale)
+    px = shrink(width, height, rgba, mask, xlim, anchor, box[3], scale)
+    opaque = sum(1 for i in range(CANVAS_W * CANVAS_H) if px[i * 4 + 3])
+    if opaque < 200:
+        raise SystemExit(f"{name}: 칠해진 칸이 {opaque}개뿐이다 — 잘라낼 위치를 확인할 것")
+    write_png(OUT_DIR / f"{name}.png", CANVAS_W, CANVAS_H, px)
+    print(f"{name}.png  {CANVAS_W}x{CANVAS_H}  칠한 칸 {opaque}  "
+          f"원본 {box[1] - box[0] + 1}x{box[3] - box[2] + 1}  "
+          f"배율 1px = 원본 {scale:.2f}px")
+
+
 def build_all() -> None:
-    if not SRC.exists():
-        raise SystemExit(f"원본 아트가 없다: {SRC}")
+    for src in (SRC, SRC_WALK):
+        if not src.exists():
+            raise SystemExit(f"원본 아트가 없다: {src}")
+
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     width, height, rgba = read_png(SRC)
     mask = background_mask(width, height, rgba)
@@ -256,20 +298,26 @@ def build_all() -> None:
     # 기준으로 배율을 잡고 달리기에도 그대로 써야 이동 중 몸집이 안 변한다.
     scale = (idle_box[3] - idle_box[2] + 1) / float(CANVAS_H)
 
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    for name, box, xlim, anchor in (
-        ("player_idle", idle_box, IDLE_X, IDLE_ANCHOR_X),
-        ("player_run", run_box, RUN_X, RUN_ANCHOR_X),
-    ):
-        _check_fits(name, box, anchor, scale)
-        px = shrink(width, height, rgba, mask, xlim, anchor, box[3], scale)
-        opaque = sum(1 for i in range(CANVAS_W * CANVAS_H) if px[i * 4 + 3])
-        if opaque < 200:
-            raise SystemExit(f"{name}: 칠해진 칸이 {opaque}개뿐이다 — 잘라낼 위치를 확인할 것")
-        write_png(OUT_DIR / f"{name}.png", CANVAS_W, CANVAS_H, px)
-        print(f"{name}.png  {CANVAS_W}x{CANVAS_H}  칠한 칸 {opaque}  "
-              f"원본 {box[1] - box[0] + 1}x{box[3] - box[2] + 1}")
-    print(f"배율 1px = 원본 {scale:.2f}px")
+    _bake("player_idle", width, height, rgba, mask, idle_box, IDLE_X, IDLE_ANCHOR_X, scale)
+    _bake("player_run", width, height, rgba, mask, run_box, RUN_X, RUN_ANCHOR_X, scale)
+
+    # 걷기 프레임(#365)은 **원본이 달라 축척도 다르다** — 새 원본은 인물이 캔버스를
+    # 덜 채운다(키 604 / 953). 원본 bbox 비율로 줄이면 걷기 프레임만 작아지므로,
+    # 달리기 포즈가 캔버스에서 차지한 높이(71.5px)에 맞춰 배율을 거꾸로 계산한다.
+    # 그러면 세 이동 프레임의 머리 위·발끝이 캔버스에서 같은 자리에 온다.
+    run_canvas_h = (run_box[3] - run_box[2] + 1) / scale
+
+    wwidth, wheight, wrgba = read_png(SRC_WALK)
+    wmask = background_mask(wwidth, wheight, wrgba)
+    boxes = [bbox(wwidth, wheight, wmask, *xlim) for _, xlim, _ in WALK_POSES]
+    heights = [b[3] - b[2] + 1 for b in boxes]
+    if max(heights) - min(heights) > WALK_HEIGHT_TOLERANCE:
+        raise SystemExit(f"걷기 포즈의 키가 다르다 {heights} — 배율이 프레임마다 달라져 "
+                         "몸집이 커졌다 작아진다. 원본을 확인할 것")
+    walk_scale = heights[0] / run_canvas_h
+
+    for (name, xlim, wanchor), box in zip(WALK_POSES, boxes):
+        _bake(name, wwidth, wheight, wrgba, wmask, box, xlim, wanchor, walk_scale)
 
 
 def _check_fits(name: str, box: tuple[int, int, int, int], anchor_x: float,
