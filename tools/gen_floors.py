@@ -3158,16 +3158,218 @@ def add_outer(sc):
                 f'position = {pos}\nshape = SubResource("{shape}")\n')
 
 
+# ── 운동장(0층, #356) ────────────────────────────────────────────
+# 게임 전체가 실내라 네 개 층을 기어 내려온 보상이 컷신 페이드 하나였다.
+# 현관과 엔딩 사이에 **걸어 다니는 구간**을 하나 둔다.
+#
+# 다른 층과 달리 방·복도·계단이 없다. 그래서 `build_common`을 쓰지 않고
+# 골격만 같은 모양으로 직접 짠다 — 대신 노드 규약(PC_/PV_/WD_/WC_/WV_/LO_)과
+# 그리기 순서는 똑같이 지킨다. 검사 스크립트들이 그 이름 규칙으로 읽는다.
+YW, YH = 3400, 1700          # 운동장 캔버스. 층(3400x2500)보다 낮다.
+YARD_FACADE = 300            # 위쪽 학교 정면 띠의 깊이
+YARD_FENCE = 1600            # 담장 y (그 아래는 인도)
+# 정문은 현관에서 **비스듬히** 떨어져 있다. 바로 아래 두면 3초 만에 끝나서
+# 마지막 구간이라는 느낌이 없고, 운동장을 만들어 놓고 보여 주지도 못한다.
+# 그래도 트여 있어서 처음부터 보인다 — 헤맬 일은 없다(0층은 시야가 넓다).
+YARD_GATE_X0, YARD_GATE_X1 = 2260, 2540   # 정문 틈
+YARD_PORCH = (1560, 1840)    # 현관 틈
+YARD_ARRIVE = (1700.0, 380.0)             # 현관 앞 등장 지점
+
+C_YARD = "Color(0.196, 0.150, 0.106, 1)"        # 다져진 흙
+C_YARD_TRACK = "Color(0.232, 0.166, 0.112, 1)"  # 트랙 — 흙보다 살짝 붉다
+C_WALK = "Color(0.150, 0.152, 0.156, 1)"        # 정문 밖 인도
+C_FENCE = "Color(0.225, 0.235, 0.260, 1)"       # 담장 살
+C_GOAL = "Color(0.52, 0.54, 0.58, 1)"           # 축구 골대 — 밤에도 흰 철제
+C_TREE = "Color(0.13, 0.21, 0.15, 1)"           # 나무 수관
+C_LAMP = "Color(0.86, 0.78, 0.52, 1)"           # 가로등 불빛(광원 색)
+C_LAMPPOST = "Color(0.22, 0.23, 0.25, 1)"       # 가로등 기둥
+
+
+def _yard_light(sc, key, x, y):
+    """가로등 — 진짜 광원(#274와 같은 이유로 폴리곤을 쓰지 않는다).
+
+    실내 달빛과 달리 **껐다 켜지 않는다.** 밖에는 가릴 벽도, 숨길 방 안도 없다.
+    """
+    sc.node(NL.join([
+        '[node name="Lamp_' + key + '" type="PointLight2D" parent="Lights"]',
+        "position = Vector2(%s, %s)" % (n(x), n(y)),
+        "color = " + C_LAMP,
+        "energy = 1.05",
+        "shadow_enabled = true",
+        "shadow_filter = 1",
+        "shadow_filter_smooth = 4.0",
+        'texture = SubResource("GradientTexture2D_moon")',
+        "texture_scale = 1.35",
+        ""]))
+
+
+def _yard_prop(sc, key, x0, y0, x1, y1, color, solid=True):
+    """운동장 집기. 층과 같은 PC_/PV_ 한 쌍이다."""
+    box = poly((x0, y0), (x1, y0), (x1, y1), (x0, y1))
+    if solid:
+        sc.node('[node name="PC_' + key + '" type="CollisionPolygon2D" '
+                'parent="PropBodies"]' + NL + "polygon = " + box + NL)
+    sc.poly2d("PV_" + key, "Props", color, box)
+    sc.prop_rects.append((key, (x0, y0, x1, y1), color))
+
+
+def build_yard():
+    """탈출 뒤 걸어 나가는 운동장(#356)."""
+    sc = Scene()
+    sc.floor_no = 0
+    sc.rect_shapes = [
+        ("RectangleShape2D_wall_h", "Vector2(" + str(YW) + ", 40)"),
+        ("RectangleShape2D_wall_v", "Vector2(40, " + str(YH) + ")"),
+        ("RectangleShape2D_door_zone", "Vector2(140, 60)"),
+        ("RectangleShape2D_exam_zone",
+         "Vector2(" + str(EXAMINE_ZONE[0]) + ", " + str(EXAMINE_ZONE[1]) + ")"),
+    ]
+
+    sc.node('[node name="SchoolYard" type="Node2D"]' + NL + TEX_FLAGS)
+    sc.poly2d("Floor", ".", C_YARD, rect(0, 0, YW, YH))
+    sc.node('[node name="Ground" type="Node2D" parent="."]' + NL)
+    sc.node('[node name="WallGlow" type="CanvasLayer" parent="."]' + NL
+            + "layer = 1" + NL + "follow_viewport_enabled = true" + NL)
+    sc.node('[node name="Rooms" type="Node2D" parent="."]' + NL)
+    sc.node('[node name="RoomMarks" type="Node2D" parent="."]' + NL)
+    sc.node('[node name="Props" type="Node2D" parent="."]' + NL)
+    add_lights_root(sc)
+    sc.node('[node name="Structures" type="Node2D" parent="."]' + NL)
+    sc.node('[node name="Marks" type="Node2D" parent="WallGlow"]' + NL
+            + 'script = ExtResource("8_marks")' + NL
+            + "require_line_of_sight = true" + NL)
+    sc.node('[node name="Labels" type="Node2D" parent="WallGlow"]' + NL
+            + 'script = ExtResource("8_marks")' + NL
+            + "reveal_distance = 420.0" + NL + "full_distance = 300.0" + NL)
+    sc.node('[node name="RoomWalls" type="StaticBody2D" parent="."]' + NL)
+    sc.node('[node name="PropBodies" type="StaticBody2D" parent="."]' + NL)
+
+    # ── 바닥 ────────────────────────────────────────────────
+    # 트랙은 **면**이라 복도에서 다섯 번 실패한 "바닥에 얇고 긴 막대"와 다르다
+    # (#268~#277). 밖은 원래 흙 색이 구역마다 다르므로 떨어진 물건으로 안 보인다.
+    sc.poly2d("Track", "Ground", C_YARD_TRACK,
+              rect(240, YARD_FACADE + 120, YW - 240, YARD_FENCE - 150))
+    sc.poly2d("Infield", "Ground", C_YARD,
+              rect(430, YARD_FACADE + 250, YW - 430, YARD_FENCE - 280))
+    sc.poly2d("Walk", "Ground", C_WALK, rect(0, YARD_FENCE + T, YW, YH))
+
+    # ── 학교 정면 ────────────────────────────────────────────
+    # 나온 문이 등 뒤에 있다는 표시만 남기고 막는다 — 되돌아 들어갈 수는 없다.
+    px0, px1 = YARD_PORCH
+    sc.poly2d("Facade", "Structures", C_WALL, rect(0, 0, YW, YARD_FACADE))
+    sc.wall("FacadeL", rect(0, YARD_FACADE - T, px0, YARD_FACADE))
+    sc.wall("FacadeR", rect(px1, YARD_FACADE - T, YW, YARD_FACADE))
+    sc.wall("PorchSeal", rect(px0, YARD_FACADE - T, px1, YARD_FACADE))
+    sc.poly2d("PorchDoor", "Structures", C_LEAF,
+              rect(px0 + 8, YARD_FACADE - T - 26, px1 - 8, YARD_FACADE - T))
+    # 정면 창문 — 위층에서 내려다보던 그 창들이다. 불은 하나도 안 켜져 있다.
+    for i in range(14):
+        wx = 140 + i * 230
+        if px0 - 90 < wx < px1 + 20:
+            continue
+        sc.poly2d("WD_Win" + str(i), "Structures", C_WINDOW,
+                  rect(wx, YARD_FACADE - T - 34, wx + 130, YARD_FACADE - T - 8))
+
+    # ── 담장과 정문 ──────────────────────────────────────────
+    gx0, gx1 = YARD_GATE_X0, YARD_GATE_X1
+    sc.wall("FenceL", rect(0, YARD_FENCE, gx0, YARD_FENCE + T))
+    sc.wall("FenceR", rect(gx1, YARD_FENCE, YW, YARD_FENCE + T))
+    for i in range(44):
+        bx = 40 + i * 76
+        if gx0 - 40 < bx < gx1:
+            continue
+        sc.poly2d("WD_Bar" + str(i), "Structures", C_FENCE,
+                  rect(bx, YARD_FENCE - 22, bx + 10, YARD_FENCE))
+    sc.wall("GatePostL", rect(gx0 - T, YARD_FENCE - 48, gx0, YARD_FENCE + T))
+    sc.wall("GatePostR", rect(gx1, YARD_FENCE - 48, gx1 + T, YARD_FENCE + T))
+
+    # ── 집기 ────────────────────────────────────────────────
+    # 길을 막지 않는다 — 현관(x 1560~1840)에서 정문(같은 x)까지는 통째로 비운다.
+    my = (YARD_FACADE + YARD_FENCE) / 2
+    _yard_prop(sc, "GoalL", 250, my - 130, 300, my + 130, C_GOAL)
+    _yard_prop(sc, "GoalR", YW - 300, my - 130, YW - 250, my + 130, C_GOAL)
+    for i in range(3):
+        _yard_prop(sc, "Stand" + str(i), YW - 520, YARD_FENCE - 210 + i * 44,
+                   YW - 120, YARD_FENCE - 178 + i * 44, C_STEP)
+    _yard_prop(sc, "Podium", 980, YARD_FACADE + 90, 1300, YARD_FACADE + 190, C_SLAB)
+    _yard_prop(sc, "FlagPole", 1330, YARD_FACADE + 96, 1352, YARD_FACADE + 118,
+               C_METAL)
+    for i in range(9):
+        tx = 180 + i * 350
+        if gx0 - 130 < tx < gx1 + 40:
+            continue
+        _yard_prop(sc, "Tree" + str(i), tx, YARD_FENCE - 130, tx + 96,
+                   YARD_FENCE - 34, C_TREE)
+    for i in range(4):
+        bx = 320 + i * 300
+        if gx0 - 160 < bx < gx1 + 40:
+            continue
+        _yard_prop(sc, "Bench" + str(i), bx, YARD_FACADE + 40, bx + 130,
+                   YARD_FACADE + 74, C_BENCH)
+    for i in range(5):
+        _yard_prop(sc, "Bike" + str(i), 2500 + i * 60, YARD_FACADE + 40,
+                   2530 + i * 60, YARD_FACADE + 128, C_METAL)
+
+    # ── 가로등 ──────────────────────────────────────────────
+    # 정문 앞 등은 마지막에 둔다 — 나가는 곳이 어디인지 불빛으로 먼저 보인다.
+    lamps = [(620, YARD_FACADE + 60), (2900, YARD_FACADE + 60),
+             (620, YARD_FENCE - 90), (1180, YARD_FENCE - 90),
+             ((YARD_GATE_X0 + YARD_GATE_X1) / 2, YARD_FENCE - 250)]
+    for i, (lx, ly) in enumerate(lamps):
+        _yard_prop(sc, "LampPost" + str(i), lx - 11, ly - 11, lx + 11, ly + 11,
+                   C_LAMPPOST)
+        _yard_light(sc, str(i), lx, ly)
+
+    # ── 정문(탈출) ──────────────────────────────────────────
+    gcx = (gx0 + gx1) / 2
+    sc.node(NL.join([
+        '[node name="FrontGate" type="Area2D" parent="."]',
+        "position = Vector2(%s, %s)" % (n(gcx), n(YARD_FENCE + 8)),
+        "collision_layer = 2",
+        "collision_mask = 0",
+        'script = ExtResource("4_exit")',
+        'required_item_id = ""',
+        'prompt_text = "정문으로 나가기"',
+        "",
+        '[node name="Zone" type="CollisionShape2D" parent="FrontGate"]',
+        'shape = SubResource("RectangleShape2D_door_zone")',
+        ""]))
+    sc.mark("FrontGate", gcx, YARD_FENCE + 8, C_MARK_KEY, 9.0)
+
+    # ── 뒤를 돌아보면 ────────────────────────────────────────
+    # 수위는 나오지 않지만 **거기 있다**는 것만 남긴다. 정문 앞에서만 닿는다.
+    sc.examine("Exam_LookBack", gcx - 170, YARD_FENCE - 70, "뒤를 돌아보기",
+               "학교가 서 있다. 3층 어디쯤 창가에 불빛 하나가 멈춰 있다. "
+               "손전등이다. 이쪽을 보고 있는지는 알 수 없다.")
+
+    sc.node('[node name="Walls" type="StaticBody2D" parent="."]' + NL)
+    for nm, pos, shape in [
+        ("TopWall", "Vector2(" + str(YW / 2) + ", 0)", "RectangleShape2D_wall_h"),
+        ("BottomWall", "Vector2(" + str(YW / 2) + ", " + str(YH) + ")",
+         "RectangleShape2D_wall_h"),
+        ("LeftWall", "Vector2(0, " + str(YH / 2) + ")", "RectangleShape2D_wall_v"),
+        ("RightWall", "Vector2(" + str(YW) + ", " + str(YH / 2) + ")",
+         "RectangleShape2D_wall_v"),
+    ]:
+        sc.node('[node name="' + nm + '" type="CollisionShape2D" parent="Walls"]'
+                + NL + "position = " + pos + NL
+                + 'shape = SubResource("' + shape + '")' + NL)
+    return sc
+
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 if __name__ == "__main__":
-    for fl in (1, 2, 3, 4, 5):
-        sc = build_floor1() if fl == 1 else build_common(fl, LAYOUT[fl])
+    # 0 = 운동장(#356). 층이 아니라 탈출 뒤 걸어 나가는 바깥 구간이다.
+    for fl in (0, 1, 2, 3, 4, 5):
+        sc = (build_yard() if fl == 0 else
+              build_floor1() if fl == 1 else build_common(fl, LAYOUT[fl]))
         text = sc.render(ext_for(text_of(sc)))
-        path = ROOT / f"scenes/background/school_floor_{fl}.tscn"
+        name = "school_yard" if fl == 0 else f"school_floor_{fl}"
+        path = ROOT / f"scenes/background/{name}.tscn"
         # write_text 기본값은 플랫폼 로케일·줄바꿈을 따른다. Windows에서 돌리면
         # cp949로 쓰려다 한글에서 죽고, 살아남아도 전 파일이 CRLF가 되어
         # 한 줄만 고쳐도 5개 층이 통째로 바뀐 것처럼 보인다(#169).
         with open(path, "w", encoding="utf-8", newline="\n") as out:
             out.write(text)
-        print(f"OK floor{fl}: 노드 {len(sc.nodes)}개, 차단체 {len(sc.subs)}개")
+        print(f"OK {name}: 노드 {len(sc.nodes)}개, 차단체 {len(sc.subs)}개")

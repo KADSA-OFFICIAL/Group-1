@@ -10,6 +10,9 @@ extends Node2D
 ## tools/verify_stairs.py가 씬과 대조해 어긋나면 실패한다.
 
 const FLOOR_SCENES := {
+	# 0은 층이 아니라 **탈출 뒤 걸어 나가는 바깥 구간**이다(#356). 계단이 없고,
+	# 현관에서 한 방향으로만 들어온다.
+	0: "res://scenes/background/school_yard.tscn",
 	1: "res://scenes/background/school_floor_1.tscn",
 	2: "res://scenes/background/school_floor_2.tscn",
 	3: "res://scenes/background/school_floor_3.tscn",
@@ -21,12 +24,33 @@ const MAX_FLOOR := 4  # 5층은 프롤로그 전용 — 본편에서 올라가�
 const START_FLOOR := 4
 # 시작 층은 안전 구간 — 기획서상 수위는 3층부터 활동한다.
 const JANITOR_FREE_FLOOR := 4
+## 운동장(#356). 계단 대신 현관 문이 데려오고, 정문이 엔딩으로 보낸다.
+const YARD_FLOOR := 0
+const YARD_LABEL := "운동장"
+## 운동장 등장 지점 — 현관 바로 앞. `gen_floors.py`의 `YARD_ARRIVE`와 같아야 한다.
+const YARD_ARRIVE := Vector2(1700, 380)
+
+## 층별 카메라 한계. 운동장은 3400x1500이라 층(3400x2500)과 다르다 —
+## `player.tscn`에 박아 두면 운동장에서 빈 아래쪽이 보인다.
+const FLOOR_BOUNDS := {
+	0: Rect2(0, 0, 3400, 1700),
+}
+const DEFAULT_BOUNDS := Rect2(0, 0, 3400, 2500)
+
+## 밖은 안보다 밝다. "손전등만이 광원"(#74)은 **실내** 규칙이다 — 네 개 층을
+## 기어 내려온 끝에 시야가 트이는 것이 이 구간의 연출이다.
+const INDOOR_DARKNESS := Color(0, 0, 0, 1)
+const YARD_DARKNESS := Color(0.30, 0.31, 0.36, 1)
+## 시야 마스크 배율. 2 = 반경 1024px(389px에서 완전히 검다).
+const INDOOR_FADE_SCALE := 2.0
+const YARD_FADE_SCALE := 5.0
 
 # 층별 계단실 사각형. 인덱스 0 = 위쪽(좌측) 계단, 1 = 하단 중앙 계단.
 # 1층은 도면상 계단이 한 곳뿐이라 목록 길이가 1이다.
 const STAIR_A := Rect2(300, 720, 440, 280)
 const STAIR_B := Rect2(1450, 2120, 440, 320)
 const STAIRS := {
+	0: [],   # 운동장 — 계단 없음(#356)
 	1: [Rect2(220, 2120, 440, 320)],
 	2: [STAIR_A, STAIR_B],
 	3: [STAIR_A, STAIR_B],
@@ -67,6 +91,8 @@ var changing_floor: bool = false
 @onready var floor_label: Label = $UI/FloorLabel
 @onready var fade_rect: ColorRect = $UI/FadeRect
 @onready var hud: CanvasLayer = $HUD
+@onready var darkness: CanvasModulate = $Darkness
+@onready var fade_mask: Sprite2D = $WallFade/Mask
 
 const FADE_IN_SECONDS := 1.5
 const FLOOR_FADE_OUT_SECONDS := 0.25
@@ -82,14 +108,21 @@ const GAME_OVER_LINE_HOLD := 0.5
 var game_over_active: bool = false
 
 
+## 현관 문(#356)이 층 전환을 부르려면 이름이 아니라 그룹으로 찾아야 한다 —
+## 상호작용 노드는 층 씬 안에 있어서 조립 씬 루트까지의 경로를 알 수 없다.
+func _enter_tree() -> void:
+	add_to_group("floor_manager")
+
+
 func _ready() -> void:
 	var game_state = get_tree().get_first_node_in_group("game_state")
 	if game_state != null:
 		game_state.connect("game_over", _on_game_over)
 
 	_update_floor_label()
+	_apply_environment(current_floor)
 	Sfx.start_music()
-	janitor.sync_floor(current_floor != JANITOR_FREE_FLOOR, current_floor, player, $Background)
+	janitor.sync_floor(_janitor_active(current_floor), current_floor, player, $Background)
 	fade_rect.color.a = 1.0
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 0.0, FADE_IN_SECONDS)
@@ -139,7 +172,9 @@ func _physics_process(_delta: float) -> void:
 		return
 
 	var pos := player.position
-	var stairs: Array = STAIRS[current_floor]
+	var stairs: Array = STAIRS.get(current_floor, [])
+	if stairs.is_empty():
+		return   # 운동장(#356) — 계단이 없다
 
 	for i in stairs.size():
 		var r: Rect2 = stairs[i]
@@ -149,6 +184,16 @@ func _physics_process(_delta: float) -> void:
 		if current_floor > MIN_FLOOR and _stair_zone(r, false).has_point(pos):
 			_change_floor(current_floor - 1, _arrive_on(current_floor - 1, i, false))
 			return
+
+
+## 계단이 아닌 곳에서 층을 바꾼다(#356) — 현관 문이 운동장으로 데려올 때 쓴다.
+## `arrive`를 비워 두면 그 층의 기본 등장 지점으로 간다.
+func travel_to(target: int, arrive: Vector2 = Vector2.INF) -> void:
+	if changing_floor or not FLOOR_SCENES.has(target):
+		return
+	if arrive == Vector2.INF:
+		arrive = YARD_ARRIVE if target == YARD_FLOOR else Vector2.ZERO
+	_change_floor(target, arrive)
 
 
 func _change_floor(target: int, arrive: Vector2) -> void:
@@ -179,8 +224,10 @@ func _swap_floor(target: int, arrive: Vector2) -> void:
 	current_floor = target
 	_update_floor_label()
 	# 새 층 씬의 벽으로 수위 경로탐색 격자를 다시 만든다(위에서 add_child 완료됨)
-	janitor.sync_floor(current_floor != JANITOR_FREE_FLOOR, current_floor, player,
+	janitor.sync_floor(_janitor_active(current_floor), current_floor, player,
 		next_background)
+
+	_apply_environment(target)
 
 	var camera: Camera2D = player.get_node_or_null("Camera2D")
 	if camera != null:
@@ -188,4 +235,31 @@ func _swap_floor(target: int, arrive: Vector2) -> void:
 
 
 func _update_floor_label() -> void:
-	floor_label.text = "%d층" % current_floor
+	floor_label.text = YARD_LABEL if current_floor == YARD_FLOOR \
+			else "%d층" % current_floor
+
+
+## 수위가 이 층에서 활동하는가. 4층은 안전 구간이고, 운동장(#356)에는 아예 없다
+## — 밖에서 붙잡히면 탈출이 무효가 되는데 그 자리는 이미 엔딩 판정이 끝난 뒤다.
+func _janitor_active(target: int) -> bool:
+	return target != JANITOR_FREE_FLOOR and target != YARD_FLOOR
+
+
+## 어둠·시야·카메라 한계를 층에 맞춘다(#356).
+##
+## 운동장은 크기부터 다르다(3400x1500). 카메라 한계를 `player.tscn`에 박아 두면
+## 씬 아래쪽 빈 공간이 보인다.
+func _apply_environment(target: int) -> void:
+	var outside := target == YARD_FLOOR
+	if darkness != null:
+		darkness.color = YARD_DARKNESS if outside else INDOOR_DARKNESS
+	if fade_mask != null:
+		var k := YARD_FADE_SCALE if outside else INDOOR_FADE_SCALE
+		fade_mask.scale = Vector2(k, k)
+	var camera: Camera2D = player.get_node_or_null("Camera2D")
+	if camera != null:
+		var b: Rect2 = FLOOR_BOUNDS.get(target, DEFAULT_BOUNDS)
+		camera.limit_left = int(b.position.x)
+		camera.limit_top = int(b.position.y)
+		camera.limit_right = int(b.position.x + b.size.x)
+		camera.limit_bottom = int(b.position.y + b.size.y)
