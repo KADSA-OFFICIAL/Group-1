@@ -1,28 +1,29 @@
 #!/usr/bin/env python3
-"""플레이어(이설) 스프라이트 생성기 (#210, 걷기 #365·#368·#372·#375, 손그림 #378).
+"""플레이어(이설) 스프라이트 생성기 (#210, 걷기 #365·#368·#372·#375·#378·#381, 12프레임 #384).
 
 원본이 두 장이다.
 
 `player_design.png`       대기 정면(+ 배율 기준이 되는 측면 포즈).
-`player_walk_design.png`  측면 걷기 세 포즈 — 왼쪽 접지 / 가운데 통과 / 오른쪽 접지.
+`player_walk_design.png`  측면 걷기 **열두 포즈**(2행×6열 시트, 사용자가 직접 그렸다).
+                          왼쪽 위부터 가로로 1~6, 다음 줄이 7~12 — 한 장이 전체 걷기
+                          사이클(두 걸음)이다.
 
-이 도구가 배경을 지우고 게임 크기로 줄여 아래 네 장을 만든다.
+이 도구가 배경을 지우고 게임 크기로 줄여 아래 열세 장을 만든다.
 
-    assets/sprites/player_idle.png     대기(정면)
-    assets/sprites/player_walk_0.png   기본 — 다리가 몸 아래를 지남(통과)
-    assets/sprites/player_walk_1.png   걸음 A — 접지
-    assets/sprites/player_walk_2.png   걸음 B — 접지
+    assets/sprites/player_idle.png      대기(정면)
+    assets/sprites/player_walk_1.png    ~
+    ...                                  걷기 1~12(시트 순서 그대로)
+    assets/sprites/player_walk_12.png   ~
 
-이동 중에는 `player_controller.gd`의 `WALK_CYCLE := [0, 1, 0, 2]`가
-`[기본, 걸음A, 기본, 걸음B]`로 돈다 — 수위(`janitor.gd`)와 같은 구조다. 네 장 모두
-오른쪽을 보고 있어 왼쪽으로 갈 때만 flip_h 한다.
+이동 중에는 `player_controller.gd`가 `player_walk_1 → 2 → … → 12 → (루프) 1`을 순서대로
+돈다 — 반복되는 "기본 프레임"을 끼우는 인덱스 표(수위 방식, #375)는 없다. 열두 장이
+전부 서로 다른, 직접 그린 포즈라 그럴 필요가 없다. 열두 장 모두 오른쪽을 보고 있어
+왼쪽으로 갈 때만 flip_h 한다.
 
-**원본을 그대로 줄인다. 합성 단계는 없다(#378).** #372·#375에는 원본 포즈에서
-다리를 모으고 엉덩이를 올리고 팔을 당기는 변형이 있었다 — 그때 원본은 측면 포즈
-셋이 모두 앞다리 고정에 머리 높이·팔 위치까지 같아서, 걷기에 필요한 움직임을 그림이
-담고 있지 않았기 때문이다. 새 원본에는 셋 다 들어 있다(통과 포즈가 접지보다 3원본px
-높고, 팔 폭이 통과 161 대 접지 191/194). 그림이 가진 것을 코드로 다시 만들면 1px
-단위로 거칠어지기만 한다.
+**원본을 그대로 줄인다. 합성 단계는 없다(#378 이후 계속).** #372·#375에는 한두 장뿐인
+원본에서 다리를 모으고 엉덩이를 올리고 팔을 당기는 코드 합성이 있었는데, 세 번(#368·
+#372·#375) 다 "다리 윤곽이 거칠다"로 끝났다. 이번 원본은 걸음 하나를 열두 장으로 나눠
+그려서 그 문제 자체가 없다 — 코드는 자르고 줄이기만 한다.
 
 원본이 있는 폴더에는 `.gdignore`를 뒀다 — 1254x1254 / 1774x887 원본까지 Godot이
 임포트해 빌드에 실을 이유가 없다(이 도구는 파일시스템에서 직접 읽는다).
@@ -47,11 +48,11 @@ SRC = ROOT / "assets" / "sprites" / "source" / "player_design.png"
 SRC_WALK = ROOT / "assets" / "sprites" / "source" / "player_walk_design.png"
 OUT_DIR = ROOT / "assets" / "sprites"
 
-# 출력 캔버스. 네 장이 같은 크기여야 Sprite2D 오프셋(SPRITE_OFFSET_Y)을 하나로 쓸 수 있다.
-# 폭은 활보 포즈(뒤로 뻗은 다리 + 앞으로 뻗은 팔)가 잘리지 않을 만큼 필요하다 —
-# 인물 키 72에서는 대칭 중심 정렬 기준 최소 72.1칸이라 여유를 두고 74로 잡았다
-# (_check_fits가 검사한다). #378 원본(활보가 좁았다)에서는 60으로 충분했지만
-# #381에서 활보를 더 크게 다시 그리면서 넘겼다 — 새 원본을 넣을 때마다 다시 잴 것.
+# 출력 캔버스. 열세 장이 같은 크기여야 Sprite2D 오프셋(SPRITE_OFFSET_Y)을 하나로 쓸 수
+# 있다. 폭은 가장 벌어진 포즈(뒤로 뻗은 다리 + 앞으로 뻗은 팔)가 잘리지 않을 만큼
+# 필요하다 — #381의 활보 포즈 기준 대칭 중심 정렬 최소 72.1칸이라 여유를 두고 74로
+# 잡았다(`_check_fits`가 검사한다). #384의 12프레임 걷기 사이클은 보폭이 이보다 훨씬
+# 좁아 74 안에 여유 있게 들어간다 — 새 원본을 넣을 때마다 다시 잴 것.
 CANVAS_W = 74
 # 인물의 키. 배율의 기준이고 **화면에서 보이는 크기를 정하는 값**이다.
 FIGURE_H = 72
@@ -79,35 +80,30 @@ IDLE_X = (872, 1138)
 RUN_ANCHOR_X = (380 + 603) / 2.0
 IDLE_ANCHOR_X = (902 + 1117) / 2.0
 
-# 걷기 원본에서 세 포즈가 놓인 x 구간과 머리 중심(#378, 재작업 #381). 인물 사이에
-# 넉넉한 빈 띠가 있어 가운데서 자른다 — 창은 배경뿐인 여백을 넉넉히 물어도 되지만
-# 옆 인물을 물면 안 된다. 값은 (포즈 키, 잘라낼 창, 머리 중심).
-WALK_POSES = (
-    ("contact_a", (40, 494), 358.0),
-    ("pass", (496, 993), 812.5),
-    ("contact_b", (1030, 1472), 1364.5),
+# 걷기 원본은 2행×6열 시트다(#384). 값은 (출력 이름, 가로 창, 세로 창, 머리 중심).
+# 같은 열의 위·아래 포즈가 가로로는 겹치므로(같은 x 구간을 공유) 세로 창으로 행을
+# 갈라야 한다 — 안 그러면 bbox가 두 포즈를 하나로 합쳐 잡는다. 행 사이 빈 띠가
+# 421~476(원본px)이라 443을 경계로 잡았다.
+_WALK_COLS = ((140, 319), (397, 555), (658, 835), (927, 1096), (1190, 1349), (1458, 1636))
+_WALK_ROWS = ((0, 443), (443, 887))
+_WALK_HEADS = (226.0, 490.0, 754.0, 1016.5, 1280.0, 1545.0,   # 1~6행(위)
+               219.5, 481.5, 745.0, 1005.5, 1267.0, 1541.5)   # 7~12행(아래)
+WALK_POSES = tuple(
+    (f"player_walk_{i + 1}", _WALK_COLS[i % 6], _WALK_ROWS[i // 6], _WALK_HEADS[i])
+    for i in range(12)
 )
 
 # 배율 기준이 되는 포즈. 이 포즈의 캔버스 높이를 기존 아트의 측면 포즈와 같은 71.5px로
 # 맞춘다 — **그 값이 지금 화면에 보이는 인물 크기다.** 다른 포즈는 원본 키 그대로
-# 줄어들므로 키 차이가 그대로 상하 흔들림이 된다.
-WALK_SCALE_POSE = "contact_a"
+# 줄어들므로 키 차이가 그대로 상하 흔들림이 된다(진짜 걸음처럼 자연스러운 정도라
+# 굳이 맞추지 않는다 — #372·#375의 인위적인 `raise_hips`와 달리 이번엔 그림 자체의
+# 높이 차이를 그대로 쓴다).
+WALK_SCALE_POSE = "player_walk_1"
 
-# 포즈들의 키가 이만큼(원본 px) 넘게 다르면 멈춘다. 걸음의 상하 흔들림이라 조금은
-# 달라야 정상이다 — **통과 포즈는 두 발이 다 공중에 있어 원래 짧다**(#381 원본은
-# 663/603/661, 차이 60원본px = 캔버스 6.5칸). 배율은 접지 포즈(WALK_SCALE_POSE) 기준
-# 하나뿐이라 인물 픽셀 크기는 그대로고, 통과 프레임의 머리가 캔버스에서 살짝 낮게
-# 앉을 뿐이다(위쪽 여유가 느는 것뿐, 잘리지 않는다). 정말 스케일이 어긋난 사고는
-# 대개 이보다 훨씬 크게 벌어진다.
-WALK_HEIGHT_TOLERANCE = 70
-
-# 걷기 순환에 쓰는 그림 (출력 이름, 원본 포즈). 순서·끼우기는 코드가 아니라
-# `player_controller.gd`의 `WALK_CYCLE := [0, 1, 0, 2]`가 정한다.
-WALK_CYCLE = (
-    ("player_walk_0", "pass"),
-    ("player_walk_1", "contact_a"),
-    ("player_walk_2", "contact_b"),
-)
+# 포즈들의 키가 이만큼(원본 px) 넘게 다르면 멈춘다. 12장 다 같은 걸음 사이클 안이라
+# 키 차이가 크지 않다(실측 378~380, 2px) — #381의 두 발이 다 공중에 뜨는 포즈처럼
+# 극단적으로 짧아지는 컷이 없다. 그래도 사고를 잡을 여유는 남겨 둔다.
+WALK_HEIGHT_TOLERANCE = 20
 
 
 # --------------------------------------------------------------------------- PNG
@@ -245,9 +241,17 @@ def background_mask(width: int, height: int, rgba: bytearray) -> bytearray:
     return mask
 
 
-def bbox(width: int, height: int, mask: bytearray, x0: int, x1: int) -> tuple[int, int, int, int]:
-    left, right, top, bottom = x1, x0, height, -1
-    for y in range(height):
+def bbox(width: int, height: int, mask: bytearray, x0: int, x1: int,
+         y0: int = 0, y1: int | None = None) -> tuple[int, int, int, int]:
+    """[x0,x1] x [y0,y1) 구간의 실루엣 경계상자. y0/y1을 생략하면 이미지 전체 높이를 본다.
+
+    2행짜리 시트(#384)처럼 같은 열에 포즈가 둘 이상 겹쳐 있을 때만 y0/y1이 필요하다
+    — 안 주면 위아래 포즈가 하나의 경계상자로 합쳐진다.
+    """
+    if y1 is None:
+        y1 = height
+    left, right, top, bottom = x1, x0, y1, y0 - 1
+    for y in range(y0, y1):
         row = y * width
         for x in range(x0, x1 + 1):
             if not mask[row + x]:
@@ -255,8 +259,8 @@ def bbox(width: int, height: int, mask: bytearray, x0: int, x1: int) -> tuple[in
                 right = max(right, x)
                 top = min(top, y)
                 bottom = max(bottom, y)
-    if bottom < 0:
-        raise SystemExit(f"x {x0}~{x1} 구간에 캐릭터가 없다")
+    if bottom < y0:
+        raise SystemExit(f"x {x0}~{x1} y {y0}~{y1} 구간에 캐릭터가 없다")
     return left, right, top, bottom
 
 
@@ -351,7 +355,8 @@ def build_all() -> None:
 
     wwidth, wheight, wrgba = read_png(SRC_WALK)
     wmask = background_mask(wwidth, wheight, wrgba)
-    boxes = {key: bbox(wwidth, wheight, wmask, *xlim) for key, xlim, _ in WALK_POSES}
+    boxes = {name: bbox(wwidth, wheight, wmask, xlim[0], xlim[1], ylim[0], ylim[1])
+             for name, xlim, ylim, _ in WALK_POSES}
     heights = [b[3] - b[2] + 1 for b in boxes.values()]
     if max(heights) - min(heights) > WALK_HEIGHT_TOLERANCE:
         raise SystemExit(f"걷기 포즈의 키가 너무 다르다 {heights} — 배율이 하나뿐이므로 "
@@ -359,16 +364,11 @@ def build_all() -> None:
     ref = boxes[WALK_SCALE_POSE]
     walk_scale = (ref[3] - ref[2] + 1) / side_canvas_h
 
-    poses = {}
-    for key, xlim, wanchor in WALK_POSES:
-        poses[key] = _cut(key, wwidth, wheight, wrgba, wmask, boxes[key], xlim,
-                          wanchor, walk_scale)
-
-    for name, key in WALK_CYCLE:
-        box = boxes[key]
-        _write(name, poses[key],
-               f"{key} 포즈  원본 {box[1] - box[0] + 1}x{box[3] - box[2] + 1}  "
-               f"배율 1px = 원본 {walk_scale:.2f}px")
+    for name, xlim, _ylim, anchor in WALK_POSES:
+        box = boxes[name]
+        px = _cut(name, wwidth, wheight, wrgba, wmask, box, xlim, anchor, walk_scale)
+        _write(name, px, f"원본 {box[1] - box[0] + 1}x{box[3] - box[2] + 1}  "
+                         f"배율 1px = 원본 {walk_scale:.2f}px")
 
 
 def _check_fits(name: str, box: tuple[int, int, int, int], anchor_x: float,
