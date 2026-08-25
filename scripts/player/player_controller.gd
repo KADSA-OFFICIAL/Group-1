@@ -11,33 +11,41 @@ const HIDDEN_PROMPT := "나오기"
 ## 스프라이트(#210): 서 있을 땐 정면 대기 포즈, 움직이면 걷기 사이클.
 ## 걷기 그림은 셋 다 오른쪽을 보고 있어 왼쪽으로 갈 때만 뒤집는다.
 ## 네 장 모두 tools/gen_player_sprites.py가 원본 아트에서 만든다.
-const IDLE_TEXTURE := preload("res://assets/sprites/player_idle.png")
-## 걷기 4프레임(#365 → #368 → 전면 재작업 #372). **번호가 곧 순서다** —
-## 활보(접지) → 뒷발 들림 → 뒷발 높이 → 다리가 몸 아래 통과. 좌우 다리를 구분할
-## 표식이 없는 그림이라, 마지막 컷 다음의 루프가 "지나간 다리가 앞다리가 된 활보"로
-## 자연히 이어진다 — 그래서 한 바퀴가 한 걸음이다.
 ##
-## 네 장은 원본 포즈를 그대로 자른 것이 **아니다**. 아트의 세 측면 포즈는 셋 다
-## 앞다리가 고정이고 머리 높이·팔 위치도 서로 같아, 그대로 쓰면 뒷다리만 떠는
-## 그림이 된다. gen_player_sprites.py의 `WALK_CYCLE`이 프레임마다 다리 모음·엉덩이
-## 높이·팔 모음을 줘서 상하 흔들림과 팔 흔들기를 만든다 — 걸음의 부자연스러움은
-## 프레임 수가 아니라 상체가 전혀 움직이지 않는 데서 왔다(#372).
+## **위아래로 걸을 때도 측면 걷기가 나온다.** 수위는 원본 열 장으로 정면·좌·우·뒷모습
+## 네 행을 갖지만(janitor.gd의 ROW_*) 플레이어는 측면 그림뿐이다 — 뒷모습 원본이
+## 생기면 수위처럼 방향에 따라 그림을 바꿀 수 있다.
+const IDLE_TEXTURE := preload("res://assets/sprites/player_idle.png")
+## 걷기 그림 3장 + 순환 4칸(#375). **수위(`janitor.gd`)와 같은 구조**다 —
+## `[기본, 걸음A, 기본, 걸음B]`. 수위 쪽 주석에 이유가 적혀 있다: "기본 프레임을
+## 사이에 끼워야 두 걸음 사이에 몸이 지나가는 순간이 생긴다." 좌우 다리를 구분할
+## 표식이 없는 그림이라 걸음 A/B가 수위의 "왼발/오른발"을 대신하고, 한 바퀴가
+## **두 걸음**이 된다.
+##
+## #372까지는 네 장을 1→2→3→4로 단조 진행시켰다(한 바퀴에 한 걸음). 다리가 모이기만
+## 하다 루프에서 되돌아와 두 걸음 사이의 통과 순간이 없었다.
+##
+## 세 장은 원본 포즈를 그대로 자른 것이 아니다 — gen_player_sprites.py의
+## `WALK_CYCLE`이 프레임마다 다리 모음·엉덩이 높이·팔 모음을 준다(#372).
 const WALK_TEXTURES := [
+	preload("res://assets/sprites/player_walk_0.png"),
 	preload("res://assets/sprites/player_walk_1.png"),
 	preload("res://assets/sprites/player_walk_2.png"),
-	preload("res://assets/sprites/player_walk_3.png"),
-	preload("res://assets/sprites/player_walk_4.png"),
 ]
+const WALK_CYCLE := [0, 1, 0, 2]
 ## 60x76 스프라이트(중앙 정렬)의 발끝을 충돌 캡슐 바닥(y=13)에 맞추는 오프셋.
 ## 캔버스 높이를 바꾸면 (발끝 y 14) - (높이/2)로 다시 계산할 것 — 76에서는 14-38.
 ## 캔버스가 인물 키(72)보다 4칸 큰 것은 엉덩이를 올릴 자리다(#372). **홀수 높이는
 ## 안 된다** — 중앙 정렬이 반 칸에 걸려 이 값이 .5로 떨어지고 스프라이트가 떨린다.
 const SPRITE_OFFSET_Y := -24.0
 ## 한 프레임이 유지되는 이동 거리. 시간이 아니라 거리로 재야 벽에 스쳐 느려질 때
-## 발이 미끄러지지 않는다(수위 #310과 같은 규약). 속도 320에서 초당 9.4칸 —
-## 4프레임 한 바퀴가 0.43초다. **프레임을 더해도 이 값은 그대로 둔다** — 한 칸이
-## 유지되는 거리가 곧 발이 땅에 붙어 있는 거리이므로, 바퀴가 길어지는 것이 맞다.
-const WALK_STRIDE := 34.0
+## 발이 미끄러지지 않는다(수위 #310과 같은 규약).
+##
+## **수위와 같은 값이어야 한다**(#375). 한 걸음이 2칸이므로 걸음 길이는 2×26 = 52px,
+## 인물 키(72)의 0.72배다 — 수위는 52/80 = 0.65배로 사실상 같다. 34였을 때는 한
+## 바퀴가 한 걸음이라 걸음 길이가 4×34 = 136px, **키의 1.89배**였다. 다리 길이로
+## 닿을 수 없는 거리라 프레임을 어떻게 다듬어도 발이 땅에서 미끄러졌다.
+const WALK_STRIDE := 26.0
 
 ## 잉크통 던지기(#169). 손에서 조금 앞에 놓고 던져야 벽에 붙어 있을 때
 ## 자기 발밑에서 터지지 않는다.
@@ -135,8 +143,8 @@ func _update_sprite(moving: bool, moved: float) -> void:
 	# 벽을 밀고 있으면 moved가 0이라 프레임이 그 자리에 멈춘다 — 대기 포즈로
 	# 돌아가면 방향키를 누른 채 정면을 보는 것처럼 보인다.
 	_walk_distance += moved
-	var frame := int(_walk_distance / WALK_STRIDE) % WALK_TEXTURES.size()
-	body.texture = WALK_TEXTURES[frame]
+	var step := int(_walk_distance / WALK_STRIDE) % WALK_CYCLE.size()
+	body.texture = WALK_TEXTURES[WALK_CYCLE[step]]
 	body.flip_h = not _facing_right
 
 
