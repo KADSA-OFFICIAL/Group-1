@@ -3200,6 +3200,9 @@ C_GOAL = "Color(0.52, 0.54, 0.58, 1)"           # 축구 골대 — 밤에도 �
 C_TREE = "Color(0.13, 0.21, 0.15, 1)"           # 나무 수관
 C_LAMP = "Color(0.86, 0.78, 0.52, 1)"           # 가로등 불빛(광원 색)
 C_LAMPPOST = "Color(0.22, 0.23, 0.25, 1)"       # 가로등 기둥
+# 조회대. **흙보다 밝아야 한다**(#361) — 실내 팔레트의 C_SLAB(0.10,0.12,0.13)을
+# 그대로 썼더니 갈색 흙보다 어둡고 푸르러서 단상이 아니라 웅덩이로 읽혔다.
+C_PODIUM = "Color(0.30, 0.30, 0.31, 1)"
 
 
 def _yard_light(sc, key, x, y):
@@ -3305,10 +3308,12 @@ def build_yard():
     my = (YARD_FACADE + YARD_FENCE) / 2
     _yard_prop(sc, "GoalL", 250, my - 130, 300, my + 130, C_GOAL)
     _yard_prop(sc, "GoalR", YW - 300, my - 130, YW - 250, my + 130, C_GOAL)
+    # 스탠드 — 담장 앞 계단식 관람석. 나무 줄(YARD_FENCE - 130 아래)에 닿지 않게
+    # 위로 올린다(#361).
     for i in range(3):
-        _yard_prop(sc, "Stand" + str(i), YW - 520, YARD_FENCE - 210 + i * 44,
-                   YW - 120, YARD_FENCE - 178 + i * 44, C_STEP)
-    _yard_prop(sc, "Podium", 980, YARD_FACADE + 90, 1300, YARD_FACADE + 190, C_SLAB)
+        _yard_prop(sc, "Stand" + str(i), YW - 520, YARD_FENCE - 300 + i * 44,
+                   YW - 120, YARD_FENCE - 268 + i * 44, C_STEP)
+    _yard_prop(sc, "Podium", 980, YARD_FACADE + 90, 1300, YARD_FACADE + 190, C_PODIUM)
     _yard_prop(sc, "FlagPole", 1330, YARD_FACADE + 96, 1352, YARD_FACADE + 118,
                C_METAL)
     for i in range(9):
@@ -3329,8 +3334,10 @@ def build_yard():
 
     # ── 가로등 ──────────────────────────────────────────────
     # 정문 앞 등은 마지막에 둔다 — 나가는 곳이 어디인지 불빛으로 먼저 보인다.
-    lamps = [(620, YARD_FACADE + 60), (2900, YARD_FACADE + 60),
-             (620, YARD_FENCE - 90), (1180, YARD_FENCE - 90),
+    # 자리는 벤치 줄(x 320·620·920·1220)과 나무 줄(x 180·530·880·1230…)을 피해
+    # 그 사이에 둔다(#361) — 기둥이 22px이라 겹치면 통행이 좁아진다.
+    lamps = [(480, YARD_FACADE + 60), (2900, YARD_FACADE + 60),
+             (420, YARD_FENCE - 90), (1120, YARD_FENCE - 90),
              ((YARD_GATE_X0 + YARD_GATE_X1) / 2, YARD_FENCE - 250)]
     for i, (lx, ly) in enumerate(lamps):
         _yard_prop(sc, "LampPost" + str(i), lx - 11, ly - 11, lx + 11, ly + 11,

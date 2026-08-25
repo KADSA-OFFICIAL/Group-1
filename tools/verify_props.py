@@ -255,10 +255,43 @@ def check(fl: int) -> None:
         warnings.append(f"{tag}: 집기 없는 방 {len(bare)}개 — {', '.join(bare)}")
 
 
+def check_yard() -> None:
+    """운동장(#356)은 방·복도가 없어 check()를 못 쓴다 — **집기끼리 겹치는지만** 본다.
+
+    `build_yard()`가 소품마다 독립적인 루프로 좌표를 잡고 서로 확인하지 않아
+    스탠드·나무·가로등·벤치가 세 쌍이나 파고들어 있었다(#361). 층 쪽은
+    `add_props()`가 `sc.prop_rects`를 보며 피하지만 운동장은 그 경로를 안 탄다.
+    """
+    path = ROOT / "scenes/background/school_yard.tscn"
+    if not path.exists():
+        errors.append("school_yard.tscn이 없다 — gen_floors.py를 다시 돌려야 한다")
+        return
+    text = path.read_text(encoding="utf-8")
+    pat = re.compile(r'\[node name="PC_(\w+)" type="CollisionPolygon2D" '
+                     r'parent="PropBodies"\]\npolygon = PackedVector2Array\(([^)]*)\)')
+    boxes = []
+    for m in pat.finditer(text):
+        nums = [float(v) for v in m.group(2).split(",")]
+        xs, ys = nums[0::2], nums[1::2]
+        boxes.append((m.group(1), min(xs), min(ys), max(xs), max(ys)))
+
+    hits = 0
+    for i in range(len(boxes)):
+        for j in range(i + 1, len(boxes)):
+            a, b = boxes[i], boxes[j]
+            if a[1] < b[3] and b[1] < a[3] and a[2] < b[4] and b[2] < a[4]:
+                ox = min(a[3], b[3]) - max(a[1], b[1])
+                oy = min(a[4], b[4]) - max(a[2], b[2])
+                errors.append(f"운동장: {a[0]}와 {b[0]}가 겹친다 ({ox:.0f}x{oy:.0f}px)")
+                hits += 1
+    print(f"  운동장: 집기 {len(boxes)}개, 겹침 {hits}쌍")
+
+
 def main() -> int:
-    print("집기 검사: 5개 층")
+    print("집기 검사: 5개 층 + 운동장")
     for fl in (1, 2, 3, 4, 5):
         check(fl)
+    check_yard()
     if warnings:
         print("\n경고 " + str(len(warnings)) + "건:")
         for w in warnings:
