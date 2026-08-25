@@ -1,37 +1,30 @@
 #!/usr/bin/env python3
-"""플레이어(이설) 스프라이트 생성기 (#210, 걷기 #365·#368, 전면 재작업 #372).
+"""플레이어(이설) 스프라이트 생성기 (#210, 걷기 #365·#368·#372·#375, 손그림 #378).
 
 원본이 두 장이다.
 
-`player_design.png`  두 포즈(왼쪽=달리기 측면, 오른쪽=대기 정면)가 같은 축척으로 있다.
-`player_walk_design.png`  측면 걷기 두 포즈(왼쪽=넓은 활보, 오른쪽=뒷발 들기).
+`player_design.png`       대기 정면(+ 배율 기준이 되는 측면 포즈).
+`player_walk_design.png`  측면 걷기 세 포즈 — 왼쪽 접지 / 가운데 통과 / 오른쪽 접지.
 
-이 도구가 배경을 지우고 게임 크기로 줄여 아래 다섯 장을 만든다.
+이 도구가 배경을 지우고 게임 크기로 줄여 아래 네 장을 만든다.
 
     assets/sprites/player_idle.png     대기(정면)
-    assets/sprites/player_walk_1.png   걷기 1 — 활보(접지). 엉덩이가 가장 낮다
-    assets/sprites/player_walk_2.png   걷기 2 — 뒷발이 들리기 시작
-    assets/sprites/player_walk_3.png   걷기 3 — 뒷발이 높이 들림
-    assets/sprites/player_walk_4.png   걷기 4 — 다리가 몸 아래를 지남. 엉덩이가 가장 높다
+    assets/sprites/player_walk_0.png   기본 — 다리가 몸 아래를 지남(통과)
+    assets/sprites/player_walk_1.png   걸음 A — 접지
+    assets/sprites/player_walk_2.png   걸음 B — 접지
 
-이동 중에는 walk_1 → 2 → 3 → 4 순으로 순환한다(`player_controller.gd`).
-네 장 모두 오른쪽을 보고 있어 왼쪽으로 갈 때만 flip_h 한다.
+이동 중에는 `player_controller.gd`의 `WALK_CYCLE := [0, 1, 0, 2]`가
+`[기본, 걸음A, 기본, 걸음B]`로 돈다 — 수위(`janitor.gd`)와 같은 구조다. 네 장 모두
+오른쪽을 보고 있어 왼쪽으로 갈 때만 flip_h 한다.
 
-**원본 포즈를 그대로 쓰지 않는다(#372).** 아트에 있는 세 측면 포즈는 셋 다 앞다리가
-앞으로 뻗은 채 고정이고, 머리 높이도 팔 위치도 서로 같다. 그대로 쓰면 뒷다리만 떠는
-그림이 된다 — 걷기의 부자연스러움은 프레임 수가 아니라 **상체가 전혀 움직이지 않는
-데서** 온다(측정: 네 컷의 머리끝 y가 모두 1, 팔 좌우 끝 차이 1px).
+**원본을 그대로 줄인다. 합성 단계는 없다(#378).** #372·#375에는 원본 포즈에서
+다리를 모으고 엉덩이를 올리고 팔을 당기는 변형이 있었다 — 그때 원본은 측면 포즈
+셋이 모두 앞다리 고정에 머리 높이·팔 위치까지 같아서, 걷기에 필요한 움직임을 그림이
+담고 있지 않았기 때문이다. 새 원본에는 셋 다 들어 있다(통과 포즈가 접지보다 3원본px
+높고, 팔 폭이 통과 161 대 접지 191/194). 그림이 가진 것을 코드로 다시 만들면 1px
+단위로 거칠어지기만 한다.
 
-그래서 `WALK_CYCLE` 위상표가 프레임마다 세 값을 주고, 아래 세 변형이 그것을 만든다.
-
-    close_legs()   다리를 엉덩이 축으로 모은다 — 앞다리도 프레임마다 움직인다
-    tuck_arms()    팔을 몸통 쪽으로 당긴다 — 상체가 마네킹처럼 굳어 있지 않게
-    raise_hips()   치마 밑단 위를 올린다 — 다리가 모일수록 엉덩이가 올라간다
-
-**손으로 그린 컷이 합성보다 좋다.** 포즈 원본이 생기면 `WALK_CYCLE`의 위상값을
-1.00 / 0 / 0으로 두고 그 그림을 그대로 쓰면 된다.
-
-원본이 있는 폴더에는 `.gdignore`를 뒀다 — 1254x1254 / 1650x953 원본까지 Godot이
+원본이 있는 폴더에는 `.gdignore`를 뒀다 — 1254x1254 / 1774x887 원본까지 Godot이
 임포트해 빌드에 실을 이유가 없다(이 도구는 파일시스템에서 직접 읽는다).
 
 gen_sfx.py / gen_music.py와 같은 규약: **표준 라이브러리만 쓰고 결정론적**이다.
@@ -60,8 +53,9 @@ OUT_DIR = ROOT / "assets" / "sprites"
 CANVAS_W = 60
 # 인물의 키. 배율의 기준이고 **화면에서 보이는 크기를 정하는 값**이다.
 FIGURE_H = 72
-# 머리 위에 비워 두는 줄 수(#372). 발끝이 캔버스 바닥에 고정이므로, 엉덩이를 올리려면
-# 위쪽에 자리가 있어야 한다. WALK_CYCLE의 엉덩이 높이 최대치(3)보다 커야 한다.
+# 머리 위에 비워 두는 줄 수. 포즈마다 키가 달라(걸음의 상하 흔들림) 인물이 캔버스
+# 바닥에 붙은 채 머리끝이 프레임마다 오르내리므로 그만큼 여유가 필요하다 — 지금 원본은
+# 통과 포즈가 접지보다 1칸 높다.
 # **짝수로 둘 것** — 캔버스 높이가 홀수면 Sprite2D 중앙 정렬이 반 칸에 걸려
 # SPRITE_OFFSET_Y가 .5로 떨어지고, Nearest 필터에서 스프라이트가 떨린다.
 BOB_HEADROOM = 4
@@ -83,56 +77,31 @@ IDLE_X = (872, 1138)
 RUN_ANCHOR_X = (380 + 603) / 2.0
 IDLE_ANCHOR_X = (902 + 1117) / 2.0
 
-# 걷기 원본(#365). 두 인물 사이에 넉넉한 빈 띠(x 676~944)가 있어 가운데서 자른다.
-# 값은 (출력 이름, 잘라낼 창, 머리 중심). 창은 배경뿐인 여백을 넉넉히 물어도 되지만
-# 옆 인물을 물면 안 된다.
+# 걷기 원본에서 세 포즈가 놓인 x 구간과 머리 중심(#378). 인물 사이에 넉넉한 빈 띠가
+# 있어 가운데서 자른다 — 창은 배경뿐인 여백을 넉넉히 물어도 되지만 옆 인물을 물면 안 된다.
+# 값은 (포즈 키, 잘라낼 창, 머리 중심).
 WALK_POSES = (
-    ("stride", (0, 810), (421 + 566) / 2.0),
-    ("lift", (811, 1649), (1121 + 1269) / 2.0),
+    ("contact_a", (0, 632), (258 + 418) / 2.0),
+    ("pass", (633, 1109), (799 + 959) / 2.0),
+    ("contact_b", (1110, 1773), (1345 + 1505) / 2.0),
 )
 
-# 걷기 두 포즈의 키가 이만큼(원본 px) 넘게 다르면 멈춘다. 배율을 첫 포즈에서 잡아
-# 둘 다에 쓰므로, 키가 다르면 프레임이 바뀔 때 몸집이 커졌다 작아진다.
-WALK_HEIGHT_TOLERANCE = 2
+# 배율 기준이 되는 포즈. 이 포즈의 캔버스 높이를 기존 아트의 측면 포즈와 같은 71.5px로
+# 맞춘다 — **그 값이 지금 화면에 보이는 인물 크기다.** 다른 포즈는 원본 키 그대로
+# 줄어들므로 키 차이가 그대로 상하 흔들림이 된다.
+WALK_SCALE_POSE = "contact_a"
 
-# ── 걷기 위상표 (#372, 수위 방식으로 #375) ────────────────────────────────
-# (출력 이름, 원본 포즈, 다리 모음, 엉덩이 높이, 팔 모음)
-#
-# **그림은 3장이고 순환은 4칸이다** — `player_controller.gd`의
-# `WALK_CYCLE := [0, 1, 0, 2]`가 기본 프레임을 두 걸음 사이에 끼운다(수위 janitor.gd와
-# 같은 구조). 수위 쪽 주석에 이유가 적혀 있다: "기본 프레임을 사이에 끼워야 두 걸음
-# 사이에 몸이 지나가는 순간이 생긴다." #372의 단조 진행(1→2→3→4)에는 그 순간이 없어
-# 다리가 모이기만 하다 루프에서 되돌아왔다.
-# 좌우 다리를 구분할 표식이 없는 그림이라 걸음 A/B가 수위의 "왼발/오른발"을 대신한다.
-#
-# **다리 모음**: 1.00이면 원본 그대로, 작을수록 두 다리가 엉덩이 축으로 모인다.
-#   0.52 밑으로는 두 다리가 한 덩어리로 뭉쳐 무엇이 무엇인지 알 수 없다.
-# **엉덩이 높이**(px): 다리가 모일수록 커야 한다 — 다리를 세우면 엉덩이가 올라간다.
-#   기본 프레임에서 최대, 걸음 프레임에서 최소다. 순환이 3 → 0 → 3 → 1이라 한 바퀴에
-#   **두 번** 올라간다(걸음이 두 번이므로). #372에서는 한 번만 올라갔다.
-# **팔 모음**(px): 몸통 쪽으로 당기는 거리. 다리가 모일 때 붙는다. 2px을 넘기면 팔이
-#   몸통에 삼켜져 잘린 것처럼 보인다.
+# 포즈들의 키가 이만큼(원본 px) 넘게 다르면 멈춘다. 걸음의 상하 흔들림이라 조금은
+# 달라야 정상이지만(지금 원본은 3px), 크게 벌어지면 인물이 커졌다 작아진다.
+WALK_HEIGHT_TOLERANCE = 40
+
+# 걷기 순환에 쓰는 그림 (출력 이름, 원본 포즈). 순서·끼우기는 코드가 아니라
+# `player_controller.gd`의 `WALK_CYCLE := [0, 1, 0, 2]`가 정한다.
 WALK_CYCLE = (
-    ("player_walk_0", "stride", 0.52, 3, 2),   # 기본 — 두 발이 몸 아래로 모임
-    ("player_walk_1", "stride", 1.00, 0, 0),   # 걸음 A — 활보(접지)
-    ("player_walk_2", "lift",   0.90, 1, 1),   # 걸음 B — 뒷발 들림(접지)
+    ("player_walk_0", "pass"),
+    ("player_walk_1", "contact_a"),
+    ("player_walk_2", "contact_b"),
 )
-
-# 기본 프레임은 **두 발이 땅에 모인 자세**다(수위의 0번 열과 같다). 발을 든 통과
-# 자세로도 만들어 봤지만(`high` 포즈를 0.60까지 모음) 든 발이 치마 높이에서 가로
-# 막대로 뭉쳐 보였다 — 뒷발이 이미 수평인 그림이라 엉덩이 쪽으로 밀어도 수평이다.
-# 활보를 조이면 두 다리가 나란히 내려와 그림이 깨지지 않는다.
-#
-# 그래서 이동 3프레임이 모두 `player_walk_design.png` 한 장에서 나온다 — 기존
-# 아트의 달리기 포즈(`high`)는 이제 쓰지 않는다. **머리 폭이 2px 좁던 문제(#372
-# 잔여 위험)도 같이 없어진다.** 배율 기준으로는 계속 쓰므로 잘라내기 자체는 남는다.
-
-# 치마로 볼 어두운 픽셀 수의 하한(한 행 기준). 구두도 어둡지만 한 행에 4~6칸뿐이라
-# 걸리지 않는다 — 치마는 10칸이 넘는다.
-SKIRT_RUN = 10
-# 치마 밑단이 이 구간(캔버스 바닥에서 위로) 밖이면 멈춘다. 다리는 늘 아래 1/3이므로,
-# 밑단을 잘못 잡으면(구두를 치마로 봤다든지) 몸통을 다리로 알고 뭉갠다.
-HEM_ABOVE_FLOOR = (18, 38)
 
 
 # --------------------------------------------------------------------------- PNG
@@ -326,192 +295,6 @@ def shrink(width: int, height: int, rgba: bytearray, mask: bytearray,
     return out
 
 
-# ------------------------------------------------------ 걷기 위상 변형 (#372)
-
-def _rows(px: bytearray) -> dict[int, tuple[int, int]]:
-    """칠해진 행마다 (왼끝, 오른끝)."""
-    out = {}
-    for y in range(CANVAS_H):
-        xs = [x for x in range(CANVAS_W) if px[(y * CANVAS_W + x) * 4 + 3]]
-        if xs:
-            out[y] = (min(xs), max(xs))
-    return out
-
-
-def _width(rows: dict[int, tuple[int, int]], y: int) -> int:
-    return rows[y][1] - rows[y][0] + 1
-
-
-def _landmarks(px: bytearray) -> tuple[int, float, int, int, int]:
-    """(치마 밑단 y, 엉덩이 축 x, 몸통 왼끝, 몸통 오른끝, 어깨 y).
-
-    변형 세 가지가 모두 이 네 좌표로 "무엇을 옮길지"를 가른다.
-
-    - 치마 밑단: 캔버스에서 가장 아래에 있는 넓은 어두운 띠. 그 아래는 전부 다리·구두다.
-    - 엉덩이 축: 그 띠의 가로 중심. 다리를 모을 때의 중심이 된다.
-    - 몸통 폭: **팔이 끝난 뒤 밑단까지 중 가장 좁은 행**. 팔은 이 폭 밖으로 나간
-      픽셀이므로, 이 두 값이 팔과 몸통을 가른다.
-    - 어깨: 머리 아래 가장 좁은 행(목) 다음 행. 팔은 여기서부터 시작한다.
-    """
-    rows = _rows(px)
-    if not rows:
-        raise SystemExit("빈 스프라이트다")
-    top = min(rows)
-
-    hem = -1
-    hip = 0.0
-    for y in range(CANVAS_H):
-        dark = [x for x in range(CANVAS_W)
-                if px[(y * CANVAS_W + x) * 4 + 3]
-                and px[(y * CANVAS_W + x) * 4] + px[(y * CANVAS_W + x) * 4 + 1]
-                + px[(y * CANVAS_W + x) * 4 + 2] < 220]
-        if len(dark) >= SKIRT_RUN:
-            hem = y
-            hip = (min(dark) + max(dark)) / 2.0
-    above = CANVAS_H - 1 - hem
-    if not HEM_ABOVE_FLOOR[0] <= above <= HEM_ABOVE_FLOOR[1]:
-        raise SystemExit(f"치마 밑단이 바닥에서 {above}칸 위다 — {HEM_ABOVE_FLOOR} 밖이라 "
-                         "다리와 몸통을 가를 수 없다. SKIRT_RUN을 확인할 것")
-
-    neck = min(range(top + 6, top + 22), key=lambda y: _width(rows, y))
-    waist = min(range(neck + 8, hem + 1), key=lambda y: _width(rows, y))
-    torso_l, torso_r = rows[waist]
-    if not 8 <= torso_r - torso_l + 1 <= 26:
-        raise SystemExit(f"몸통 폭이 {torso_r - torso_l + 1}칸이다 — 목/허리 검출이 "
-                         "빗나갔다. neck·waist 탐색 구간을 확인할 것")
-    return hem, hip, torso_l, torso_r, neck + 1
-
-
-def _clear_rows(out: bytearray, y0: int, y1: int) -> None:
-    for y in range(y0, y1 + 1):
-        for x in range(CANVAS_W):
-            j = (y * CANVAS_W + x) * 4
-            out[j:j + 4] = b"\0\0\0\0"
-
-
-def close_legs(px: bytearray, close: float) -> bytearray:
-    """다리를 엉덩이 축으로 모은다. close=1.0이면 그대로.
-
-    **행마다 정수로 밀고, 배율을 걸지 않는다.** 가로로 눌러 줄이면 다리가 그만큼
-    얇아져 젓가락이 되고, 엉덩이를 축으로 회전시키면 접지한 다리가 세워지면서
-    발끝이 캔버스 바닥을 뚫는다(발이 바닥에 닿아 있으므로 다리를 세우려면 몸이
-    떠올라야 한다 — 그 상승은 raise_hips()가 따로 맡는다). 행을 통째로 미는 것은
-    다리 두께를 그대로 두고 기울기만 세우는 방법이다.
-
-    한 행에서 엉덩이 축의 좌/우를 각각 한 다리로 보고, 그 행의 중심을 축 쪽으로
-    (1 - close)만큼 당긴다. 축에서 멀리 나간 행이 더 많이 당겨지므로 다리가
-    통째로 세워진다.
-    """
-    if close >= 1.0:
-        return bytearray(px)
-    hem, hip, _, _, _ = _landmarks(px)
-    out = bytearray(px)
-    _clear_rows(out, hem + 1, CANVAS_H - 1)
-    for y in range(hem + 1, CANVAS_H):
-        for near_side in (True, False):
-            xs = [x for x in range(CANVAS_W)
-                  if px[(y * CANVAS_W + x) * 4 + 3]
-                  and ((x < hip) if near_side else (x >= hip))]
-            if not xs:
-                continue
-            center = (min(xs) + max(xs)) / 2.0
-            shift = int(round((hip - center) * (1.0 - close)))
-            for x in xs:
-                nx = x + shift
-                if 0 <= nx < CANVAS_W:
-                    j = (y * CANVAS_W + x) * 4
-                    k = (y * CANVAS_W + nx) * 4
-                    out[k:k + 4] = px[j:j + 4]
-    return out
-
-
-def tuck_arms(px: bytearray, inward: int) -> bytearray:
-    """팔을 몸통 쪽으로 inward칸 당긴다. 0이면 그대로.
-
-    원본 세 포즈의 팔 위치가 서로 1px밖에 차이 나지 않아 상체가 마네킹처럼 굳어
-    보였다(#372). 팔이 실제로 움직이게 하려면 프레임마다 옮겨야 한다.
-
-    **안쪽으로만 당긴다.** 밖으로 밀면 어깨와 팔 사이가 벌어져 팔이 떨어져 나간다.
-    안쪽으로 당기면 팔이 몸통 위에 겹치는데, 앞팔은 원래 몸통 앞에 있으므로 맞다.
-    """
-    if inward <= 0:
-        return bytearray(px)
-    hem, _, torso_l, torso_r, shoulder = _landmarks(px)
-    out = bytearray(px)
-    for y in range(shoulder, hem + 1):
-        for side_left in (True, False):
-            xs = [x for x in range(CANVAS_W)
-                  if px[(y * CANVAS_W + x) * 4 + 3]
-                  and ((x < torso_l) if side_left else (x > torso_r))]
-            if not xs:
-                continue
-            for x in xs:
-                j = (y * CANVAS_W + x) * 4
-                out[j:j + 4] = b"\0\0\0\0"
-            shift = inward if side_left else -inward
-            for x in xs:
-                nx = x + shift
-                if 0 <= nx < CANVAS_W:
-                    j = (y * CANVAS_W + x) * 4
-                    k = (y * CANVAS_W + nx) * 4
-                    out[k:k + 4] = px[j:j + 4]
-    return out
-
-
-def raise_hips(px: bytearray, bob: int) -> bytearray:
-    """치마 밑단 위(머리·팔·몸통·치마)를 bob칸 올린다. 0이면 그대로.
-
-    걷기에는 다리가 모일 때 엉덩이가 올라가고 활보에서 내려앉는 상하 운동이 있다.
-    원본 세 포즈는 머리끝 y가 모두 같아 그 운동이 0이었고, 그래서 몸이 레일 위를
-    미끄러지는 것처럼 보였다(#372).
-
-    발끝은 바닥에 고정이므로 **다리가 그만큼 길어진다** — 실제로도 다리를 세우면
-    엉덩이-발끝 거리가 늘어난다. 그래서 생긴 틈은 **넓적다리**(밑단 바로 아래 행)로
-    채운다. 밑단 행으로 채우면 치마가 프레임마다 길어져 늘어나는 것처럼 보인다.
-    """
-    if bob <= 0:
-        return bytearray(px)
-    hem, _, _, _, _ = _landmarks(px)
-    out = bytearray(px)
-    for y in range(0, hem + 1):
-        src = y + bob
-        for x in range(CANVAS_W):
-            j = (y * CANVAS_W + x) * 4
-            if src <= hem:
-                k = (src * CANVAS_W + x) * 4
-                out[j:j + 4] = px[k:k + 4]
-            else:
-                out[j:j + 4] = b"\0\0\0\0"
-    thigh = hem + 1
-    for y in range(hem - bob + 1, hem + 1):
-        for x in range(CANVAS_W):
-            j = (y * CANVAS_W + x) * 4
-            k = (thigh * CANVAS_W + x) * 4
-            out[j:j + 4] = px[k:k + 4]
-    return out
-
-
-def walk_frame(px: bytearray, close: float, bob: int, arms: int) -> bytearray:
-    """위상값 하나로 걷기 프레임 한 장을 만든다.
-
-    순서가 중요하다 — raise_hips()를 마지막에 둬야 앞의 두 변형이 원래 밑단 좌표로
-    일한다. 먼저 올려 버리면 치마 밑단이 옮겨져 다리·팔의 경계가 어긋난다.
-    """
-    top_before = min(_rows(px))
-    out = raise_hips(tuck_arms(close_legs(px, close), arms), bob)
-
-    rows = _rows(out)
-    if not rows:
-        raise SystemExit("변형 결과가 비었다")
-    if min(rows) != top_before - bob:
-        raise SystemExit(f"머리끝이 y={min(rows)}다 (기대 {top_before - bob}) — "
-                         "엉덩이를 올리다 머리가 캔버스를 넘었다. BOB_HEADROOM을 늘릴 것")
-    if max(rows) != CANVAS_H - 1:
-        raise SystemExit(f"발끝이 y={max(rows)}로 옮겨졌다 (바닥 {CANVAS_H - 1}) — "
-                         "다리가 캔버스 밖으로 밀려 발이 떠 있다. 다리 모음을 확인할 것")
-    return out
-
-
 # ------------------------------------------------------------------- 굽기
 
 def _cut(name: str, width: int, height: int, rgba: bytearray, mask: bytearray,
@@ -526,6 +309,11 @@ def _write(name: str, px: bytearray, note: str) -> None:
     opaque = sum(1 for i in range(CANVAS_W * CANVAS_H) if px[i * 4 + 3])
     if opaque < 200:
         raise SystemExit(f"{name}: 칠해진 칸이 {opaque}개뿐이다 — 잘라낼 위치를 확인할 것")
+    # 발끝은 캔버스 바닥에 붙어야 한다. 네 장이 같은 오프셋(SPRITE_OFFSET_Y) 하나를
+    # 쓰므로, 어긋나면 프레임이 바뀔 때 인물이 위아래로 튄다.
+    if not any(px[((CANVAS_H - 1) * CANVAS_W + x) * 4 + 3] for x in range(CANVAS_W)):
+        raise SystemExit(f"{name}: 발끝이 캔버스 바닥(y={CANVAS_H - 1})에 닿지 않는다 "
+                         "— 잘라낼 위치나 배율을 확인할 것")
     write_png(OUT_DIR / f"{name}.png", CANVAS_W, CANVAS_H, px)
     print(f"{name}.png  {CANVAS_W}x{CANVAS_H}  칠한 칸 {opaque}  {note}")
 
@@ -539,44 +327,42 @@ def build_all() -> None:
 
     width, height, rgba = read_png(SRC)
     mask = background_mask(width, height, rgba)
-    high_box = bbox(width, height, mask, *RUN_X)
+    side_box = bbox(width, height, mask, *RUN_X)
     idle_box = bbox(width, height, mask, *IDLE_X)
 
     # 두 포즈는 같은 축척으로 그려져 있다(키 1059 vs 1067). 대기 포즈를 기준으로
-    # 배율을 잡고 나머지에도 그대로 써야 이동 중 몸집이 안 변한다. 기준은 캔버스가
-    # 아니라 **인물 키(FIGURE_H)** 다 — 캔버스에는 머리 위 흔들림 여유가 붙어 있다.
+    # 배율을 잡는다. 기준은 캔버스가 아니라 **인물 키(FIGURE_H)** 다 — 캔버스에는
+    # 머리 위 흔들림 여유가 붙어 있다.
     scale = (idle_box[3] - idle_box[2] + 1) / float(FIGURE_H)
-
-    poses = {}
-    if any(key == "high" for _, key, _, _, _ in WALK_CYCLE):
-        poses["high"] = _cut("high", width, height, rgba, mask, high_box, RUN_X,
-                             RUN_ANCHOR_X, scale)
     _write("player_idle", _cut("player_idle", width, height, rgba, mask, idle_box,
-                               IDLE_X, IDLE_ANCHOR_X, scale),
+                              IDLE_X, IDLE_ANCHOR_X, scale),
            f"대기(정면)  배율 1px = 원본 {scale:.2f}px")
 
-    # 걷기 원본은 **축척이 다르다** — 인물이 캔버스를 덜 채운다(키 604 / 953).
-    # 원본 bbox 비율로 줄이면 걷기 포즈만 작아지므로, 달리기 포즈가 캔버스에서
-    # 차지한 높이(71.5px)에 맞춰 배율을 거꾸로 계산한다. 그러면 모든 이동 포즈의
-    # 머리 위·발끝이 캔버스에서 같은 자리에 온다.
-    high_canvas_h = (high_box[3] - high_box[2] + 1) / scale
+    # 걷기 원본은 **축척이 다르다** — 인물이 캔버스를 덜 채운다. 원본 bbox 비율로
+    # 줄이면 걷기 포즈만 작아지므로, 기존 아트의 측면 포즈가 캔버스에서 차지한
+    # 높이(71.5px)에 맞춰 배율을 거꾸로 계산한다. 그 값이 지금 화면에 보이는 크기다.
+    side_canvas_h = (side_box[3] - side_box[2] + 1) / scale
 
     wwidth, wheight, wrgba = read_png(SRC_WALK)
     wmask = background_mask(wwidth, wheight, wrgba)
-    boxes = [bbox(wwidth, wheight, wmask, *xlim) for _, xlim, _ in WALK_POSES]
-    heights = [b[3] - b[2] + 1 for b in boxes]
+    boxes = {key: bbox(wwidth, wheight, wmask, *xlim) for key, xlim, _ in WALK_POSES}
+    heights = [b[3] - b[2] + 1 for b in boxes.values()]
     if max(heights) - min(heights) > WALK_HEIGHT_TOLERANCE:
-        raise SystemExit(f"걷기 포즈의 키가 다르다 {heights} — 배율이 프레임마다 달라져 "
-                         "몸집이 커졌다 작아진다. 원본을 확인할 것")
-    walk_scale = heights[0] / high_canvas_h
+        raise SystemExit(f"걷기 포즈의 키가 너무 다르다 {heights} — 배율이 하나뿐이므로 "
+                         "인물이 커졌다 작아진다. 원본을 확인할 것")
+    ref = boxes[WALK_SCALE_POSE]
+    walk_scale = (ref[3] - ref[2] + 1) / side_canvas_h
 
-    for (key, xlim, wanchor), box in zip(WALK_POSES, boxes):
-        poses[key] = _cut(key, wwidth, wheight, wrgba, wmask, box, xlim,
+    poses = {}
+    for key, xlim, wanchor in WALK_POSES:
+        poses[key] = _cut(key, wwidth, wheight, wrgba, wmask, boxes[key], xlim,
                           wanchor, walk_scale)
 
-    for name, key, close, bob, arms in WALK_CYCLE:
-        _write(name, walk_frame(poses[key], close, bob, arms),
-               f"{key} 포즈  다리 {close:.2f}  엉덩이 +{bob}  팔 -{arms}")
+    for name, key in WALK_CYCLE:
+        box = boxes[key]
+        _write(name, poses[key],
+               f"{key} 포즈  원본 {box[1] - box[0] + 1}x{box[3] - box[2] + 1}  "
+               f"배율 1px = 원본 {walk_scale:.2f}px")
 
 
 def _check_fits(name: str, box: tuple[int, int, int, int], anchor_x: float,

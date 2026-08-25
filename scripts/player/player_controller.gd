@@ -25,8 +25,10 @@ const IDLE_TEXTURE := preload("res://assets/sprites/player_idle.png")
 ## #372까지는 네 장을 1→2→3→4로 단조 진행시켰다(한 바퀴에 한 걸음). 다리가 모이기만
 ## 하다 루프에서 되돌아와 두 걸음 사이의 통과 순간이 없었다.
 ##
-## 세 장은 원본 포즈를 그대로 자른 것이 아니다 — gen_player_sprites.py의
-## `WALK_CYCLE`이 프레임마다 다리 모음·엉덩이 높이·팔 모음을 준다(#372).
+## 세 장은 **원본 아트를 그대로 줄인 것**이다(#378). #372·#375에는 다리를 모으고
+## 엉덩이를 올리고 팔을 당기는 합성이 있었는데, 그때 원본이 그 움직임을 담고 있지
+## 않았기 때문이다. 새 원본에는 셋 다 들어 있다 — 통과 포즈가 접지보다 1px 높고
+## 팔이 몸에 붙어 있다.
 const WALK_TEXTURES := [
 	preload("res://assets/sprites/player_walk_0.png"),
 	preload("res://assets/sprites/player_walk_1.png"),
