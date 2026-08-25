@@ -72,6 +72,44 @@ def walls(fl):
     return out
 
 
+def _check_yard(fail):
+    """운동장(#356) — floor_manager의 상수가 생성기·씬과 맞는지 본다.
+
+    운동장은 층과 크기가 다르다(3400x1700). `FLOOR_BOUNDS`와 `YARD_ARRIVE`가
+    어긋나면 카메라가 씬 밖을 비추거나 플레이어가 벽 속에 등장한다 — 둘 다
+    실행해 봐야만 보이는 종류라 여기서 정적으로 잡는다.
+    """
+    import re as _re
+    gen = (ROOT / "tools/gen_floors.py").read_text(encoding="utf-8")
+    m = _re.search(r"^YW, YH = (\d+), (\d+)", gen, _re.M)
+    a = _re.search(r"^YARD_ARRIVE = \(([\d.]+), ([\d.]+)\)", gen, _re.M)
+    if m is None or a is None:
+        fail("gen_floors.py에서 YW/YH 또는 YARD_ARRIVE를 못 찾았다")
+        return
+    yw, yh = int(m.group(1)), int(m.group(2))
+    ax, ay = float(a.group(1)), float(a.group(2))
+
+    fm = (ROOT / "scripts/game/floor_manager.gd").read_text(encoding="utf-8")
+    b = _re.search(r"0: Rect2\(0, 0, (\d+), (\d+)\)", fm)
+    if b is None:
+        fail("floor_manager.gd에서 운동장 FLOOR_BOUNDS를 못 찾았다")
+    elif (int(b.group(1)), int(b.group(2))) != (yw, yh):
+        fail(f"운동장 카메라 한계 {b.group(1)}x{b.group(2)} != 씬 {yw}x{yh}")
+    v = _re.search(r"const YARD_ARRIVE := Vector2\(([\d.]+), ([\d.]+)\)", fm)
+    if v is None:
+        fail("floor_manager.gd에서 YARD_ARRIVE를 못 찾았다")
+    elif (float(v.group(1)), float(v.group(2))) != (ax, ay):
+        fail(f"운동장 등장 지점 {v.group(1)},{v.group(2)} != 생성기 {ax},{ay}")
+
+    path = ROOT / "scenes/background/school_yard.tscn"
+    if not path.exists():
+        fail("school_yard.tscn이 없다 — gen_floors.py를 다시 돌려야 한다")
+        return
+    text = path.read_text(encoding="utf-8")
+    if '[node name="FrontGate" type="Area2D"' not in text:
+        fail("운동장에 정문(FrontGate)이 없다")
+
+
 def main():
     stairs = parse_rects()
     if not stairs:
@@ -112,7 +150,9 @@ def main():
                         fail(f"floor{fl} 계단{i} 도착지점({ax:.0f},{ay:.0f})이 벽 안")
                         break
 
-    print(f"계단 검사: 5개 층")
+    _check_yard(fail)
+
+    print(f"계단 검사: 5개 층 + 운동장")
     if errors:
         print(f"\n오류 {len(errors)}건:")
         for e in errors:

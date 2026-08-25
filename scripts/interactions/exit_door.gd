@@ -13,6 +13,9 @@ const CHOICE_SCENE: PackedScene = preload("res://scenes/ui/choice_prompt.tscn")
 @export_multiline var locked_message: String = "현관이 굳게 잠겨 있다. 열쇠가 필요하다."
 @export var prompt_text: String = "현관 열기"
 @export_file("*.tscn") var ending_scene_path: String = "res://scenes/ui/ending.tscn"
+## 0 이상이면 엔딩 대신 그 층으로 간다(#356). 1층 현관은 0(운동장)을 준다.
+## 판정은 그대로 여기서 하고 메타에 실어 두므로, 정문에서 꺼내 쓰면 결과가 같다.
+@export var next_floor: int = -1
 
 ## 어른 쪽 은폐를 본 플레이어에게만 묻는다. 아무것도 못 봤으면 신고할 거리가 없다.
 const CHOICE_PROMPT := "이대로 나가면 아무도 모른다."
@@ -61,4 +64,13 @@ func _leave(game_state, reported: bool) -> void:
 	# autoload라 씬이 바뀌어도 소리는 끊기지 않는다.
 	Sfx.stop_music()
 	Sfx.play(&"escape")
+
+	# 현관은 엔딩이 아니라 운동장으로 보낸다(#356). 판정은 위에서 이미 메타에
+	# 실었으므로, 정문에서 다시 물어보지 않아도 결과가 같다.
+	if next_floor >= 0:
+		var manager := get_tree().get_first_node_in_group("floor_manager")
+		if manager != null and manager.has_method("travel_to"):
+			manager.call("travel_to", next_floor)
+			return
+		# 층 관리자를 못 찾으면 예전처럼 곧바로 엔딩으로 간다 — 막히는 것보다 낫다.
 	get_tree().change_scene_to_file(ending_scene_path)

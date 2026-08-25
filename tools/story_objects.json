@@ -20,7 +20,7 @@
    ]
   },
   "ExitDoor": {
-   "body": "[node name=\"ExitDoor\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(1654, 1750)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"4_exit\")\n\n",
+   "body": "[node name=\"ExitDoor\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(1654, 1750)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"4_exit\")\nnext_floor = 0\n\n",
    "kids": [
     "[node name=\"ExitZone\" type=\"CollisionShape2D\" parent=\"ExitDoor\"]\nshape = SubResource(\"RectangleShape2D_stair_zone\")\n\n"
    ]
