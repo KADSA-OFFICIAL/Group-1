@@ -4161,13 +4161,13 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 
 [node name="Mark_ReportFlyer" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(610, 2343.2)
+position = Vector2(1187.5, 1780.4)
 z_index = 5
 color = Color(1.00, 0.78, 0.32, 1)
 polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
 
 [node name="ReportFlyer" type="Area2D" parent="."]
-position = Vector2(610, 2343.2)
+position = Vector2(1187.5, 1780.4)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
@@ -4183,6 +4183,32 @@ polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
 
 
 [node name="ReportFlyerZone" type="CollisionShape2D" parent="ReportFlyer"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+
+[node name="Mark_ScienceClue" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2167.5, 1780.4)
+z_index = 5
+color = Color(1.00, 0.78, 0.32, 1)
+polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
+
+[node name="ScienceClue" type="Area2D" parent="."]
+position = Vector2(2167.5, 1780.4)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+message = "깨진 비커가 치워지지 않은 채로 있다. 그 아래 가정통신문 뒷면에 눌러쓴 글씨 — '집에서 맞고 학교서 혼나고. 그럼 나는 어디로 가.' 이름 칸: 2학년 2반 조민혁."
+prompt_text = "조사"
+grants_flag = "found_jominhyuk"
+
+
+[node name="ScienceClueVisual" type="Polygon2D" parent="ScienceClue"]
+z_index = 1
+color = Color(0.55, 0.62, 0.6, 1)
+polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+
+
+[node name="ScienceClueZone" type="CollisionShape2D" parent="ScienceClue"]
 shape = SubResource("RectangleShape2D_key_zone")
 
 
@@ -10791,140 +10817,6 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.377, 0.3527, 0.3162, 1)
 polygon = PackedVector2Array(950.5, 1808, 1034.5, 1808, 1034.5, 1814, 950.5, 1814)
 
-[node name="PC_CareerDept_desk5_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1080.5, 1772, 1164.5, 1772, 1164.5, 1808, 1080.5, 1808)
-
-[node name="PV_CareerDept_desk5_0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_desk")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3909, 0.31, 0.2291, 1)
-polygon = PackedVector2Array(1080.5, 1772, 1164.5, 1772, 1164.5, 1808, 1080.5, 1808)
-
-[node name="PT_CareerDept_pc5_0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_screen")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.1178, 0.1309, 0.157, 1)
-polygon = PackedVector2Array(1088.5, 1778, 1114.5, 1778, 1114.5, 1802, 1088.5, 1802)
-
-[node name="PT_CareerDept_doc5_0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_prop_cloth")
-color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(1122.5, 1781, 1156.5, 1781, 1156.5, 1799, 1122.5, 1799)
-
-[node name="PC_CareerDept_ch5_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1111.5, 1746, 1133.5, 1746, 1133.5, 1768, 1111.5, 1768)
-
-[node name="PV_CareerDept_ch5_0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_chair")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.2712, 0.2219, 0.1726, 1)
-polygon = PackedVector2Array(1111.5, 1746, 1133.5, 1746, 1133.5, 1768, 1111.5, 1768)
-
-[node name="PC_CareerDept_desk5_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1080.5, 1814, 1164.5, 1814, 1164.5, 1850, 1080.5, 1850)
-
-[node name="PV_CareerDept_desk5_1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_desk")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3633, 0.2882, 0.2129, 1)
-polygon = PackedVector2Array(1080.5, 1814, 1164.5, 1814, 1164.5, 1850, 1080.5, 1850)
-
-[node name="PT_CareerDept_pc5_1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_screen")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.1093, 0.1214, 0.1457, 1)
-polygon = PackedVector2Array(1088.5, 1820, 1114.5, 1820, 1114.5, 1844, 1088.5, 1844)
-
-[node name="PT_CareerDept_doc5_1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_prop_cloth")
-color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(1122.5, 1823, 1156.5, 1823, 1156.5, 1841, 1122.5, 1841)
-
-[node name="PC_CareerDept_ch5_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1111.5, 1854, 1133.5, 1854, 1133.5, 1876, 1111.5, 1876)
-
-[node name="PV_CareerDept_ch5_1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_chair")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.2841, 0.2325, 0.1808, 1)
-polygon = PackedVector2Array(1111.5, 1854, 1133.5, 1854, 1133.5, 1876, 1111.5, 1876)
-
-[node name="PC_CareerDept_part5" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1080.5, 1808, 1164.5, 1808, 1164.5, 1814, 1080.5, 1814)
-
-[node name="PV_CareerDept_part5" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_panel")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3953, 0.3698, 0.3315, 1)
-polygon = PackedVector2Array(1080.5, 1808, 1164.5, 1808, 1164.5, 1814, 1080.5, 1814)
-
-[node name="PC_CareerDept_desk6_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1210.5, 1772, 1294.5, 1772, 1294.5, 1808, 1210.5, 1808)
-
-[node name="PV_CareerDept_desk6_0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_desk")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3857, 0.306, 0.2261, 1)
-polygon = PackedVector2Array(1210.5, 1772, 1294.5, 1772, 1294.5, 1808, 1210.5, 1808)
-
-[node name="PT_CareerDept_pc6_0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_screen")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.121, 0.1344, 0.1613, 1)
-polygon = PackedVector2Array(1218.5, 1778, 1244.5, 1778, 1244.5, 1802, 1218.5, 1802)
-
-[node name="PT_CareerDept_doc6_0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_prop_cloth")
-color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(1252.5, 1781, 1286.5, 1781, 1286.5, 1799, 1252.5, 1799)
-
-[node name="PC_CareerDept_ch6_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1241.5, 1746, 1263.5, 1746, 1263.5, 1768, 1241.5, 1768)
-
-[node name="PV_CareerDept_ch6_0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_chair")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.2783, 0.2277, 0.1771, 1)
-polygon = PackedVector2Array(1241.5, 1746, 1263.5, 1746, 1263.5, 1768, 1241.5, 1768)
-
-[node name="PC_CareerDept_desk6_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1210.5, 1814, 1294.5, 1814, 1294.5, 1850, 1210.5, 1850)
-
-[node name="PV_CareerDept_desk6_1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_desk")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3687, 0.2924, 0.2161, 1)
-polygon = PackedVector2Array(1210.5, 1814, 1294.5, 1814, 1294.5, 1850, 1210.5, 1850)
-
-[node name="PT_CareerDept_pc6_1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_screen")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.1157, 0.1285, 0.1542, 1)
-polygon = PackedVector2Array(1218.5, 1820, 1244.5, 1820, 1244.5, 1844, 1218.5, 1844)
-
-[node name="PT_CareerDept_doc6_1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_prop_cloth")
-color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(1252.5, 1823, 1286.5, 1823, 1286.5, 1841, 1252.5, 1841)
-
-[node name="PC_CareerDept_ch6_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1241.5, 1854, 1263.5, 1854, 1263.5, 1876, 1241.5, 1876)
-
-[node name="PV_CareerDept_ch6_1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_chair")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.2653, 0.217, 0.1688, 1)
-polygon = PackedVector2Array(1241.5, 1854, 1263.5, 1854, 1263.5, 1876, 1241.5, 1876)
-
-[node name="PC_CareerDept_part6" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1210.5, 1808, 1294.5, 1808, 1294.5, 1814, 1210.5, 1814)
-
-[node name="PV_CareerDept_part6" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_panel")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.4136, 0.3869, 0.3469, 1)
-polygon = PackedVector2Array(1210.5, 1808, 1294.5, 1808, 1294.5, 1814, 1210.5, 1814)
-
 [node name="PC_CareerDept_desk7_0" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1340.5, 1772, 1424.5, 1772, 1424.5, 1808, 1340.5, 1808)
 
@@ -11123,40 +11015,40 @@ color = Color(0.3533, 0.2802, 0.2071, 1)
 polygon = PackedVector2Array(2248.5, 1636.1, 2367, 1636.1, 2367, 1674.1, 2248.5, 1674.1)
 
 [node name="PC_ScienceLab1_2" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2055.5, 1785.9, 2195.5, 1785.9, 2195.5, 1823.9, 2055.5, 1823.9)
+polygon = PackedVector2Array(2054, 1785.9, 2091.5, 1785.9, 2091.5, 1823.9, 2054, 1823.9)
 
 [node name="PV_ScienceLab1_2" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3913, 0.3104, 0.2294, 1)
-polygon = PackedVector2Array(2055.5, 1785.9, 2195.5, 1785.9, 2195.5, 1823.9, 2055.5, 1823.9)
+polygon = PackedVector2Array(2054, 1785.9, 2091.5, 1785.9, 2091.5, 1823.9, 2054, 1823.9)
 
 [node name="PC_ScienceLab1_3" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2055.5, 1849.9, 2195.5, 1849.9, 2195.5, 1887.9, 2055.5, 1887.9)
+polygon = PackedVector2Array(2054, 1849.9, 2091.5, 1849.9, 2091.5, 1887.9, 2054, 1887.9)
 
 [node name="PV_ScienceLab1_3" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3638, 0.2885, 0.2132, 1)
-polygon = PackedVector2Array(2055.5, 1849.9, 2195.5, 1849.9, 2195.5, 1887.9, 2055.5, 1887.9)
+polygon = PackedVector2Array(2054, 1849.9, 2091.5, 1849.9, 2091.5, 1887.9, 2054, 1887.9)
 
 [node name="PC_ScienceLab1_4" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2225.5, 1785.9, 2365.5, 1785.9, 2365.5, 1823.9, 2225.5, 1823.9)
+polygon = PackedVector2Array(2243.5, 1785.9, 2367, 1785.9, 2367, 1823.9, 2243.5, 1823.9)
 
 [node name="PV_ScienceLab1_4" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3572, 0.2833, 0.2093, 1)
-polygon = PackedVector2Array(2225.5, 1785.9, 2365.5, 1785.9, 2365.5, 1823.9, 2225.5, 1823.9)
+polygon = PackedVector2Array(2243.5, 1785.9, 2367, 1785.9, 2367, 1823.9, 2243.5, 1823.9)
 
 [node name="PC_ScienceLab1_5" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2225.5, 1849.9, 2365.5, 1849.9, 2365.5, 1887.9, 2225.5, 1887.9)
+polygon = PackedVector2Array(2243.5, 1849.9, 2367, 1849.9, 2367, 1887.9, 2243.5, 1887.9)
 
 [node name="PV_ScienceLab1_5" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_desk")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3743, 0.2968, 0.2193, 1)
-polygon = PackedVector2Array(2225.5, 1849.9, 2365.5, 1849.9, 2365.5, 1887.9, 2225.5, 1887.9)
+polygon = PackedVector2Array(2243.5, 1849.9, 2367, 1849.9, 2367, 1887.9, 2243.5, 1887.9)
 
 [node name="PT_ScienceLab1_sink0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_sink")
@@ -11174,25 +11066,25 @@ polygon = PackedVector2Array(2295.9, 1643.7, 2319.6, 1643.7, 2319.6, 1666.5, 229
 texture = ExtResource("tex_obj_sink")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.4051, 0.4457, 0.4727, 1)
-polygon = PackedVector2Array(2111.5, 1793.5, 2139.5, 1793.5, 2139.5, 1816.3, 2111.5, 1816.3)
+polygon = PackedVector2Array(2069, 1793.5, 2076.5, 1793.5, 2076.5, 1816.3, 2069, 1816.3)
 
 [node name="PT_ScienceLab1_sink3" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_sink")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3875, 0.4262, 0.452, 1)
-polygon = PackedVector2Array(2111.5, 1857.5, 2139.5, 1857.5, 2139.5, 1880.3, 2111.5, 1880.3)
+polygon = PackedVector2Array(2069, 1857.5, 2076.5, 1857.5, 2076.5, 1880.3, 2069, 1880.3)
 
 [node name="PT_ScienceLab1_sink4" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_sink")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3698, 0.4068, 0.4314, 1)
-polygon = PackedVector2Array(2281.5, 1793.5, 2309.5, 1793.5, 2309.5, 1816.3, 2281.5, 1816.3)
+polygon = PackedVector2Array(2292.9, 1793.5, 2317.6, 1793.5, 2317.6, 1816.3, 2292.9, 1816.3)
 
 [node name="PT_ScienceLab1_sink5" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_sink")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3983, 0.4382, 0.4647, 1)
-polygon = PackedVector2Array(2281.5, 1857.5, 2309.5, 1857.5, 2309.5, 1880.3, 2281.5, 1880.3)
+polygon = PackedVector2Array(2292.9, 1857.5, 2317.6, 1857.5, 2317.6, 1880.3, 2292.9, 1880.3)
 
 [node name="PD_ScienceLab1_wboard" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_glass")
@@ -11495,67 +11387,85 @@ color = Color(0.3479, 0.322, 0.2705, 1)
 polygon = PackedVector2Array(1050.5, 2192.9, 1134.5, 2192.9, 1134.5, 2232.9, 1050.5, 2232.9)
 
 [node name="PC_CareerRoom_7" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(189, 2367.1, 273, 2367.1, 273, 2407.1, 189, 2407.1)
+polygon = PackedVector2Array(156, 2367.1, 240, 2367.1, 240, 2407.1, 156, 2407.1)
 
 [node name="PV_CareerRoom_7" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_shelf")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.332, 0.3073, 0.2581, 1)
-polygon = PackedVector2Array(189, 2367.1, 273, 2367.1, 273, 2407.1, 189, 2407.1)
+polygon = PackedVector2Array(156, 2367.1, 240, 2367.1, 240, 2407.1, 156, 2407.1)
 
 [node name="PC_CareerRoom_8" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(303, 2367.1, 387, 2367.1, 387, 2407.1, 303, 2407.1)
+polygon = PackedVector2Array(270, 2367.1, 354, 2367.1, 354, 2407.1, 270, 2407.1)
 
 [node name="PV_CareerRoom_8" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_shelf")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3329, 0.3082, 0.2589, 1)
-polygon = PackedVector2Array(303, 2367.1, 387, 2367.1, 387, 2407.1, 303, 2407.1)
+polygon = PackedVector2Array(270, 2367.1, 354, 2367.1, 354, 2407.1, 270, 2407.1)
 
 [node name="PC_CareerRoom_9" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(417, 2367.1, 501, 2367.1, 501, 2407.1, 417, 2407.1)
+polygon = PackedVector2Array(384, 2367.1, 468, 2367.1, 468, 2407.1, 384, 2407.1)
 
 [node name="PV_CareerRoom_9" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_shelf")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3586, 0.332, 0.2788, 1)
-polygon = PackedVector2Array(417, 2367.1, 501, 2367.1, 501, 2407.1, 417, 2407.1)
+polygon = PackedVector2Array(384, 2367.1, 468, 2367.1, 468, 2407.1, 384, 2407.1)
 
 [node name="PC_CareerRoom_10" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(706, 2367.1, 790, 2367.1, 790, 2407.1, 706, 2407.1)
+polygon = PackedVector2Array(498, 2367.1, 582, 2367.1, 582, 2407.1, 498, 2407.1)
 
 [node name="PV_CareerRoom_10" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_shelf")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3333, 0.3085, 0.2591, 1)
-polygon = PackedVector2Array(706, 2367.1, 790, 2367.1, 790, 2407.1, 706, 2407.1)
+polygon = PackedVector2Array(498, 2367.1, 582, 2367.1, 582, 2407.1, 498, 2407.1)
 
 [node name="PC_CareerRoom_11" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(820, 2367.1, 904, 2367.1, 904, 2407.1, 820, 2407.1)
+polygon = PackedVector2Array(612, 2367.1, 696, 2367.1, 696, 2407.1, 612, 2407.1)
 
 [node name="PV_CareerRoom_11" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_shelf")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3492, 0.3232, 0.2715, 1)
-polygon = PackedVector2Array(820, 2367.1, 904, 2367.1, 904, 2407.1, 820, 2407.1)
+polygon = PackedVector2Array(612, 2367.1, 696, 2367.1, 696, 2407.1, 612, 2407.1)
 
 [node name="PC_CareerRoom_12" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(934, 2367.1, 1018, 2367.1, 1018, 2407.1, 934, 2407.1)
+polygon = PackedVector2Array(726, 2367.1, 810, 2367.1, 810, 2407.1, 726, 2407.1)
 
 [node name="PV_CareerRoom_12" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_shelf")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.343, 0.3175, 0.2667, 1)
-polygon = PackedVector2Array(934, 2367.1, 1018, 2367.1, 1018, 2407.1, 934, 2407.1)
+polygon = PackedVector2Array(726, 2367.1, 810, 2367.1, 810, 2407.1, 726, 2407.1)
 
 [node name="PC_CareerRoom_13" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1048, 2367.1, 1132, 2367.1, 1132, 2407.1, 1048, 2407.1)
+polygon = PackedVector2Array(840, 2367.1, 924, 2367.1, 924, 2407.1, 840, 2407.1)
 
 [node name="PV_CareerRoom_13" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_shelf")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3589, 0.3323, 0.2791, 1)
-polygon = PackedVector2Array(1048, 2367.1, 1132, 2367.1, 1132, 2407.1, 1048, 2407.1)
+polygon = PackedVector2Array(840, 2367.1, 924, 2367.1, 924, 2407.1, 840, 2407.1)
+
+[node name="PC_CareerRoom_14" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(954, 2367.1, 1038, 2367.1, 1038, 2407.1, 954, 2407.1)
+
+[node name="PV_CareerRoom_14" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_shelf")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.3553, 0.329, 0.2763, 1)
+polygon = PackedVector2Array(954, 2367.1, 1038, 2367.1, 1038, 2407.1, 954, 2407.1)
+
+[node name="PC_CareerRoom_15" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1068, 2367.1, 1152, 2367.1, 1152, 2407.1, 1068, 2407.1)
+
+[node name="PV_CareerRoom_15" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_shelf")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.3297, 0.3052, 0.2564, 1)
+polygon = PackedVector2Array(1068, 2367.1, 1152, 2367.1, 1152, 2407.1, 1068, 2407.1)
 
 [node name="PT_CareerRoom_cup0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
@@ -11658,100 +11568,128 @@ polygon = PackedVector2Array(1080.5, 2236.9, 1104.5, 2236.9, 1104.5, 2250.9, 108
 [node name="PT_CareerRoom_cup7" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(214.2, 2379.9, 247.8, 2379.9, 247.8, 2394.3, 214.2, 2394.3)
+polygon = PackedVector2Array(181.2, 2379.9, 214.8, 2379.9, 214.8, 2394.3, 181.2, 2394.3)
 
 [node name="PC_CareerRoom_chair7" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(219, 2411.1, 243, 2411.1, 243, 2425.1, 219, 2425.1)
+polygon = PackedVector2Array(186, 2411.1, 210, 2411.1, 210, 2425.1, 186, 2425.1)
 
 [node name="PV_CareerRoom_chair7" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2683, 0.2195, 0.1707, 1)
-polygon = PackedVector2Array(219, 2411.1, 243, 2411.1, 243, 2425.1, 219, 2425.1)
+polygon = PackedVector2Array(186, 2411.1, 210, 2411.1, 210, 2425.1, 186, 2425.1)
 
 [node name="PT_CareerRoom_cup8" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(328.2, 2379.9, 361.8, 2379.9, 361.8, 2394.3, 328.2, 2394.3)
+polygon = PackedVector2Array(295.2, 2379.9, 328.8, 2379.9, 328.8, 2394.3, 295.2, 2394.3)
 
 [node name="PC_CareerRoom_chair8" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(333, 2411.1, 357, 2411.1, 357, 2425.1, 333, 2425.1)
+polygon = PackedVector2Array(300, 2411.1, 324, 2411.1, 324, 2425.1, 300, 2425.1)
 
 [node name="PV_CareerRoom_chair8" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2771, 0.2267, 0.1763, 1)
-polygon = PackedVector2Array(333, 2411.1, 357, 2411.1, 357, 2425.1, 333, 2425.1)
+polygon = PackedVector2Array(300, 2411.1, 324, 2411.1, 324, 2425.1, 300, 2425.1)
 
 [node name="PT_CareerRoom_cup9" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(442.2, 2379.9, 475.8, 2379.9, 475.8, 2394.3, 442.2, 2394.3)
+polygon = PackedVector2Array(409.2, 2379.9, 442.8, 2379.9, 442.8, 2394.3, 409.2, 2394.3)
 
 [node name="PC_CareerRoom_chair9" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(447, 2411.1, 471, 2411.1, 471, 2425.1, 447, 2425.1)
+polygon = PackedVector2Array(414, 2411.1, 438, 2411.1, 438, 2425.1, 414, 2425.1)
 
 [node name="PV_CareerRoom_chair9" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.29, 0.2373, 0.1846, 1)
-polygon = PackedVector2Array(447, 2411.1, 471, 2411.1, 471, 2425.1, 447, 2425.1)
+polygon = PackedVector2Array(414, 2411.1, 438, 2411.1, 438, 2425.1, 414, 2425.1)
 
 [node name="PT_CareerRoom_cup10" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(731.2, 2379.9, 764.8, 2379.9, 764.8, 2394.3, 731.2, 2394.3)
+polygon = PackedVector2Array(523.2, 2379.9, 556.8, 2379.9, 556.8, 2394.3, 523.2, 2394.3)
 
 [node name="PC_CareerRoom_chair10" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(736, 2411.1, 760, 2411.1, 760, 2425.1, 736, 2425.1)
+polygon = PackedVector2Array(528, 2411.1, 552, 2411.1, 552, 2425.1, 528, 2425.1)
 
 [node name="PV_CareerRoom_chair10" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2857, 0.2337, 0.1818, 1)
-polygon = PackedVector2Array(736, 2411.1, 760, 2411.1, 760, 2425.1, 736, 2425.1)
+polygon = PackedVector2Array(528, 2411.1, 552, 2411.1, 552, 2425.1, 528, 2425.1)
 
 [node name="PT_CareerRoom_cup11" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(845.2, 2379.9, 878.8, 2379.9, 878.8, 2394.3, 845.2, 2394.3)
+polygon = PackedVector2Array(637.2, 2379.9, 670.8, 2379.9, 670.8, 2394.3, 637.2, 2394.3)
 
 [node name="PC_CareerRoom_chair11" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(850, 2411.1, 874, 2411.1, 874, 2425.1, 850, 2425.1)
+polygon = PackedVector2Array(642, 2411.1, 666, 2411.1, 666, 2425.1, 642, 2425.1)
 
 [node name="PV_CareerRoom_chair11" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2727, 0.2231, 0.1735, 1)
-polygon = PackedVector2Array(850, 2411.1, 874, 2411.1, 874, 2425.1, 850, 2425.1)
+polygon = PackedVector2Array(642, 2411.1, 666, 2411.1, 666, 2425.1, 642, 2425.1)
 
 [node name="PT_CareerRoom_cup12" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(959.2, 2379.9, 992.8, 2379.9, 992.8, 2394.3, 959.2, 2394.3)
+polygon = PackedVector2Array(751.2, 2379.9, 784.8, 2379.9, 784.8, 2394.3, 751.2, 2394.3)
 
 [node name="PC_CareerRoom_chair12" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(964, 2411.1, 988, 2411.1, 988, 2425.1, 964, 2425.1)
+polygon = PackedVector2Array(756, 2411.1, 780, 2411.1, 780, 2425.1, 756, 2425.1)
 
 [node name="PV_CareerRoom_chair12" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2778, 0.2273, 0.1767, 1)
-polygon = PackedVector2Array(964, 2411.1, 988, 2411.1, 988, 2425.1, 964, 2425.1)
+polygon = PackedVector2Array(756, 2411.1, 780, 2411.1, 780, 2425.1, 756, 2425.1)
 
 [node name="PT_CareerRoom_cup13" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(1073.2, 2379.9, 1106.8, 2379.9, 1106.8, 2394.3, 1073.2, 2394.3)
+polygon = PackedVector2Array(865.2, 2379.9, 898.8, 2379.9, 898.8, 2394.3, 865.2, 2394.3)
 
 [node name="PC_CareerRoom_chair13" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1078, 2411.1, 1102, 2411.1, 1102, 2425.1, 1078, 2425.1)
+polygon = PackedVector2Array(870, 2411.1, 894, 2411.1, 894, 2425.1, 870, 2425.1)
 
 [node name="PV_CareerRoom_chair13" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_chair")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2987, 0.2444, 0.19, 1)
-polygon = PackedVector2Array(1078, 2411.1, 1102, 2411.1, 1102, 2425.1, 1078, 2425.1)
+polygon = PackedVector2Array(870, 2411.1, 894, 2411.1, 894, 2425.1, 870, 2425.1)
+
+[node name="PT_CareerRoom_cup14" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_cloth")
+color = Color(0.7051, 0.6923, 0.641, 1)
+polygon = PackedVector2Array(979.2, 2379.9, 1012.8, 2379.9, 1012.8, 2394.3, 979.2, 2394.3)
+
+[node name="PC_CareerRoom_chair14" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(984, 2411.1, 1008, 2411.1, 1008, 2425.1, 984, 2425.1)
+
+[node name="PV_CareerRoom_chair14" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_chair")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.2677, 0.219, 0.1703, 1)
+polygon = PackedVector2Array(984, 2411.1, 1008, 2411.1, 1008, 2425.1, 984, 2425.1)
+
+[node name="PT_CareerRoom_cup15" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_cloth")
+color = Color(0.7051, 0.6923, 0.641, 1)
+polygon = PackedVector2Array(1093.2, 2379.9, 1126.8, 2379.9, 1126.8, 2394.3, 1093.2, 2394.3)
+
+[node name="PC_CareerRoom_chair15" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1098, 2411.1, 1122, 2411.1, 1122, 2425.1, 1098, 2425.1)
+
+[node name="PV_CareerRoom_chair15" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_chair")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.2886, 0.2361, 0.1836, 1)
+polygon = PackedVector2Array(1098, 2411.1, 1122, 2411.1, 1122, 2425.1, 1098, 2425.1)
 
 [node name="PD_CareerRoom_sign" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_glass")
@@ -14217,14 +14155,6 @@ polygon = PackedVector2Array(1376.0, 1682.5, 1390.5, 1682.5, 1390.5, 1691.3, 137
 color = Color(0.35, 0.38, 0.42, 1)
 polygon = PackedVector2Array(984.5, 1749, 997.7, 1749, 997.7, 1756.5, 984.5, 1756.5)
 
-[node name="PT_CareerDept_ch5_0_gym0" type="Polygon2D" parent="Props"]
-color = Color(0.35, 0.38, 0.42, 1)
-polygon = PackedVector2Array(1117.3, 1750.5, 1130.5, 1750.5, 1130.5, 1758.0, 1117.3, 1758.0)
-
-[node name="PT_CareerDept_ch5_1_gym0" type="Polygon2D" parent="Props"]
-color = Color(0.35, 0.38, 0.42, 1)
-polygon = PackedVector2Array(1115.9, 1858.5, 1129.1, 1858.5, 1129.1, 1866.0, 1115.9, 1866.0)
-
 [node name="PT_CareerDept_ch7_0_bag0" type="Polygon2D" parent="Props"]
 color = Color(0.30, 0.26, 0.32, 1)
 polygon = PackedVector2Array(1375.2, 1750.5, 1389.8, 1750.5, 1389.8, 1759.3, 1375.2, 1759.3)
@@ -14279,12 +14209,12 @@ polygon = PackedVector2Array(2251.5, 1578.1, 2294.2, 1578.1, 2294.2, 1588.0, 225
 
 [node name="PT_ScienceLab1_3_cup0" type="Polygon2D" parent="Props"]
 color = Color(0.66, 0.65, 0.60, 1)
-polygon = PackedVector2Array(2058.5, 1852.9, 2079.5, 1852.9, 2079.5, 1860.5, 2058.5, 1860.5)
+polygon = PackedVector2Array(2057, 1852.9, 2063, 1852.9, 2063, 1860.5, 2057, 1860.5)
 
 [node name="PT_ScienceLab1_4_bottle0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
 color = Color(0.3077, 0.3846, 0.4359, 1)
-polygon = PackedVector2Array(2344.3, 1790.4, 2362.5, 1790.4, 2362.5, 1800.3, 2344.3, 1800.3)
+polygon = PackedVector2Array(2347.9, 1790.4, 2364, 1790.4, 2364, 1800.3, 2347.9, 1800.3)
 
 [node name="PT_Storage2_0_files0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
@@ -14348,23 +14278,27 @@ polygon = PackedVector2Array(711.5, 2198.9, 723.3, 2198.9, 723.3, 2206.1, 711.5,
 
 [node name="PT_CareerRoom_7_cup0" type="Polygon2D" parent="Props"]
 color = Color(0.66, 0.65, 0.60, 1)
-polygon = PackedVector2Array(258.2, 2371.6, 270, 2371.6, 270, 2378.8, 258.2, 2378.8)
+polygon = PackedVector2Array(225.2, 2371.6, 237, 2371.6, 237, 2378.8, 225.2, 2378.8)
 
 [node name="PT_CareerRoom_7_cup1" type="Polygon2D" parent="Props"]
 color = Color(0.66, 0.65, 0.60, 1)
-polygon = PackedVector2Array(192, 2370.1, 203.8, 2370.1, 203.8, 2377.3, 192, 2377.3)
+polygon = PackedVector2Array(159, 2370.1, 170.8, 2370.1, 170.8, 2377.3, 159, 2377.3)
 
 [node name="PT_CareerRoom_9_cup0" type="Polygon2D" parent="Props"]
 color = Color(0.66, 0.65, 0.60, 1)
-polygon = PackedVector2Array(486.2, 2373.1, 498, 2373.1, 498, 2380.3, 486.2, 2380.3)
+polygon = PackedVector2Array(453.2, 2373.1, 465, 2373.1, 465, 2380.3, 453.2, 2380.3)
 
 [node name="PT_CareerRoom_9_cup1" type="Polygon2D" parent="Props"]
 color = Color(0.66, 0.65, 0.60, 1)
-polygon = PackedVector2Array(420, 2371.6, 431.8, 2371.6, 431.8, 2378.8, 420, 2378.8)
+polygon = PackedVector2Array(387, 2371.6, 398.8, 2371.6, 398.8, 2378.8, 387, 2378.8)
 
 [node name="PT_CareerRoom_13_cup0" type="Polygon2D" parent="Props"]
 color = Color(0.66, 0.65, 0.60, 1)
-polygon = PackedVector2Array(1117.2, 2371.6, 1129, 2371.6, 1129, 2378.8, 1117.2, 2378.8)
+polygon = PackedVector2Array(909.2, 2371.6, 921, 2371.6, 921, 2378.8, 909.2, 2378.8)
+
+[node name="PT_CareerRoom_15_cup0" type="Polygon2D" parent="Props"]
+color = Color(0.66, 0.65, 0.60, 1)
+polygon = PackedVector2Array(1071, 2373.1, 1082.8, 2373.1, 1082.8, 2380.3, 1071, 2380.3)
 
 [node name="PT_CareerRoom_chair0_gym0" type="Polygon2D" parent="Props"]
 color = Color(0.35, 0.38, 0.42, 1)
@@ -14380,15 +14314,15 @@ polygon = PackedVector2Array(1085.3, 2239.9, 1099.7, 2239.9, 1099.7, 2244.7, 108
 
 [node name="PT_CareerRoom_chair7_gym0" type="Polygon2D" parent="Props"]
 color = Color(0.35, 0.38, 0.42, 1)
-polygon = PackedVector2Array(222, 2415.6, 236.4, 2415.6, 236.4, 2420.4, 222, 2420.4)
+polygon = PackedVector2Array(189, 2415.6, 203.4, 2415.6, 203.4, 2420.4, 189, 2420.4)
 
 [node name="PT_CareerRoom_chair9_gym0" type="Polygon2D" parent="Props"]
 color = Color(0.35, 0.38, 0.42, 1)
-polygon = PackedVector2Array(450, 2414.1, 464.4, 2414.1, 464.4, 2418.9, 450, 2418.9)
+polygon = PackedVector2Array(417, 2414.1, 431.4, 2414.1, 431.4, 2418.9, 417, 2418.9)
 
 [node name="PT_CareerRoom_chair11_bag0" type="Polygon2D" parent="Props"]
 color = Color(0.30, 0.26, 0.32, 1)
-polygon = PackedVector2Array(853, 2414.1, 868.8, 2414.1, 868.8, 2419.1, 853, 2419.1)
+polygon = PackedVector2Array(645, 2414.1, 660.8, 2414.1, 660.8, 2419.1, 645, 2419.1)
 
 [node name="PT_MensRoomB_sink0_soap0" type="Polygon2D" parent="Props"]
 color = Color(0.66, 0.65, 0.60, 1)
