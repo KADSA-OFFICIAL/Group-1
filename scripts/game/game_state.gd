@@ -88,3 +88,72 @@ func trigger_game_over(reason: String = "") -> void:
 
 func is_finished() -> bool:
 	return _is_finished
+
+
+## ── 엔딩 판정(#353) ───────────────────────────────────────────────
+##
+## 엔딩 종류. `exit_door.gd`가 `SceneTree` 메타로 넘기고 `ending.gd`가 읽는다.
+const ENDING_BASIC := &"after_school"     # 방과 후 — 기본 탈출
+const ENDING_REPORT := &"adults_work"     # 어른들의 일 — 신고
+const ENDING_HIDDEN := &"break_time"      # 쉬는 시간 — 히든
+## `SceneTree`에 엔딩 종류를 담을 때 쓰는 키.
+const ENDING_META := &"ending_kind"
+
+## 실종 학생 다섯의 흔적.
+const MISSING_FLAGS := [
+	"found_songharam", "found_imnayeon", "found_jominhyuk",
+	"found_kangyujin", "found_baekseungho"]
+## 시우가 어떤 아이였는지 알려 주는 것.
+const SIWOO_FLAGS := [
+	"read_siwoo_counseling", "read_siwoo_painting", "read_janitor_notebook"]
+## 학교가 덮었다는 증거. 하나라도 있으면 현관에서 신고 선택지가 뜬다.
+const COVERUP_FLAGS := [
+	"read_principal_letter", "read_janitor_notebook", "read_crisis_manual"]
+
+
+## 히든 엔딩 조건인가 — 실종 학생 다섯을 **전부** 찾고 시우의 이야기를 **전부** 봤는가.
+##
+## 기획서(`docs/story.md` 7장)의 "5명 흔적 + 상담 기록 + 공책 + 시우 그림"이다.
+## 그림 **재조사** 기믹은 2026-07-28에 걷어냈으므로 그림 플래그 보유로 대신한다.
+func has_full_truth() -> bool:
+	for f in MISSING_FLAGS + SIWOO_FLAGS:
+		if f not in flags:
+			return false
+	return true
+
+
+## 신고 선택지를 띄울 만큼 어른 쪽 은폐를 봤는가.
+func saw_coverup() -> bool:
+	for f in COVERUP_FLAGS:
+		if f in flags:
+			return true
+	return false
+
+
+## 현관에서 어떤 엔딩으로 갈 것인가(#353).
+##
+## `reported`는 신고 선택지에서 "신고한다"를 골랐는지다. 히든이 신고보다
+## **우선**한다 — 전부 아는 플레이어에게 신고 여부를 다시 묻는 것은 의미가 없다.
+func ending_kind(reported: bool) -> StringName:
+	if has_full_truth():
+		return ENDING_HIDDEN
+	if reported and saw_coverup():
+		return ENDING_REPORT
+	return ENDING_BASIC
+
+
+## 본 단서 수 / 전체. 엔딩 컷신 끝에 보여 준다.
+func clue_score() -> Array:
+	var all: Array = MISSING_FLAGS + SIWOO_FLAGS + COVERUP_FLAGS + [
+		"read_siwoo_past", "read_taeho_note", "read_report_flyer",
+		"read_janitor_warning", "saw_photo_wall", "saw_student_cards",
+		"saw_shower_marks", "opened_key_cabinet"]
+	var uniq: Array = []
+	for f in all:
+		if f not in uniq:
+			uniq.append(f)
+	var got := 0
+	for f in uniq:
+		if f in flags:
+			got += 1
+	return [got, uniq.size()]
