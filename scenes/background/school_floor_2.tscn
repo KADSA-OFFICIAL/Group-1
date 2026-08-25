@@ -701,6 +701,7 @@ follow_viewport_enabled = true
 
 [node name="Marks" type="Node2D" parent="WallGlow"]
 script = ExtResource("8_marks")
+require_line_of_sight = true
 
 [node name="Labels" type="Node2D" parent="WallGlow"]
 script = ExtResource("8_marks")

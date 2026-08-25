@@ -16,6 +16,8 @@ extends Node2D
 
 ## 이 거리 안에 들어야 뜬다. 방 이름(#307)은 더 멀리서 보여야 하므로 씬에서 올린다.
 @export var reveal_distance: float = 210.0
+## 벽에 가리면 끈다(#343). 방 이름·문은 벽 너머에서도 보여야 하므로 씬에서 끈다.
+@export var require_line_of_sight: bool = false
 ## 완전히 밝아지는 거리. 이 사이는 서서히 밝아진다.
 @export var full_distance: float = 120.0
 ## 거리를 다시 재는 주기(초). 매 프레임 잴 필요가 없다.
@@ -26,9 +28,17 @@ const FADE_SPEED := 6.0
 const READ_ALPHA := 0.3
 ## 표시 이름 앞머리. 뒤가 임자 노드 이름이다.
 const PREFIX := "Mark_"
+## 시야 검사를 면제받는 표시. 은신처는 **도망치는 중에** 찾아야 하므로 벽 너머에서도
+## 보여야 한다 — 모퉁이를 돌 때까지 어디 숨을지 모르면 추격에서 살아남을 수 없다.
+const LOS_EXEMPT := "Mark_Hide"
+## 시야 광선이 뚫고 지나갈 몸. 표시는 **집기 위에** 붙는 것이 정상이라(`Exam_*`)
+## 집기에 막히면 하나도 안 켜진다. 플레이어 자신도 뺀다(광선이 몸 안에서 시작한다).
+const RAY_PASS := ["PropBodies"]
 
 var _player: Node2D = null
 var _timer: float = 0.0
+## 광선에서 뺄 몸의 RID. 층마다 한 번만 모은다.
+var _ray_exclude: Array[RID] = []
 ## 자식 -> 목표 밝기. _process가 여기로 수렴시킨다.
 var _target: Dictionary = {}
 
@@ -98,6 +108,7 @@ func _refresh() -> void:
 		_player = get_tree().get_first_node_in_group("player")
 		if _player == null:
 			return
+		_build_exclude()
 
 	var origin := _player.global_position
 	for child in get_children():
@@ -107,12 +118,48 @@ func _refresh() -> void:
 		if owner_node == null:
 			_target[child] = 0.0       # 주웠거나 열려서 사라졌다
 			continue
-		var d := origin.distance_to(_center_of(child))
+		var at := _center_of(child)
+		var d := origin.distance_to(at)
 		var a := 0.0
 		if d <= full_distance:
 			a = 1.0
 		elif d < reveal_distance:
 			a = 1.0 - (d - full_distance) / (reveal_distance - full_distance)
+		# 거리 안에 든 것만 광선을 쏜다 — 층당 표시가 백 개 남짓이라 전부 쏘면 낭비다.
+		if a > 0.0 and require_line_of_sight and not _visible_from(origin, at) \
+				and not String(child.name).begins_with(LOS_EXEMPT):
+			a = 0.0
 		if a > 0.0 and owner_node.get("investigated") == true:
 			a *= READ_ALPHA
 		_target[child] = a
+
+
+## 벽에 가리지 않았는가(#343).
+##
+## `CanvasModulate`(완전한 검정, #307)와 시야 마스크는 **레이어 0만** 가린다.
+## 표시는 어둠을 받으면 안 되므로 `WallGlow`(CanvasLayer)에 있고, 그래서 거리만
+## 맞으면 **닫힌 문 너머·벽 뒤 단서까지 훤히 떴다** — 방 안을 숨기려고 넣은 #292가
+## 표시 하나로 무너진다.
+##
+## 집기(`PropBodies`)는 뚫는다. 조사 표시는 그 집기 **위에** 붙는 것이라 막으면
+## 하나도 안 켜진다. 벽(`RoomWalls`·`StairWalls`)과 닫힌 문짝(`SDPanel`)이 막는다 —
+## 문짝은 열리면 벽 쪽으로 비켜나므로 여닫이에 맞춘 코드가 따로 필요 없다.
+func _visible_from(from: Vector2, to: Vector2) -> bool:
+	var space := get_world_2d().direct_space_state
+	var q := PhysicsRayQueryParameters2D.create(from, to, 1, _ray_exclude)
+	q.collide_with_areas = false
+	return space.intersect_ray(q).is_empty()
+
+
+## 광선에서 뺄 몸을 모은다. 층 씬 루트(`WallGlow`의 두 단계 위)에서 찾는다.
+func _build_exclude() -> void:
+	_ray_exclude = []
+	if _player != null and _player is CollisionObject2D:
+		_ray_exclude.append((_player as CollisionObject2D).get_rid())
+	var root := get_parent().get_parent()
+	if root == null:
+		return
+	for n in RAY_PASS:
+		var body := root.get_node_or_null(n)
+		if body is CollisionObject2D:
+			_ray_exclude.append((body as CollisionObject2D).get_rid())

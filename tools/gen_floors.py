@@ -2954,8 +2954,12 @@ def build_common(fl, spec):
     # 두면 어둠도 손전등도 안 받아 시야 밖에서도 100% 밝기로 보였다.
     # Stairwells **뒤**라야 집기 위에 그려진다 — 선언 순서가 곧 레이어다.
     sc.node('[node name="Structures" type="Node2D" parent="."]\n')
+    # 표시는 CanvasLayer에 있어 어둠·시야 마스크를 안 받는다 — 거리만 맞으면
+    # 벽 뒤·닫힌 문 너머 단서까지 떴다(#343). 광선으로 시야를 확인한다.
+    # **은신처 표시(`Mark_Hide*`)만 면제**다(스크립트의 `LOS_EXEMPT`).
     sc.node('[node name="Marks" type="Node2D" parent="WallGlow"]\n'
-            + 'script = ExtResource("8_marks")\n')
+            + 'script = ExtResource("8_marks")\n'
+            + 'require_line_of_sight = true\n')
     # 방 이름도 거리로 껐다 켠다(#307). 벽이 레이어 0으로 내려가 캄캄해졌는데
     # 라벨만 허공에 떠 있으면 더 이상하다. 표시(Marks)보다 멀리서 보여야
     # 어느 방인지 알고 다가갈 수 있으므로 반경을 키운다.
@@ -3059,8 +3063,12 @@ def build_floor1():
     # 두면 어둠도 손전등도 안 받아 시야 밖에서도 100% 밝기로 보였다.
     # Stairwells **뒤**라야 집기 위에 그려진다 — 선언 순서가 곧 레이어다.
     sc.node('[node name="Structures" type="Node2D" parent="."]\n')
+    # 표시는 CanvasLayer에 있어 어둠·시야 마스크를 안 받는다 — 거리만 맞으면
+    # 벽 뒤·닫힌 문 너머 단서까지 떴다(#343). 광선으로 시야를 확인한다.
+    # **은신처 표시(`Mark_Hide*`)만 면제**다(스크립트의 `LOS_EXEMPT`).
     sc.node('[node name="Marks" type="Node2D" parent="WallGlow"]\n'
-            + 'script = ExtResource("8_marks")\n')
+            + 'script = ExtResource("8_marks")\n'
+            + 'require_line_of_sight = true\n')
     # 방 이름도 거리로 껐다 켠다(#307). 벽이 레이어 0으로 내려가 캄캄해졌는데
     # 라벨만 허공에 떠 있으면 더 이상하다. 표시(Marks)보다 멀리서 보여야
     # 어느 방인지 알고 다가갈 수 있으므로 반경을 키운다.
