@@ -1220,7 +1220,12 @@ def add_story(sc, floor):
 def add_stair_locks(sc, floor, key_id, stairwells):
     """계단 입구 자물쇠. 한 층의 계단 전부를 열쇠 하나로 연다(기존 규약).
     SEALED에 든 계단은 열쇠로도 열리지 않으므로, 배리어를 StairLocks 밖에 두어
-    자물쇠가 풀려도 남게 하고 자물쇠 대신 안내 문구만 붙인다."""
+    자물쇠가 풀려도 남게 하고 자물쇠 대신 안내 문구만 붙인다.
+
+    **배리어 시각은 `WallGlow/Doors`에 낸다**(#359). #307에서 벽·계단 시각을
+    레이어 0으로 내렸고 #318에서 **문만** 되돌렸는데, 계단 자물쇠가 그 되돌림에서
+    빠져 있었다 — 손전등이 정확히 비출 때만 보여서 복도에서 계단을 찾을 수 없었다.
+    게임에서 가장 중요한 문이 유일하게 안 보이는 문이었다."""
     sealed = SEALED.get(floor, set())
     tags = ["SU", "SD"][:len(stairwells)]
     sc.node('[node name="StairLocks" type="Node2D" parent="."]\n')
@@ -1234,12 +1239,15 @@ def add_stair_locks(sc, floor, key_id, stairwells):
         if i in sealed:
             sc.node(f'[node name="{tag}Seal" type="StaticBody2D" parent="SealedStairs"]\n')
             sc.solid(f"{tag}SealCollision", f"SealedStairs/{tag}Seal", bar)
-            sc.poly2d(f"{tag}SealVisual", "Structures", C_SEAL, bar, z=2)
+            sc.poly2d(f"{tag}SealVisual", "WallGlow/Doors", C_SEAL, bar, z=2)
         else:
             sc.node(f'[node name="{tag}Barrier" type="StaticBody2D" parent="StairLocks"]\n')
             sc.solid(f"{tag}BarrierCollision", f"StairLocks/{tag}Barrier", bar)
-            sc.poly2d(f"{tag}BarrierVisual", "Structures", C_LOCK, bar, z=2)
-            visual_paths.append(f'NodePath("../WallGlow/{tag}BarrierVisual")')
+            sc.poly2d(f"{tag}BarrierVisual", "WallGlow/Doors", C_LOCK, bar, z=2)
+            # #318로 `WallGlow/<이름>`이 `WallGlow/Doors/<이름>`이 됐는데 이 경로가
+            # 따라가지 않아, 자물쇠를 열어도 **반대쪽 배리어 그림이 남았다**(#359).
+            # get_node_or_null이라 조용히 실패해서 CI가 못 잡는다.
+            visual_paths.append(f'NodePath("../WallGlow/Doors/{tag}BarrierVisual")')
 
     open_tags = [tg for i, tg in enumerate(tags) if i not in sealed]
     for i, (tag, (x0, y0, x1, y1)) in enumerate(zip(tags, stairwells)):
@@ -1254,6 +1262,9 @@ def add_stair_locks(sc, floor, key_id, stairwells):
                 f'prompt_text = "계단 살펴보기"\n')
             sc.node(f'[node name="{tag}SealedZone" type="CollisionShape2D" parent="{tag}Sealed"]\n'
                     f'shape = SubResource("RectangleShape2D_stair_zone")\n')
+
+            # 봉인 계단은 진행에 쓸 수 없다 — 흐린 표시로 '여기는 아니다'만 알린다.
+            sc.mark(f"{tag}Sealed", mid, y0 - 24, C_MARK_FLAVOR, 6.0)
             continue
         removes = [f'NodePath("../{o}Lock")' for o in open_tags if o != tag] + visual_paths
         sc.node(
@@ -1271,6 +1282,12 @@ def add_stair_locks(sc, floor, key_id, stairwells):
             f'also_remove_paths = Array[NodePath]([{", ".join(removes)}])\n')
         sc.node(f'[node name="{tag}LockZone" type="CollisionShape2D" parent="{tag}Lock"]\n'
                 f'shape = SubResource("RectangleShape2D_stair_zone")\n')
+        # 잠긴 문이므로 호박색이다(#301의 색 규약). 계단만 표시가 없었다.
+        #
+        # **배리어 안이 아니라 복도 쪽에 둔다.** 표시는 시야를 요구하는데(#343)
+        # 광선이 배리어 몸(StairLocks의 StaticBody2D)에 막혀 자기 표시를 가린다 —
+        # 자물쇠 Area2D와 같은 자리(y0 + T/2)에 두면 영영 안 켜진다.
+        sc.mark(f"{tag}Lock", mid, y0 - 24, C_MARK_KEY, 9.0)
 
 
 def add_stairwell(sc, name, x0, y0, x1, y1):
