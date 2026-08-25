@@ -935,19 +935,26 @@ EXT_PICKUP = ('[ext_resource type="Script" '
 # 추출해 두고 위치만 새 방으로 옮긴다. 플래그 ID를 유지해야 엔딩 판정이 깨지지 않는다.
 # 기획서의 방이 새 도면에 없어 대체한 곳은 주석에 원래 방을 적는다.
 PLACEMENT = {
+    # 방 선택은 강제 동선(도착 계단 → 그 층 열쇠 → 다음 계단/현관)에서 얼마나
+    # 우회해야 하는지로 정한다(#350). 진행에 필요한 것은 +1500px, 스토리 단서는
+    # +1700px 이하. **성격이 같은 방으로만 옮긴다** — 문구가 방을 가리키기 때문이다.
     4: [("Dasan7", ["DasanStairKey", "FriendNote"]),              # 다산실
         ("CreativeDept", ["CounselRecord", "SiwooPainting"]),     # ← 상담실
-        ("InfoDept", ["CrisisManual", "InkCan"]),                 # ← 인쇄실
+        # 잉크통은 게임의 유일한 방어 수단(#169)인데 정보부실이 4층에서 가장 먼
+        # 방이라 우회 +3440px였다 — 여기를 안 들른 플레이어는 3·2·1층을 맨손으로
+        # 지난다. 컴퓨터실도 인쇄기가 있는 방이라 "인쇄기 옆/아래" 문구가 그대로 산다.
+        ("ComputerRoom", ["InkCan", "CrisisManual"]),             # ← 인쇄실
         # 4층 계단 열쇠는 다산7실 하나로 충분하다 — 중복 열쇠 제거(#219).
         # story_objects.json의 StairKey 항목은 남겨 둔다(되돌리기 쉽게).
-        ("ComputerRoom", ["ScienceClue"]),                        # ← 과학 실험실
-        ("Dasan6", ["HistoryClue"]),                              # ← 역사자료실
-        ("Storage2", ["TaehoNote"])],                             # ← 수학교구실
+        ("North4", ["HistoryClue"]),                              # ← 역사자료실
+        ("StorageR", ["TaehoNote"])],                             # ← 수학교구실
     3: [("North4", ["NayeonClue"]),                               # 생활지도부 ← 방송실
         ("North5", ["JanitorWarning", "KeyCabinet", "SpareKeyHook"]),  # 2학년부 ← 교무실
-        ("CareerRoom", ["ReportFlyer"]),                          # 진로실 ← 학생회실
+        ("CareerDept", ["ReportFlyer"]),                          # 진로진학부 ← 학생회실
+        # 깨진 비커는 과학실 물건인데 4층 컴퓨터실에 있었다 — 4층에는 과학실이 없다.
+        ("ScienceLab1", ["ScienceClue"]),                         # ← 과학 실험실
         ],
-    2: [("PEStorage", ["YujinClue"]),                             # 체육창고 ← 체육관 입구
+    2: [("PEDept", ["YujinClue"]),                                # 체육건강부 ← 체육관 입구
         ("MensRoomB", ["ShowerMarks", "DrainKey"]),   # 화장실 ← 샤워실
         ("EduRoom", ["SeunghoClue"]),                             # 교육실 ← 2층 교무실
         ],
