@@ -960,7 +960,9 @@ PLACEMENT = {
         ],
     2: [("PEDept", ["YujinClue"]),                                # 체육건강부 ← 체육관 입구
         ("MensRoomB", ["ShowerMarks", "DrainKey"]),   # 화장실 ← 샤워실
-        ("EduRoom", ["SeunghoClue"]),                             # 교육실 ← 2층 교무실
+        # 교육실(← 2층 교무실)의 압수품 상자는 백승호 단서였는데 #413에서 없앴다.
+        # 그 방에 배치된 단서가 그것뿐이라 항목째로 빠졌다. story_objects.json의
+        # SeunghoClue 항목도 함께 지웠다 — #407의 하람 쪽지와 같은 처리.
         ],
     1: [("StaffRoom", ["PrincipalLetter"]),                       # 교무실 ← 교장실
         ("JanitorRoom", ["PhotoWall", "StudentCards", "JanitorNotebook", "JanitorSafe"]),

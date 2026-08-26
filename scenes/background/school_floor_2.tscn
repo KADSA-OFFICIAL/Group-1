@@ -3825,32 +3825,6 @@ texture = ExtResource("9_key")
 shape = SubResource("RectangleShape2D_key_zone")
 
 
-[node name="Mark_SeunghoClue" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(2167.5, 1780.4)
-z_index = 5
-color = Color(1.00, 0.78, 0.32, 1)
-polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
-
-[node name="SeunghoClue" type="Area2D" parent="."]
-position = Vector2(2167.5, 1780.4)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("3_interactable")
-message = "압수품 상자에 이름표가 붙어 있다. '2-4 백승호'. 안에는 남의 이름이 적힌 물건들이 섞여 있다. 상자 옆 지도부 수첩 — '반복. 지도 요망.' 그 뒤로 기록이 끊겼다."
-prompt_text = "조사"
-grants_flag = "found_baekseungho"
-
-
-[node name="SeunghoClueVisual" type="Sprite2D" parent="SeunghoClue"]
-z_index = 1
-texture_filter = 1
-texture = ExtResource("10_note")
-
-
-[node name="SeunghoClueZone" type="CollisionShape2D" parent="SeunghoClue"]
-shape = SubResource("RectangleShape2D_key_zone")
-
-
 [node name="HideClass1" type="Area2D" parent="."]
 position = Vector2(76, 280)
 collision_layer = 2
