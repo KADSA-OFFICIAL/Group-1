@@ -122,13 +122,6 @@
     "[node name=\"DrainKeyZone\" type=\"CollisionShape2D\" parent=\"DrainKey\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
    ]
   },
-  "SeunghoClue": {
-   "body": "[node name=\"SeunghoClue\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(1150, 250)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"압수품 상자에 이름표가 붙어 있다. '2-4 백승호'. 안에는 남의 이름이 적힌 물건들이 섞여 있다. 상자 옆 지도부 수첩 — '반복. 지도 요망.' 그 뒤로 기록이 끊겼다.\"\nprompt_text = \"조사\"\ngrants_flag = \"found_baekseungho\"\n\n",
-   "kids": [
-    "[node name=\"SeunghoClueVisual\" type=\"Sprite2D\" parent=\"SeunghoClue\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"10_note\")\n\n",
-    "[node name=\"SeunghoClueZone\" type=\"CollisionShape2D\" parent=\"SeunghoClue\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
-   ]
-  },
   "HideClass1": {
    "body": "[node name=\"HideClass1\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(262, 362)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"5_hiding\")\nprompt_text = \"사물함에 숨기\"\nmessage = \"누군가의 사물함. 안쪽에 이름표가 떨어져 있다.\"\n\n",
    "kids": [

@@ -99,10 +99,10 @@ const ENDING_HIDDEN := &"break_time"      # 쉬는 시간 — 히든
 ## `SceneTree`에 엔딩 종류를 담을 때 쓰는 키.
 const ENDING_META := &"ending_kind"
 
-## 실종 학생 넷의 흔적. **송하람은 없다** — 하람 관련 단서를 전부 없앴으므로(#407)
+## 실종 학생의 흔적. 다섯 → 넷(#407) → **셋**(#413) — 힌트를 지운 만큼 조건도 줄인다. **송하람은 없다** — 하람 관련 단서를 전부 없앴으므로(#407)
 ## `found_songharam`을 얻을 방법이 없다. 남겨 두면 히든 엔딩이 영구히 닫힌다.
 const MISSING_FLAGS := [
-	"found_imnayeon", "found_jominhyuk", "found_kangyujin", "found_baekseungho"]
+	"found_imnayeon", "found_jominhyuk", "found_kangyujin"]
 ## 시우가 어떤 아이였는지 알려 주는 것.
 const SIWOO_FLAGS := [
 	"read_siwoo_counseling", "read_siwoo_painting", "read_janitor_notebook"]
