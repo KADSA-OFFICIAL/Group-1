@@ -147,23 +147,58 @@ def _check_yard(fail):
                 fail(f"{label} 등장 지점 {px},{py}이 집기 {nm} 안이다")
 
 
+def no_stairwell():
+    """계단실을 없앤 자리(#398). `gen_floors`와 `floor_manager`가 맞는지도 본다.
+
+    한쪽만 고치면 카메라·층 전환은 그대로인데 씬에서 계단이 사라지거나 그 반대가
+    된다 — 둘 다 실행해 봐야만 보이는 종류라 여기서 정적으로 잡는다.
+    """
+    import re as _re
+    gen = (ROOT / "tools/gen_floors.py").read_text(encoding="utf-8")
+    fm = (ROOT / "scripts/game/floor_manager.gd").read_text(encoding="utf-8")
+    # `[^}]*`로 잡으면 안쪽 중괄호(`{2: {1}}`)에서 끊긴다 — 줄 끝까지 본다.
+    g = _re.search(r"^NO_STAIRWELL = \{(.*)\}\s*$", gen, _re.M)
+    f = _re.search(r"^const NO_STAIRWELL := \{([^}]*)\}", fm, _re.M)
+    if g is None or f is None:
+        fail("NO_STAIRWELL을 gen_floors.py 또는 floor_manager.gd에서 못 찾았다")
+        return {}
+
+    def pairs(text):
+        out = {}
+        for fl, items in _re.findall(r"(\d+)\s*:\s*[\{\[]([^\}\]]*)[\}\]]", text):
+            out[int(fl)] = {int(v) for v in _re.findall(r"\d+", items)}
+        return out
+
+    a, b = pairs(g.group(1)), pairs(f.group(1))
+    if a != b:
+        fail(f"NO_STAIRWELL 불일치 — gen_floors {a} vs floor_manager {b}")
+    return a
+
+
 def main():
     stairs = parse_rects()
     if not stairs:
         print("\n".join(errors)); return 1
 
+    gone_all = no_stairwell()
     for fl in (1, 2, 3, 4, 5):
         declared = stairs.get(fl, [])
         actual = scene_slabs(fl)
-        if len(declared) != len(actual):
-            fail(f"floor{fl}: STAIRS {len(declared)}개 vs 씬 계단실 {len(actual)}개")
+        gone = gone_all.get(fl, set())
+        # 계단실이 없는 자리(#398)는 씬에 슬래브가 없다 — 개수 대조에서 뺀다.
+        live = [d for i, d in enumerate(declared) if i not in gone]
+        if len(live) != len(actual):
+            fail(f"floor{fl}: STAIRS {len(live)}개(없앤 자리 제외) "
+                 f"vs 씬 계단실 {len(actual)}개")
             continue
-        for (name, sx, sy, sw, sh), d in zip(actual, declared):
+        for (name, sx, sy, sw, sh), d in zip(actual, live):
             if [sx, sy, sw, sh] != d:
                 fail(f"floor{fl} {name}: 씬 {[sx,sy,sw,sh]} vs STAIRS {d}")
 
         ws = walls(fl)
         for i, d in enumerate(declared):
+            if i in gone:
+                continue   # 계단실이 없으니 존도 도착 지점도 없다
             x, y, w, h = d
             mid = x + w / 2.0
             y_end = y + h - WALL_T

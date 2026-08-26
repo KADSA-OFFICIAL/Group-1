@@ -4507,13 +4507,22 @@ color = Color(0.3106, 0.27, 0.216, 1)
 polygon = PackedVector2Array(2866, 2192.9, 2932, 2192.9, 2932, 2232.9, 2866, 2232.9)
 
 [node name="PC_Storage1_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2862.5, 2367.1, 2930.5, 2367.1, 2930.5, 2407.1, 2862.5, 2407.1)
+polygon = PackedVector2Array(2751, 2367.1, 2819, 2367.1, 2819, 2407.1, 2751, 2407.1)
 
 [node name="PV_Storage1_1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_shelf")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2887, 0.251, 0.2008, 1)
-polygon = PackedVector2Array(2862.5, 2367.1, 2930.5, 2367.1, 2930.5, 2407.1, 2862.5, 2407.1)
+polygon = PackedVector2Array(2751, 2367.1, 2819, 2367.1, 2819, 2407.1, 2751, 2407.1)
+
+[node name="PC_Storage1_2" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(2839, 2367.1, 2907, 2367.1, 2907, 2407.1, 2839, 2407.1)
+
+[node name="PV_Storage1_2" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_shelf")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.2835, 0.2465, 0.1972, 1)
+polygon = PackedVector2Array(2839, 2367.1, 2907, 2367.1, 2907, 2407.1, 2839, 2407.1)
 
 [node name="PT_Storage1_box0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_grain")
@@ -4523,7 +4532,12 @@ polygon = PackedVector2Array(2878.5, 2203.7, 2919.5, 2203.7, 2919.5, 2222.1, 287
 [node name="PT_Storage1_box1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(2875.4, 2377.9, 2917.6, 2377.9, 2917.6, 2396.3, 2875.4, 2396.3)
+polygon = PackedVector2Array(2763.9, 2377.9, 2806.1, 2377.9, 2806.1, 2396.3, 2763.9, 2396.3)
+
+[node name="PT_Storage1_box2" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_grain")
+color = Color(0.5769, 0.4359, 0.3077, 1)
+polygon = PackedVector2Array(2851.9, 2377.9, 2894.1, 2377.9, 2894.1, 2396.3, 2851.9, 2396.3)
 
 [node name="PD_Storage1_sign" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_glass")
@@ -6801,8 +6815,8 @@ z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
-[node name="Exam_Storage1_0" type="Area2D" parent="."]
-position = Vector2(2899, 2212.9)
+[node name="Exam_Storage1_2" type="Area2D" parent="."]
+position = Vector2(2873, 2387.1)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
@@ -6810,17 +6824,17 @@ interact_priority = 3
 message = "맨 아래 칸이 젖어 있다. 종이가 부풀어 있다."
 prompt_text = "선반 살펴보기"
 
-[node name="Zone" type="CollisionShape2D" parent="Exam_Storage1_0"]
+[node name="Zone" type="CollisionShape2D" parent="Exam_Storage1_2"]
 shape = SubResource("RectangleShape2D_exam_zone")
 
-[node name="Mark_Exam_Storage1_0" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(2899, 2212.9)
+[node name="Mark_Exam_Storage1_2" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2873, 2387.1)
 z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
-[node name="Exam_Storage1_1" type="Area2D" parent="."]
-position = Vector2(2896.5, 2387.1)
+[node name="Exam_Storage1_0" type="Area2D" parent="."]
+position = Vector2(2899, 2212.9)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
@@ -6828,11 +6842,11 @@ interact_priority = 3
 message = "상자 하나가 밖으로 끌려 나온 자국이 있다."
 prompt_text = "선반 살펴보기"
 
-[node name="Zone" type="CollisionShape2D" parent="Exam_Storage1_1"]
+[node name="Zone" type="CollisionShape2D" parent="Exam_Storage1_0"]
 shape = SubResource("RectangleShape2D_exam_zone")
 
-[node name="Mark_Exam_Storage1_1" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(2896.5, 2387.1)
+[node name="Mark_Exam_Storage1_0" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2899, 2212.9)
 z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)

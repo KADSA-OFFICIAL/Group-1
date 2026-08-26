@@ -49,6 +49,11 @@ const YARD_FADE_SCALE := 5.0
 # 1층은 도면상 계단이 한 곳뿐이라 목록 길이가 1이다.
 const STAIR_A := Rect2(300, 720, 440, 280)
 const STAIR_B := Rect2(1450, 2120, 440, 320)
+## 계단실이 **아예 없는** 자리(#398). `STAIRS`의 사각형은 남긴다 — 위층에서
+## 내려올 때 `_arrive_on`이 쓰는 도착 지점의 기준이라, 빼면 인덱스가 밀려
+## 엉뚱한 계단 앞으로 순간이동한다. 층 전환 판정에서만 건너뛴다.
+const NO_STAIRWELL := {2: [1]}
+
 const STAIRS := {
 	0: [],   # 운동장 — 계단 없음(#356)
 	1: [Rect2(220, 2120, 440, 320)],
@@ -175,8 +180,11 @@ func _physics_process(_delta: float) -> void:
 	var stairs: Array = STAIRS.get(current_floor, [])
 	if stairs.is_empty():
 		return   # 운동장(#356) — 계단이 없다
+	var walled: Array = NO_STAIRWELL.get(current_floor, [])
 
 	for i in stairs.size():
+		if i in walled:
+			continue   # 계단실이 없는 자리(#398) — 실체로 메워져 닿을 수도 없다
 		var r: Rect2 = stairs[i]
 		if current_floor < MAX_FLOOR and _stair_zone(r, true).has_point(pos):
 			_change_floor(current_floor + 1, _arrive_on(current_floor + 1, i, true))
