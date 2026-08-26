@@ -81,3 +81,21 @@ jobs:
             exit 1
           fi
           echo "씬·스크립트 오류 없음"
+
+      # 여기까지는 씬을 instantiate만 한다 — 트리에 안 넣으므로 _ready가 돌지
+      # 않고 @onready 경로·시그널·트윈이 통째로 미검증이다(#240). 아래 잡이
+      # 실제로 트리에 붙이고 프레임을 돌린다.
+      - name: 런타임 스모크 (트리에 붙이고 프레임 돌리기)
+        run: |
+          set -o pipefail
+          ~/godot-bin/godot --headless --script res://tools/ci_smoke_scenes.gd 2>&1 | tee /tmp/smoke.log
+
+      - name: 스모크 로그의 오류 검사
+        run: |
+          # 스크립트는 실패를 종료 코드로도 내지만, push_error가 찍은 줄을
+          # 한 번 더 본다 — 검사 밖에서 난 런타임 오류도 잡으려는 것이다.
+          if grep -nE "SCRIPT ERROR|Parse Error|Cannot get node|Invalid call|스모크: " /tmp/smoke.log; then
+            echo "::error::런타임 스모크에서 오류가 발견됐다"
+            exit 1
+          fi
+          echo "런타임 오류 없음"
