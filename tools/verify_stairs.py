@@ -181,7 +181,7 @@ def main():
         print("\n".join(errors)); return 1
 
     gone_all = no_stairwell()
-    for fl in (1, 2, 3, 4, 5):
+    for fl in (1, 2, 3, 4):
         declared = stairs.get(fl, [])
         actual = scene_slabs(fl)
         gone = gone_all.get(fl, set())
@@ -224,7 +224,7 @@ def main():
 
     _check_yard(fail)
 
-    print(f"계단 검사: 5개 층 + 운동장")
+    print(f"계단 검사: 4개 층 + 운동장")
     if errors:
         print(f"\n오류 {len(errors)}건:")
         for e in errors:

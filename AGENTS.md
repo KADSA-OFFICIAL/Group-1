@@ -13,7 +13,7 @@
 ### 씬 흐름
 
 main_menu → intro(프롤로그 컷신: street→back_gate→art_room→cabinet→next_room, scripts/ui/intro.gd의 SCRIPT_NODES) → main(본편, **4층에서 시작**) → ending → main_menu
-5층은 프롤로그 컷신 전용이며 본편에서 방문하지 않는다(MAX_FLOOR=4). 규칙 칠판·사망 엔딩은 구 시나리오 요소로 제거됨.
+**5층은 삭제됐다**(#405) — 프롤로그 자막 전용이라 본편에서 한 번도 못 갔다. 미술실은 4층으로 옮겼다. 규칙 칠판·사망 엔딩은 구 시나리오 요소로 제거됨.
 
 ### 구조 요약
 

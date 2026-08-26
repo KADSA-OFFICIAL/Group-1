@@ -538,6 +538,66 @@ def o_rack(dx: int, dy: int, gw: int, gh: int) -> float:
     return v
 
 
+def o_easel(dx: int, dy: int, gw: int, gh: int) -> float:
+    """이젤(#405). 위에서 보면 **비스듬히 세운 화판** + 앞으로 뻗은 다리 셋이다.
+
+    책상(`o_desk`)으로 대신하면 미술실이 그냥 교실이 된다 — 이젤은 실루엣이
+    책상과 완전히 다른 물건이라 그림이 따로 있어야 한다.
+    """
+    e = _edge(dx, dy, gw, gh)
+    if e == 0:
+        return 0.50
+    cx0 = (gw - 1) / 2.0
+    board_h = int(gh * 0.62)
+    if dy < board_h:
+        # 화판 — 가장자리에 나무 테, 안쪽은 밝은 캔버스 천
+        if abs(dx - cx0) > gw * 0.40 or dy < 2:
+            return 0.72 + jit(0.04, dx, dy, 521)      # 나무 테
+        v = 0.95 + jit(0.03, dx, dy, 522)             # 캔버스
+        if rnd(dx // 3, dy // 3, 523) > 0.86:
+            v -= 0.22                                 # 그리다 만 자국
+        return v
+    # 다리 셋 — 가운데 하나가 뒤로, 양옆 둘이 앞으로 벌어진다
+    t = (dy - board_h) / max(1.0, gh - board_h)
+    spread = gw * (0.10 + 0.30 * t)
+    for off in (-spread, 0.0, spread):
+        if abs(dx - cx0 - off) < 1.2:
+            return 0.66 + jit(0.05, dx, dy, 524)
+    return 0.93                                       # 다리 사이 — 바닥이 비친다
+
+
+def o_bust(dx: int, dy: int, gw: int, gh: int) -> float:
+    """석고상(#405). 네모난 받침 위에 둥근 머리. 미술실에서 가장 알아보기 쉬운 물건."""
+    e = _edge(dx, dy, gw, gh)
+    if e == 0:
+        return 0.55
+    cx0 = (gw - 1) / 2.0
+    if dy > gh * 0.70:
+        if abs(dx - cx0) > gw * 0.34:
+            return 0.90                               # 받침 바깥
+        return 0.74 + jit(0.03, dx, dy, 531)          # 받침
+    r = (((dx - cx0) / (gw * 0.34)) ** 2
+         + ((dy - gh * 0.36) / (gh * 0.34)) ** 2) ** 0.5
+    if r > 1.0:
+        return 0.90
+    # 왼쪽 위에서 빛을 받는 흰 석고 — 오른쪽 아래로 갈수록 어둡다
+    return 1.06 - 0.30 * r - 0.10 * ((dx - cx0) / gw + (dy / gh))
+
+
+def o_canvas(dx: int, dy: int, gw: int, gh: int) -> float:
+    """세워 둔 캔버스 묶음(#405). 벽에 기대 놓은 그림들 — 세로 줄무늬로 읽힌다."""
+    e = _edge(dx, dy, gw, gh)
+    if e == 0:
+        return 0.52
+    slot = dx // max(2, gw // 6)
+    v = 0.92 + jit(0.06, slot, 0, 541)                # 캔버스마다 다른 흰색
+    if dx % max(2, gw // 6) == 0:
+        v = 0.58                                      # 캔버스 사이 틈
+    if dy < 2:
+        v = 0.70                                      # 위쪽 나무 틀
+    return v
+
+
 OBJ = 32            # 오브젝트 그림 한 변. 재질과 같은 32라 도트 크기가 어긋나지 않는다.
 
 def solid_obj(fn):
@@ -589,6 +649,10 @@ OBJECTS = {
     "obj_plant": solid_obj(o_plant),
     "obj_rack": solid_obj(o_rack),
     "obj_toilet": solid_obj(o_toilet),
+    # 미술실 전용(#405) — 책상·선반으로 대신하면 미술실이 그냥 교실이 된다.
+    "obj_easel": solid_obj(o_easel),
+    "obj_bust": solid_obj(o_bust),
+    "obj_canvas": solid_obj(o_canvas),
 }
 
 

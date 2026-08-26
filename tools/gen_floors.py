@@ -95,6 +95,19 @@ C_MOP = "Color(0.36, 0.30, 0.20, 1)"          # 대걸레
 C_BUCKET = "Color(0.22, 0.32, 0.30, 1)"       # 양동이
 C_STAIN = "Color(0.118, 0.130, 0.136, 1)"     # 바닥 물때(바닥 표시)
 C_TOILET = "Color(0.60, 0.63, 0.65, 1)"       # 대변기
+
+# 미술실 팔레트(#405). **색이 곧 그림이다** — `SPRITE`가 색을 키로 도트 오브젝트를
+# 고르므로, 이젤·석고상·캔버스는 자기 색을 가져야 자기 그림이 붙는다. 책상 색으로
+# 대신하면 미술실이 그냥 교실이 된다.
+C_EASEL = "Color(0.38, 0.30, 0.21, 1)"        # 이젤 — 밝은 나무
+C_BUST = "Color(0.66, 0.64, 0.60, 1)"         # 석고상 — 흰 석고
+C_CANVASES = "Color(0.58, 0.55, 0.49, 1)"     # 세워 둔 캔버스 묶음
+C_PAINTBOX = "Color(0.34, 0.28, 0.38, 1)"     # 물감장 — 색이 섞인 자줏빛
+C_WORKTOP = "Color(0.33, 0.28, 0.22, 1)"      # 작업대 — 교실 책상보다 크고 밝다
+C_STILL = "Color(0.30, 0.24, 0.26, 1)"        # 정물대 — 천을 덮어 둔 받침
+C_PALETTE = "Color(0.52, 0.42, 0.30, 1)"      # 팔레트(집기 위 소품)
+C_BRUSHJAR = "Color(0.44, 0.46, 0.50, 1)"     # 붓통
+C_TUBE = "Color(0.60, 0.30, 0.28, 1)"         # 물감 튜브
 C_PIPE = "Color(0.225, 0.235, 0.255, 1)"      # 천장 배관(장식) — 바닥보다
                                               # 살짝만 밝게. 진하면 바닥 선이 된다
 
@@ -232,6 +245,13 @@ SPRITE = {
     C_SHELF: "obj_shelf",
     C_SINK: "obj_sink",
     C_URINAL: "obj_sink",
+    # 미술실 전용 그림(#405)
+    C_EASEL: "obj_easel",
+    C_BUST: "obj_bust",
+    C_CANVASES: "obj_canvas",
+    C_WORKTOP: "obj_desk",
+    C_STILL: "obj_desk",
+    C_PAINTBOX: "obj_shelf",
     C_MONITOR: "obj_screen",
     C_STALL: "obj_panel",
     C_STALLDOOR: "obj_panel",
@@ -359,14 +379,6 @@ RIGHT_X0 = 1920
 # north: 교실 8칸 이름 / mid_left·mid_right·south·bottom: (키, 라벨, x0, x1)
 # 라벨이 None이면 막힌 공간(문 없음·라벨 없음)
 LAYOUT = {
-    4: {
-        "north": ["1반", "2반", "3반", "3학년부", "4반", "5반", "6반", "7반", "8반"],
-        "south_left": [("Dasan7", "다산7실", 20, 720), ("CreativeDept", "창의체험부", 750, 1640)],
-        "south_right": [("ComputerRoom", "컴퓨터실", 1920, 2400),
-                        ("Storage2", "창고", 2430, 2790),
-                        ("InfoDept", "정보부실", 2820, 3380)],
-        "bottom_left": [("Dasan6", "다산6실", 20, 1200)],
-    },
     3: {
         "north": ["1반", "2반", "3반", "생활지도부", "2학년부", "4반", "5반", "6반", "7반"],
         "south_left": [("Class6", "6반", 20, 720), ("CareerDept", "진로진학부", 750, 1640)],
@@ -382,14 +394,6 @@ LAYOUT = {
                         ("Storage2", "창고", 2430, 2790),
                         ("ComputerRoom", "컴퓨터실", 2820, 3380)],
         "bottom_left": [],
-    },
-    5: {   # 프롤로그 전용 — 같은 뼈대, 방 이름만 미술 계열
-        "north": ["1반", "2반", "3반", "예술부", "4반", "5반", "6반", "7반"],
-        "south_left": [("ArtRoom", "미술실", 20, 720), ("MusicPrep", "음악준비실", 750, 1640)],
-        "south_right": [("AVRoom", "시청각실", 1920, 2400),
-                        ("Storage2", "창고", 2430, 2790),
-                        ("EmptyClass", "빈 교실", 2820, 3380)],
-        "bottom_left": [("ArtStorage", "미술창고", 20, 1200)],
     },
 }
 
@@ -875,8 +879,10 @@ def add_room(sc, key, label, x0, y0, x1, y1, door):
         sc.wall(f"{key}_right", rect(x1 - T, y0, x1, y1))
 
 
-# 본편에서 오갈 수 있는 층 범위 — floor_manager.gd의 MIN_FLOOR/MAX_FLOOR와 맞춘다.
-MIN_FLOOR, MAX_FLOOR = 1, 4
+# 계단으로 오갈 수 있는 층 범위 — floor_manager.gd의 MIN_FLOOR/MAX_FLOOR와 맞춘다.
+# 위 경계가 3인 것은 4층에 계단이 없기 때문이다(#406) — 3층 계단에 '위층 ▲'
+# 표지를 내면 갈 수 없는 곳을 가리킨다.
+MIN_FLOOR, MAX_FLOOR = 1, 3
 C_ARROW = "Color(0.55, 0.8, 0.85, 1)"
 
 
@@ -908,6 +914,9 @@ SCRIPTS = {
     "6_sliding": "res://scripts/interactions/sliding_door.gd",
     "7_roomlights": "res://scripts/game/room_lights.gd",
     "8_marks": "res://scripts/game/interact_marks.gd",
+    # 9_key·10_note는 SPRITE_TEXTURES가 쓴다(단서 스프라이트) — 겹치면 안 된다.
+    "11_floorlink": "res://scripts/interactions/floor_link.gd",
+    "12_artintro": "res://scripts/game/art_room_intro.gd",
 }
 
 
@@ -942,23 +951,27 @@ PLACEMENT = {
     # 방 선택은 강제 동선(도착 계단 → 그 층 열쇠 → 다음 계단/현관)에서 얼마나
     # 우회해야 하는지로 정한다(#350). 진행에 필요한 것은 +1500px, 스토리 단서는
     # +1700px 이하. **성격이 같은 방으로만 옮긴다** — 문구가 방을 가리키기 때문이다.
-    4: [("Dasan7", ["DasanStairKey", "FriendNote"]),              # 다산실
-        ("CreativeDept", ["CounselRecord", "SiwooPainting"]),     # ← 상담실
-        # 잉크통은 게임의 유일한 방어 수단(#169)인데 정보부실이 4층에서 가장 먼
-        # 방이라 우회 +3440px였다 — 여기를 안 들른 플레이어는 3·2·1층을 맨손으로
-        # 지난다. 컴퓨터실도 인쇄기가 있는 방이라 "인쇄기 옆/아래" 문구가 그대로 산다.
-        ("ComputerRoom", ["InkCan", "CrisisManual"]),             # ← 인쇄실
-        # 4층 계단 열쇠는 다산7실 하나로 충분하다 — 중복 열쇠 제거(#219).
-        # story_objects.json의 StairKey 항목은 남겨 둔다(되돌리기 쉽게).
-        ("North4", ["HistoryClue"]),                              # ← 역사자료실
-        ("StorageR", ["TaehoNote"])],                             # ← 수학교구실
-    3: [("North4", ["NayeonClue"]),                               # 생활지도부 ← 방송실
+    # 도입부 4층(#405) — 미술실·준비실. 학생증은 #407에서 송하람 단서를
+    # 전부 없애며 빠졌다 — 실종 학생의 훅은 준비실의 소지품 봉투·날짜 벽이 맡는다.
+    4: [("ArtRoom", ["KoreanBook", "SiwooPainting"]),
+        ("ArtPrep", ["Belongings", "DateWall"])],
+    # 상담기록부는 **생활지도부**가 가장 자연스러운 집이고, 도착지에서 +520px다.
+    3: [("North4", ["NayeonClue", "CounselRecord"]),               # 생활지도부 ← 방송실
         ("North5", ["JanitorWarning", "KeyCabinet", "SpareKeyHook"]),  # 2학년부 ← 교무실
-        ("CareerDept", ["ReportFlyer"]),                          # 진로진학부 ← 학생회실
-        # 깨진 비커는 과학실 물건인데 4층 컴퓨터실에 있었다 — 4층에는 과학실이 없다.
-        ("ScienceLab1", ["ScienceClue"]),                         # ← 과학 실험실
+        # 잉크통은 **수위가 활동하는 첫 층**에 있어야 한다(#411). 4층이 도입부로
+        # 줄면서 갈 곳을 잃었는데, 그때까지 게임의 유일한 방어 수단을 못 얻었다.
+        # 부서실이라 복사기가 있어 "인쇄기 아래"가 그대로 맞는다.
+        ("CareerDept", ["ReportFlyer"]),                              # 진로진학부 ← 학생회실
+        # 잉크통은 **진행에 필요한 것**이라 +1500px 안이어야 한다(#350). 부서실은
+        # 전부 그보다 멀어서 창고로 보냈다 — 인쇄기 여분이 놓인 자리로 문구를 고쳤다.
+        ("StorageR", ["InkCan"]),                 # 창고 +1160px
+        # 태호 쪽지는 과학실을 직접 가리킨다. 과학실2는 +3440px이라 과학실1로.
+        ("ScienceLab1", ["ScienceClue", "TaehoNote"]),
         ],
-    2: [("PEDept", ["YujinClue"]),                                # 체육건강부 ← 체육관 입구
+    2: [
+        # 컴퓨터실은 +2800px이라 부서실로. 대응 매뉴얼은 전 부서에 돌린 문서다.
+        ("PEDept", ["YujinClue", "CrisisManual"]),
+        ("StorageR", ["HistoryClue"]),            # 창고 +780px — 10년 전 졸업앨범
         ("MensRoomB", ["ShowerMarks", "DrainKey"]),   # 화장실 ← 샤워실
         ("EduRoom", ["SeunghoClue"]),                             # 교육실 ← 2층 교무실
         ],
@@ -971,8 +984,6 @@ PLACEMENT = {
         # 두 번째 탈출 루트(#393). 열쇠를 묻지 않는다.
         ("YardExit", ["YardGateDoor"]),
         ],
-    5: [("ArtRoom", ["Blackboard", "ArtRoomDoorLock"]),
-        ("ArtStorage", ["StairKey"])],
 }
 # 영구 봉인 계단(열쇠로도 열리지 않음). 2층 하단 중앙 계단은 그 아래가 1층
 # 현관·중앙 구역이라 계단이 내려갈 자리가 없다 — 도면 구조를 지키려고 막는다.
@@ -988,8 +999,9 @@ NO_STAIRWELL = {2: {1}}
 # 열쇠만 지우고 자물쇠를 남기면 **열 수 없는 문**이 되어 "이 층 어딘가에 열쇠가
 # 있을 것이다" 안내가 거짓말이 되고, 2층에서 놓친 단서를 주우러 되돌아갈 길이
 # 막혀 히든 엔딩(#353)이 그 판에서 영구히 닫힌다. 그래서 둘을 함께 없앤다.
-LOCKED = {2: "stair_key_2", 3: "stair_key_3",
-          4: "stair_key_4", 5: "stair_key_5"}
+# 4층은 계단이 없다 — 도입부라 창문으로 3층에 내려간다(#405).
+# 5층은 삭제됐다(프롤로그 자막 전용이라 본편에서 못 갔다).
+LOCKED = {2: "stair_key_2", 3: "stair_key_3"}
 
 
 # 특정 단서의 위치를 방 안 자동 배치 대신 직접 지정한다.
@@ -1011,6 +1023,14 @@ POS_OVERRIDE = {
     # "보관함 옆 고리"인 SpareKeyHook을 같은 벽면 오른쪽에 나란히 둔다.
     (3, "KeyCabinet"): (1560, 54),
     (3, "SpareKeyHook"): (1620, 50),
+    # 도입부 4층(#405) — 자동 배치는 방을 균등 분할해서 작업대 위에 떨어진다.
+    # 다섯 개 모두 놓일 물건이 정해져 있으므로 자리를 직접 적는다.
+    (4, "KoreanBook"): (675, 720),      # 국어책 책상 위
+    # 시우 그림은 **학생 그림들과 같은 벽**에 건다 — 혼자 다른 벽에 있으면
+    # 단서 표시가 붙은 그것만 액자로 떠 보인다.
+    (4, "SiwooPainting"): (800, 846),   # 아래쪽 벽, 학생 그림 사이
+    (4, "Belongings"): (1310, 646),     # 준비실 작업대 위
+    (4, "DateWall"): (1465, 848),       # 준비실 아래쪽 벽에 적힌 날짜
 }
 
 # 방 안 가구(시각 전용). 충돌은 넣지 않는다 — 통행·수위 경로탐색·도달성 검사에
@@ -1089,17 +1109,23 @@ HIDE_KINDS = {
 # **교무실·부서실에는 은신처를 두지 않는다**(#342). `_office`가 양쪽 옆벽을
 # 서류 캐비닛 줄로 채우므로 벽에 붙일 자리가 없고, 가운데는 책상 섬이다.
 # 억지로 넣으면 `verify_hiding_spots`가 '걸어서 닿을 수 없다'로 잡는다.
-HIDE_POS = {}
+HIDE_POS = {
+    # 준비실 왼쪽 벽 한가운데는 **연결문 틈**이다 — 기본 자리(L, 0.5)로 두면
+    # 적재함이 문을 막고 선다. 오른쪽 벽 아래쪽으로 옮긴다(#405).
+    (4, "HidePrepShelf"): ("R", 0.75),
+}
 # 노드 중심을 벽면에서 이만큼 띄운다(#342). **시각은 벽에 붙이고 중심만 띄운다** —
 # 도달성 격자가 벽을 플레이어 반경(10)만큼 부풀리므로 중심이 벽에 딱 붙으면
 # 부풀린 벽 안에 들어가 `verify_hiding_spots`가 '걸어서 닿을 수 없다'로 잡는다.
 HIDE_STANDOFF = 22
 
 EXTRA_HIDING = {
-    4: [("HideInfoDept", "InfoDept", "locker", "사물함에 숨기",
-         "정보부실 사물함. 종이 냄새와 먼지 사이에 몸을 접었다."),
-        ("HideDasan6", "Dasan6", "clean", "청소함에 숨기",
-         "청소함 안. 대걸레 자루가 어깨를 누른다.")],
+    # 도입부 4층(#405) — 미술실 캐비넷 하나뿐이다. 수위가 문 밖에 섰을 때
+    # 숨을 곳이 여기밖에 없어야 프롤로그의 그 장면이 그대로 재현된다.
+    4: [("HideArtCabinet", "ArtRoom", "locker", "캐비넷에 숨기",
+         "미술실 캐비넷 안. 숨을 참는다. 문틈으로 빛이 지나간다."),
+        ("HidePrepShelf", "ArtPrep", "files", "적재함 뒤에 숨기",
+         "준비실 적재함 뒤. 비닐봉투 냄새가 코를 찌른다.")],
     3: [("HideClass2", "North2", "locker", "사물함에 숨기",
          "2반 뒤 사물함. 문틈으로 복도가 가늘게 보인다."),
         ("HideClass5", "North7", "clean", "청소함에 숨기",
@@ -3439,13 +3465,285 @@ def build_yard():
     return sc
 
 
+# ── 도입부 4층 — 미술실 + 준비실 (#405) ─────────────────────────
+# 스토리가 여기서 시작한다. 수위가 문 밖에서 말하고 문을 잠그고 내려간 사이,
+# 준비실 창문으로 3층에 내려가야 한다(#404).
+#
+# **큰 층 도면(3400x2500)을 쓰지 않는다.** 창문이 3층으로 직행하므로 나머지
+# 방은 도달 불가가 된다 — 미술실 한 칸을 위해 3275노드를 로드하던 것을
+# 두 방 300노드 남짓으로 줄인다. `build_yard()`(#356)와 같은 방식이다.
+#
+# **복도를 만들지 않는다.** 수위는 미술실에 들어오지 않는다 — 문 밖에서
+# 말하고 잠그고 간다(프롤로그 자막 그대로). 클로즈업(#404 4번)은 문과
+# 문틈 불빛만 보여 주면 되므로 복도가 필요 없다.
+IW, IH = 1800, 1000          # 도입부 캔버스. 층(3400x2500)보다 훨씬 작다.
+IX0, IY0 = 20, 20            # 건물 바깥 경계
+IX1, IY1 = 1780, 880
+IXM = 1120                   # 미술실 | 준비실 경계 벽의 왼쪽 면
+INTRO_ARRIVE = (300.0, 700.0)   # 조작이 시작되는 자리 — 미술실 문 안쪽
+
+# 미술실 색은 `SPRITE`보다 **앞에서** 정의한다(파일 위쪽) — 여기서 다시 정의하면
+# 나중 값이 이겨서 `SPRITE` 조회가 빗나가고 도트 그림이 하나도 안 붙는다(#405).
+
+
+def _intro_prop(sc, key, x0, y0, x1, y1, color, solid=True):
+    """도입부 집기. 층과 같은 PC_/PV_ 한 쌍이다."""
+    box = poly((x0, y0), (x1, y0), (x1, y1), (x0, y1))
+    if solid:
+        sc.node('[node name="PC_' + key + '" type="CollisionPolygon2D" '
+                'parent="PropBodies"]' + NL + "polygon = " + box + NL)
+    sc.poly2d("PV_" + key, "Props", color, box)
+    sc.prop_rects.append((key, (x0, y0, x1, y1), color))
+
+
+def _intro_room(sc, key, label, x0, y0, x1, y1):
+    """방 바닥 + 라벨 + 검사 스크립트가 읽는 메타. 벽은 따로 낸다."""
+    sc.rooms[key] = (x0, y0, x1, y1)
+    sc.room_meta[key] = (label, None, x0, x1,
+                         lambda x, v=y0: v, lambda x, v=y1: v)
+    sc.poly2d(key, "Rooms", ROOM_FLOOR["classroom"], rect(x0, y0, x1, y1))
+    sc.label(key, label, (x0 + x1) / 2, (y0 + y1) / 2)
+
+
+def build_intro():
+    """도입부 4층 — 미술실과 준비실(#405)."""
+    sc = Scene()
+    sc.floor_no = 4
+    sc.rect_shapes = [
+        ("RectangleShape2D_wall_h", "Vector2(" + str(IW) + ", 40)"),
+        ("RectangleShape2D_wall_v", "Vector2(40, " + str(IH) + ")"),
+        ("RectangleShape2D_door_zone", "Vector2(140, 60)"),
+        ("RectangleShape2D_key_zone", "Vector2(48, 48)"),
+        ("RectangleShape2D_window_zone",
+         "Vector2(" + str(WINDOW_ZONE[0]) + ", " + str(WINDOW_ZONE[1]) + ")"),
+        ("RectangleShape2D_exam_zone",
+         "Vector2(" + str(EXAMINE_ZONE[0]) + ", " + str(EXAMINE_ZONE[1]) + ")"),
+    ]
+
+    sc.node('[node name="SchoolFloor" type="Node2D"]' + NL + TEX_FLAGS)
+    sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, IW, IH))
+    sc.node('[node name="Ground" type="Node2D" parent="."]' + NL)
+    sc.node('[node name="WallGlow" type="CanvasLayer" parent="."]' + NL
+            + "layer = 1" + NL + "follow_viewport_enabled = true" + NL)
+    sc.node('[node name="Rooms" type="Node2D" parent="."]' + NL)
+    sc.node('[node name="RoomMarks" type="Node2D" parent="."]' + NL)
+    sc.node('[node name="Props" type="Node2D" parent="."]' + NL)
+    add_lights_root(sc)
+    sc.node('[node name="Structures" type="Node2D" parent="."]' + NL)
+    sc.node('[node name="Marks" type="Node2D" parent="WallGlow"]' + NL
+            + 'script = ExtResource("8_marks")' + NL
+            + "require_line_of_sight = true" + NL)
+    sc.node('[node name="Labels" type="Node2D" parent="WallGlow"]' + NL
+            + 'script = ExtResource("8_marks")' + NL
+            + "reveal_distance = 420.0" + NL + "full_distance = 300.0" + NL)
+    sc.node('[node name="Doors" type="Node2D" parent="WallGlow"]' + NL
+            + 'script = ExtResource("8_marks")' + NL
+            + "reveal_distance = 420.0" + NL + "full_distance = 300.0" + NL)
+    sc.node('[node name="RoomWalls" type="StaticBody2D" parent="."]' + NL)
+    sc.node('[node name="PropBodies" type="StaticBody2D" parent="."]' + NL)
+
+    # ── 방 둘 ────────────────────────────────────────────────
+    _intro_room(sc, "ArtRoom", "미술실", IX0, IY0, IXM + T, IY1)
+    _intro_room(sc, "ArtPrep", "미술 준비실", IXM, IY0, IX1, IY1)
+
+    # ── 벽 ──────────────────────────────────────────────────
+    # 복도 문은 미술실 아래변 가운데. 수위가 이 문을 잠근다(#404 4번).
+    dcx = (IX0 + IXM) / 2
+    dl, dr = dcx - DOOR / 2, dcx + DOOR / 2
+    sc.wall("IntroTop", rect(IX0, IY0, IX1, IY0 + T))
+    sc.wall("IntroLeft", rect(IX0, IY0, IX0 + T, IY1))
+    sc.wall("IntroRight", rect(IX1 - T, IY0, IX1, IY1))
+    sc.wall("IntroBotL", rect(IX0, IY1 - T, dl, IY1))
+    sc.wall("IntroBotR", rect(dr, IY1 - T, IX1, IY1))
+    # **문 틈에 실체를 둔다**(#405). 안 두면 문 그림만 있고 그대로 걸어 나가진다.
+    # 도입부는 미술실에서 나갈 수 없어야 한다 — 창문이 유일한 출구이고,
+    # 이야기에서도 수위가 이 문을 잠근다. 이름을 `...DoorCollision`으로 두어
+    # `verify_scenes`의 벽↔광원 차단체 1:1 검사에 편입시킨다.
+    sc.node('[node name="ArtDoorPanel" type="StaticBody2D" parent="."]' + NL)
+    sc.solid("ArtRoomDoorCollision", "ArtDoorPanel", rect(dl, IY1 - T, dr, IY1))
+    sc.poly2d("Door_ArtRoom", "WallGlow/Doors", C_DOOR,
+              rect(dl, IY1 - T, dr, IY1), z=1)
+    # 나가려 하면 이유를 말해 준다. 잠긴 문이 아니라 "지금 나갈 이유가 없다"다.
+    sc.node(NL.join([
+        '[node name="ArtRoomDoor" type="Area2D" parent="."]',
+        "position = Vector2(%s, %s)" % (n(dcx), n(IY1 - T - 28)),
+        "collision_layer = 2",
+        "collision_mask = 0",
+        'script = ExtResource("3_interactable")',
+        'message = "복도로 나가는 문. 밖은 캄캄하고 아무 소리도 없다. 국어책부터 챙기자."',
+        'prompt_text = "문 살펴보기"',
+        "",
+        '[node name="ArtRoomDoorZone" type="CollisionShape2D" parent="ArtRoomDoor"]',
+        'shape = SubResource("RectangleShape2D_door_zone")',
+        ""]))
+
+    # 미술실 | 준비실 사이 벽 — 가운데에 연결문 틈.
+    mcy = (IY0 + IY1) / 2
+    mt, mb = mcy - DOOR / 2, mcy + DOOR / 2
+    sc.wall("IntroMidT", rect(IXM, IY0, IXM + T, mt))
+    sc.wall("IntroMidB", rect(IXM, mb, IXM + T, IY1))
+    sc.poly2d("Door_ArtPrep", "WallGlow/Doors", C_DOOR,
+              rect(IXM, mt, IXM + T, mb), z=1)
+
+    # ── 창문과 달빛 ──────────────────────────────────────────
+    # 위쪽이 외벽이다. 준비실 창문이 탈출구가 된다(#404 2번에서 배선).
+    sc.room_lights("ArtRoom", IX0, IY0, IXM + T, IY1)
+    sc.room_lights("ArtPrep", IXM, IY0, IX1, IY1)
+    for i, wx in enumerate((220, 520, 820)):
+        sc.wall_decor("ArtWin" + str(i),
+                      rect(wx, IY0 + T, wx + 170, IY0 + T + 12), C_WINDOW)
+        sc.window_light("ArtWin" + str(i), wx + 85, IY0 + T + 46, "ArtRoom")
+    sc.wall_decor("PrepWin", rect(1380, IY0 + T, 1550, IY0 + T + 12), C_WINDOW)
+    sc.window_light("PrepWin", 1465, IY0 + T + 46, "ArtPrep")
+
+    # 준비실 창문이 **유일한 출구**다(#406). 국어책을 챙겨야 나간다 — 그걸
+    # 가지러 온 것이고, 수위 등장의 백스톱(#404 4번)도 여기에 걸린다.
+    sc.node(NL.join([
+        '[node name="PrepWindowEscape" type="Area2D" parent="."]',
+        "position = Vector2(1465, %s)" % n(IY0 + T + 44),
+        "collision_layer = 2",
+        "collision_mask = 0",
+        'script = ExtResource("11_floorlink")',
+        'required_item_id = "korean_book"',
+        'locked_message = "창문은 열린다. 그런데 국어책도 없이 이러려고 온 게 아니다."',
+        'prompt_text = "창문으로 내려가기"',
+        'message = "창틀을 넘어 난간에 발을 디뎠다. 아래층 창문까지 두 걸음."',
+        "target_floor = 3",
+        # 3층 도착지는 **교실1 창가**다. 가운데(2학년부, 1700)에 떨어뜨리면
+        # 계단 열쇠가 있는 방에 착지해 3층 강제 동선이 1720px로 줄었다 —
+        # 끝에서 시작해야 층을 가로지른다(4360px, 2층과 비슷해진다).
+        "arrive_at = Vector2(150, 100)",
+        "",
+        '[node name="PrepWindowEscapeZone" type="CollisionShape2D" '
+        'parent="PrepWindowEscape"]',
+        'shape = SubResource("RectangleShape2D_window_zone")',
+        ""]))
+    sc.mark("PrepWindowEscape", 1465, IY0 + T + 44, C_MARK_KEY, 9.0)
+
+    sc.window_probe("ArtRoom", 605, IY0 + T + 40,
+                    "운동장이 내려다보인다. 4층이라 뛰어내릴 높이는 아니다. "
+                    "창틀 바깥으로 좁은 난간이 옆 창문까지 이어져 있다.")
+
+    # ── 미술실 집기 ──────────────────────────────────────────
+    # **이젤이 정물대를 둘러싼다.** 미술실은 책상이 줄지어 선 교실이 아니라
+    # 가운데를 보고 둘러앉는 방이다 — 격자로 늘어놓으면 다시 교실이 된다.
+    #
+    # 통로를 먼저 잡는다: 가로 y 470~560과 세로 x 660~880이 비어야
+    # `verify_floor_reach`가 방 중심(578,450)에 닿고 준비실 연결문(y 395~505)
+    # 까지 이어진다.
+    _intro_prop(sc, "StillTable", 470, 250, 660, 340, C_STILL)
+    sc.poly2d("PT_StillCloth", "Props", C_CLOTHES,
+              rect(486, 262, 644, 326), z=1)
+    sc.overlay_rects.append((486, 262, 644, 326))
+    sc.poly2d("PT_StillBust", "Props", C_BUST, rect(536, 268, 594, 318), z=1)
+    sc.overlay_rects.append((536, 268, 594, 318))
+    for i, (ex, ey) in enumerate(((300, 210), (300, 360), (720, 210),
+                                  (720, 360), (520, 120))):
+        _intro_prop(sc, "Easel" + str(i), ex, ey, ex + 54, ey + 66, C_EASEL)
+
+    # 벽을 따라 — 석고상 선반, 캔버스 랙, 물감장, 개수대.
+    for i in range(3):
+        bx = 110 + i * 96
+        _intro_prop(sc, "BustShelf" + str(i), bx, IY0 + T + 6, bx + 60,
+                    IY0 + T + 54, C_BUST)
+    _intro_prop(sc, "CanvasRack0", 900, 150, 1096, 206, C_CANVASES)
+    _intro_prop(sc, "CanvasRack1", 900, 220, 1096, 276, C_CANVASES)
+    _intro_prop(sc, "PaintBox", 1036, 300, 1096, 440, C_PAINTBOX)
+    # 붓 씻는 개수대 — 미술실에서 가장 큰 설비다.
+    _intro_prop(sc, "ArtSink", 900, 700, 1096, 764, C_SINK)
+    # 작업대 — 물감을 짜고 붓을 씻는 큰 대. 교실 책상보다 넓고 밝다.
+    for i in range(2):
+        wy = 600 + i * 110
+        _intro_prop(sc, "WorkTop" + str(i), 110, wy, 380, wy + 70, C_WORKTOP)
+    # 국어책이 놓인 책상 — 목표. 들어오는 문 쪽에 두어 바로 눈에 든다.
+    _intro_prop(sc, "BookDesk", 600, 690, 750, 754, C_DESK)
+
+    # 집기 위 소품 — 팔레트·붓통·물감 튜브. 전부 `PT_`라 충돌이 없고 집기
+    # 경계 안에 온전히 들어간다(`verify_props`가 확인한다).
+    for i in range(2):
+        wy = 600 + i * 110
+        sc.poly2d("PT_Palette" + str(i), "Props", C_PALETTE,
+                  rect(126, wy + 14, 190, wy + 52), z=1)
+        sc.overlay_rects.append((126, wy + 14, 190, wy + 52))
+        sc.poly2d("PT_BrushJar" + str(i), "Props", C_BRUSHJAR,
+                  rect(214, wy + 16, 244, wy + 50), z=1)
+        sc.overlay_rects.append((214, wy + 16, 244, wy + 50))
+        for k in range(3):
+            tx = 270 + k * 32
+            sc.poly2d("PT_Tube%d_%d" % (i, k), "Props", C_TUBE,
+                      rect(tx, wy + 24, tx + 22, wy + 40), z=1)
+            sc.overlay_rects.append((tx, wy + 24, tx + 22, wy + 40))
+
+    # 벽에 걸린 학생 그림 — 시우 그림(단서)과 같은 벽에 여럿 걸려 있어야
+    # 그 하나만 액자로 떠 보이지 않는다.
+    for i, wx in enumerate((150, 300, 940, 1030)):
+        sc.wall_decor("StudentArt" + str(i),
+                      rect(wx, IY1 - T - 12, wx + 84, IY1 - T), C_CANVASES)
+    # 칠판은 왼쪽 벽. 은신처 캐비넷(y 424~476)을 피해 아래에 건다.
+    sc.decor("ArtBoard", rect(IX0 + T, 530, IX0 + T + 10, 700), C_BOARD)
+
+    # ── 준비실 집기 ──────────────────────────────────────────
+    for i in range(3):
+        sy = 120 + i * 150
+        _intro_prop(sc, "PrepShelf" + str(i), IX1 - T - 44, sy,
+                    IX1 - T, sy + 120, C_SHELF)
+    _intro_prop(sc, "PrepTable", 1200, 620, 1420, 672, C_DESK)
+    # 준비실은 **미술실의 창고**다 — 석고상 여분, 캔버스 두루마리, 물감 상자.
+    _intro_prop(sc, "PrepBust", 1200, 190, 1272, 250, C_BUST)
+    _intro_prop(sc, "PrepCanvas", 1200, 270, 1290, 330, C_CANVASES)
+    _intro_prop(sc, "PrepPaint", 1200, 350, 1290, 410, C_PAINTBOX)
+    # 날짜가 적힌 벽 — 조사 대상은 아래 PLACEMENT에서 붙는다.
+    sc.decor("DateWallMark", rect(1330, IY1 - T - 10, 1600, IY1 - T), C_PAPER)
+
+    add_hiding(sc, 4)
+    add_story(sc, 4)
+
+    # ── 수위가 찾아오는 장면(#409) ──────────────────────────
+    # 문틈으로 새는 빛. **문 바깥에 광원을 두면 안 된다** — 문짝 차단체
+    # (`LO_ArtRoomDoorCollision`)에 막혀 아무것도 안 보인다. 폴리곤 하나를
+    # `WallGlow`에 두고 알파로 켰다 끈다(어둠도 안 받는다).
+    sc.node(NL.join([
+        '[node name="ArtDoorGlow" type="Polygon2D" parent="WallGlow/Doors"]',
+        'modulate = Color(1, 1, 1, 0)',
+        'z_index = 2',
+        'color = %s' % C_MOON_LIGHT,
+        'polygon = %s' % rect(dl + 6, IY1 - T - 7, dr - 6, IY1 - T),
+        '']))
+    # 장면 진행자. 단서 노드의 `interacted`를 이름으로 찾아 잇는다.
+    sc.node(NL.join([
+        '[node name="ArtRoomIntro" type="Node" parent="."]',
+        'script = ExtResource("12_artintro")',
+        'door_position = Vector2(%s, %s)' % (n(dcx), n(IY1 - T)),
+        'door_glow_path = NodePath("../WallGlow/Doors/ArtDoorGlow")',
+        'door_path = NodePath("../ArtRoomDoor")',
+        'door_after_message = "복도로 나가는 문. 수위가 저쪽에 있다. 지금 나가면 마주친다."',
+        '']))
+    add_clutter(sc)
+    add_examine(sc)
+
+    sc.node('[node name="Walls" type="StaticBody2D" parent="."]' + NL)
+    for nm, pos, shape in [
+        ("TopWall", "Vector2(" + str(IW / 2) + ", 0)", "RectangleShape2D_wall_h"),
+        ("BottomWall", "Vector2(" + str(IW / 2) + ", " + str(IH) + ")",
+         "RectangleShape2D_wall_h"),
+        ("LeftWall", "Vector2(0, " + str(IH / 2) + ")", "RectangleShape2D_wall_v"),
+        ("RightWall", "Vector2(" + str(IW) + ", " + str(IH / 2) + ")",
+         "RectangleShape2D_wall_v"),
+    ]:
+        sc.node('[node name="' + nm + '" type="CollisionShape2D" parent="Walls"]'
+                + NL + "position = " + pos + NL
+                + 'shape = SubResource("' + shape + '")' + NL)
+    return sc
+
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 if __name__ == "__main__":
     # 0 = 운동장(#356). 층이 아니라 탈출 뒤 걸어 나가는 바깥 구간이다.
-    for fl in (0, 1, 2, 3, 4, 5):
+    for fl in (0, 1, 2, 3, 4):
         sc = (build_yard() if fl == 0 else
-              build_floor1() if fl == 1 else build_common(fl, LAYOUT[fl]))
+              build_floor1() if fl == 1 else
+              build_intro() if fl == 4 else build_common(fl, LAYOUT[fl]))
         text = sc.render(ext_for(text_of(sc)))
         name = "school_yard" if fl == 0 else f"school_floor_{fl}"
         path = ROOT / f"scenes/background/{name}.tscn"
