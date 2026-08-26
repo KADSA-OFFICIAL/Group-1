@@ -966,7 +966,9 @@ PLACEMENT = {
         ],
     1: [("StaffRoom", ["PrincipalLetter"]),                       # 교무실 ← 교장실
         ("JanitorRoom", ["PhotoWall", "StudentCards", "JanitorNotebook", "JanitorSafe"]),
-        ("Storage1", ["StairKey"]),                               # 창고 ← 행정실
+        # 1층 계단 열쇠는 없앴다(#396) — 자물쇠도 같이 없어서 열 것이 없다.
+        # story_objects.json의 StairKey 항목은 남겨 둔다(4층 #219와 같은 처리,
+        # 되돌리기 쉽게). 창고(← 행정실)는 그래서 단서 없는 방이 됐다.
         ("Entrance", ["ExitDoor"]),
         # 두 번째 탈출 루트(#393). 열쇠를 묻지 않는다.
         ("YardExit", ["YardGateDoor"]),
@@ -979,7 +981,16 @@ PLACEMENT = {
 SEALED = {2: {1}}
 
 # 각 층 계단은 그 층 열쇠로 연다. 열쇠 획득처는 PLACEMENT 참조(한 층 위에서도 얻는다).
-LOCKED = {1: "stair_key_1", 2: "stair_key_2", 3: "stair_key_3",
+#
+# **1층은 자물쇠가 없다**(#396). 1층 계단이 여는 것은 1층에서 2층으로 **되돌아
+# 올라가는** 길뿐이다 — 2→1층 하강은 2층 열쇠(하단 남자화장실 배수구)로 이미
+# 열리고, 1층 도착 지점은 계단실 밖 복도라 갇히지도 않는다. 그래서 `stair_key_1`은
+# 강제 동선 어디에도 쓰이지 않으면서 인벤토리 5칸 중 하나를 먹었다
+# (#219·#222·#207에서 걷어낸 중복 열쇠와 같은 부류).
+# 열쇠만 지우고 자물쇠를 남기면 **열 수 없는 문**이 되어 "이 층 어딘가에 열쇠가
+# 있을 것이다" 안내가 거짓말이 되고, 2층에서 놓친 단서를 주우러 되돌아갈 길이
+# 막혀 히든 엔딩(#353)이 그 판에서 영구히 닫힌다. 그래서 둘을 함께 없앤다.
+LOCKED = {2: "stair_key_2", 3: "stair_key_3",
           4: "stair_key_4", 5: "stair_key_5"}
 
 
@@ -3134,7 +3145,7 @@ def build_floor1():
     add_room(sc, "StaffRoom", "교무실", sx0, sy0, sx1, sy1, "bottom")
     add_stairwell(sc, "StairA", *FLOOR1["stair"])
     add_stair_markers(sc, "StairA", *FLOOR1["stair"], floor=1)
-    add_stair_locks(sc, 1, LOCKED[1], [FLOOR1["stair"]])
+    # 1층 계단에는 자물쇠가 없다(#396) — LOCKED 주석 참조.
     # 1층 건물은 도면상 아래쪽 절반뿐이다. 북쪽 빈 구역에 경계벽을 세우고
     # 안쪽을 메워, 플레이어가 들어가지도 수위가 스폰되지도 않게 한다.
     sc.wall("Floor1North", rect(0, 1004, W, 1020))
