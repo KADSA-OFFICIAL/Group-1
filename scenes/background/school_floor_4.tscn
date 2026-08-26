@@ -4079,32 +4079,6 @@ texture = ExtResource("9_key")
 shape = SubResource("RectangleShape2D_key_zone")
 
 
-[node name="Mark_FriendNote" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(496.7, 1780.4)
-z_index = 5
-color = Color(1.00, 0.78, 0.32, 1)
-polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
-
-[node name="FriendNote" type="Area2D" parent="."]
-position = Vector2(496.7, 1780.4)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("3_interactable")
-message = "책상 위에 접힌 쪽지. '하람아, 은수 때린 거 수위 아저씨가 봤다더라.' 뒷면에 다른 글씨로 — '나 안 때렸어. 쓰러지길래 잡은 건데.'"
-prompt_text = "조사"
-grants_flag = "found_songharam"
-
-
-[node name="FriendNoteVisual" type="Sprite2D" parent="FriendNote"]
-z_index = 1
-texture_filter = 1
-texture = ExtResource("10_note")
-
-
-[node name="FriendNoteZone" type="CollisionShape2D" parent="FriendNote"]
-shape = SubResource("RectangleShape2D_key_zone")
-
-
 [node name="Mark_CounselRecord" type="Polygon2D" parent="WallGlow/Marks"]
 position = Vector2(1045, 1752)
 z_index = 5
