@@ -248,7 +248,11 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
 ### 개발 시 주의
 
 - 이 환경에는 Godot 바이너리가 없음 — 실행 검증(F5)은 사용자가 수동으로 함. 정적 검증(기하·경로 대조 스크립트)을 기록하고 PR을 연 뒤 사용자 확인을 기다린다.
-- `ci_load_scenes.gd`는 씬을 instantiate만 하고 트리에 붙이지 않는다 — **`_ready`가 돌지 않으므로 노드 경로·시그널 연결은 검증되지 않는다.** 미닫이문처럼 `_ready`에서 자식을 찾는 스크립트를 넣었으면, 층 씬을 `root.add_child()`로 붙이는 임시 스크립트로 따로 확인할 것.
+- `ci_load_scenes.gd`는 씬을 instantiate만 하고 트리에 붙이지 않는다 — `_ready`가 돌지 않는다. **그 빈틈은 `tools/ci_smoke_scenes.gd`(#240)가 메운다** — 씬을 `root.add_child()`로 붙이고 프레임을 돌려 미닫이문 여닫기(몸·시각·충돌), 프롤로그 건너뛰기 버튼, 미술실 도입부 발동·카메라 복귀·유예를 본다. CI에 잡으로 들어 있다.
+  - 이 검사가 있는 이유: `_ready`가 안 돌던 시절 **버그 둘이 `main`까지 머지됐다**(#225 → #234) — 문짝 시각이 레이어 0에 있어 안 보였고, 문 존의 `collision_mask = 1`에 벽·집기가 걸려 **모든 문이 씬을 여는 순간 영구히 열린 채**였다. 둘 다 정적 검사로는 못 잡고 프레임 한 번이면 드러난다.
+  - **일부러 깨뜨려 잡히는 것을 확인했다**: `_apply()`의 `want`를 `true`로 고정(문이 저절로 열림) → 6건 실패, 트윈에서 `_leaf`를 빼기(시각이 안 따라옴) → 실패, `CLUES_TO_TRIGGER`를 1로(잘못 발동) → 실패.
+  - **미닫이문 검사는 1~3층만 한다.** 4층은 도입부라 미술실 문이 미닫이가 아니라 고정 패널(`ArtDoorPanel`)이다(#405) — 4층은 도입부 전용 검사가 따로 본다.
+  - 새 런타임 동작을 넣었으면 여기에 검사를 더할 것. 임시 스크립트를 쓰고 지우기를 열 번 넘게 반복한 끝에 상설로 만든 것이다.
 - .tscn 수정 시 `load_steps` = ext_resource 수 + sub_resource 수 + 1 유지.
 - project.godot에 사용자의 미커밋 변경이 있을 수 있음 — 내 커밋에 섞지 말 것(필요 시 stash로 분리).
 - .gd 스크립트를 새로 만들면 사용자 에디터가 .uid 파일을 생성함 — 발견 시 해당 이슈 브랜치에 커밋.
@@ -334,6 +338,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
 - 플레이어 입력, UI, 충돌, 게임 흐름 확인은 사용자의 수동 F5에 의존합니다.
 - 푸시하면 GitHub Actions(`.github/workflows/ci.yml`)가 정적 검사와 함께
   Godot 4.6 헤드리스 임포트·전체 씬 로드를 실행합니다. 결과는 `gh pr checks <번호>`로 확인합니다.
+  씬 로드는 `tools/ci_load_scenes.gd`, **런타임 스모크는 `tools/ci_smoke_scenes.gd`**(#240)가 맡는다.
   씬 로드는 `tools/ci_load_scenes.gd`가 맡고 씬뿐 아니라 `scripts/` 아래 `.gd`도 전부
   컴파일해 봅니다. 이 스크립트는 **`_init()`이 아니라 `_initialize()`에서 돌아야 합니다**(#183) —
   `--script`로 넘긴 MainLoop는 autoload(`Sfx`) 등록보다 먼저 만들어져서, `_init()`에서
