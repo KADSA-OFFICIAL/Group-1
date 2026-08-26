@@ -115,11 +115,11 @@
     "[node name=\"ShowerMarksZone\" type=\"CollisionShape2D\" parent=\"ShowerMarks\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
    ]
   },
-  "DrainKey": {
-   "body": "[node name=\"DrainKey\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(720, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"배수구 뚜껑이 어긋나 있다. 손을 넣어 보니 젖은 열쇠가 잡혔다. '2F 계단'.\"\nprompt_text = \"배수구 뒤지기\"\ngrants_item_id = \"stair_key_2\"\ngrants_flag = \"found_drain_key\"\n\n",
+  "HeadKey": {
+   "body": "[node name=\"HeadKey\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(720, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"적재함 사이에 무언가 놓여 있다. 사람의 머리다. 한쪽 눈이 있어야 할 자리에 열쇠가 깊이 박혀 있다. 손이 떨렸지만 뽑아 냈다. — '2F 계단'\"\nprompt_text = \"열쇠 뽑기\"\ngrants_item_id = \"stair_key_2\"\ngrants_flag = \"found_head_key\"\n\n",
    "kids": [
-    "[node name=\"DrainKeyVisual\" type=\"Sprite2D\" parent=\"DrainKey\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"9_key\")\n\n",
-    "[node name=\"DrainKeyZone\" type=\"CollisionShape2D\" parent=\"DrainKey\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
+    "[node name=\"HeadKeyVisual\" type=\"Sprite2D\" parent=\"HeadKey\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"15_eyekey\")\n\n",
+    "[node name=\"HeadKeyZone\" type=\"CollisionShape2D\" parent=\"HeadKey\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
    ]
   },
   "HideClass1": {

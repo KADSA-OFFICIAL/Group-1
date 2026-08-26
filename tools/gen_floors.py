@@ -301,7 +301,8 @@ TEXTURES = {f"tex_{stem}": f"{TEX_DIR}/{stem}.png"
 SPRITE_TEXTURES = {"9_key": "res://assets/sprites/key.png",
                    "10_note": "res://assets/sprites/note.png",
                    "13_inkcan": "res://assets/sprites/ink_can.png",
-                   "14_beaker": "res://assets/sprites/beaker.png"}
+                   "14_beaker": "res://assets/sprites/beaker.png",
+                   "15_eyekey": "res://assets/sprites/eye_key.png"}
 
 # 텍스처 설정을 물려받을 부모가 없는 CanvasLayer 직속 노드. #307에서 벽·문·계단
 # 시각이 전부 레이어 0(`Structures`)으로 내려가면서 비었다가, #318에서 문
@@ -919,7 +920,7 @@ SCRIPTS = {
     # 9_key·10_note는 SPRITE_TEXTURES가 쓴다(단서 스프라이트) — 겹치면 안 된다.
     "11_floorlink": "res://scripts/interactions/floor_link.gd",
     "12_artintro": "res://scripts/game/art_room_intro.gd",
-    # 13_inkcan·14_beaker도 SPRITE_TEXTURES 쪽이다(#427).
+    # 13_inkcan·14_beaker도 SPRITE_TEXTURES 쪽이다(#427). 15_eyekey도 그렇다(#438).
 }
 
 
@@ -974,8 +975,13 @@ PLACEMENT = {
     2: [
         # 컴퓨터실은 +2800px이라 부서실로. 대응 매뉴얼은 전 부서에 돌린 문서다.
         ("PEDept", ["YujinClue", "CrisisManual"]),
-        ("StorageR", ["HistoryClue"]),            # 창고 +780px — 10년 전 졸업앨범
-        ("MensRoomB", ["ShowerMarks", "DrainKey"]),   # 화장실 ← 샤워실
+        # 2층 계단 열쇠는 #438에서 하단 남자화장실 배수구에서 여기로 옮겼다.
+        # 창고는 도착 계단에서 +780px라 진행 필수 아이템 기준(+1500px) 안이고,
+        # 화장실보다 강제 동선에 가깝다. 그림도 범용 열쇠에서 전용 아트로
+        # 바뀌었다 — 눈구멍에 열쇠가 박힌 머리(`assets/sprites/eye_key.png`).
+        ("StorageR", ["HistoryClue", "HeadKey"]),  # 창고 +780px — 졸업앨범 + 열쇠
+        # 끌린 자국은 열쇠와 무관한 스토리 단서라 화장실에 남는다.
+        ("MensRoomB", ["ShowerMarks"]),           # 화장실 ← 샤워실
         ],
     1: [("StaffRoom", ["PrincipalLetter"]),                       # 교무실 ← 교장실
         ("JanitorRoom", ["PhotoWall", "StudentCards", "JanitorNotebook", "JanitorSafe"]),
@@ -1033,6 +1039,18 @@ POS_OVERRIDE = {
     (4, "SiwooPainting"): (800, 846),   # 아래쪽 벽, 학생 그림 사이
     (4, "Belongings"): (1310, 646),     # 준비실 작업대 위
     (4, "DateWall"): (1465, 848),       # 준비실 아래쪽 벽에 적힌 날짜
+    # 2층 창고(1920,720)~(2295,1000), 내벽 안쪽 (1936,736)~(2279,984) = 343x248.
+    # #438에서 계단 열쇠가 들어와 단서가 둘이 되자 **집기가 하나도 안 남았다**
+    # (verify_props: "floor2: 집기 없는 방 — StorageR"). 단서 하나가 반경
+    # PROP_CLUE_CLEAR(76)를 비우는데, 자동 배치는 방을 균등 분할해 x를 1/3·2/3
+    # (2045·2170), y를 0.62(894)에 놓는다 — 두 정사각형이 x 1969~2246,
+    # y 818~970을 덮어 폭도 높이도 자투리만 남는다.
+    #
+    # 그래서 **둘 다 아래쪽 벽에 붙여 좌우 구석으로 벌린다.** 문이 위쪽 벽
+    # 한가운데(x 2052~2162)라 위쪽 띠를 비워야 문 앞이 막히지 않는데, 이렇게
+    # 두면 y 736~874(138px)가 폭 전체로 남아 선반이 들어간다.
+    (2, "HistoryClue"): (2000, 950),    # 졸업앨범 — 왼쪽 아래 구석
+    (2, "HeadKey"): (2215, 950),        # 머리 — 오른쪽 아래 구석
 }
 
 # 방 안 가구(시각 전용). 충돌은 넣지 않는다 — 통행·수위 경로탐색·도달성 검사에
@@ -1063,7 +1081,7 @@ def add_furniture(sc, floor):
 # 층마다 조작이 달랐다. 메시지와 플래그는 그대로 옮긴다.
 # KeyCabinet은 #207에서 열쇠 지급을 뗐으므로 여기 들어가지 않는다(E 조사 단서).
 # TaehoNote는 #222에서 열쇠 지급을 뗐으므로 여기 들어가지 않는다(E 조사 단서).
-AUTO_PICKUP = {"SpareKeyHook", "DrainKey", "JanitorSafe"}
+AUTO_PICKUP = {"SpareKeyHook", "HeadKey", "JanitorSafe"}
 
 
 def to_pickup(body):
