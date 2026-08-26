@@ -35,7 +35,6 @@ C_SLAB = "Color(0.1, 0.12, 0.13, 1)"
 C_STEP = "Color(0.22, 0.24, 0.28, 1)"
 C_LOCK = "Color(0.55, 0.26, 0.22, 1)"   # 잠긴 계단 배리어
 C_KEY = "Color(0.85, 0.74, 0.32, 1)"    # 열쇠
-C_SEAL = "Color(0.38, 0.38, 0.40, 1)"   # 영구 봉인된 계단(콘크리트)
 
 # 방 안 집기 — 어둠(CanvasModulate)을 받는 Props 레이어라 손전등에 들어와야 보인다.
 C_DESK = "Color(0.29, 0.23, 0.17, 1)"    # 나무 책상·탁자
@@ -175,7 +174,6 @@ TEX = {
     ROOM_FLOOR["computer"]: "floor_panel",
     # 벽·문·계단
     C_WALL: "wall_brick",
-    C_SEAL: "wall_brick",
     C_PILASTER: "wall_brick",
     C_STEP: "wall_brick",
     C_SLAB: "floor_cement",
@@ -1231,8 +1229,12 @@ def add_story(sc, floor):
 
 def add_stair_locks(sc, floor, key_id, stairwells):
     """계단 입구 자물쇠. 한 층의 계단 전부를 열쇠 하나로 연다(기존 규약).
-    SEALED에 든 계단은 열쇠로도 열리지 않으므로, 배리어를 StairLocks 밖에 두어
-    자물쇠가 풀려도 남게 하고 자물쇠 대신 안내 문구만 붙인다.
+
+    **SEALED에 든 계단은 아무 노드도 내지 않는다**(#400). 예전에는 콘크리트
+    배리어 + "계단 살펴보기" 조사 + 흐린 표시를 냈는데, 배리어 시각이
+    `WallGlow/Doors`에 있어(#359) 어둠·손전등을 받지 않아서 **캄캄한 복도에
+    회색 문 한 짝만 떠 있었다.** 지금은 `add_stairwell(sealed=True)`이 입구
+    문 틈 자체를 내지 않아 벽으로 이어지므로 막을 것이 없다.
 
     **배리어 시각은 `WallGlow/Doors`에 낸다**(#359). #307에서 벽·계단 시각을
     레이어 0으로 내렸고 #318에서 **문만** 되돌렸는데, 계단 자물쇠가 그 되돌림에서
@@ -1241,42 +1243,25 @@ def add_stair_locks(sc, floor, key_id, stairwells):
     sealed = SEALED.get(floor, set())
     tags = ["SU", "SD"][:len(stairwells)]
     sc.node('[node name="StairLocks" type="Node2D" parent="."]\n')
-    if sealed:
-        sc.node('[node name="SealedStairs" type="Node2D" parent="."]\n')
 
     visual_paths = []
     for i, (tag, (x0, y0, x1, y1)) in enumerate(zip(tags, stairwells)):
+        if i in sealed:
+            continue
         mid = (x0 + x1) / 2
         bar = rect(mid - DOOR, y0, mid + DOOR, y0 + T)
-        if i in sealed:
-            sc.node(f'[node name="{tag}Seal" type="StaticBody2D" parent="SealedStairs"]\n')
-            sc.solid(f"{tag}SealCollision", f"SealedStairs/{tag}Seal", bar)
-            sc.poly2d(f"{tag}SealVisual", "WallGlow/Doors", C_SEAL, bar, z=2)
-        else:
-            sc.node(f'[node name="{tag}Barrier" type="StaticBody2D" parent="StairLocks"]\n')
-            sc.solid(f"{tag}BarrierCollision", f"StairLocks/{tag}Barrier", bar)
-            sc.poly2d(f"{tag}BarrierVisual", "WallGlow/Doors", C_LOCK, bar, z=2)
-            # #318로 `WallGlow/<이름>`이 `WallGlow/Doors/<이름>`이 됐는데 이 경로가
-            # 따라가지 않아, 자물쇠를 열어도 **반대쪽 배리어 그림이 남았다**(#359).
-            # get_node_or_null이라 조용히 실패해서 CI가 못 잡는다.
-            visual_paths.append(f'NodePath("../WallGlow/Doors/{tag}BarrierVisual")')
+        sc.node(f'[node name="{tag}Barrier" type="StaticBody2D" parent="StairLocks"]\n')
+        sc.solid(f"{tag}BarrierCollision", f"StairLocks/{tag}Barrier", bar)
+        sc.poly2d(f"{tag}BarrierVisual", "WallGlow/Doors", C_LOCK, bar, z=2)
+        # #318로 `WallGlow/<이름>`이 `WallGlow/Doors/<이름>`이 됐는데 이 경로가
+        # 따라가지 않아, 자물쇠를 열어도 **반대쪽 배리어 그림이 남았다**(#359).
+        # get_node_or_null이라 조용히 실패해서 CI가 못 잡는다.
+        visual_paths.append(f'NodePath("../WallGlow/Doors/{tag}BarrierVisual")')
 
     open_tags = [tg for i, tg in enumerate(tags) if i not in sealed]
     for i, (tag, (x0, y0, x1, y1)) in enumerate(zip(tags, stairwells)):
         mid = (x0 + x1) / 2
         if i in sealed:
-            sc.node(
-                f'[node name="{tag}Sealed" type="Area2D" parent="."]\n'
-                f'position = Vector2({n(mid)}, {n(y0 - 24)})\n'
-                f'collision_layer = 2\ncollision_mask = 0\n'
-                f'script = ExtResource("3_interactable")\n'
-                f'message = "계단 입구가 콘크리트로 메워져 있다. 아래층으로는 통하지 않는다."\n'
-                f'prompt_text = "계단 살펴보기"\n')
-            sc.node(f'[node name="{tag}SealedZone" type="CollisionShape2D" parent="{tag}Sealed"]\n'
-                    f'shape = SubResource("RectangleShape2D_stair_zone")\n')
-
-            # 봉인 계단은 진행에 쓸 수 없다 — 흐린 표시로 '여기는 아니다'만 알린다.
-            sc.mark(f"{tag}Sealed", mid, y0 - 24, C_MARK_FLAVOR, 6.0)
             continue
         removes = [f'NodePath("../{o}Lock")' for o in open_tags if o != tag] + visual_paths
         sc.node(
@@ -1302,19 +1287,28 @@ def add_stair_locks(sc, floor, key_id, stairwells):
         sc.mark(f"{tag}Lock", mid, y0 - 24, C_MARK_KEY, 9.0)
 
 
-def add_stairwell(sc, name, x0, y0, x1, y1):
-    """계단실: 바닥 + 계단 단 + 난간(좌·우·앞) + 가운데 분할 난간."""
+def add_stairwell(sc, name, x0, y0, x1, y1, sealed=False):
+    """계단실: 바닥 + 계단 단 + 난간(좌·우·앞) + 가운데 분할 난간.
+
+    `sealed`면 입구 문 틈을 내지 않고 **한 장의 벽으로 잇는다**(#400). 예전에는
+    문 틈을 낸 뒤 `add_stair_locks()`가 콘크리트 배리어로 막았는데, 그 배리어
+    시각이 `WallGlow/Doors`에 있어(#359) 어둠·손전등을 받지 않았다 — 주변 벽은
+    캄캄한데 봉인 조각만 저절로 밝아져서, 갈 수 없는 곳이 복도에서 가장 눈에
+    띄는 문으로 읽혔다. 갈 수 없으면 문이 아니라 벽이어야 한다.
+    """
     sc.poly2d(f"Slab_{name}", "Stairwells", C_SLAB, rect(x0, y0, x1, y1))
     for i in range(4):
         yy = y1 - 42 - i * 26
         sc.poly2d(f"Step_{name}_{i+1}", "Stairwells", C_STEP, rect(x0 + 26, yy, x1 - 26, yy + 14))
     mid = (x0 + x1) / 2
+    entrance = ([(f"RC_{name}_E", rect(x0, y0, x1, y0 + T))] if sealed else
+                [(f"RC_{name}_EL", rect(x0, y0, mid - DOOR, y0 + T)),
+                 (f"RC_{name}_ER", rect(mid + DOOR, y0, x1, y0 + T))])
     for key, p in [
         (f"RC_{name}_L", rect(x0, y0, x0 + T, y1)),
         (f"RC_{name}_R", rect(x1 - T, y0, x1, y1)),
         (f"RC_{name}_F", rect(x0, y1 - T, x1, y1)),
-        (f"RC_{name}_EL", rect(x0, y0, mid - DOOR, y0 + T)),
-        (f"RC_{name}_ER", rect(mid + DOOR, y0, x1, y0 + T)),
+    ] + entrance + [
         (f"RC_{name}_M", rect(mid - T / 2, y0 + T, mid + T / 2, y1 - T)),
     ]:
         sc.solid(key, "StairWalls", p)
@@ -3030,11 +3024,15 @@ def build_common(fl, spec):
     for key, lb, x0, x1 in MID_RIGHT:
         add_room(sc, key, lb, x0, MID_Y0, x1, MID_Y1, "top" if lb else None)
 
-    # 계단실 2곳
-    add_stairwell(sc, "StairA", *STAIR_A)
-    add_stairwell(sc, "StairB", *STAIR_B)
-    add_stair_markers(sc, "StairA", *STAIR_A, floor=fl)
-    if 1 not in SEALED.get(fl, set()):
+    # 계단실 2곳. 봉인된 쪽(#400)은 입구를 벽으로 이어 문 틈을 내지 않는다 —
+    # 갈 수 없는 곳에 문을 그려 두면 어둠을 안 받는 `WallGlow/Doors` 때문에
+    # 복도에서 가장 눈에 띄는 물건이 된다.
+    sealed = SEALED.get(fl, set())
+    add_stairwell(sc, "StairA", *STAIR_A, sealed=0 in sealed)
+    add_stairwell(sc, "StairB", *STAIR_B, sealed=1 in sealed)
+    if 0 not in sealed:
+        add_stair_markers(sc, "StairA", *STAIR_A, floor=fl)
+    if 1 not in sealed:
         add_stair_markers(sc, "StairB", *STAIR_B, floor=fl)
     if fl in LOCKED:
         add_stair_locks(sc, fl, LOCKED[fl], [STAIR_A, STAIR_B])
