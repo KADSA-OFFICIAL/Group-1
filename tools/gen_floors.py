@@ -35,7 +35,6 @@ C_SLAB = "Color(0.1, 0.12, 0.13, 1)"
 C_STEP = "Color(0.22, 0.24, 0.28, 1)"
 C_LOCK = "Color(0.55, 0.26, 0.22, 1)"   # 잠긴 계단 배리어
 C_KEY = "Color(0.85, 0.74, 0.32, 1)"    # 열쇠
-C_SEAL = "Color(0.38, 0.38, 0.40, 1)"   # 영구 봉인된 계단(콘크리트)
 
 # 방 안 집기 — 어둠(CanvasModulate)을 받는 Props 레이어라 손전등에 들어와야 보인다.
 C_DESK = "Color(0.29, 0.23, 0.17, 1)"    # 나무 책상·탁자
@@ -175,7 +174,6 @@ TEX = {
     ROOM_FLOOR["computer"]: "floor_panel",
     # 벽·문·계단
     C_WALL: "wall_brick",
-    C_SEAL: "wall_brick",
     C_PILASTER: "wall_brick",
     C_STEP: "wall_brick",
     C_SLAB: "floor_cement",
@@ -976,9 +974,19 @@ PLACEMENT = {
     5: [("ArtRoom", ["Blackboard", "ArtRoomDoorLock"]),
         ("ArtStorage", ["StairKey"])],
 }
-# 영구 봉인 계단(열쇠로도 열리지 않음). 2층 하단 중앙 계단은 그 아래가 1층
-# 현관·중앙 구역이라 계단이 내려갈 자리가 없다 — 도면 구조를 지키려고 막는다.
-SEALED = {2: {1}}
+# 계단실 자체가 없는 자리(#398). 2층 하단 중앙은 그 아래가 1층 현관·중앙
+# 구역이라 계단이 내려갈 자리가 없다.
+#
+# 예전에는 계단실을 그려 놓고 입구만 콘크리트로 봉인했는데(SEALED), 게임 전체가
+# "층별 열쇠로 계단을 연다"는 규칙 위에 있어서 **막힌 계단실은 아직 못 연 계단으로
+# 읽힌다** — 있지도 않은 열쇠를 찾아 2층을 한 바퀴 더 돌게 만들었다. 도면상 계단이
+# 없는 자리는 계단이 없는 것으로 보여야 한다. 그래서 계단실을 아예 내지 않고
+# 하단 띠의 다른 빈 구간과 같이 실체로 메운다(add_infill).
+#
+# floor_manager.gd의 NO_STAIRWELL과 짝이다. 저쪽 STAIRS에는 사각형이 남아 있다 —
+# 3층 하단 계단에서 내려올 때의 **도착 지점** 기준이기 때문이다(도착 지점은
+# 계단실 밖 복도라 메운 자리에 걸리지 않는다).
+NO_STAIRWELL = {2: {1}}
 
 # 각 층 계단은 그 층 열쇠로 연다. 열쇠 획득처는 PLACEMENT 참조(한 층 위에서도 얻는다).
 #
@@ -1240,56 +1248,34 @@ def add_story(sc, floor):
                 sc.node(kid if kid.endswith("\n") else kid + "\n")
 
 
-def add_stair_locks(sc, floor, key_id, stairwells):
+def add_stair_locks(sc, floor, key_id, wells):
     """계단 입구 자물쇠. 한 층의 계단 전부를 열쇠 하나로 연다(기존 규약).
-    SEALED에 든 계단은 열쇠로도 열리지 않으므로, 배리어를 StairLocks 밖에 두어
-    자물쇠가 풀려도 남게 하고 자물쇠 대신 안내 문구만 붙인다.
+
+    `wells`는 (태그, 사각형) 목록이다 — 태그를 자리에서 유추하지 않고 받는 이유는
+    **계단실이 아예 없는 자리**가 생겼기 때문이다(#398, `NO_STAIRWELL`).
+    ["SU","SD"][:len(...)]로 잘라 쓰면 아래쪽 계단만 남은 층에서 태그가 밀린다.
 
     **배리어 시각은 `WallGlow/Doors`에 낸다**(#359). #307에서 벽·계단 시각을
     레이어 0으로 내렸고 #318에서 **문만** 되돌렸는데, 계단 자물쇠가 그 되돌림에서
     빠져 있었다 — 손전등이 정확히 비출 때만 보여서 복도에서 계단을 찾을 수 없었다.
     게임에서 가장 중요한 문이 유일하게 안 보이는 문이었다."""
-    sealed = SEALED.get(floor, set())
-    tags = ["SU", "SD"][:len(stairwells)]
     sc.node('[node name="StairLocks" type="Node2D" parent="."]\n')
-    if sealed:
-        sc.node('[node name="SealedStairs" type="Node2D" parent="."]\n')
 
     visual_paths = []
-    for i, (tag, (x0, y0, x1, y1)) in enumerate(zip(tags, stairwells)):
+    for tag, (x0, y0, x1, y1) in wells:
         mid = (x0 + x1) / 2
         bar = rect(mid - DOOR, y0, mid + DOOR, y0 + T)
-        if i in sealed:
-            sc.node(f'[node name="{tag}Seal" type="StaticBody2D" parent="SealedStairs"]\n')
-            sc.solid(f"{tag}SealCollision", f"SealedStairs/{tag}Seal", bar)
-            sc.poly2d(f"{tag}SealVisual", "WallGlow/Doors", C_SEAL, bar, z=2)
-        else:
-            sc.node(f'[node name="{tag}Barrier" type="StaticBody2D" parent="StairLocks"]\n')
-            sc.solid(f"{tag}BarrierCollision", f"StairLocks/{tag}Barrier", bar)
-            sc.poly2d(f"{tag}BarrierVisual", "WallGlow/Doors", C_LOCK, bar, z=2)
-            # #318로 `WallGlow/<이름>`이 `WallGlow/Doors/<이름>`이 됐는데 이 경로가
-            # 따라가지 않아, 자물쇠를 열어도 **반대쪽 배리어 그림이 남았다**(#359).
-            # get_node_or_null이라 조용히 실패해서 CI가 못 잡는다.
-            visual_paths.append(f'NodePath("../WallGlow/Doors/{tag}BarrierVisual")')
+        sc.node(f'[node name="{tag}Barrier" type="StaticBody2D" parent="StairLocks"]\n')
+        sc.solid(f"{tag}BarrierCollision", f"StairLocks/{tag}Barrier", bar)
+        sc.poly2d(f"{tag}BarrierVisual", "WallGlow/Doors", C_LOCK, bar, z=2)
+        # #318로 `WallGlow/<이름>`이 `WallGlow/Doors/<이름>`이 됐는데 이 경로가
+        # 따라가지 않아, 자물쇠를 열어도 **반대쪽 배리어 그림이 남았다**(#359).
+        # get_node_or_null이라 조용히 실패해서 CI가 못 잡는다.
+        visual_paths.append(f'NodePath("../WallGlow/Doors/{tag}BarrierVisual")')
 
-    open_tags = [tg for i, tg in enumerate(tags) if i not in sealed]
-    for i, (tag, (x0, y0, x1, y1)) in enumerate(zip(tags, stairwells)):
+    for tag, (x0, y0, x1, y1) in wells:
         mid = (x0 + x1) / 2
-        if i in sealed:
-            sc.node(
-                f'[node name="{tag}Sealed" type="Area2D" parent="."]\n'
-                f'position = Vector2({n(mid)}, {n(y0 - 24)})\n'
-                f'collision_layer = 2\ncollision_mask = 0\n'
-                f'script = ExtResource("3_interactable")\n'
-                f'message = "계단 입구가 콘크리트로 메워져 있다. 아래층으로는 통하지 않는다."\n'
-                f'prompt_text = "계단 살펴보기"\n')
-            sc.node(f'[node name="{tag}SealedZone" type="CollisionShape2D" parent="{tag}Sealed"]\n'
-                    f'shape = SubResource("RectangleShape2D_stair_zone")\n')
-
-            # 봉인 계단은 진행에 쓸 수 없다 — 흐린 표시로 '여기는 아니다'만 알린다.
-            sc.mark(f"{tag}Sealed", mid, y0 - 24, C_MARK_FLAVOR, 6.0)
-            continue
-        removes = [f'NodePath("../{o}Lock")' for o in open_tags if o != tag] + visual_paths
+        removes = [f'NodePath("../{o}Lock")' for o, _ in wells if o != tag] + visual_paths
         sc.node(
             f'[node name="{tag}Lock" type="Area2D" parent="."]\n'
             f'position = Vector2({n(mid)}, {n(y0 + T / 2)})\n'
@@ -2970,12 +2956,15 @@ def add_infill(sc, fl, spec):
             fill_band_gap(sc, f"GapSouth{i}", gx0, gx1, SOUTH_Y0, SOUTH_Y1)
 
     # 하단 띠 — 방과 계단실 B 사이의 빈 구간(전부 막다른 곳).
-    bot = [(STAIR_B[0], STAIR_B[2])] + [(x0, x1) for _, _, x0, x1
-                                         in spec["bottom_left"] + BOTTOM_RIGHT]
+    # 계단실 B가 없는 층(#398)은 그 x 구간도 그냥 틈이라 이웃 틈과 이어 메운다.
+    has_b = 1 not in NO_STAIRWELL.get(fl, set())
+    bot = ([(STAIR_B[0], STAIR_B[2])] if has_b else []) \
+        + [(x0, x1) for _, _, x0, x1 in spec["bottom_left"] + BOTTOM_RIGHT]
     for i, (gx0, gx1) in enumerate(gaps_in(bot, EDGE, W - EDGE)):
         fill_band_gap(sc, f"GapBot{i}", gx0, gx1, BOT_Y0, BOT_Y1)
-    # 계단실 B 아래 남는 띠(계단실 2440 < 하단 띠 2480).
-    fill_band_gap(sc, "GapStairB", STAIR_B[0], STAIR_B[2], STAIR_B[3], BOT_Y1)
+    if has_b:
+        # 계단실 B 아래 남는 띠(계단실 2440 < 하단 띠 2480).
+        fill_band_gap(sc, "GapStairB", STAIR_B[0], STAIR_B[2], STAIR_B[3], BOT_Y1)
 
 
 def build_common(fl, spec):
@@ -3041,14 +3030,18 @@ def build_common(fl, spec):
     for key, lb, x0, x1 in MID_RIGHT:
         add_room(sc, key, lb, x0, MID_Y0, x1, MID_Y1, "top" if lb else None)
 
-    # 계단실 2곳
-    add_stairwell(sc, "StairA", *STAIR_A)
-    add_stairwell(sc, "StairB", *STAIR_B)
-    add_stair_markers(sc, "StairA", *STAIR_A, floor=fl)
-    if 1 not in SEALED.get(fl, set()):
-        add_stair_markers(sc, "StairB", *STAIR_B, floor=fl)
+    # 계단실 2곳 — 단, NO_STAIRWELL에 든 자리는 계단실 자체를 내지 않는다(#398).
+    # 그 자리는 add_infill이 하단 띠의 빈 구간으로 보고 실체로 메운다.
+    gone = NO_STAIRWELL.get(fl, set())
+    here = [(i, tag, nm, r) for i, (tag, nm, r)
+            in enumerate((("SU", "StairA", STAIR_A), ("SD", "StairB", STAIR_B)))
+            if i not in gone]
+    for _i, _tag, nm, r in here:
+        add_stairwell(sc, nm, *r)
+    for _i, _tag, nm, r in here:
+        add_stair_markers(sc, nm, *r, floor=fl)
     if fl in LOCKED:
-        add_stair_locks(sc, fl, LOCKED[fl], [STAIR_A, STAIR_B])
+        add_stair_locks(sc, fl, LOCKED[fl], [(tag, r) for _i, tag, _nm, r in here])
 
     # 공백 구역(건물 밖) 봉인 — 중앙다리 폭만 열어 둔다.
     # 위 경계: 왼쪽은 수평, 오른쪽은 중간 띠와 같은 기울기.

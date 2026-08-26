@@ -1,4 +1,4 @@
-[gd_scene load_steps=244 format=3]
+[gd_scene load_steps=235 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
@@ -336,29 +336,8 @@ polygon = PackedVector2Array(630, 720, 740, 720, 740, 736, 630, 736)
 [sub_resource type="OccluderPolygon2D" id="Occ_RC_StairA_M"]
 polygon = PackedVector2Array(512, 736, 528, 736, 528, 984, 512, 984)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairB_L"]
-polygon = PackedVector2Array(1450, 2120, 1466, 2120, 1466, 2440, 1450, 2440)
-
-[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairB_R"]
-polygon = PackedVector2Array(1874, 2120, 1890, 2120, 1890, 2440, 1874, 2440)
-
-[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairB_F"]
-polygon = PackedVector2Array(1450, 2424, 1890, 2424, 1890, 2440, 1450, 2440)
-
-[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairB_EL"]
-polygon = PackedVector2Array(1450, 2120, 1560, 2120, 1560, 2136, 1450, 2136)
-
-[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairB_ER"]
-polygon = PackedVector2Array(1780, 2120, 1890, 2120, 1890, 2136, 1780, 2136)
-
-[sub_resource type="OccluderPolygon2D" id="Occ_RC_StairB_M"]
-polygon = PackedVector2Array(1662, 2136, 1678, 2136, 1678, 2424, 1662, 2424)
-
 [sub_resource type="OccluderPolygon2D" id="Occ_SUBarrierCollision"]
 polygon = PackedVector2Array(410, 720, 630, 720, 630, 736, 410, 736)
-
-[sub_resource type="OccluderPolygon2D" id="Occ_SDSealCollision"]
-polygon = PackedVector2Array(1560, 2120, 1780, 2120, 1780, 2136, 1560, 2136)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_WC_VoidTopL"]
 polygon = PackedVector2Array(0, 1000, 1670, 1000, 1670, 1016, 0, 1016)
@@ -586,16 +565,10 @@ polygon = PackedVector2Array(20, 720, 300, 720, 300, 1000, 20, 1000)
 polygon = PackedVector2Array(740, 720, 800, 720, 800, 1000, 740, 1000)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_WC_GapBot0"]
-polygon = PackedVector2Array(20, 2120, 1450, 2120, 1450, 2480, 20, 2480)
+polygon = PackedVector2Array(20, 2120, 2270, 2120, 2270, 2480, 20, 2480)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_WC_GapBot1"]
-polygon = PackedVector2Array(1890, 2120, 2270, 2120, 2270, 2480, 1890, 2480)
-
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_GapBot2"]
 polygon = PackedVector2Array(2820, 2120, 3380, 2120, 3380, 2480, 2820, 2480)
-
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_GapStairB"]
-polygon = PackedVector2Array(1450, 2440, 1890, 2440, 1890, 2480, 1450, 2480)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_North1DoorCollision"]
 polygon = PackedVector2Array(151.7, 524, 261.7, 524, 261.7, 540, 151.7, 540)
@@ -2581,97 +2554,6 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(512, 736, 528, 736, 528, 984, 512, 984)
 
-[node name="Slab_StairB" type="Polygon2D" parent="Stairwells"]
-texture = ExtResource("tex_floor_cement")
-color = Color(0.1282, 0.1538, 0.1667, 1)
-polygon = PackedVector2Array(1450, 2120, 1890, 2120, 1890, 2440, 1450, 2440)
-
-[node name="Step_StairB_1" type="Polygon2D" parent="Stairwells"]
-texture = ExtResource("tex_wall_brick")
-color = Color(0.2821, 0.3077, 0.359, 1)
-polygon = PackedVector2Array(1476, 2398, 1864, 2398, 1864, 2412, 1476, 2412)
-
-[node name="Step_StairB_2" type="Polygon2D" parent="Stairwells"]
-texture = ExtResource("tex_wall_brick")
-color = Color(0.2821, 0.3077, 0.359, 1)
-polygon = PackedVector2Array(1476, 2372, 1864, 2372, 1864, 2386, 1476, 2386)
-
-[node name="Step_StairB_3" type="Polygon2D" parent="Stairwells"]
-texture = ExtResource("tex_wall_brick")
-color = Color(0.2821, 0.3077, 0.359, 1)
-polygon = PackedVector2Array(1476, 2346, 1864, 2346, 1864, 2360, 1476, 2360)
-
-[node name="Step_StairB_4" type="Polygon2D" parent="Stairwells"]
-texture = ExtResource("tex_wall_brick")
-color = Color(0.2821, 0.3077, 0.359, 1)
-polygon = PackedVector2Array(1476, 2320, 1864, 2320, 1864, 2334, 1476, 2334)
-
-[node name="RC_StairB_L" type="CollisionPolygon2D" parent="StairWalls"]
-polygon = PackedVector2Array(1450, 2120, 1466, 2120, 1466, 2440, 1450, 2440)
-
-[node name="LO_RC_StairB_L" type="LightOccluder2D" parent="StairWalls"]
-occluder = SubResource("Occ_RC_StairB_L")
-
-[node name="Rail_StairB_L" type="Polygon2D" parent="Structures"]
-texture = ExtResource("tex_wall_brick")
-color = Color(0.3654, 0.3846, 0.4295, 1)
-polygon = PackedVector2Array(1450, 2120, 1466, 2120, 1466, 2440, 1450, 2440)
-
-[node name="RC_StairB_R" type="CollisionPolygon2D" parent="StairWalls"]
-polygon = PackedVector2Array(1874, 2120, 1890, 2120, 1890, 2440, 1874, 2440)
-
-[node name="LO_RC_StairB_R" type="LightOccluder2D" parent="StairWalls"]
-occluder = SubResource("Occ_RC_StairB_R")
-
-[node name="Rail_StairB_R" type="Polygon2D" parent="Structures"]
-texture = ExtResource("tex_wall_brick")
-color = Color(0.3654, 0.3846, 0.4295, 1)
-polygon = PackedVector2Array(1874, 2120, 1890, 2120, 1890, 2440, 1874, 2440)
-
-[node name="RC_StairB_F" type="CollisionPolygon2D" parent="StairWalls"]
-polygon = PackedVector2Array(1450, 2424, 1890, 2424, 1890, 2440, 1450, 2440)
-
-[node name="LO_RC_StairB_F" type="LightOccluder2D" parent="StairWalls"]
-occluder = SubResource("Occ_RC_StairB_F")
-
-[node name="Rail_StairB_F" type="Polygon2D" parent="Structures"]
-texture = ExtResource("tex_wall_brick")
-color = Color(0.3654, 0.3846, 0.4295, 1)
-polygon = PackedVector2Array(1450, 2424, 1890, 2424, 1890, 2440, 1450, 2440)
-
-[node name="RC_StairB_EL" type="CollisionPolygon2D" parent="StairWalls"]
-polygon = PackedVector2Array(1450, 2120, 1560, 2120, 1560, 2136, 1450, 2136)
-
-[node name="LO_RC_StairB_EL" type="LightOccluder2D" parent="StairWalls"]
-occluder = SubResource("Occ_RC_StairB_EL")
-
-[node name="Rail_StairB_EL" type="Polygon2D" parent="Structures"]
-texture = ExtResource("tex_wall_brick")
-color = Color(0.3654, 0.3846, 0.4295, 1)
-polygon = PackedVector2Array(1450, 2120, 1560, 2120, 1560, 2136, 1450, 2136)
-
-[node name="RC_StairB_ER" type="CollisionPolygon2D" parent="StairWalls"]
-polygon = PackedVector2Array(1780, 2120, 1890, 2120, 1890, 2136, 1780, 2136)
-
-[node name="LO_RC_StairB_ER" type="LightOccluder2D" parent="StairWalls"]
-occluder = SubResource("Occ_RC_StairB_ER")
-
-[node name="Rail_StairB_ER" type="Polygon2D" parent="Structures"]
-texture = ExtResource("tex_wall_brick")
-color = Color(0.3654, 0.3846, 0.4295, 1)
-polygon = PackedVector2Array(1780, 2120, 1890, 2120, 1890, 2136, 1780, 2136)
-
-[node name="RC_StairB_M" type="CollisionPolygon2D" parent="StairWalls"]
-polygon = PackedVector2Array(1662, 2136, 1678, 2136, 1678, 2424, 1662, 2424)
-
-[node name="LO_RC_StairB_M" type="LightOccluder2D" parent="StairWalls"]
-occluder = SubResource("Occ_RC_StairB_M")
-
-[node name="Rail_StairB_M" type="Polygon2D" parent="Structures"]
-texture = ExtResource("tex_wall_brick")
-color = Color(0.3654, 0.3846, 0.4295, 1)
-polygon = PackedVector2Array(1662, 2136, 1678, 2136, 1678, 2424, 1662, 2424)
-
 [node name="Arrow_StairA_Up" type="Polygon2D" parent="Structures"]
 z_index = 2
 color = Color(0.55, 0.8, 0.85, 1)
@@ -2708,8 +2590,6 @@ horizontal_alignment = 1
 
 [node name="StairLocks" type="Node2D" parent="."]
 
-[node name="SealedStairs" type="Node2D" parent="."]
-
 [node name="SUBarrier" type="StaticBody2D" parent="StairLocks"]
 
 [node name="SUBarrierCollision" type="CollisionPolygon2D" parent="StairLocks/SUBarrier"]
@@ -2725,22 +2605,6 @@ texture_repeat = 2
 texture = ExtResource("tex_prop_metal")
 color = Color(0.7051, 0.3333, 0.2821, 1)
 polygon = PackedVector2Array(410, 720, 630, 720, 630, 736, 410, 736)
-
-[node name="SDSeal" type="StaticBody2D" parent="SealedStairs"]
-
-[node name="SDSealCollision" type="CollisionPolygon2D" parent="SealedStairs/SDSeal"]
-polygon = PackedVector2Array(1560, 2120, 1780, 2120, 1780, 2136, 1560, 2136)
-
-[node name="LO_SDSealCollision" type="LightOccluder2D" parent="SealedStairs/SDSeal"]
-occluder = SubResource("Occ_SDSealCollision")
-
-[node name="SDSealVisual" type="Polygon2D" parent="WallGlow/Doors"]
-z_index = 2
-texture_filter = 1
-texture_repeat = 2
-texture = ExtResource("tex_wall_brick")
-color = Color(0.4872, 0.4872, 0.5128, 1)
-polygon = PackedVector2Array(1560, 2120, 1780, 2120, 1780, 2136, 1560, 2136)
 
 [node name="SULock" type="Area2D" parent="."]
 position = Vector2(520, 728)
@@ -2764,23 +2628,6 @@ position = Vector2(520, 696)
 z_index = 5
 color = Color(1.00, 0.78, 0.32, 1)
 polygon = PackedVector2Array(0, -9, 9, 0, 0, 9, -9, 0)
-
-[node name="SDSealed" type="Area2D" parent="."]
-position = Vector2(1670, 2096)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("3_interactable")
-message = "계단 입구가 콘크리트로 메워져 있다. 아래층으로는 통하지 않는다."
-prompt_text = "계단 살펴보기"
-
-[node name="SDSealedZone" type="CollisionShape2D" parent="SDSealed"]
-shape = SubResource("RectangleShape2D_stair_zone")
-
-[node name="Mark_SDSealed" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(1670, 2096)
-z_index = 5
-color = Color(0.60, 0.68, 0.78, 1)
-polygon = PackedVector2Array(0, -6, 6, 0, 0, 6, -6, 0)
 
 [node name="WC_VoidTopL" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(0, 1000, 1670, 1000, 1670, 1016, 0, 1016)
@@ -4262,28 +4109,16 @@ color = Color(0.2513, 0.2051, 0.1538, 1)
 polygon = PackedVector2Array(1640, 1520, 1920, 1520, 1920, 1940, 1640, 1940)
 
 [node name="WC_GapBot0" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(20, 2120, 1450, 2120, 1450, 2480, 20, 2480)
+polygon = PackedVector2Array(20, 2120, 2270, 2120, 2270, 2480, 20, 2480)
 
 [node name="LO_WC_GapBot0" type="LightOccluder2D" parent="RoomWalls"]
 occluder = SubResource("Occ_WC_GapBot0")
 
 [node name="WC_GapBot1" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1890, 2120, 2270, 2120, 2270, 2480, 1890, 2480)
+polygon = PackedVector2Array(2820, 2120, 3380, 2120, 3380, 2480, 2820, 2480)
 
 [node name="LO_WC_GapBot1" type="LightOccluder2D" parent="RoomWalls"]
 occluder = SubResource("Occ_WC_GapBot1")
-
-[node name="WC_GapBot2" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(2820, 2120, 3380, 2120, 3380, 2480, 2820, 2480)
-
-[node name="LO_WC_GapBot2" type="LightOccluder2D" parent="RoomWalls"]
-occluder = SubResource("Occ_WC_GapBot2")
-
-[node name="WC_GapStairB" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1450, 2440, 1890, 2440, 1890, 2480, 1450, 2480)
-
-[node name="LO_WC_GapStairB" type="LightOccluder2D" parent="RoomWalls"]
-occluder = SubResource("Occ_WC_GapStairB")
 
 [node name="PD_North1_board" type="Polygon2D" parent="Props"]
 color = Color(0.13, 0.19, 0.16, 1)

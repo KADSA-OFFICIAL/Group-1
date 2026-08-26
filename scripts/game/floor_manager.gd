@@ -58,6 +58,18 @@ const STAIRS := {
 	5: [STAIR_A, STAIR_B],
 }
 
+## 계단실이 **아예 없는** 자리(#398). 2층 하단 중앙은 그 아래가 1층 현관이라
+## 계단이 내려갈 자리가 없어, 예전에는 계단실을 그려 놓고 입구만 콘크리트로
+## 봉인해 뒀다. 못 들어가는 계단실은 "아직 못 연 계단"으로 읽혀서 있지도 않은
+## 열쇠를 찾게 만들기 때문에 도면에서 지우고 벽으로 메웠다(gen_floors.py의
+## NO_STAIRWELL).
+##
+## **STAIRS에는 사각형을 남긴다** — 3층 하단 계단에서 내려올 때 _arrive_on이
+## 쓰는 도착 지점의 기준이기 때문이다(도착 지점은 계단실 밖 복도라 메운 자리에
+## 걸리지 않는다). 여기서 빼면 인덱스가 밀려 2층 **좌측** 계단 앞으로 순간이동한다.
+## 층 전환 판정에서만 건너뛴다 — 그 자리는 실체로 메워져 있어 어차피 밟을 수 없다.
+const NO_STAIRWELL := {2: [1]}
+
 const WALL_T := 16.0     # 계단실 벽 두께
 const RAIL_HALF := 8.0   # 가운데 분할 난간 반두께
 const ZONE_H := 54.0     # 트리거 존 높이(계단 안쪽 끝)
@@ -176,7 +188,10 @@ func _physics_process(_delta: float) -> void:
 	if stairs.is_empty():
 		return   # 운동장(#356) — 계단이 없다
 
+	var walled: Array = NO_STAIRWELL.get(current_floor, [])
 	for i in stairs.size():
+		if i in walled:
+			continue   # 계단실이 없는 자리(#398) — 좌표는 도착 지점용으로만 남았다
 		var r: Rect2 = stairs[i]
 		if current_floor < MAX_FLOOR and _stair_zone(r, true).has_point(pos):
 			_change_floor(current_floor + 1, _arrive_on(current_floor + 1, i, true))

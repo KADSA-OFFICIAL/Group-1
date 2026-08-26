@@ -47,6 +47,22 @@ def parse_rects():
     return out
 
 
+def parse_walled():
+    """NO_STAIRWELL = {층: [인덱스, ...]} — 계단실이 없는 자리(#398).
+
+    STAIRS에는 사각형이 남아 있다(위층에서 내려올 때의 도착 지점 기준). 그래서
+    씬 계단실 개수·트리거 존 검사에서는 빼고, 도착 지점 검사만 그대로 돌린다.
+    """
+    text = GD.read_text()
+    block = re.search(r"const NO_STAIRWELL := \{(.*?)\}", text, re.S)
+    if not block:
+        return {}
+    out = {}
+    for fl, items in re.findall(r"(\d+):\s*\[([^\]]*)\]", block.group(1)):
+        out[int(fl)] = {int(v) for v in re.findall(r"\d+", items)}
+    return out
+
+
 def scene_slabs(fl):
     """씬의 Slab_Stair* 폴리곤 → (x,y,w,h) 목록."""
     t = (ROOT / f"scenes/background/school_floor_{fl}.tscn").read_text()
@@ -152,19 +168,35 @@ def main():
     if not stairs:
         print("\n".join(errors)); return 1
 
+    walled_all = parse_walled()
+
     for fl in (1, 2, 3, 4, 5):
         declared = stairs.get(fl, [])
+        walled = walled_all.get(fl, set())
+        built = [d for i, d in enumerate(declared) if i not in walled]
         actual = scene_slabs(fl)
-        if len(declared) != len(actual):
-            fail(f"floor{fl}: STAIRS {len(declared)}개 vs 씬 계단실 {len(actual)}개")
+        if len(built) != len(actual):
+            fail(f"floor{fl}: STAIRS {len(built)}개 vs 씬 계단실 {len(actual)}개")
             continue
-        for (name, sx, sy, sw, sh), d in zip(actual, declared):
+        for (name, sx, sy, sw, sh), d in zip(actual, built):
             if [sx, sy, sw, sh] != d:
                 fail(f"floor{fl} {name}: 씬 {[sx,sy,sw,sh]} vs STAIRS {d}")
 
         ws = walls(fl)
         for i, d in enumerate(declared):
             x, y, w, h = d
+            if i in walled:
+                # 계단실이 없는 자리 — 존은 없고, 남은 좌표의 쓸모는 도착 지점뿐이다.
+                # 메운 실체(WC_Gap*) 안이면 안 되므로 그것만 본다.
+                mid = x + w / 2.0
+                for up in (True, False):
+                    ax = mid + (ARRIVE_DX if up else -ARRIVE_DX)
+                    ay = y - ARRIVE_DY
+                    for wx0, wy0, wx1, wy1 in ws:
+                        if wx0 <= ax <= wx1 and wy0 <= ay <= wy1:
+                            fail(f"floor{fl} 계단{i}(벽) 도착지점({ax:.0f},{ay:.0f})이 벽 안")
+                            break
+                continue
             mid = x + w / 2.0
             y_end = y + h - WALL_T
             zones = {
