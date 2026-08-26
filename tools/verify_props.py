@@ -27,6 +27,9 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 # 단서·은신처 Area2D 중심에서 이만큼은 집기가 없어야 상호작용 존(48×48)이 열린다.
 CLUE_CLEAR = 30
+## 집기·벽에 붙는 것이 정상인 도입부 단서(#405) — CLUE_CLEAR 검사에서 뺀다.
+INTRO_ON_PROP = {"KoreanBook", "SiwooPainting", "HaramCard",
+                 "Belongings", "DateWall"}
 
 # 미닫이 교실문이 밀려나는 거리·방향은 씬의 travel 값에서 읽는다. 상수로 박으면
 # 한 짝/두 짝, 미는 방향이 바뀔 때마다 조용히 어긋난다.
@@ -193,7 +196,10 @@ def check(fl: int) -> None:
     for name, px, py in clues:
         # 집기 조사(Exam_, #301)도 뺀다 — **집기 위에 있는 것이 정상**이다.
         # 그 집기를 조사하라고 붙인 것이라 떨어져 있으면 오히려 이상하다.
-        if name.startswith(("Window_", "Exam_")):
+        # 도입부 단서(#405)도 뺀다 — 전부 **물건 위·벽에 붙는 것**이다.
+        # 책상 위 국어책, 벽에 걸린 시우 그림, 캐비넷 문틈의 학생증,
+        # 작업대 위 비닐봉투, 벽에 적힌 날짜. 떨어뜨려 놓으면 오히려 이상하다.
+        if name in INTRO_ON_PROP or name.startswith(("Window_", "Exam_")):
             continue
         for key, (x0, y0, x1, y1) in sorted(props.items()):
             if (x0 - CLUE_CLEAR < px < x1 + CLUE_CLEAR
@@ -288,8 +294,8 @@ def check_yard() -> None:
 
 
 def main() -> int:
-    print("집기 검사: 5개 층 + 운동장")
-    for fl in (1, 2, 3, 4, 5):
+    print("집기 검사: 4개 층 + 운동장")
+    for fl in (1, 2, 3, 4):
         check(fl)
     check_yard()
     if warnings:

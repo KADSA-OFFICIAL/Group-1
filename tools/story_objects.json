@@ -303,6 +303,34 @@
     "[node name=\"TaehoNoteVisual\" type=\"Sprite2D\" parent=\"TaehoNote\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"10_note\")\n\n",
     "[node name=\"TaehoNoteZone\" type=\"CollisionShape2D\" parent=\"TaehoNote\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
    ]
+  },
+  "HaramCard": {
+   "body": "[node name=\"HaramCard\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(0, 0)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"캐비넷 문틈에 플라스틱 카드가 끼어 있다. 학생증 — 1학년 3반 송하람. 뉴스에서 들은 이름이다. 왜 없어진 학생 학생증이 미술실 캐비넷에 있는 걸까.\"\nprompt_text = \"학생증 살펴보기\"\ngrants_flag = \"found_songharam\"\n\n",
+   "kids": [
+    "[node name=\"HaramCardVisual\" type=\"Polygon2D\" parent=\"HaramCard\"]\nz_index = 1\ncolor = Color(0.55, 0.62, 0.6, 1)\npolygon = PackedVector2Array(-13, -10, 13, -10, 13, 10, -13, 10)\n",
+    "[node name=\"HaramCardZone\" type=\"CollisionShape2D\" parent=\"HaramCard\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n"
+   ]
+  },
+  "Belongings": {
+   "body": "[node name=\"Belongings\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(0, 0)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"작업대 위에 비닐봉투 몇 개. 교복 단추, 이름표, 머리끈, 볼펜. 학생 소지품이다. 하나가 아니다 — 여러 명 것이다.\"\nprompt_text = \"비닐봉투 살펴보기\"\ngrants_flag = \"saw_belongings\"\n\n",
+   "kids": [
+    "[node name=\"BelongingsVisual\" type=\"Polygon2D\" parent=\"Belongings\"]\nz_index = 1\ncolor = Color(0.55, 0.62, 0.6, 1)\npolygon = PackedVector2Array(-13, -10, 13, -10, 13, 10, -13, 10)\n",
+    "[node name=\"BelongingsZone\" type=\"CollisionShape2D\" parent=\"Belongings\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n"
+   ]
+  },
+  "DateWall": {
+   "body": "[node name=\"DateWall\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(0, 0)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"벽에 날짜가 적혀 있다. 3월 14일. 5월 22일. 8월 9일. 11월 3일. 1월 18일. 다섯 개. 뉴스에서 들은 실종 시기와 같다.\"\nprompt_text = \"벽에 적힌 날짜 읽기\"\ngrants_flag = \"saw_dates\"\n\n",
+   "kids": [
+    "[node name=\"DateWallVisual\" type=\"Polygon2D\" parent=\"DateWall\"]\nz_index = 1\ncolor = Color(0.55, 0.62, 0.6, 1)\npolygon = PackedVector2Array(-13, -10, 13, -10, 13, 10, -13, 10)\n",
+    "[node name=\"DateWallZone\" type=\"CollisionShape2D\" parent=\"DateWall\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n"
+   ]
+  },
+  "KoreanBook": {
+   "body": "[node name=\"KoreanBook\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(0, 0)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"국어책. 이름표에 '이설'. 이걸 가지러 온 거였다.\"\nprompt_text = \"국어책 챙기기\"\ngrants_item_id = \"korean_book\"\n\n",
+   "kids": [
+    "[node name=\"KoreanBookVisual\" type=\"Polygon2D\" parent=\"KoreanBook\"]\nz_index = 1\ncolor = Color(0.72, 0.45, 0.30, 1)\npolygon = PackedVector2Array(-11, -14, 11, -14, 11, 14, -11, 14)\n",
+    "[node name=\"KoreanBookZone\" type=\"CollisionShape2D\" parent=\"KoreanBook\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n"
+   ]
   }
  },
  "5": {

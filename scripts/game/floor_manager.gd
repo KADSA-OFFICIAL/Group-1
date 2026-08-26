@@ -17,13 +17,17 @@ const FLOOR_SCENES := {
 	2: "res://scenes/background/school_floor_2.tscn",
 	3: "res://scenes/background/school_floor_3.tscn",
 	4: "res://scenes/background/school_floor_4.tscn",
-	5: "res://scenes/background/school_floor_5.tscn",
 }
 const MIN_FLOOR := 1
-const MAX_FLOOR := 4  # 5층은 프롤로그 전용 — 본편에서 올라가지 않는다
+## 4층은 **도입부 전용**이다(#405) — 미술실·준비실 두 방뿐이고 계단이 없다.
+## 창문으로 3층에 내려가면 다시 올라올 수 없다.
+const MAX_FLOOR := 4
 const START_FLOOR := 4
-# 시작 층은 안전 구간 — 기획서상 수위는 3층부터 활동한다.
+## 수위가 순찰하지 않는 층. 4층에서는 순찰 대신 **스크립트로 등장**한다(#404).
 const JANITOR_FREE_FLOOR := 4
+## 도입부에서 조작이 시작되는 자리 — 미술실 문 안쪽.
+## `gen_floors.py`의 `INTRO_ARRIVE`와 같아야 한다.
+const INTRO_ARRIVE := Vector2(300, 700)
 ## 운동장(#356). 계단 대신 현관 문이 데려오고, 정문이 엔딩으로 보낸다.
 const YARD_FLOOR := 0
 const YARD_LABEL := "운동장"
@@ -34,6 +38,7 @@ const YARD_ARRIVE := Vector2(1700, 380)
 ## `player.tscn`에 박아 두면 운동장에서 빈 아래쪽이 보인다.
 const FLOOR_BOUNDS := {
 	0: Rect2(0, 0, 3400, 1700),
+	4: Rect2(0, 0, 1800, 1000),   # 도입부(#405) — 두 방뿐이라 훨씬 작다
 }
 const DEFAULT_BOUNDS := Rect2(0, 0, 3400, 2500)
 
@@ -59,8 +64,7 @@ const STAIRS := {
 	1: [Rect2(220, 2120, 440, 320)],
 	2: [STAIR_A, STAIR_B],
 	3: [STAIR_A, STAIR_B],
-	4: [STAIR_A, STAIR_B],
-	5: [STAIR_A, STAIR_B],
+	4: [],   # 도입부 — 계단 없음. 창문으로 3층에 내려간다(#405)
 }
 
 const WALL_T := 16.0     # 계단실 벽 두께
@@ -102,7 +106,7 @@ var changing_floor: bool = false
 const FADE_IN_SECONDS := 1.5
 const FLOOR_FADE_OUT_SECONDS := 0.25
 const FLOOR_FADE_IN_SECONDS := 0.35
-const START_HINT := "4층 복도. 계단으로 내려가야 한다. 이 층 어딘가에 계단 열쇠가 있을 것이다."
+const START_HINT := "4층 미술실. 국어책만 챙겨서 나가면 된다."
 
 # 붙잡힌 순간을 잠깐 보여준 뒤 실패 화면으로 넘어간다(수위가 마주보는 연출).
 const GAME_OVER_SCENE := "res://scenes/ui/game_over.tscn"
