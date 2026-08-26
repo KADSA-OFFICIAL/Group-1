@@ -1,9 +1,10 @@
-[gd_scene load_steps=37 format=3]
+[gd_scene load_steps=38 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 [ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="5_hiding"]
 [ext_resource type="Script" path="res://scripts/game/room_lights.gd" id="7_roomlights"]
 [ext_resource type="Script" path="res://scripts/game/interact_marks.gd" id="8_marks"]
+[ext_resource type="Script" path="res://scripts/interactions/floor_link.gd" id="11_floorlink"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_cement.png" id="tex_floor_cement"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_wood.png" id="tex_floor_wood"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_bust.png" id="tex_obj_bust"]
@@ -386,6 +387,27 @@ shadow_filter = 1
 shadow_filter_smooth = 4.0
 texture = SubResource("GradientTexture2D_moon")
 texture_scale = 0.72
+
+[node name="PrepWindowEscape" type="Area2D" parent="."]
+position = Vector2(1465, 80)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("11_floorlink")
+required_item_id = "korean_book"
+locked_message = "창문은 열린다. 그런데 국어책도 없이 이러려고 온 게 아니다."
+prompt_text = "창문으로 내려가기"
+message = "창틀을 넘어 난간에 발을 디뎠다. 아래층 창문까지 두 걸음."
+target_floor = 3
+arrive_at = Vector2(1700, 100)
+
+[node name="PrepWindowEscapeZone" type="CollisionShape2D" parent="PrepWindowEscape"]
+shape = SubResource("RectangleShape2D_window_zone")
+
+[node name="Mark_PrepWindowEscape" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1465, 80)
+z_index = 5
+color = Color(1.00, 0.78, 0.32, 1)
+polygon = PackedVector2Array(0, -9, 9, 0, 0, 9, -9, 0)
 
 [node name="Window_ArtRoom" type="Area2D" parent="."]
 position = Vector2(605.0, 76.0)

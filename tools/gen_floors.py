@@ -879,8 +879,10 @@ def add_room(sc, key, label, x0, y0, x1, y1, door):
         sc.wall(f"{key}_right", rect(x1 - T, y0, x1, y1))
 
 
-# 본편에서 오갈 수 있는 층 범위 — floor_manager.gd의 MIN_FLOOR/MAX_FLOOR와 맞춘다.
-MIN_FLOOR, MAX_FLOOR = 1, 4
+# 계단으로 오갈 수 있는 층 범위 — floor_manager.gd의 MIN_FLOOR/MAX_FLOOR와 맞춘다.
+# 위 경계가 3인 것은 4층에 계단이 없기 때문이다(#406) — 3층 계단에 '위층 ▲'
+# 표지를 내면 갈 수 없는 곳을 가리킨다.
+MIN_FLOOR, MAX_FLOOR = 1, 3
 C_ARROW = "Color(0.55, 0.8, 0.85, 1)"
 
 
@@ -912,6 +914,8 @@ SCRIPTS = {
     "6_sliding": "res://scripts/interactions/sliding_door.gd",
     "7_roomlights": "res://scripts/game/room_lights.gd",
     "8_marks": "res://scripts/game/interact_marks.gd",
+    # 9_key·10_note는 SPRITE_TEXTURES가 쓴다(단서 스프라이트) — 겹치면 안 된다.
+    "11_floorlink": "res://scripts/interactions/floor_link.gd",
 }
 
 
@@ -3580,6 +3584,27 @@ def build_intro():
         sc.window_light("ArtWin" + str(i), wx + 85, IY0 + T + 46, "ArtRoom")
     sc.wall_decor("PrepWin", rect(1380, IY0 + T, 1550, IY0 + T + 12), C_WINDOW)
     sc.window_light("PrepWin", 1465, IY0 + T + 46, "ArtPrep")
+
+    # 준비실 창문이 **유일한 출구**다(#406). 국어책을 챙겨야 나간다 — 그걸
+    # 가지러 온 것이고, 수위 등장의 백스톱(#404 4번)도 여기에 걸린다.
+    sc.node(NL.join([
+        '[node name="PrepWindowEscape" type="Area2D" parent="."]',
+        "position = Vector2(1465, %s)" % n(IY0 + T + 44),
+        "collision_layer = 2",
+        "collision_mask = 0",
+        'script = ExtResource("11_floorlink")',
+        'required_item_id = "korean_book"',
+        'locked_message = "창문은 열린다. 그런데 국어책도 없이 이러려고 온 게 아니다."',
+        'prompt_text = "창문으로 내려가기"',
+        'message = "창틀을 넘어 난간에 발을 디뎠다. 아래층 창문까지 두 걸음."',
+        "target_floor = 3",
+        "arrive_at = Vector2(1700, 100)",
+        "",
+        '[node name="PrepWindowEscapeZone" type="CollisionShape2D" '
+        'parent="PrepWindowEscape"]',
+        'shape = SubResource("RectangleShape2D_window_zone")',
+        ""]))
+    sc.mark("PrepWindowEscape", 1465, IY0 + T + 44, C_MARK_KEY, 9.0)
 
     sc.window_probe("ArtRoom", 605, IY0 + T + 40,
                     "운동장이 내려다보인다. 4층이라 뛰어내릴 높이는 아니다. "

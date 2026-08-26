@@ -19,9 +19,10 @@ const FLOOR_SCENES := {
 	4: "res://scenes/background/school_floor_4.tscn",
 }
 const MIN_FLOOR := 1
-## 4층은 **도입부 전용**이다(#405) — 미술실·준비실 두 방뿐이고 계단이 없다.
-## 창문으로 3층에 내려가면 다시 올라올 수 없다.
-const MAX_FLOOR := 4
+## 계단으로 오갈 수 있는 위 경계. **4층이 아니라 3층이다**(#406) — 4층은
+## 도입부 전용이라 계단이 없고, 창문으로 내려가면 다시 올라올 수 없다.
+## 4로 두면 3층 계단에서 위로 올라갈 때 빈 `STAIRS[4]`를 인덱싱해 죽는다.
+const MAX_FLOOR := 3
 const START_FLOOR := 4
 ## 수위가 순찰하지 않는 층. 4층에서는 순찰 대신 **스크립트로 등장**한다(#404).
 const JANITOR_FREE_FLOOR := 4
