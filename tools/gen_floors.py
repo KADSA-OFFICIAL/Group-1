@@ -301,7 +301,8 @@ TEXTURES = {f"tex_{stem}": f"{TEX_DIR}/{stem}.png"
 SPRITE_TEXTURES = {"9_key": "res://assets/sprites/key.png",
                    "10_note": "res://assets/sprites/note.png",
                    "13_inkcan": "res://assets/sprites/ink_can.png",
-                   "14_beaker": "res://assets/sprites/beaker.png"}
+                   "14_beaker": "res://assets/sprites/beaker.png",
+                   "15_eyekey": "res://assets/sprites/eye_key.png"}
 
 # 텍스처 설정을 물려받을 부모가 없는 CanvasLayer 직속 노드. #307에서 벽·문·계단
 # 시각이 전부 레이어 0(`Structures`)으로 내려가면서 비었다가, #318에서 문
@@ -919,7 +920,7 @@ SCRIPTS = {
     # 9_key·10_note는 SPRITE_TEXTURES가 쓴다(단서 스프라이트) — 겹치면 안 된다.
     "11_floorlink": "res://scripts/interactions/floor_link.gd",
     "12_artintro": "res://scripts/game/art_room_intro.gd",
-    # 13_inkcan·14_beaker도 SPRITE_TEXTURES 쪽이다(#427).
+    # 13_inkcan·14_beaker도 SPRITE_TEXTURES 쪽이다(#427). 15_eyekey도 그렇다(#438).
 }
 
 
@@ -974,8 +975,13 @@ PLACEMENT = {
     2: [
         # 컴퓨터실은 +2800px이라 부서실로. 대응 매뉴얼은 전 부서에 돌린 문서다.
         ("PEDept", ["YujinClue", "CrisisManual"]),
-        ("StorageR", ["HistoryClue"]),            # 창고 +780px — 10년 전 졸업앨범
-        ("MensRoomB", ["ShowerMarks", "DrainKey"]),   # 화장실 ← 샤워실
+        # 2층 계단 열쇠는 #438에서 하단 남자화장실 배수구에서 여기로 옮겼다.
+        # 창고는 도착 계단에서 +780px라 진행 필수 아이템 기준(+1500px) 안이고,
+        # 화장실보다 강제 동선에 가깝다. 그림도 범용 열쇠에서 전용 아트로
+        # 바뀌었다 — 눈구멍에 열쇠가 박힌 머리(`assets/sprites/eye_key.png`).
+        ("StorageR", ["HistoryClue", "HeadKey"]),  # 창고 +780px — 졸업앨범 + 열쇠
+        # 끌린 자국은 열쇠와 무관한 스토리 단서라 화장실에 남는다.
+        ("MensRoomB", ["ShowerMarks"]),           # 화장실 ← 샤워실
         ],
     1: [("StaffRoom", ["PrincipalLetter"]),                       # 교무실 ← 교장실
         ("JanitorRoom", ["PhotoWall", "StudentCards", "JanitorNotebook", "JanitorSafe"]),
@@ -1063,7 +1069,7 @@ def add_furniture(sc, floor):
 # 층마다 조작이 달랐다. 메시지와 플래그는 그대로 옮긴다.
 # KeyCabinet은 #207에서 열쇠 지급을 뗐으므로 여기 들어가지 않는다(E 조사 단서).
 # TaehoNote는 #222에서 열쇠 지급을 뗐으므로 여기 들어가지 않는다(E 조사 단서).
-AUTO_PICKUP = {"SpareKeyHook", "DrainKey", "JanitorSafe"}
+AUTO_PICKUP = {"SpareKeyHook", "HeadKey", "JanitorSafe"}
 
 
 def to_pickup(body):
