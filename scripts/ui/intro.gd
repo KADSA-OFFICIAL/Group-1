@@ -8,7 +8,7 @@ extends Control
 ## 게임에서 가장 무서워야 할 순간이 읽는 글이었다. 지금은 4층 미술실에서
 ## 조작이 시작되고 그 전부를 플레이어가 직접 한다.
 ## 대사는 하단 자막(scenes/ui/subtitle_dialogue.tscn)에 한 글자씩 출력, E/Enter로 진행.
-## 배경 이미지는 추후 추가.
+## 장면 배경은 노드의 선택적 background 키다(#430) — 없는 장면은 검은 화면 그대로다.
 ## 장면 노드는 choice(분기)도 지원한다 — 신고 선택지 등 후속 이슈에서 사용.
 
 @export_file("*.tscn") var game_scene_path: String = "res://scenes/main/main.tscn"
@@ -16,6 +16,10 @@ extends Control
 
 # 장면 노드: caption, lines([화자, 대사] 또는 [화자, 대사, 감정]), 그리고 next(다음 장면 키) 또는
 # choice({prompt, options: [[라벨, 다음 키]]}). 특수 키: @game(게임 시작), @title(타이틀 복귀)
+# background(선택): 그 장면 동안 화면을 채우는 그림. **이 키가 있으면 caption은 화면에
+# 뜨지 않는다** — 그림이 장소를 말하므로 글자는 같은 말을 두 번 하는 것이 된다.
+# street에 그림이 없는 것은 빠져서가 아니다 — 거기는 아직 학교가 아니고,
+# 검은 화면 위의 캡션이 곧 '아무 일도 없는 밤'이다.
 # 화자가 빈 문자열이면 지문·독백으로 표시된다. 감정 태그는 subtitle_dialogue.gd의 EMOTIONS 참고.
 const SCRIPT_NODES: Dictionary = {
 	"street": {
@@ -31,6 +35,7 @@ const SCRIPT_NODES: Dictionary = {
 	},
 	"back_gate": {
 		"caption": "— 학교 뒷문 —",
+		"background": preload("res://assets/backgrounds/intro_back_gate.png"),
 		"lines": [
 			["", "뒷문을 밀어 본다. 끼익 — 열렸다."],
 			["이설", "역시 안 잠겨 있네."],
@@ -46,6 +51,7 @@ const SCENE_FADE_SECONDS := 0.5
 const SCENE_FADE_IN_SECONDS := 1.7  # 장면 전환 시 새 장면이 드러나는 페이드인
 const CHOICE_FADE_SECONDS := 0.4    # 선택창 등장 페이드인
 
+@onready var scene_background: TextureRect = $SceneBackground
 @onready var scene_caption: Label = $SceneCaption
 @onready var dialogue: SubtitleDialogue = $Dialogue
 @onready var fade_rect: ColorRect = $FadeRect
@@ -94,9 +100,18 @@ func _unhandled_input(event: InputEvent) -> void:
 	get_viewport().set_input_as_handled()
 
 
+## 장면이 바뀔 때 캡션·배경·자막을 한꺼번에 갈아 끼운다.
+## _go_to()가 FadeRect를 1.0까지 올린 **뒤에** 부르므로 교체 순간은 화면에 보이지
+## 않는다 — 그 순서를 바꾸면 배경이 눈앞에서 튀어 바뀐다.
 func _apply_scene() -> void:
 	var node: Dictionary = SCRIPT_NODES[current_node]
+	var background: Texture2D = node.get("background", null)
+	scene_background.texture = background
+	# **배경이 있으면 캡션을 감춘다.** 그림이 이미 "밤의 학교 앞"이라고 말하고
+	# 있는데 그 위에 "— 학교 뒷문 —"을 얹으면 같은 말을 두 번 하는 것이고,
+	# 글자가 그림을 가린다. 캡션은 그림이 없는 장면(street)의 장소 표시다.
 	scene_caption.text = node["caption"]
+	scene_caption.visible = background == null
 	dialogue.clear()
 
 
