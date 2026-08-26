@@ -1,4 +1,4 @@
-[gd_scene load_steps=154 format=3]
+[gd_scene load_steps=156 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
@@ -113,8 +113,11 @@ polygon = PackedVector2Array(1359, 1020, 1375, 1020, 1375, 1500, 1359, 1500)
 [sub_resource type="OccluderPolygon2D" id="Occ_WC_YardExit_top"]
 polygon = PackedVector2Array(1375, 1020, 1950, 1020, 1950, 1036, 1375, 1036)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_YardExit_bot"]
-polygon = PackedVector2Array(1375, 1484, 1950, 1484, 1950, 1500, 1375, 1500)
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_YardExit_botL"]
+polygon = PackedVector2Array(1375, 1484, 1607.5, 1484, 1607.5, 1500, 1375, 1500)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_YardExit_botR"]
+polygon = PackedVector2Array(1717.5, 1484, 1950, 1484, 1950, 1500, 1717.5, 1500)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_WC_YardExit_left"]
 polygon = PackedVector2Array(1375, 1020, 1391, 1020, 1391, 1500, 1375, 1500)
@@ -370,6 +373,9 @@ polygon = PackedVector2Array(595, 1484, 705, 1484, 705, 1500, 595, 1500)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_Class3DoorCollision"]
 polygon = PackedVector2Array(1045, 1484, 1155, 1484, 1155, 1500, 1045, 1500)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_YardExitDoorCollision"]
+polygon = PackedVector2Array(1607.5, 1484, 1717.5, 1484, 1717.5, 1500, 1607.5, 1500)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_MensRoom1DoorCollision"]
 polygon = PackedVector2Array(982.5, 2120, 1092.5, 2120, 1092.5, 2136, 982.5, 2136)
@@ -801,8 +807,8 @@ color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1359, 1020, 1375, 1020, 1375, 1500, 1359, 1500)
 
 [node name="YardExit" type="Polygon2D" parent="Rooms"]
-texture = ExtResource("tex_floor_matte")
-color = Color(0.1282, 0.141, 0.1538, 1)
+texture = ExtResource("tex_floor_wood")
+color = Color(0.1897, 0.1615, 0.1282, 1)
 polygon = PackedVector2Array(1375, 1020, 1950, 1020, 1950, 1500, 1375, 1500)
 
 [node name="L_YardExit" type="Label" parent="WallGlow/Labels"]
@@ -840,28 +846,59 @@ polygon = PackedVector2Array(1375, 1036, 1950, 1036, 1950, 1052, 1375, 1052)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(1375, 1052, 1950, 1052, 1950, 1056, 1375, 1056)
 
-[node name="WC_YardExit_bot" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(1375, 1484, 1950, 1484, 1950, 1500, 1375, 1500)
+[node name="WC_YardExit_botL" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1375, 1484, 1607.5, 1484, 1607.5, 1500, 1375, 1500)
 
-[node name="LO_WC_YardExit_bot" type="LightOccluder2D" parent="RoomWalls"]
-occluder = SubResource("Occ_WC_YardExit_bot")
+[node name="LO_WC_YardExit_botL" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_YardExit_botL")
 
-[node name="WV_YardExit_bot" type="Polygon2D" parent="Structures"]
+[node name="WV_YardExit_botL" type="Polygon2D" parent="Structures"]
 texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
-polygon = PackedVector2Array(1375, 1484, 1950, 1484, 1950, 1500, 1375, 1500)
+polygon = PackedVector2Array(1375, 1484, 1607.5, 1484, 1607.5, 1500, 1375, 1500)
 
-[node name="WH_YardExit_bot" type="Polygon2D" parent="Structures"]
+[node name="WH_YardExit_botL" type="Polygon2D" parent="Structures"]
 color = Color(0.375, 0.392, 0.430, 1)
-polygon = PackedVector2Array(1375, 1484, 1950, 1484, 1950, 1487, 1375, 1487)
+polygon = PackedVector2Array(1375, 1484, 1607.5, 1484, 1607.5, 1487, 1375, 1487)
 
-[node name="WF_YardExit_bot" type="Polygon2D" parent="Structures"]
+[node name="WF_YardExit_botL" type="Polygon2D" parent="Structures"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(1375, 1500, 1950, 1500, 1950, 1516, 1375, 1516)
+polygon = PackedVector2Array(1375, 1500, 1607.5, 1500, 1607.5, 1516, 1375, 1516)
 
-[node name="WS_YardExit_bot" type="Polygon2D" parent="Structures"]
+[node name="WS_YardExit_botL" type="Polygon2D" parent="Structures"]
 color = Color(0.118, 0.124, 0.140, 1)
-polygon = PackedVector2Array(1375, 1516, 1950, 1516, 1950, 1520, 1375, 1520)
+polygon = PackedVector2Array(1375, 1516, 1607.5, 1516, 1607.5, 1520, 1375, 1520)
+
+[node name="WC_YardExit_botR" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(1717.5, 1484, 1950, 1484, 1950, 1500, 1717.5, 1500)
+
+[node name="LO_WC_YardExit_botR" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_YardExit_botR")
+
+[node name="WV_YardExit_botR" type="Polygon2D" parent="Structures"]
+texture = ExtResource("tex_wall_brick")
+color = Color(0.3654, 0.3846, 0.4295, 1)
+polygon = PackedVector2Array(1717.5, 1484, 1950, 1484, 1950, 1500, 1717.5, 1500)
+
+[node name="WH_YardExit_botR" type="Polygon2D" parent="Structures"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(1717.5, 1484, 1950, 1484, 1950, 1487, 1717.5, 1487)
+
+[node name="WF_YardExit_botR" type="Polygon2D" parent="Structures"]
+color = Color(0.205, 0.216, 0.242, 1)
+polygon = PackedVector2Array(1717.5, 1500, 1950, 1500, 1950, 1516, 1717.5, 1516)
+
+[node name="WS_YardExit_botR" type="Polygon2D" parent="Structures"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(1717.5, 1516, 1950, 1516, 1950, 1520, 1717.5, 1520)
+
+[node name="Door_YardExit" type="Polygon2D" parent="WallGlow/Doors"]
+z_index = 1
+texture_filter = 1
+texture_repeat = 2
+texture = ExtResource("tex_prop_grain")
+color = Color(0.5769, 0.4103, 0.2564, 1)
+polygon = PackedVector2Array(1607.5, 1484, 1717.5, 1484, 1717.5, 1500, 1607.5, 1500)
 
 [node name="WC_YardExit_left" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1375, 1020, 1391, 1020, 1391, 1500, 1375, 1500)
@@ -2081,6 +2118,14 @@ texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
 polygon = PackedVector2Array(1745, 2464, 1855, 2464, 1855, 2480, 1745, 2480)
 
+[node name="Door_YardGate" type="Polygon2D" parent="WallGlow/Doors"]
+z_index = 1
+texture_filter = 1
+texture_repeat = 2
+texture = ExtResource("tex_prop_grain")
+color = Color(0.5769, 0.4103, 0.2564, 1)
+polygon = PackedVector2Array(1600, 1020, 1710, 1020, 1710, 1036, 1600, 1036)
+
 [node name="Mark_PrincipalLetter" type="Polygon2D" parent="WallGlow/Marks"]
 position = Vector2(2665, 1317.6)
 z_index = 5
@@ -2252,6 +2297,28 @@ next_floor = 0
 
 
 [node name="ExitZone" type="CollisionShape2D" parent="ExitDoor"]
+shape = SubResource("RectangleShape2D_stair_zone")
+
+
+[node name="Mark_YardGateDoor" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1655, 1068)
+z_index = 5
+color = Color(1.00, 0.78, 0.32, 1)
+polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
+
+[node name="YardGateDoor" type="Area2D" parent="."]
+position = Vector2(1655, 1068)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("4_exit")
+required_item_id = ""
+prompt_text = "운동장 출입구 열기"
+next_floor = 0
+arrive_at = Vector2(740, 380)
+exit_route = "yard_exit"
+
+
+[node name="ExitZone" type="CollisionShape2D" parent="YardGateDoor"]
 shape = SubResource("RectangleShape2D_stair_zone")
 
 
@@ -3890,6 +3957,132 @@ polygon = PackedVector2Array(1172.5, 1397, 1184.5, 1397, 1184.5, 1423, 1172.5, 1
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4359, 0.3077, 1)
 polygon = PackedVector2Array(1145.5, 1397, 1163.5, 1397, 1163.5, 1423, 1145.5, 1423)
+
+[node name="PC_YardExit_0" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1446, 1083.3, 1556, 1083.3, 1556, 1119.3, 1446, 1119.3)
+
+[node name="PV_YardExit_0" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_shelf")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.3658, 0.3386, 0.2844, 1)
+polygon = PackedVector2Array(1446, 1083.3, 1556, 1083.3, 1556, 1119.3, 1446, 1119.3)
+
+[node name="PC_YardExit_1" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1446, 1147.3, 1556, 1147.3, 1556, 1183.3, 1446, 1183.3)
+
+[node name="PV_YardExit_1" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_shelf")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.3401, 0.3149, 0.2645, 1)
+polygon = PackedVector2Array(1446, 1147.3, 1556, 1147.3, 1556, 1183.3, 1446, 1183.3)
+
+[node name="PC_YardExit_2" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1761.5, 1083.3, 1871.5, 1083.3, 1871.5, 1119.3, 1761.5, 1119.3)
+
+[node name="PV_YardExit_2" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_shelf")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.3339, 0.3092, 0.2597, 1)
+polygon = PackedVector2Array(1761.5, 1083.3, 1871.5, 1083.3, 1871.5, 1119.3, 1761.5, 1119.3)
+
+[node name="PC_YardExit_3" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1761.5, 1147.3, 1871.5, 1147.3, 1871.5, 1183.3, 1761.5, 1183.3)
+
+[node name="PV_YardExit_3" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_shelf")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.3499, 0.3239, 0.272, 1)
+polygon = PackedVector2Array(1761.5, 1147.3, 1871.5, 1147.3, 1871.5, 1183.3, 1761.5, 1183.3)
+
+[node name="PC_YardExit_4" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1447.2, 1336.7, 1557.2, 1336.7, 1557.2, 1372.7, 1447.2, 1372.7)
+
+[node name="PV_YardExit_4" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_shelf")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.3437, 0.3182, 0.2672, 1)
+polygon = PackedVector2Array(1447.2, 1336.7, 1557.2, 1336.7, 1557.2, 1372.7, 1447.2, 1372.7)
+
+[node name="PC_YardExit_5" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1447.2, 1400.7, 1557.2, 1400.7, 1557.2, 1436.7, 1447.2, 1436.7)
+
+[node name="PV_YardExit_5" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_shelf")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.3596, 0.3329, 0.2796, 1)
+polygon = PackedVector2Array(1447.2, 1400.7, 1557.2, 1400.7, 1557.2, 1436.7, 1447.2, 1436.7)
+
+[node name="PC_YardExit_6" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1767.8, 1336.7, 1877.8, 1336.7, 1877.8, 1372.7, 1767.8, 1372.7)
+
+[node name="PV_YardExit_6" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_shelf")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.3534, 0.3272, 0.2748, 1)
+polygon = PackedVector2Array(1767.8, 1336.7, 1877.8, 1336.7, 1877.8, 1372.7, 1767.8, 1372.7)
+
+[node name="PC_YardExit_7" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1767.8, 1400.7, 1877.8, 1400.7, 1877.8, 1436.7, 1767.8, 1436.7)
+
+[node name="PV_YardExit_7" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_shelf")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.3278, 0.3034, 0.2549, 1)
+polygon = PackedVector2Array(1767.8, 1400.7, 1877.8, 1400.7, 1877.8, 1436.7, 1767.8, 1436.7)
+
+[node name="PT_YardExit_mat0" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_cloth")
+color = Color(0.2436, 0.2179, 0.1923, 1)
+polygon = PackedVector2Array(1457, 1095.2, 1545, 1095.2, 1545, 1107.4, 1457, 1107.4)
+
+[node name="PT_YardExit_mat1" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_cloth")
+color = Color(0.2436, 0.2179, 0.1923, 1)
+polygon = PackedVector2Array(1457, 1159.2, 1545, 1159.2, 1545, 1171.4, 1457, 1171.4)
+
+[node name="PT_YardExit_mat2" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_cloth")
+color = Color(0.2436, 0.2179, 0.1923, 1)
+polygon = PackedVector2Array(1772.5, 1095.2, 1860.5, 1095.2, 1860.5, 1107.4, 1772.5, 1107.4)
+
+[node name="PT_YardExit_mat3" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_cloth")
+color = Color(0.2436, 0.2179, 0.1923, 1)
+polygon = PackedVector2Array(1772.5, 1159.2, 1860.5, 1159.2, 1860.5, 1171.4, 1772.5, 1171.4)
+
+[node name="PT_YardExit_mat4" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_cloth")
+color = Color(0.2436, 0.2179, 0.1923, 1)
+polygon = PackedVector2Array(1458.2, 1348.6, 1546.2, 1348.6, 1546.2, 1360.8, 1458.2, 1360.8)
+
+[node name="PT_YardExit_mat5" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_cloth")
+color = Color(0.2436, 0.2179, 0.1923, 1)
+polygon = PackedVector2Array(1458.2, 1412.6, 1546.2, 1412.6, 1546.2, 1424.8, 1458.2, 1424.8)
+
+[node name="PT_YardExit_mat6" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_cloth")
+color = Color(0.2436, 0.2179, 0.1923, 1)
+polygon = PackedVector2Array(1778.8, 1348.6, 1866.8, 1348.6, 1866.8, 1360.8, 1778.8, 1360.8)
+
+[node name="PT_YardExit_mat7" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_cloth")
+color = Color(0.2436, 0.2179, 0.1923, 1)
+polygon = PackedVector2Array(1778.8, 1412.6, 1866.8, 1412.6, 1866.8, 1424.8, 1778.8, 1424.8)
+
+[node name="PD_YardExit_sign" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_glass")
+color = Color(0.3846, 0.4359, 0.4872, 1)
+polygon = PackedVector2Array(1582.5, 1036, 1742.5, 1036, 1742.5, 1046, 1582.5, 1046)
+
+[node name="PC_YardExit_plant" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1393, 1038, 1419, 1038, 1419, 1064, 1393, 1064)
+
+[node name="PV_YardExit_plant" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_plant")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.1948, 0.3166, 0.2192, 1)
+polygon = PackedVector2Array(1393, 1038, 1419, 1038, 1419, 1064, 1393, 1064)
 
 [node name="PC_MensRoom1_bin" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(918, 2438, 940, 2438, 940, 2462, 918, 2462)
@@ -5586,6 +5779,11 @@ texture = ExtResource("tex_prop_grain")
 color = Color(0.4359, 0.3718, 0.2821, 1)
 polygon = PackedVector2Array(1717.5, 1515, 1934, 1515, 1934, 1520, 1717.5, 1520)
 
+[node name="PD_Mat_YardExit_1500" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_cloth")
+color = Color(0.2436, 0.2179, 0.1923, 1)
+polygon = PackedVector2Array(1587.5, 1524, 1737.5, 1524, 1737.5, 1546, 1587.5, 1546)
+
 [node name="PC_Corr_YardExit_1500_water" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1397, 1500, 1437, 1500, 1437, 1526, 1397, 1526)
 
@@ -6869,6 +7067,34 @@ texture = ExtResource("tex_obj_panel")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8765, 0.7702, 0.5843, 1)
 polygon = PackedVector2Array(1045, 1484, 1155, 1484, 1155, 1500, 1045, 1500)
+
+[node name="SlideDoor_YardExit" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("6_sliding")
+travel = 110
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_YardExit")
+
+[node name="Zone" type="CollisionShape2D" parent="SlideDoor_YardExit"]
+position = Vector2(1662.5, 1492)
+shape = SubResource("RectangleShape2D_door_zone")
+
+[node name="SDPanel" type="StaticBody2D" parent="SlideDoor_YardExit"]
+
+[node name="YardExitDoorCollision" type="CollisionPolygon2D" parent="SlideDoor_YardExit/SDPanel"]
+polygon = PackedVector2Array(1607.5, 1484, 1717.5, 1484, 1717.5, 1500, 1607.5, 1500)
+
+[node name="LO_YardExitDoorCollision" type="LightOccluder2D" parent="SlideDoor_YardExit/SDPanel"]
+occluder = SubResource("Occ_YardExitDoorCollision")
+
+[node name="SDVis_YardExit" type="Polygon2D" parent="WallGlow/Doors"]
+z_index = 2
+texture_filter = 1
+texture_repeat = 2
+texture = ExtResource("tex_obj_panel")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.8118, 0.7134, 0.5412, 1)
+polygon = PackedVector2Array(1607.5, 1484, 1717.5, 1484, 1717.5, 1500, 1607.5, 1500)
 
 [node name="SlideDoor_MensRoom1" type="Area2D" parent="."]
 collision_layer = 2

@@ -172,7 +172,10 @@ def main():
             cy = sum(p[1] for p in poly) / len(poly)
             r, c = int(cy // CELL), int(cx // CELL)
             reach = (r, c) in seen
-            want_closed = name.startswith("Blocked") or name == "YardExit"
+            # 운동장 출입구는 #393에서 열렸다 — 두 번째 탈출 루트라
+            # 복도에서 걸어 들어갈 수 있어야 한다. 이제 막힌 방은
+            # 이름 없는 Blocked* 뿐이다.
+            want_closed = name.startswith("Blocked")
             if want_closed and reach:
                 print(f"   ✗ {name}: 막혀 있어야 하는데 도달됨"); bad += 1
             elif not want_closed and not reach:

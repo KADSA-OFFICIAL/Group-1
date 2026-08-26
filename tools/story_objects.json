@@ -80,6 +80,12 @@
     "[node name=\"HideEmptyRoomVisual\" type=\"Polygon2D\" parent=\"HideEmptyRoom\"]\nz_index = 1\ncolor = Color(0.3, 0.32, 0.38, 1)\npolygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)\n\n",
     "[node name=\"HideEmptyRoomZone\" type=\"CollisionShape2D\" parent=\"HideEmptyRoom\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n"
    ]
+  },
+  "YardGateDoor": {
+   "body": "[node name=\"YardGateDoor\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(1655, 1068)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"4_exit\")\nrequired_item_id = \"\"\nprompt_text = \"운동장 출입구 열기\"\nnext_floor = 0\narrive_at = Vector2(740, 380)\nexit_route = \"yard_exit\"\n\n",
+   "kids": [
+    "[node name=\"ExitZone\" type=\"CollisionShape2D\" parent=\"YardGateDoor\"]\nshape = SubResource(\"RectangleShape2D_stair_zone\")\n\n"
+   ]
   }
  },
  "2": {
