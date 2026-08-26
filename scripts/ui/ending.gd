@@ -134,6 +134,46 @@ const HIDDEN_SCENES: Array = [
 	},
 ]
 
+# 운동장 출입구로 나온 경우의 첫 장면(#393). **판정은 바뀌지 않는다** — 엔딩은
+# 그대로 3종이고, 현관을 묘사하는 첫 장면만 그 루트에서 갈아 끼운다.
+# 현관으로 나오지 않았는데 "현관문이 열렸다"로 시작하면 방금 한 선택이 지워진다.
+const YARD_ROUTE := &"yard_exit"
+const YARD_OPENINGS: Dictionary = {
+	&"after_school": {
+		"caption": "— 운동장 출입구 —",
+		"lines": [
+			["", "철문이 안쪽으로 밀렸다. 경첩이 길게 울었다."],
+			["", "현관은 지나지도 않았다. 아무도 쓰지 않는 문이었다."],
+			["", "이설은 어두운 운동장으로 내려섰다. 뒤는 돌아보지 않았다."],
+		],
+	},
+	&"adults_work": {
+		"caption": "— 운동장 출입구 —",
+		"lines": [
+			["", "철문이 안쪽으로 밀렸다. 경첩이 길게 울었다."],
+			["", "이설은 어두운 운동장 한가운데서 걸음을 멈췄다."],
+			["", "가방 안에 접어 넣은 것들이 등을 눌렀다. 편지 한 장, 공책 몇 줄."],
+			["이설", "…말 안 하면, 아무 일도 없던 게 되잖아."],
+			["", "휴대폰을 꺼냈다. 화면 빛이 손을 하얗게 만들었다."],
+		],
+	},
+	&"break_time": {
+		"caption": "— 운동장 출입구 —",
+		"lines": [
+			["", "철문 손잡이를 잡은 채로, 이설은 뒤를 돌아봤다."],
+			["", "통로 끝, 복도 쪽에 불빛 하나가 서 있었다. 손전등. 움직이지 않았다."],
+			["이설", "…박시우."],
+			["", "불빛이 흔들렸다."],
+			["이설", "그 애 그림, 봤어요. 상담 기록도요."],
+			["이설", "쉬는 시간에 혼자 있는 게 제일 무서웠다고 적혀 있었어요."],
+			["수위", "……"],
+			["이설", "다섯 명도 봤어요. 그 애들도 어딘가에서 혼자였어요."],
+			["수위", "(낮게) 그만해."],
+			["이설", "아저씨가 제일 잘 알잖아요. 아무도 안 물어봐 주는 게 어떤 건지."],
+		],
+	},
+}
+
 ## 메타 값 -> 장면 묶음. `game_state.gd`의 ENDING_* 상수와 같은 문자열이다.
 const ENDINGS: Dictionary = {
 	&"after_school": BASIC_SCENES,
@@ -164,6 +204,7 @@ func _ready() -> void:
 		kind = StringName(get_tree().get_meta("ending_kind"))
 		get_tree().remove_meta("ending_kind")   # 타이틀로 돌아간 뒤 남지 않게
 	scenes = ENDINGS.get(kind, BASIC_SCENES)
+	_apply_route(kind)
 	_append_score()
 
 	fade_rect.color.a = 1.0
@@ -186,6 +227,25 @@ func _unhandled_input(event: InputEvent) -> void:
 		_next_line()
 
 	get_viewport().set_input_as_handled()
+
+
+## 나온 문에 맞춰 첫 장면을 갈아 끼운다(#393).
+##
+## **원본 상수를 건드리지 않는다** — `const`가 담은 Array는 참조라, 그냥 0번을
+## 바꾸면 같은 프로세스에서 다음 판까지 운동장 출입구 판으로 남는다(#353에서
+## 점수 줄이 쌓이던 것과 같은 함정이다).
+##
+## 메타가 없으면(현관으로 나왔거나 에디터에서 이 씬만 실행) 그대로 둔다.
+func _apply_route(kind: StringName) -> void:
+	if not get_tree().has_meta("exit_route"):
+		return
+	var route := StringName(get_tree().get_meta("exit_route"))
+	get_tree().remove_meta("exit_route")   # 타이틀로 돌아간 뒤 남지 않게
+	if route != YARD_ROUTE or not YARD_OPENINGS.has(kind):
+		return
+	var copy: Array = scenes.duplicate(true)
+	copy[0] = YARD_OPENINGS[kind]
+	scenes = copy
 
 
 ## 마지막에 "알아낸 것 N / M"을 한 줄 붙인다(#353).
