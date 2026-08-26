@@ -973,7 +973,6 @@ PLACEMENT = {
         ("PEDept", ["YujinClue", "CrisisManual"]),
         ("StorageR", ["HistoryClue"]),            # 창고 +780px — 10년 전 졸업앨범
         ("MensRoomB", ["ShowerMarks", "DrainKey"]),   # 화장실 ← 샤워실
-        ("EduRoom", ["SeunghoClue"]),                             # 교육실 ← 2층 교무실
         ],
     1: [("StaffRoom", ["PrincipalLetter"]),                       # 교무실 ← 교장실
         ("JanitorRoom", ["PhotoWall", "StudentCards", "JanitorNotebook", "JanitorSafe"]),
