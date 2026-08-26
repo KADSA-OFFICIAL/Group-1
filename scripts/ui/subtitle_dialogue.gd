@@ -59,6 +59,11 @@ const PORTRAIT_DIM := Color(0.40, 0.42, 0.48, 1.0)
 # 글이 좌우로 튀므로, 컷신에서는 스탠딩이 아직 없어도 이 폭을 늘 비워 둔다.
 const PORTRAIT_TEXT_MARGIN := 430.0
 
+# 감춰져 있던 자막이 처음 뜰 때의 페이드(#436). 하단 그라디언트(Shade)가 한 프레임에
+# 튀어나오면, 1.7초에 걸쳐 천천히 드러나는 장면 배경과 부딪혀 대화창이 화면에 붙여
+# 놓은 UI로 보인다. 선택창 페이드(intro.gd의 CHOICE_FADE_SECONDS)와 같은 길이다.
+const APPEAR_FADE := 0.4
+
 const FONT: FontFile = preload("res://assets/fonts/NotoSansKR-VF.ttf")
 const WGHT_TAG := 0x77676874  # OpenType 가변 축 'wght'
 
@@ -78,6 +83,7 @@ const WGHT_TAG := 0x77676874  # OpenType 가변 축 'wght'
 var typing: bool = false
 var typing_tween: Tween
 var portrait_tween: Tween
+var appear_tween: Tween
 
 ## 마지막 show_line()의 타이핑 소요 시간(초). 넘기는 입력이 없는 본편에서
 ## "타이핑이 끝나기 전에 자막이 사라지는" 일이 없도록 HUD가 표시 시간을 여기서 잰다.
@@ -113,7 +119,12 @@ func show_line(speaker: String, text: String, emotion: String = "") -> void:
 	text_label.text = text
 
 	_update_portrait(speaker)
+	# 감춰져 있다가 처음 뜨는 줄에서만 페이드한다 — 같은 장면에서 줄이 넘어갈 때는
+	# 이미 떠 있으므로 다시 걸면 글을 읽는 내내 화면이 깜빡인다.
+	var appearing := not visible
 	visible = true
+	if appearing:
+		_fade_in()
 	_start_typing(emotion)
 
 
@@ -144,12 +155,28 @@ func clear() -> void:
 		portrait_tween.kill()
 	portrait.texture = null
 	portrait.visible = false
+	# 페이드 도중에 비워질 수 있다 — 트윈을 죽이고 농도를 되돌려 두지 않으면
+	# 다음에 뜰 때 반쯤 투명한 채로 남는다.
+	if appear_tween != null:
+		appear_tween.kill()
+	modulate.a = 1.0
 	visible = false
 
 
 ## 장면 자막처럼 대화창 바깥에 있지만 같은 서체를 써야 하는 Label에 본문 서체를 입힌다.
 func apply_font(label: Label, weight: float = 400.0) -> void:
 	label.add_theme_font_override("font", _weighted_font(weight, 0))
+
+
+## 자막판 전체를 투명에서 띄운다. Shade만 페이드하면 검은 띠가 차오르는 동안
+## 화자 이름과 첫 글자가 허공에 먼저 떠 있게 되므로, 그림자와 글을 함께 올린다.
+## Shade 자체의 농도(shade_alpha)는 건드리지 않는다 — 본편 HUD는 그 값이 낮다.
+func _fade_in() -> void:
+	if appear_tween != null:
+		appear_tween.kill()
+	modulate.a = 0.0
+	appear_tween = create_tween()
+	appear_tween.tween_property(self, "modulate:a", 1.0, APPEAR_FADE)
 
 
 func _update_portrait(speaker: String) -> void:
