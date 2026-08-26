@@ -976,7 +976,7 @@ PLACEMENT = {
 }
 # 영구 봉인 계단(열쇠로도 열리지 않음). 2층 하단 중앙 계단은 그 아래가 1층
 # 현관·중앙 구역이라 계단이 내려갈 자리가 없다 — 도면 구조를 지키려고 막는다.
-SEALED = {2: {1}}
+NO_STAIRWELL = {2: {1}}
 
 # 각 층 계단은 그 층 열쇠로 연다. 열쇠 획득처는 PLACEMENT 참조(한 층 위에서도 얻는다).
 #
@@ -1241,17 +1241,17 @@ def add_story(sc, floor):
 def add_stair_locks(sc, floor, key_id, stairwells):
     """계단 입구 자물쇠. 한 층의 계단 전부를 열쇠 하나로 연다(기존 규약).
 
-    **SEALED에 든 계단은 아무 노드도 내지 않는다**(#400). 예전에는 콘크리트
-    배리어 + "계단 살펴보기" 조사 + 흐린 표시를 냈는데, 배리어 시각이
+    **`NO_STAIRWELL`에 든 자리는 아무 노드도 내지 않는다**(#400 → #398). 예전에는
+    콘크리트 배리어 + "계단 살펴보기" 조사 + 흐린 표시를 냈는데, 배리어 시각이
     `WallGlow/Doors`에 있어(#359) 어둠·손전등을 받지 않아서 **캄캄한 복도에
-    회색 문 한 짝만 떠 있었다.** 지금은 `add_stairwell(sealed=True)`이 입구
-    문 틈 자체를 내지 않아 벽으로 이어지므로 막을 것이 없다.
+    회색 문 한 짝만 떠 있었다.** #400에서 입구를 벽으로 이었고, #398에서 계단실
+    자체를 없앴으므로 이제 막을 것이 없다.
 
     **배리어 시각은 `WallGlow/Doors`에 낸다**(#359). #307에서 벽·계단 시각을
     레이어 0으로 내렸고 #318에서 **문만** 되돌렸는데, 계단 자물쇠가 그 되돌림에서
     빠져 있었다 — 손전등이 정확히 비출 때만 보여서 복도에서 계단을 찾을 수 없었다.
     게임에서 가장 중요한 문이 유일하게 안 보이는 문이었다."""
-    sealed = SEALED.get(floor, set())
+    sealed = NO_STAIRWELL.get(floor, set())
     tags = ["SU", "SD"][:len(stairwells)]
     sc.node('[node name="StairLocks" type="Node2D" parent="."]\n')
 
@@ -2964,12 +2964,16 @@ def add_infill(sc, fl, spec):
             fill_band_gap(sc, f"GapSouth{i}", gx0, gx1, SOUTH_Y0, SOUTH_Y1)
 
     # 하단 띠 — 방과 계단실 B 사이의 빈 구간(전부 막다른 곳).
-    bot = [(STAIR_B[0], STAIR_B[2])] + [(x0, x1) for _, _, x0, x1
-                                         in spec["bottom_left"] + BOTTOM_RIGHT]
+    # 계단실을 없앤 층(#398)은 그 x 구간도 빈 것으로 넘겨 실체로 메운다.
+    gone = NO_STAIRWELL.get(fl, set())
+    bot = ([] if 1 in gone else [(STAIR_B[0], STAIR_B[2])]) \
+        + [(x0, x1) for _, _, x0, x1 in spec["bottom_left"] + BOTTOM_RIGHT]
     for i, (gx0, gx1) in enumerate(gaps_in(bot, EDGE, W - EDGE)):
         fill_band_gap(sc, f"GapBot{i}", gx0, gx1, BOT_Y0, BOT_Y1)
     # 계단실 B 아래 남는 띠(계단실 2440 < 하단 띠 2480).
-    fill_band_gap(sc, "GapStairB", STAIR_B[0], STAIR_B[2], STAIR_B[3], BOT_Y1)
+    # 계단실을 없앤 층은 위에서 띠 전체를 메웠으므로 여기서 또 낼 것이 없다.
+    if 1 not in gone:
+        fill_band_gap(sc, "GapStairB", STAIR_B[0], STAIR_B[2], STAIR_B[3], BOT_Y1)
 
 
 def build_common(fl, spec):
@@ -3035,15 +3039,17 @@ def build_common(fl, spec):
     for key, lb, x0, x1 in MID_RIGHT:
         add_room(sc, key, lb, x0, MID_Y0, x1, MID_Y1, "top" if lb else None)
 
-    # 계단실 2곳. 봉인된 쪽(#400)은 입구를 벽으로 이어 문 틈을 내지 않는다 —
-    # 갈 수 없는 곳에 문을 그려 두면 어둠을 안 받는 `WallGlow/Doors` 때문에
-    # 복도에서 가장 눈에 띄는 물건이 된다.
-    sealed = SEALED.get(fl, set())
-    add_stairwell(sc, "StairA", *STAIR_A, sealed=0 in sealed)
-    add_stairwell(sc, "StairB", *STAIR_B, sealed=1 in sealed)
-    if 0 not in sealed:
+    # 계단실. `NO_STAIRWELL`에 든 자리는 **계단실 자체를 안 낸다**(#398).
+    # #400에서 입구만 벽으로 막았더니 들어갈 수 없는 계단실이 도면에 그대로
+    # 남아, 슬래브·디딤판·난간이 보이는데 문이 없는 방이 됐다 — 게임이 "층별
+    # 열쇠로 계단을 연다"는 규칙 위에 있으니 있지도 않은 열쇠를 찾게 만든다.
+    # 그 자리는 `add_infill()`이 하단 띠의 빈 구간으로 보고 실체로 메운다.
+    gone = NO_STAIRWELL.get(fl, set())
+    if 0 not in gone:
+        add_stairwell(sc, "StairA", *STAIR_A)
         add_stair_markers(sc, "StairA", *STAIR_A, floor=fl)
-    if 1 not in sealed:
+    if 1 not in gone:
+        add_stairwell(sc, "StairB", *STAIR_B)
         add_stair_markers(sc, "StairB", *STAIR_B, floor=fl)
     if fl in LOCKED:
         add_stair_locks(sc, fl, LOCKED[fl], [STAIR_A, STAIR_B])
