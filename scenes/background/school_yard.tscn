@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3]
+[gd_scene load_steps=24 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 [ext_resource type="Script" path="res://scripts/interactions/exit_door.gd" id="4_exit"]
@@ -21,14 +21,20 @@ size = Vector2(140, 60)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_exam_zone"]
 size = Vector2(58, 50)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_FacadeL"]
-polygon = PackedVector2Array(0, 284, 1560, 284, 1560, 300, 0, 300)
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Facade0"]
+polygon = PackedVector2Array(0, 284, 600, 284, 600, 300, 0, 300)
 
-[sub_resource type="OccluderPolygon2D" id="Occ_WC_FacadeR"]
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Facade1"]
+polygon = PackedVector2Array(880, 284, 1560, 284, 1560, 300, 880, 300)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_Facade2"]
 polygon = PackedVector2Array(1840, 284, 3400, 284, 3400, 300, 1840, 300)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_WC_PorchSeal"]
 polygon = PackedVector2Array(1560, 284, 1840, 284, 1840, 300, 1560, 300)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_WC_SideSeal"]
+polygon = PackedVector2Array(600, 284, 880, 284, 880, 300, 600, 300)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_WC_FenceL"]
 polygon = PackedVector2Array(0, 1600, 2260, 1600, 2260, 1616, 0, 1616)
@@ -109,49 +115,72 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(0, 0, 3400, 0, 3400, 300, 0, 300)
 
-[node name="WC_FacadeL" type="CollisionPolygon2D" parent="RoomWalls"]
-polygon = PackedVector2Array(0, 284, 1560, 284, 1560, 300, 0, 300)
+[node name="WC_Facade0" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(0, 284, 600, 284, 600, 300, 0, 300)
 
-[node name="LO_WC_FacadeL" type="LightOccluder2D" parent="RoomWalls"]
-occluder = SubResource("Occ_WC_FacadeL")
+[node name="LO_WC_Facade0" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_Facade0")
 
-[node name="WV_FacadeL" type="Polygon2D" parent="Structures"]
+[node name="WV_Facade0" type="Polygon2D" parent="Structures"]
 texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
-polygon = PackedVector2Array(0, 284, 1560, 284, 1560, 300, 0, 300)
+polygon = PackedVector2Array(0, 284, 600, 284, 600, 300, 0, 300)
 
-[node name="WH_FacadeL" type="Polygon2D" parent="Structures"]
+[node name="WH_Facade0" type="Polygon2D" parent="Structures"]
 color = Color(0.375, 0.392, 0.430, 1)
-polygon = PackedVector2Array(0, 284, 1560, 284, 1560, 287, 0, 287)
+polygon = PackedVector2Array(0, 284, 600, 284, 600, 287, 0, 287)
 
-[node name="WF_FacadeL" type="Polygon2D" parent="Structures"]
+[node name="WF_Facade0" type="Polygon2D" parent="Structures"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(0, 300, 1560, 300, 1560, 316, 0, 316)
+polygon = PackedVector2Array(0, 300, 600, 300, 600, 316, 0, 316)
 
-[node name="WS_FacadeL" type="Polygon2D" parent="Structures"]
+[node name="WS_Facade0" type="Polygon2D" parent="Structures"]
 color = Color(0.118, 0.124, 0.140, 1)
-polygon = PackedVector2Array(0, 316, 1560, 316, 1560, 320, 0, 320)
+polygon = PackedVector2Array(0, 316, 600, 316, 600, 320, 0, 320)
 
-[node name="WC_FacadeR" type="CollisionPolygon2D" parent="RoomWalls"]
+[node name="WC_Facade1" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(880, 284, 1560, 284, 1560, 300, 880, 300)
+
+[node name="LO_WC_Facade1" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_Facade1")
+
+[node name="WV_Facade1" type="Polygon2D" parent="Structures"]
+texture = ExtResource("tex_wall_brick")
+color = Color(0.3654, 0.3846, 0.4295, 1)
+polygon = PackedVector2Array(880, 284, 1560, 284, 1560, 300, 880, 300)
+
+[node name="WH_Facade1" type="Polygon2D" parent="Structures"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(880, 284, 1560, 284, 1560, 287, 880, 287)
+
+[node name="WF_Facade1" type="Polygon2D" parent="Structures"]
+color = Color(0.205, 0.216, 0.242, 1)
+polygon = PackedVector2Array(880, 300, 1560, 300, 1560, 316, 880, 316)
+
+[node name="WS_Facade1" type="Polygon2D" parent="Structures"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(880, 316, 1560, 316, 1560, 320, 880, 320)
+
+[node name="WC_Facade2" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(1840, 284, 3400, 284, 3400, 300, 1840, 300)
 
-[node name="LO_WC_FacadeR" type="LightOccluder2D" parent="RoomWalls"]
-occluder = SubResource("Occ_WC_FacadeR")
+[node name="LO_WC_Facade2" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_Facade2")
 
-[node name="WV_FacadeR" type="Polygon2D" parent="Structures"]
+[node name="WV_Facade2" type="Polygon2D" parent="Structures"]
 texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1840, 284, 3400, 284, 3400, 300, 1840, 300)
 
-[node name="WH_FacadeR" type="Polygon2D" parent="Structures"]
+[node name="WH_Facade2" type="Polygon2D" parent="Structures"]
 color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1840, 284, 3400, 284, 3400, 287, 1840, 287)
 
-[node name="WF_FacadeR" type="Polygon2D" parent="Structures"]
+[node name="WF_Facade2" type="Polygon2D" parent="Structures"]
 color = Color(0.205, 0.216, 0.242, 1)
 polygon = PackedVector2Array(1840, 300, 3400, 300, 3400, 316, 1840, 316)
 
-[node name="WS_FacadeR" type="Polygon2D" parent="Structures"]
+[node name="WS_Facade2" type="Polygon2D" parent="Structures"]
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(1840, 316, 3400, 316, 3400, 320, 1840, 320)
 
@@ -184,6 +213,35 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8929, 0.7846, 0.5952, 1)
 polygon = PackedVector2Array(1568, 258, 1832, 258, 1832, 284, 1568, 284)
 
+[node name="WC_SideSeal" type="CollisionPolygon2D" parent="RoomWalls"]
+polygon = PackedVector2Array(600, 284, 880, 284, 880, 300, 600, 300)
+
+[node name="LO_WC_SideSeal" type="LightOccluder2D" parent="RoomWalls"]
+occluder = SubResource("Occ_WC_SideSeal")
+
+[node name="WV_SideSeal" type="Polygon2D" parent="Structures"]
+texture = ExtResource("tex_wall_brick")
+color = Color(0.3654, 0.3846, 0.4295, 1)
+polygon = PackedVector2Array(600, 284, 880, 284, 880, 300, 600, 300)
+
+[node name="WH_SideSeal" type="Polygon2D" parent="Structures"]
+color = Color(0.375, 0.392, 0.430, 1)
+polygon = PackedVector2Array(600, 284, 880, 284, 880, 287, 600, 287)
+
+[node name="WF_SideSeal" type="Polygon2D" parent="Structures"]
+color = Color(0.205, 0.216, 0.242, 1)
+polygon = PackedVector2Array(600, 300, 880, 300, 880, 316, 600, 316)
+
+[node name="WS_SideSeal" type="Polygon2D" parent="Structures"]
+color = Color(0.118, 0.124, 0.140, 1)
+polygon = PackedVector2Array(600, 316, 880, 316, 880, 320, 600, 320)
+
+[node name="SideDoor" type="Polygon2D" parent="Structures"]
+texture = ExtResource("tex_obj_panel")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.828, 0.7276, 0.552, 1)
+polygon = PackedVector2Array(608, 258, 872, 258, 872, 284, 608, 284)
+
 [node name="WD_Win0" type="Polygon2D" parent="Structures"]
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
@@ -193,16 +251,6 @@ polygon = PackedVector2Array(140, 250, 270, 250, 270, 276, 140, 276)
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
 polygon = PackedVector2Array(370, 250, 500, 250, 500, 276, 370, 276)
-
-[node name="WD_Win2" type="Polygon2D" parent="Structures"]
-texture = ExtResource("tex_prop_glass")
-color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(600, 250, 730, 250, 730, 276, 600, 276)
-
-[node name="WD_Win3" type="Polygon2D" parent="Structures"]
-texture = ExtResource("tex_prop_glass")
-color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(830, 250, 960, 250, 960, 276, 830, 276)
 
 [node name="WD_Win4" type="Polygon2D" parent="Structures"]
 texture = ExtResource("tex_prop_glass")
@@ -590,15 +638,6 @@ texture = ExtResource("tex_obj_shelf")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3284, 0.304, 0.2553, 1)
 polygon = PackedVector2Array(320, 340, 450, 340, 450, 374, 320, 374)
-
-[node name="PC_Bench1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(620, 340, 750, 340, 750, 374, 620, 374)
-
-[node name="PV_Bench1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_shelf")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.354, 0.3277, 0.2753, 1)
-polygon = PackedVector2Array(620, 340, 750, 340, 750, 374, 620, 374)
 
 [node name="PC_Bench2" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(920, 340, 1050, 340, 1050, 374, 920, 374)
