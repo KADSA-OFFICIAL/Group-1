@@ -40,14 +40,14 @@
    ]
   },
   "StudentCards": {
-   "body": "[node name=\"StudentCards\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(170, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"서랍 안에 학생증 두 장이 나란히 놓여 있다. 3학년 1반 강유진. 2학년 2반 조민혁. 미술실 캐비넷에서 주운 송하람의 것과 같은 방식으로 정리돼 있다.\"\nprompt_text = \"서랍 열기\"\ngrants_flag = \"saw_student_cards\"\n\n",
+   "body": "[node name=\"StudentCards\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(170, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"서랍 안에 학생증 두 장이 나란히 놓여 있다. 3학년 1반 강유진. 2학년 2반 조민혁. 잃어버린 물건을 정리해 둔 것처럼 각도까지 맞춰 놓여 있다.\"\nprompt_text = \"서랍 열기\"\ngrants_flag = \"saw_student_cards\"\n\n",
    "kids": [
     "[node name=\"StudentCardsVisual\" type=\"Sprite2D\" parent=\"StudentCards\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"10_note\")\n\n",
     "[node name=\"StudentCardsZone\" type=\"CollisionShape2D\" parent=\"StudentCards\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
    ]
   },
   "JanitorNotebook": {
-   "body": "[node name=\"JanitorNotebook\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(450, 1450)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"손때 묻은 공책. 이름과 짧은 판단이 줄줄이 적혀 있다. '강유진 — 후배 때림.' '조민혁 — 집에서 맞음.' 그리고 마지막 줄. '송하람 — 확실하지 않음. 그래도 만약을 위해.'\"\nprompt_text = \"공책 읽기\"\ngrants_flag = \"read_janitor_notebook\"\n\n",
+   "body": "[node name=\"JanitorNotebook\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(450, 1450)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"손때 묻은 공책. 이름과 짧은 판단이 줄줄이 적혀 있다. '강유진 — 후배 때림.' 그리고 마지막 줄. '조민혁 — 집에서 맞고 온다는 걸 안다. 확실하지 않다. 그래도 만약을 위해.'\"\nprompt_text = \"공책 읽기\"\ngrants_flag = \"read_janitor_notebook\"\n\n",
    "kids": [
     "[node name=\"JanitorNotebookVisual\" type=\"Sprite2D\" parent=\"JanitorNotebook\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"10_note\")\n\n",
     "[node name=\"JanitorNotebookZone\" type=\"CollisionShape2D\" parent=\"JanitorNotebook\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
@@ -148,13 +148,6 @@
    "kids": [
     "[node name=\"HideShowerVisual\" type=\"Polygon2D\" parent=\"HideShower\"]\nz_index = 1\ncolor = Color(0.3, 0.32, 0.38, 1)\npolygon = PackedVector2Array(-18, -26, 18, -26, 18, 26, -18, 26)\n\n",
     "[node name=\"HideShowerZone\" type=\"CollisionShape2D\" parent=\"HideShower\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n"
-   ]
-  },
-  "FriendNote": {
-   "body": "[node name=\"FriendNote\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(1760, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"책상 위에 접힌 쪽지. '하람아, 은수 때린 거 수위 아저씨가 봤다더라.' 뒷면에 다른 글씨로 — '나 안 때렸어. 쓰러지길래 잡은 건데.'\"\nprompt_text = \"조사\"\ngrants_flag = \"found_songharam\"\n\n",
-   "kids": [
-    "[node name=\"FriendNoteVisual\" type=\"Sprite2D\" parent=\"FriendNote\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"10_note\")\n\n",
-    "[node name=\"FriendNoteZone\" type=\"CollisionShape2D\" parent=\"FriendNote\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
    ]
   },
   "CrisisManual": {
@@ -302,13 +295,6 @@
    "kids": [
     "[node name=\"SiwooPaintingVisual\" type=\"Polygon2D\" parent=\"SiwooPainting\"]\nz_index = 1\ncolor = Color(0.35, 0.3, 0.45, 1)\npolygon = PackedVector2Array(-14, -12, 14, -12, 14, 12, -14, 12)\n\n",
     "[node name=\"SiwooPaintingZone\" type=\"CollisionShape2D\" parent=\"SiwooPainting\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
-   ]
-  },
-  "HaramCard": {
-   "body": "[node name=\"HaramCard\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(0, 0)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"캐비넷 문틈에 플라스틱 카드가 끼어 있다. 학생증 — 1학년 3반 송하람. 뉴스에서 들은 이름이다. 왜 없어진 학생 학생증이 미술실 캐비넷에 있는 걸까.\"\nprompt_text = \"학생증 살펴보기\"\ngrants_flag = \"found_songharam\"\n\n",
-   "kids": [
-    "[node name=\"HaramCardVisual\" type=\"Polygon2D\" parent=\"HaramCard\"]\nz_index = 1\ncolor = Color(0.55, 0.62, 0.6, 1)\npolygon = PackedVector2Array(-13, -10, 13, -10, 13, 10, -13, 10)\n",
-    "[node name=\"HaramCardZone\" type=\"CollisionShape2D\" parent=\"HaramCard\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n"
    ]
   },
   "Belongings": {

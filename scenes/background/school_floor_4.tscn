@@ -825,30 +825,6 @@ polygon = PackedVector2Array(-14, -12, 14, -12, 14, 12, -14, 12)
 shape = SubResource("RectangleShape2D_key_zone")
 
 
-[node name="Mark_HaramCard" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(150, 470)
-z_index = 5
-color = Color(1.00, 0.78, 0.32, 1)
-polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
-
-[node name="HaramCard" type="Area2D" parent="."]
-position = Vector2(150, 470)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("3_interactable")
-message = "캐비넷 문틈에 플라스틱 카드가 끼어 있다. 학생증 — 1학년 3반 송하람. 뉴스에서 들은 이름이다. 왜 없어진 학생 학생증이 미술실 캐비넷에 있는 걸까."
-prompt_text = "학생증 살펴보기"
-grants_flag = "found_songharam"
-
-
-[node name="HaramCardVisual" type="Polygon2D" parent="HaramCard"]
-z_index = 1
-color = Color(0.55, 0.62, 0.6, 1)
-polygon = PackedVector2Array(-13, -10, 13, -10, 13, 10, -13, 10)
-
-[node name="HaramCardZone" type="CollisionShape2D" parent="HaramCard"]
-shape = SubResource("RectangleShape2D_key_zone")
-
 [node name="Mark_Belongings" type="Polygon2D" parent="WallGlow/Marks"]
 position = Vector2(1310, 646)
 z_index = 5
