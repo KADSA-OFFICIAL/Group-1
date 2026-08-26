@@ -131,7 +131,7 @@ def render(stem, out_path):
 
 
 # 축소 배율. 3400px를 그대로 쓰면 PNG이 커지고 볼 때도 불편하다.
-PNG_DIV = 2
+PNG_DIV = 1
 
 
 def _fill(buf, w, h, pts, rgb, alpha):

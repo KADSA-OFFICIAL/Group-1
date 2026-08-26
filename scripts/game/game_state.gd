@@ -148,7 +148,9 @@ func clue_score() -> Array:
 	var all: Array = MISSING_FLAGS + SIWOO_FLAGS + COVERUP_FLAGS + [
 		"read_siwoo_past", "read_taeho_note", "read_report_flyer",
 		"read_janitor_warning", "saw_photo_wall", "saw_student_cards",
-		"saw_shower_marks", "opened_key_cabinet"]
+		"saw_shower_marks", "opened_key_cabinet",
+		# 미술실 도입부(#405) — 목록에 안 넣어서 "알아낸 것 N"에 안 세어졌다.
+		"saw_belongings", "saw_dates"]
 	var uniq: Array = []
 	for f in all:
 		if f not in uniq:

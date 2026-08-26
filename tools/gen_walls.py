@@ -23,7 +23,7 @@ CENTER_Y = 900
 WALL_COLOR = "Color(0.45, 0.48, 0.55, 1)"
 DOOR_COLOR = "Color(0.45, 0.32, 0.2, 1)"
 
-FILES = [f"scenes/background/school_floor_{i}.tscn" for i in range(1, 6)]
+FILES = [f"scenes/background/school_floor_{i}.tscn" for i in range(1, 5)]
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 room_block_re = re.compile(

@@ -105,6 +105,10 @@ def _near(poly, x, y, d):
     return False
 
 
+# 도입부 4층(#405)의 시드 — 미술실 안. main.tscn의 시작 위치와 같다.
+INTRO_START = (300, 700)
+
+
 def flood(blocked, cols, rows, start):
     sc, sr = int(start[0] // CELL), int(start[1] // CELL)
     if blocked[sr][sc]:
@@ -133,37 +137,57 @@ def flood(blocked, cols, rows, start):
 
 
 def check_camera(sizes):
-    """플레이어 카메라 한계가 맵 캔버스와 맞는지. 어긋나면 맵 끝에서 카메라가
-    따라오지 않는다(#159에서 옛 2800×1800 값이 남아 발생)."""
-    text = (ROOT / "scenes/player/player.tscn").read_text()
+    """카메라 한계가 맵 캔버스와 맞는지. 어긋나면 맵 끝에서 카메라가 밖을 비춘다.
+
+    한계는 두 곳에서 온다 — `player.tscn`의 기본값과, 층마다 그것을 덮어쓰는
+    `floor_manager`의 `FLOOR_BOUNDS`(#356). 크기가 다른 층(운동장 3400x1700,
+    도입부 1800x1000)은 후자에 적혀 있어야 한다.
+    """
+    text = (ROOT / "scenes/player/player.tscn").read_text(encoding="utf-8")
     lim = {}
     for key in ("limit_left", "limit_top", "limit_right", "limit_bottom"):
-        m = re.search(rf"^{key} = (-?\d+)", text, re.M)
+        m = re.search(rf"^{key} = (-?\d+)$", text, re.M)
         if m:
             lim[key] = int(m.group(1))
     if len(lim) != 4:
         print("   ✗ player.tscn에서 카메라 limit_*를 찾지 못했다")
         return 1
+    default = (lim["limit_right"], lim["limit_bottom"])
+
+    fm = (ROOT / "scripts/game/floor_manager.gd").read_text(encoding="utf-8")
+    bounds = {}
+    blk = re.search(r"const FLOOR_BOUNDS := \{(.*?)\}", fm, re.S)
+    if blk:
+        for fl, w, h in re.findall(r"(\d+)\s*:\s*Rect2\(0,\s*0,\s*(\d+),\s*(\d+)\)",
+                                   blk.group(1)):
+            bounds[int(fl)] = (int(w), int(h))
+
     bad = 0
-    for w, h in set(sizes):
-        if (lim["limit_left"], lim["limit_top"]) != (0, 0) \
-                or lim["limit_right"] != int(w) or lim["limit_bottom"] != int(h):
-            print(f"   ✗ 카메라 한계 {lim['limit_left']},{lim['limit_top']}~"
-                  f"{lim['limit_right']},{lim['limit_bottom']} ≠ 맵 0,0~{int(w)},{int(h)}")
+    if (lim["limit_left"], lim["limit_top"]) != (0, 0):
+        print(f"   ✗ 카메라 원점이 0,0이 아니다 ({lim['limit_left']},{lim['limit_top']})")
+        bad += 1
+    for fl, (w, h) in sizes.items():
+        want = bounds.get(fl, default)
+        if want != (int(w), int(h)):
+            where = f"FLOOR_BOUNDS[{fl}]" if fl in bounds else "player.tscn 기본값"
+            print(f"   ✗ floor{fl} 카메라 한계 {want[0]}x{want[1]}({where}) "
+                  f"≠ 맵 {int(w)}x{int(h)}")
             bad += 1
     return bad
 
 
 def main():
     bad = 0
-    sizes = []
-    for fl in (1, 2, 3, 4, 5):
+    sizes = {}
+    for fl in (1, 2, 3, 4):
         path = ROOT / f"scenes/background/school_floor_{fl}.tscn"
         walls, rooms, (w, h), wins = parse(path)
-        sizes.append((w, h))
+        sizes[fl] = (w, h)
         blocked, cols, rows = build_grid(walls, w, h)
         # 시작: 북쪽 복도 한가운데(1층은 상단 복도)
-        start = (200, 700) if fl != 1 else (200, 1700)
+        # 시드는 그 층에서 확실히 걸을 수 있는 자리 — 1층은 아래쪽 절반만
+        # 건물이고, 4층은 도입부라 캔버스 자체가 작다(#405).
+        start = {1: (200, 1700), 4: INTRO_START}.get(fl, (200, 700))
         seen = flood(blocked, cols, rows, start)
         print(f"floor{fl}: 벽 {len(walls)}개, 도달 셀 {len(seen)}/{cols*rows}")
 
