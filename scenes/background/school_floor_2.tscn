@@ -30,8 +30,8 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_grain.png" id="tex_prop_grain"]
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_metal.png" id="tex_prop_metal"]
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
-[ext_resource type="Texture2D" path="res://assets/sprites/key.png" id="9_key"]
 [ext_resource type="Texture2D" path="res://assets/sprites/note.png" id="10_note"]
+[ext_resource type="Texture2D" path="res://assets/sprites/eye_key.png" id="15_eyekey"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(3400, 40)
@@ -3800,13 +3800,13 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 
 [node name="Mark_HistoryClue" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(2107.5, 893.6)
+position = Vector2(2000, 950)
 z_index = 5
 color = Color(1.00, 0.78, 0.32, 1)
 polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
 
 [node name="HistoryClue" type="Area2D" parent="."]
-position = Vector2(2107.5, 893.6)
+position = Vector2(2000, 950)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
@@ -3825,14 +3825,40 @@ texture = ExtResource("10_note")
 shape = SubResource("RectangleShape2D_key_zone")
 
 
+[node name="Mark_HeadKey" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2215, 950)
+z_index = 5
+color = Color(1.00, 0.78, 0.32, 1)
+polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
+
+[node name="HeadKey" type="Area2D" parent="."]
+position = Vector2(2215, 950)
+collision_layer = 0
+collision_mask = 1
+script = ExtResource("2_pickup")
+message = "적재함 사이에 무언가 놓여 있다. 사람의 머리다. 한쪽 눈이 있어야 할 자리에 열쇠가 깊이 박혀 있다. 손이 떨렸지만 뽑아 냈다. — '2F 계단'"
+item_id = "stair_key_2"
+pickup_id = "found_head_key"
+
+
+[node name="HeadKeyVisual" type="Sprite2D" parent="HeadKey"]
+z_index = 1
+texture_filter = 1
+texture = ExtResource("15_eyekey")
+
+
+[node name="HeadKeyZone" type="CollisionShape2D" parent="HeadKey"]
+shape = SubResource("RectangleShape2D_key_zone")
+
+
 [node name="Mark_ShowerMarks" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(2361.7, 2343.2)
+position = Vector2(2407.5, 2343.2)
 z_index = 5
 color = Color(1.00, 0.78, 0.32, 1)
 polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
 
 [node name="ShowerMarks" type="Area2D" parent="."]
-position = Vector2(2361.7, 2343.2)
+position = Vector2(2407.5, 2343.2)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
@@ -3848,32 +3874,6 @@ polygon = PackedVector2Array(-16, -8, 16, -8, 16, 8, -16, 8)
 
 
 [node name="ShowerMarksZone" type="CollisionShape2D" parent="ShowerMarks"]
-shape = SubResource("RectangleShape2D_key_zone")
-
-
-[node name="Mark_DrainKey" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(2453.3, 2343.2)
-z_index = 5
-color = Color(1.00, 0.78, 0.32, 1)
-polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
-
-[node name="DrainKey" type="Area2D" parent="."]
-position = Vector2(2453.3, 2343.2)
-collision_layer = 0
-collision_mask = 1
-script = ExtResource("2_pickup")
-message = "배수구 뚜껑이 어긋나 있다. 손을 넣어 보니 젖은 열쇠가 잡혔다. '2F 계단'."
-item_id = "stair_key_2"
-pickup_id = "found_drain_key"
-
-
-[node name="DrainKeyVisual" type="Sprite2D" parent="DrainKey"]
-z_index = 1
-texture_filter = 1
-texture = ExtResource("9_key")
-
-
-[node name="DrainKeyZone" type="CollisionShape2D" parent="DrainKey"]
 shape = SubResource("RectangleShape2D_key_zone")
 
 
@@ -9053,22 +9053,13 @@ color = Color(0.2941, 0.2557, 0.2045, 1)
 polygon = PackedVector2Array(2188.5, 777, 2247, 777, 2247, 817, 2188.5, 817)
 
 [node name="PC_StorageR_2" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1968, 903, 2031.5, 903, 2031.5, 943, 1968, 943)
+polygon = PackedVector2Array(2076, 903, 2139, 903, 2139, 943, 2076, 943)
 
 [node name="PV_StorageR_2" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_shelf")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2993, 0.2602, 0.2082, 1)
-polygon = PackedVector2Array(1968, 903, 2031.5, 903, 2031.5, 943, 1968, 943)
-
-[node name="PC_StorageR_3" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2183.5, 903, 2247, 903, 2247, 943, 2183.5, 943)
-
-[node name="PV_StorageR_3" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_shelf")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.2858, 0.2485, 0.1988, 1)
-polygon = PackedVector2Array(2183.5, 903, 2247, 903, 2247, 943, 2183.5, 943)
+polygon = PackedVector2Array(2076, 903, 2139, 903, 2139, 943, 2076, 943)
 
 [node name="PT_StorageR_box0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_grain")
@@ -9083,12 +9074,7 @@ polygon = PackedVector2Array(2199.6, 787.8, 2235.9, 787.8, 2235.9, 806.2, 2199.6
 [node name="PT_StorageR_box2" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(1980.1, 913.8, 2019.4, 913.8, 2019.4, 932.2, 1980.1, 932.2)
-
-[node name="PT_StorageR_box3" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_prop_grain")
-color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(2195.6, 913.8, 2234.9, 913.8, 2234.9, 932.2, 2195.6, 932.2)
+polygon = PackedVector2Array(2088.0, 913.8, 2127.0, 913.8, 2127.0, 932.2, 2088.0, 932.2)
 
 [node name="PD_StorageR_sign" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_glass")
@@ -10868,18 +10854,18 @@ color = Color(0.3788, 0.4168, 0.442, 1)
 polygon = PackedVector2Array(2294, 2185, 2320, 2185, 2320, 2215, 2294, 2215)
 
 [node name="PC_MensRoomB_sink1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2294, 2419.2, 2320, 2419.2, 2320, 2438, 2294, 2438)
+polygon = PackedVector2Array(2294, 2392, 2320, 2392, 2320, 2422, 2294, 2422)
 
 [node name="PV_MensRoomB_sink1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_sink")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.4073, 0.4481, 0.4752, 1)
-polygon = PackedVector2Array(2294, 2419.2, 2320, 2419.2, 2320, 2438, 2294, 2438)
+polygon = PackedVector2Array(2294, 2392, 2320, 2392, 2320, 2422, 2294, 2422)
 
 [node name="PD_MensRoomB_mirror" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_glass")
 color = Color(0.4359, 0.5128, 0.5769, 1)
-polygon = PackedVector2Array(2286, 2185, 2292, 2185, 2292, 2438, 2286, 2438)
+polygon = PackedVector2Array(2286, 2185, 2292, 2185, 2292, 2422, 2286, 2422)
 
 [node name="PC_WomensRoomB_bin" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(2563, 2438, 2585, 2438, 2585, 2462, 2563, 2462)
@@ -13075,7 +13061,7 @@ polygon = PackedVector2Array(2311, 2188, 2317, 2188, 2317, 2192.5, 2311, 2192.5)
 
 [node name="PT_MensRoomB_sink1_soap0" type="Polygon2D" parent="Props"]
 color = Color(0.66, 0.65, 0.60, 1)
-polygon = PackedVector2Array(2297, 2425.2, 2303, 2425.2, 2303, 2429.2, 2297, 2429.2)
+polygon = PackedVector2Array(2297, 2398, 2303, 2398, 2303, 2402.5, 2297, 2402.5)
 
 [node name="PT_WomensRoomB_sink1_soap0" type="Polygon2D" parent="Props"]
 color = Color(0.66, 0.65, 0.60, 1)
@@ -13269,13 +13255,31 @@ z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
+[node name="Exam_MensRoomB_sink1" type="Area2D" parent="."]
+position = Vector2(2307, 2407)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "세면대 밑에 젖은 발자국이 있다. 크기가 어른 것이다."
+prompt_text = "세면대 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_MensRoomB_sink1"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_MensRoomB_sink1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2307, 2407)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
 [node name="Exam_MensRoomB_sink0" type="Area2D" parent="."]
 position = Vector2(2307, 2200)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
 interact_priority = 3
-message = "세면대 밑에 젖은 발자국이 있다. 크기가 어른 것이다."
+message = "수도꼭지에서 물이 한 방울씩 떨어진다."
 prompt_text = "세면대 살펴보기"
 
 [node name="Zone" type="CollisionShape2D" parent="Exam_MensRoomB_sink0"]
