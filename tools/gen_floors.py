@@ -954,13 +954,24 @@ PLACEMENT = {
     # 도입부 4층(#405) — 미술실·준비실. 나머지 4층 단서는 #404 3번에서 아래층으로.
     4: [("ArtRoom", ["KoreanBook", "SiwooPainting", "HaramCard"]),
         ("ArtPrep", ["Belongings", "DateWall"])],
-    3: [("North4", ["NayeonClue"]),                               # 생활지도부 ← 방송실
+    # 상담기록부는 **생활지도부**가 가장 자연스러운 집이고, 도착지에서 +520px다.
+    3: [("North4", ["NayeonClue", "CounselRecord"]),               # 생활지도부 ← 방송실
         ("North5", ["JanitorWarning", "KeyCabinet", "SpareKeyHook"]),  # 2학년부 ← 교무실
-        ("CareerDept", ["ReportFlyer"]),                          # 진로진학부 ← 학생회실
-        # 깨진 비커는 과학실 물건인데 4층 컴퓨터실에 있었다 — 4층에는 과학실이 없다.
-        ("ScienceLab1", ["ScienceClue"]),                         # ← 과학 실험실
+        # 잉크통은 **수위가 활동하는 첫 층**에 있어야 한다(#411). 4층이 도입부로
+        # 줄면서 갈 곳을 잃었는데, 그때까지 게임의 유일한 방어 수단을 못 얻었다.
+        # 부서실이라 복사기가 있어 "인쇄기 아래"가 그대로 맞는다.
+        ("CareerDept", ["ReportFlyer"]),                              # 진로진학부 ← 학생회실
+        # 잉크통은 **진행에 필요한 것**이라 +1500px 안이어야 한다(#350). 부서실은
+        # 전부 그보다 멀어서 창고로 보냈다 — 인쇄기 여분이 놓인 자리로 문구를 고쳤다.
+        ("StorageR", ["InkCan"]),                 # 창고 +1160px
+        # 태호 쪽지는 과학실을 직접 가리킨다. 과학실2는 +3440px이라 과학실1로.
+        ("ScienceLab1", ["ScienceClue", "TaehoNote"]),
         ],
-    2: [("PEDept", ["YujinClue"]),                                # 체육건강부 ← 체육관 입구
+    2: [
+        ("North3", ["FriendNote"]),               # 2층이 1학년이고 하람은 3반이다
+        # 컴퓨터실은 +2800px이라 부서실로. 대응 매뉴얼은 전 부서에 돌린 문서다.
+        ("PEDept", ["YujinClue", "CrisisManual"]),
+        ("StorageR", ["HistoryClue"]),            # 창고 +780px — 10년 전 졸업앨범
         ("MensRoomB", ["ShowerMarks", "DrainKey"]),   # 화장실 ← 샤워실
         ("EduRoom", ["SeunghoClue"]),                             # 교육실 ← 2층 교무실
         ],
@@ -3599,7 +3610,10 @@ def build_intro():
         'prompt_text = "창문으로 내려가기"',
         'message = "창틀을 넘어 난간에 발을 디뎠다. 아래층 창문까지 두 걸음."',
         "target_floor = 3",
-        "arrive_at = Vector2(1700, 100)",
+        # 3층 도착지는 **교실1 창가**다. 가운데(2학년부, 1700)에 떨어뜨리면
+        # 계단 열쇠가 있는 방에 착지해 3층 강제 동선이 1720px로 줄었다 —
+        # 끝에서 시작해야 층을 가로지른다(4360px, 2층과 비슷해진다).
+        "arrive_at = Vector2(150, 100)",
         "",
         '[node name="PrepWindowEscapeZone" type="CollisionShape2D" '
         'parent="PrepWindowEscape"]',
