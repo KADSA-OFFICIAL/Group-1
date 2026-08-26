@@ -916,6 +916,7 @@ SCRIPTS = {
     "8_marks": "res://scripts/game/interact_marks.gd",
     # 9_key·10_note는 SPRITE_TEXTURES가 쓴다(단서 스프라이트) — 겹치면 안 된다.
     "11_floorlink": "res://scripts/interactions/floor_link.gd",
+    "12_artintro": "res://scripts/game/art_room_intro.gd",
 }
 
 
@@ -3683,6 +3684,27 @@ def build_intro():
 
     add_hiding(sc, 4)
     add_story(sc, 4)
+
+    # ── 수위가 찾아오는 장면(#409) ──────────────────────────
+    # 문틈으로 새는 빛. **문 바깥에 광원을 두면 안 된다** — 문짝 차단체
+    # (`LO_ArtRoomDoorCollision`)에 막혀 아무것도 안 보인다. 폴리곤 하나를
+    # `WallGlow`에 두고 알파로 켰다 끈다(어둠도 안 받는다).
+    sc.node(NL.join([
+        '[node name="ArtDoorGlow" type="Polygon2D" parent="WallGlow/Doors"]',
+        'modulate = Color(1, 1, 1, 0)',
+        'z_index = 2',
+        'color = %s' % C_MOON_LIGHT,
+        'polygon = %s' % rect(dl + 6, IY1 - T - 7, dr - 6, IY1 - T),
+        '']))
+    # 장면 진행자. 단서 노드의 `interacted`를 이름으로 찾아 잇는다.
+    sc.node(NL.join([
+        '[node name="ArtRoomIntro" type="Node" parent="."]',
+        'script = ExtResource("12_artintro")',
+        'door_position = Vector2(%s, %s)' % (n(dcx), n(IY1 - T)),
+        'door_glow_path = NodePath("../WallGlow/Doors/ArtDoorGlow")',
+        'door_path = NodePath("../ArtRoomDoor")',
+        'door_after_message = "복도로 나가는 문. 수위가 저쪽에 있다. 지금 나가면 마주친다."',
+        '']))
     add_clutter(sc)
     add_examine(sc)
 
