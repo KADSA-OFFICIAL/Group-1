@@ -1,6 +1,5 @@
-[gd_scene load_steps=156 format=3]
+[gd_scene load_steps=153 format=3]
 
-[ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 [ext_resource type="Script" path="res://scripts/interactions/exit_door.gd" id="4_exit"]
@@ -29,7 +28,6 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_grain.png" id="tex_prop_grain"]
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_metal.png" id="tex_prop_metal"]
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
-[ext_resource type="Texture2D" path="res://assets/sprites/key.png" id="9_key"]
 [ext_resource type="Texture2D" path="res://assets/sprites/note.png" id="10_note"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
@@ -247,9 +245,6 @@ polygon = PackedVector2Array(550, 2120, 660, 2120, 660, 2136, 550, 2136)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_RC_StairA_M"]
 polygon = PackedVector2Array(432, 2136, 448, 2136, 448, 2424, 432, 2424)
-
-[sub_resource type="OccluderPolygon2D" id="Occ_SUBarrierCollision"]
-polygon = PackedVector2Array(330, 2120, 550, 2120, 550, 2136, 330, 2136)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_WC_Floor1North"]
 polygon = PackedVector2Array(0, 1004, 3400, 1004, 3400, 1020, 0, 1020)
@@ -1842,47 +1837,6 @@ theme_override_font_sizes/font_size = 22
 text = "2층"
 horizontal_alignment = 1
 
-[node name="StairLocks" type="Node2D" parent="."]
-
-[node name="SUBarrier" type="StaticBody2D" parent="StairLocks"]
-
-[node name="SUBarrierCollision" type="CollisionPolygon2D" parent="StairLocks/SUBarrier"]
-polygon = PackedVector2Array(330, 2120, 550, 2120, 550, 2136, 330, 2136)
-
-[node name="LO_SUBarrierCollision" type="LightOccluder2D" parent="StairLocks/SUBarrier"]
-occluder = SubResource("Occ_SUBarrierCollision")
-
-[node name="SUBarrierVisual" type="Polygon2D" parent="WallGlow/Doors"]
-z_index = 2
-texture_filter = 1
-texture_repeat = 2
-texture = ExtResource("tex_prop_metal")
-color = Color(0.7051, 0.3333, 0.2821, 1)
-polygon = PackedVector2Array(330, 2120, 550, 2120, 550, 2136, 330, 2136)
-
-[node name="SULock" type="Area2D" parent="."]
-position = Vector2(440, 2128)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("1_locked_door")
-required_item_id = "stair_key_1"
-locked_message = "계단 입구가 잠겨 있다. 이 층 어딘가에 열쇠가 있을 것이다."
-open_message = "계단 자물쇠를 열었다."
-barrier_path = NodePath("../StairLocks")
-prompt_text = "계단 열기"
-door_id = "stairs_f1_unlocked"
-consume_key = true
-also_remove_paths = Array[NodePath]([NodePath("../WallGlow/Doors/SUBarrierVisual")])
-
-[node name="SULockZone" type="CollisionShape2D" parent="SULock"]
-shape = SubResource("RectangleShape2D_stair_zone")
-
-[node name="Mark_SULock" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(440, 2096)
-z_index = 5
-color = Color(1.00, 0.78, 0.32, 1)
-polygon = PackedVector2Array(0, -9, 9, 0, 0, 9, -9, 0)
-
 [node name="WC_Floor1North" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(0, 1004, 3400, 1004, 3400, 1020, 0, 1020)
 
@@ -2253,32 +2207,6 @@ polygon = PackedVector2Array(-12, -12, 12, -12, 12, 12, -12, 12)
 
 
 [node name="SafeZone" type="CollisionShape2D" parent="JanitorSafe"]
-shape = SubResource("RectangleShape2D_key_zone")
-
-
-[node name="Mark_StairKey" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(2785, 2343.2)
-z_index = 5
-color = Color(1.00, 0.78, 0.32, 1)
-polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
-
-[node name="StairKey" type="Area2D" parent="."]
-position = Vector2(2785, 2343.2)
-collision_layer = 0
-collision_mask = 1
-script = ExtResource("2_pickup")
-item_id = "stair_key_1"
-message = "창고 선반 위에서 1층 계단 열쇠를 주웠다."
-pickup_id = "stair_key_1_taken"
-
-
-[node name="StairKeyVisual" type="Sprite2D" parent="StairKey"]
-z_index = 1
-texture_filter = 1
-texture = ExtResource("9_key")
-
-
-[node name="StairKeyZone" type="CollisionShape2D" parent="StairKey"]
 shape = SubResource("RectangleShape2D_key_zone")
 
 
@@ -4579,13 +4507,22 @@ color = Color(0.3106, 0.27, 0.216, 1)
 polygon = PackedVector2Array(2866, 2192.9, 2932, 2192.9, 2932, 2232.9, 2866, 2232.9)
 
 [node name="PC_Storage1_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2862.5, 2367.1, 2930.5, 2367.1, 2930.5, 2407.1, 2862.5, 2407.1)
+polygon = PackedVector2Array(2751, 2367.1, 2819, 2367.1, 2819, 2407.1, 2751, 2407.1)
 
 [node name="PV_Storage1_1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_shelf")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2887, 0.251, 0.2008, 1)
-polygon = PackedVector2Array(2862.5, 2367.1, 2930.5, 2367.1, 2930.5, 2407.1, 2862.5, 2407.1)
+polygon = PackedVector2Array(2751, 2367.1, 2819, 2367.1, 2819, 2407.1, 2751, 2407.1)
+
+[node name="PC_Storage1_2" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(2839, 2367.1, 2907, 2367.1, 2907, 2407.1, 2839, 2407.1)
+
+[node name="PV_Storage1_2" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_shelf")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.2835, 0.2465, 0.1972, 1)
+polygon = PackedVector2Array(2839, 2367.1, 2907, 2367.1, 2907, 2407.1, 2839, 2407.1)
 
 [node name="PT_Storage1_box0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_grain")
@@ -4595,7 +4532,12 @@ polygon = PackedVector2Array(2878.5, 2203.7, 2919.5, 2203.7, 2919.5, 2222.1, 287
 [node name="PT_Storage1_box1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(2875.4, 2377.9, 2917.6, 2377.9, 2917.6, 2396.3, 2875.4, 2396.3)
+polygon = PackedVector2Array(2763.9, 2377.9, 2806.1, 2377.9, 2806.1, 2396.3, 2763.9, 2396.3)
+
+[node name="PT_Storage1_box2" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_grain")
+color = Color(0.5769, 0.4359, 0.3077, 1)
+polygon = PackedVector2Array(2851.9, 2377.9, 2894.1, 2377.9, 2894.1, 2396.3, 2851.9, 2396.3)
 
 [node name="PD_Storage1_sign" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_glass")
@@ -6873,8 +6815,8 @@ z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
-[node name="Exam_Storage1_0" type="Area2D" parent="."]
-position = Vector2(2899, 2212.9)
+[node name="Exam_Storage1_2" type="Area2D" parent="."]
+position = Vector2(2873, 2387.1)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
@@ -6882,17 +6824,17 @@ interact_priority = 3
 message = "맨 아래 칸이 젖어 있다. 종이가 부풀어 있다."
 prompt_text = "선반 살펴보기"
 
-[node name="Zone" type="CollisionShape2D" parent="Exam_Storage1_0"]
+[node name="Zone" type="CollisionShape2D" parent="Exam_Storage1_2"]
 shape = SubResource("RectangleShape2D_exam_zone")
 
-[node name="Mark_Exam_Storage1_0" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(2899, 2212.9)
+[node name="Mark_Exam_Storage1_2" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2873, 2387.1)
 z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
-[node name="Exam_Storage1_1" type="Area2D" parent="."]
-position = Vector2(2896.5, 2387.1)
+[node name="Exam_Storage1_0" type="Area2D" parent="."]
+position = Vector2(2899, 2212.9)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
@@ -6900,11 +6842,11 @@ interact_priority = 3
 message = "상자 하나가 밖으로 끌려 나온 자국이 있다."
 prompt_text = "선반 살펴보기"
 
-[node name="Zone" type="CollisionShape2D" parent="Exam_Storage1_1"]
+[node name="Zone" type="CollisionShape2D" parent="Exam_Storage1_0"]
 shape = SubResource("RectangleShape2D_exam_zone")
 
-[node name="Mark_Exam_Storage1_1" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(2896.5, 2387.1)
+[node name="Mark_Exam_Storage1_0" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2899, 2212.9)
 z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
