@@ -18,12 +18,11 @@ extends Control
 # choice({prompt, options: [[라벨, 다음 키]]}). 특수 키: @game(게임 시작), @title(타이틀 복귀)
 # background(선택): 그 장면 동안 화면을 채우는 그림. **이 키가 있으면 caption은 화면에
 # 뜨지 않는다** — 그림이 장소를 말하므로 글자는 같은 말을 두 번 하는 것이 된다.
-# street에 그림이 없는 것은 빠져서가 아니다 — 거기는 아직 학교가 아니고,
-# 검은 화면 위의 캡션이 곧 '아무 일도 없는 밤'이다.
 # 화자가 빈 문자열이면 지문·독백으로 표시된다. 감정 태그는 subtitle_dialogue.gd의 EMOTIONS 참고.
 const SCRIPT_NODES: Dictionary = {
 	"street": {
 		"caption": "— 밤 10시 20분, 학원에서 집으로 —",
+		"background": preload("res://assets/backgrounds/intro_street.png"),
 		"lines": [
 			["", "가방이 가볍다. 이설은 걸음을 멈췄다."],
 			["이설", "…국어책."],

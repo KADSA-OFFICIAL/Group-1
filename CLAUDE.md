@@ -14,11 +14,11 @@
 
 main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scripts/ui/intro.gd`의 SCRIPT_NODES) → main(본편, **4층 미술실에서 시작** → 3층 → 1층 현관 → **운동장(0층)**) → ending → main_menu
 **미술실 장면은 자막이 아니라 조작 구간이다**(#405). 예전에는 `art_room`→`cabinet`→`next_room` 세 장면이 자막으로 흘러가 수위가 문 밖에서 말하는 것도, 캐비넷에 숨는 것도, 단서를 찾는 것도 **읽기만** 했다. 지금은 전부 플레이어가 직접 한다. **캐비넷 문틈의 송하람 학생증은 #407에서 걷어냈다** — 도입부의 훅은 준비실의 소지품 봉투와 날짜 벽이다.
-**프롤로그 장면 배경은 `SCRIPT_NODES`의 선택적 `background` 키다**(#430) — `assets/backgrounds/`의 그림을 `preload`로 물리고, `_apply_scene()`이 `SceneBackground`(TextureRect)에 끼운다. 키가 없는 장면은 검은 화면 그대로다(`street`).
+**프롤로그 장면 배경은 `SCRIPT_NODES`의 선택적 `background` 키다**(#430) — `assets/backgrounds/`의 그림을 `preload`로 물리고, `_apply_scene()`이 `SceneBackground`(TextureRect)에 끼운다. 키가 없는 장면은 검은 화면 그대로다 — **지금은 두 장면 다 그림이 있다**(`street`·`back_gate`, #433).
   - **배경이 있으면 장면 캡션(`SceneCaption`)을 감춘다.** 그림이 이미 장소를 말하는데 그 위에 "— 학교 뒷문 —"을 얹으면 같은 말을 두 번 하는 것이고 글자가 그림을 가린다. 캡션은 그림이 없는 장면의 장소 표시다.
   - **교체는 `FadeRect`가 화면을 덮은 뒤에 일어난다.** `_go_to()`가 페이드를 1.0까지 올리고 `_apply_scene()`을 부르는 순서라 배경이 바뀌는 순간이 안 보인다 — 그 순서를 바꾸면 눈앞에서 그림이 튄다.
   - `SceneBackground`는 `Background`(검은 ColorRect) **뒤에, `SceneCaption` 앞에** 선언한다. 먼저 선언된 형제가 먼저 그려지므로 선언 순서가 곧 레이어다 — 자막·캡션·스탠딩·`FadeRect`가 전부 그 위에 온다.
-  - `stretch_mode = 6`(KEEP_ASPECT_COVERED)이라 원본 비율이 16:9와 달라도 검은 띠가 안 생긴다. 대신 잘린다 — `intro_back_gate.png`는 4:3(1448x1086)이라 위아래로 150px씩 날아간다. **새 배경은 중요한 것을 세로 가운데 3/4 안에 두고 그릴 것.**
+  - `stretch_mode = 6`(KEEP_ASPECT_COVERED)이라 원본 비율이 16:9와 달라도 검은 띠가 안 생긴다. 대신 잘린다 — 지금 두 장 다 4:3(1448x1086)이라 위아래로 150px씩 날아간다(원본 y 136~950만 보인다). **새 배경은 중요한 것을 세로 가운데 3/4 안에 두고 그릴 것.**
 현관을 열면 곧바로 엔딩이 아니라 **운동장으로 나간다**(#356). 정문에서 E를 눌러야 엔딩 컷신으로 넘어간다.
 **5층은 삭제됐다**(#405) — 프롤로그 자막 전용이라 본편에서 한 번도 못 갔다. 미술실은 4층으로 옮겼다. 규칙 칠판·사망 엔딩은 구 시나리오 요소로 제거됨.
 
