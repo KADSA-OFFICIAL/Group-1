@@ -236,7 +236,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
   - **쉬는 시간**(히든) — 실종 학생 넷을 전부 찾고(`found_*` 4종 — 하람 단서를 없앤 #407 이후) 시우의 이야기를 전부 본 경우(`read_siwoo_counseling`·`read_siwoo_painting`·`read_janitor_notebook`). **히든이 신고보다 우선**한다 — 전부 아는 플레이어에게 신고 여부를 다시 묻는 것은 의미가 없다.
   - 판정은 `game_state.gd`의 `ending_kind(reported)`가 한다(플래그 옆이라 검사·수정이 쉽다). 상수 `ENDING_BASIC`/`ENDING_REPORT`/`ENDING_HIDDEN`과 `MISSING_FLAGS`/`SIWOO_FLAGS`/`COVERUP_FLAGS`가 조건을 쥔다.
   - **결과는 `SceneTree` 메타로 넘긴다**(`ending_kind`·`clue_score`). `GameState`는 씬 노드라 `change_scene_to_file()` 뒤에 사라진다 — 넘길 값이 문자열 하나뿐이라 오토로드를 새로 만들지 않았다. `ending.gd`가 읽고 **바로 지운다**(타이틀로 돌아간 뒤 남으면 다음 판이 오염된다). 메타가 없으면(에디터에서 `ending.tscn`만 실행) 기본 엔딩으로 떨어진다.
-  - 엔딩 끝에 "알아낸 것 N / 20"을 한 줄 붙인다(#411에서 도입부 플래그 `saw_belongings`·`saw_dates`가 더해져 18 → 20). 엔딩이 셋뿐이라 그 사이가 안 보이기 때문이다. **`const`가 담은 Array는 참조**라 원본에 append하면 같은 프로세스에서 두 번째 클리어 때 줄이 쌓인다 — `duplicate(true)`로 복사한다.
+  - 엔딩 끝에 "알아낸 것 N / 19"를 한 줄 붙인다(#407이 송하람을 빼 18 → 17, #411이 도입부 플래그 `saw_belongings`·`saw_dates`를 더해 17 → 19). 엔딩이 셋뿐이라 그 사이가 안 보이기 때문이다. **`const`가 담은 Array는 참조**라 원본에 append하면 같은 프로세스에서 두 번째 클리어 때 줄이 쌓인다 — `duplicate(true)`로 복사한다.
   - 시우 그림 **재조사** 기믹은 되살리지 않았다(2026-07-28에 걷어낸 것). 기획서의 "시우 그림 재조사" 조건은 그림 플래그 보유로 대신한다.
 - 현관 선택지는 `scenes/ui/choice_prompt.tscn`(`scripts/ui/choice_prompt.gd`) — 본편에서 플레이어가 **말로 고르는 유일한 자리**다. 대화 자막(`subtitle_dialogue.tscn`)은 한 줄씩 흘려보내는 장치라 커서를 올렸다 내렸다 할 수 없어 따로 만들었다.
   - **게임을 멈춘다**(`get_tree().paused`). 안 그러면 고르는 동안 수위가 걸어와 붙잡는다. 패널만 `PROCESS_MODE_ALWAYS`라 멈춘 중에도 입력을 받고, Tween에는 `TWEEN_PAUSE_PROCESS`를 준다.
