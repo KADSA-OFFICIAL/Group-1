@@ -230,14 +230,14 @@
   "ScienceClue": {
    "body": "[node name=\"ScienceClue\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(1650, 1240)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"깨진 비커가 치워지지 않은 채로 있다. 그 아래 가정통신문 뒷면에 눌러쓴 글씨 — '집에서 맞고 학교서 혼나고. 그럼 나는 어디로 가.' 이름 칸: 2학년 2반 조민혁.\"\nprompt_text = \"조사\"\ngrants_flag = \"found_jominhyuk\"\n\n",
    "kids": [
-    "[node name=\"ScienceClueVisual\" type=\"Polygon2D\" parent=\"ScienceClue\"]\nz_index = 1\ncolor = Color(0.55, 0.62, 0.6, 1)\npolygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)\n\n",
+    "[node name=\"ScienceClueVisual\" type=\"Sprite2D\" parent=\"ScienceClue\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"14_beaker\")\n\n",
     "[node name=\"ScienceClueZone\" type=\"CollisionShape2D\" parent=\"ScienceClue\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
    ]
   },
   "InkCan": {
    "body": "[node name=\"InkCan\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(2620, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"선반 아래 인쇄기 잉크통이 쌓여 있다. 하나는 뚜껑이 헐겁다.\\n이걸 뒤집어쓰면 잠깐은 아무것도 못 보겠지. [Q] 키로 던질 수 있다.\"\nprompt_text = \"잉크통 챙기기\"\ngrants_item_id = \"ink_can\"\n\n",
    "kids": [
-    "[node name=\"InkCanVisual\" type=\"Polygon2D\" parent=\"InkCan\"]\nz_index = 1\ncolor = Color(0.2, 0.2, 0.28, 1)\npolygon = PackedVector2Array(-10, -12, 10, -12, 10, 12, -10, 12)\n\n",
+    "[node name=\"InkCanVisual\" type=\"Sprite2D\" parent=\"InkCan\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"13_inkcan\")\n\n",
     "[node name=\"InkCanZone\" type=\"CollisionShape2D\" parent=\"InkCan\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
    ]
   },
