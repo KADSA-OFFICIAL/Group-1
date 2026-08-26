@@ -99,8 +99,10 @@ const ENDING_HIDDEN := &"break_time"      # 쉬는 시간 — 히든
 ## `SceneTree`에 엔딩 종류를 담을 때 쓰는 키.
 const ENDING_META := &"ending_kind"
 
-## 실종 학생의 흔적. 다섯 → 넷(#407) → **셋**(#413) — 힌트를 지운 만큼 조건도 줄인다. **송하람은 없다** — 하람 관련 단서를 전부 없앴으므로(#407)
-## `found_songharam`을 얻을 방법이 없다. 남겨 두면 히든 엔딩이 영구히 닫힌다.
+## 실종 학생의 흔적. 다섯 → 넷(#407) → **셋**(#413) — 힌트를 지운 만큼 조건도
+## 줄인다. **송하람(#407)·백승호(#413)는 없다** — 그 둘의 단서를 전부 없앴으므로
+## `found_songharam`·`found_baekseungho`를 얻을 방법이 없다. 남겨 두면 히든 엔딩이
+## 영구히 닫힌다.
 const MISSING_FLAGS := [
 	"found_imnayeon", "found_jominhyuk", "found_kangyujin"]
 ## 시우가 어떤 아이였는지 알려 주는 것.
@@ -111,10 +113,10 @@ const COVERUP_FLAGS := [
 	"read_principal_letter", "read_janitor_notebook", "read_crisis_manual"]
 
 
-## 히든 엔딩 조건인가 — 실종 학생 넷을 **전부** 찾고 시우의 이야기를 **전부** 봤는가.
+## 히든 엔딩 조건인가 — 실종 학생 셋을 **전부** 찾고 시우의 이야기를 **전부** 봤는가.
 ##
 ## 기획서(`docs/story.md` 7장)의 "5명 흔적 + 상담 기록 + 공책 + 시우 그림"인데,
-## 하람 단서를 없앤 뒤로 찾을 수 있는 실종 학생이 **넷**이다(#407).
+## 하람(#407)·백승호(#413) 단서를 없앤 뒤로 찾을 수 있는 실종 학생이 **셋**이다.
 ## 그림 **재조사** 기믹은 2026-07-28에 걷어냈으므로 그림 플래그 보유로 대신한다.
 func has_full_truth() -> bool:
 	for f in MISSING_FLAGS + SIWOO_FLAGS:

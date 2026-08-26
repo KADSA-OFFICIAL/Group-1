@@ -28,8 +28,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 # 단서·은신처 Area2D 중심에서 이만큼은 집기가 없어야 상호작용 존(48×48)이 열린다.
 CLUE_CLEAR = 30
 ## 집기·벽에 붙는 것이 정상인 도입부 단서(#405) — CLUE_CLEAR 검사에서 뺀다.
-INTRO_ON_PROP = {"KoreanBook", "SiwooPainting", "HaramCard",
-                 "Belongings", "DateWall"}
+INTRO_ON_PROP = {"KoreanBook", "SiwooPainting", "Belongings", "DateWall"}
 
 # 미닫이 교실문이 밀려나는 거리·방향은 씬의 travel 값에서 읽는다. 상수로 박으면
 # 한 짝/두 짝, 미는 방향이 바뀔 때마다 조용히 어긋난다.
