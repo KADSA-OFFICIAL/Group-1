@@ -323,7 +323,8 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
 - 맵 관련 변경은 **`python3 tools/gen_floors.py` 재생성 후** 아래 4개를 모두 돌립니다:
   `verify_scenes.py`(정합성·깨진 실수 값) / `verify_floor_reach.py`(방 도달성·막힌 공간 봉인·카메라 한계) /
   `verify_stairs.py`(floor_manager 계단 좌표 ↔ 씬 대조) / `verify_progression.py`(4층→1층 현관 완주 가능) /
-  `verify_props.py`(방 집기는 방 안, 복도 집기 `Corr_*`는 방 밖, 소품 `PT_`는 집기 안. 벽·다른 집기·단서와 겹치지 않는지, 미닫이문이 **열린 자리**에서 집기와 겹치지 않는지. 사선 벽이 있어 분리축으로 본다).
+  `verify_props.py`(방 집기는 방 안, 복도 집기 `Corr_*`는 방 밖, 소품 `PT_`는 집기 안. 벽·다른 집기·단서와 겹치지 않는지, 미닫이문이 **열린 자리**에서 집기와 겹치지 않는지. 사선 벽이 있어 분리축으로 본다. **스토리 단서끼리 상호작용 존(48x48)이 겹치는지도 본다**(`CLUE_GAP` 56, #441) — 겹치면 `_find_interactable()`이 하나만 돌려줘서 뒤쪽을 영영 집을 수 없고, 그게 계단 열쇠면 진행이 막힌다. `POS_OVERRIDE`가 손으로 적는 좌표라 실제로 가능한 사고다).
+- **`verify_story_objects.py`는 없다**(#441에서 걷어냈다). 검사 넷 중 셋이 다른 검사기와 겹치거나 지금 설계에서 무의미했고(단서가 벽·집기에 붙는 것이 정상이라 "방 안쪽에 있어야 한다"가 틀렸고, 단서는 충돌체가 없어 문을 막지 못하고, 열쇠 진행은 `verify_progression`이 실제 도보 BFS로 본다), 넷째만 위처럼 `verify_props`로 옮겼다. **#246(방 바닥 도트 타일)에서 `texture =` 한 줄이 끼면서 `ROOM_RE`가 방을 0개 잡는 채로 6일간 방치돼 있었다** — 어느 워크플로에도 문서에도 안 걸려 있어서 아무도 못 봤다. 새 검사 도구를 만들면 CI나 이 목록에 반드시 걸 것.
   은신처를 건드렸으면 `verify_hiding_spots.py`도 함께 돌립니다.
 - 씬이나 스크립트를 고쳤으면 **푸시 전에 `python3 tools/verify_scenes.py`를 실행**합니다.
   load_steps, 리소스 참조, 노드 부모 경로, 형제 이름 중복, 스크립트 $NodePath,
