@@ -1,4 +1,4 @@
-[gd_scene load_steps=250 format=3]
+[gd_scene load_steps=252 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
@@ -31,6 +31,8 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
 [ext_resource type="Texture2D" path="res://assets/sprites/key.png" id="9_key"]
 [ext_resource type="Texture2D" path="res://assets/sprites/note.png" id="10_note"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ink_can.png" id="13_inkcan"]
+[ext_resource type="Texture2D" path="res://assets/sprites/beaker.png" id="14_beaker"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(3400, 40)
@@ -4211,10 +4213,10 @@ prompt_text = "잉크통 챙기기"
 grants_item_id = "ink_can"
 
 
-[node name="InkCanVisual" type="Polygon2D" parent="InkCan"]
+[node name="InkCanVisual" type="Sprite2D" parent="InkCan"]
 z_index = 1
-color = Color(0.2, 0.2, 0.28, 1)
-polygon = PackedVector2Array(-10, -12, 10, -12, 10, 12, -10, 12)
+texture_filter = 1
+texture = ExtResource("13_inkcan")
 
 
 [node name="InkCanZone" type="CollisionShape2D" parent="InkCan"]
@@ -4237,10 +4239,10 @@ prompt_text = "조사"
 grants_flag = "found_jominhyuk"
 
 
-[node name="ScienceClueVisual" type="Polygon2D" parent="ScienceClue"]
+[node name="ScienceClueVisual" type="Sprite2D" parent="ScienceClue"]
 z_index = 1
-color = Color(0.55, 0.62, 0.6, 1)
-polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+texture_filter = 1
+texture = ExtResource("14_beaker")
 
 
 [node name="ScienceClueZone" type="CollisionShape2D" parent="ScienceClue"]

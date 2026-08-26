@@ -299,7 +299,9 @@ TEXTURES = {f"tex_{stem}": f"{TEX_DIR}/{stem}.png"
 # 굽는 곳은 tools/gen_key_sprite.py·tools/gen_note_sprite.py, 쓰는 곳은
 # story_objects.json의 열쇠·단서 시각 노드다.
 SPRITE_TEXTURES = {"9_key": "res://assets/sprites/key.png",
-                   "10_note": "res://assets/sprites/note.png"}
+                   "10_note": "res://assets/sprites/note.png",
+                   "13_inkcan": "res://assets/sprites/ink_can.png",
+                   "14_beaker": "res://assets/sprites/beaker.png"}
 
 # 텍스처 설정을 물려받을 부모가 없는 CanvasLayer 직속 노드. #307에서 벽·문·계단
 # 시각이 전부 레이어 0(`Structures`)으로 내려가면서 비었다가, #318에서 문
@@ -917,6 +919,7 @@ SCRIPTS = {
     # 9_key·10_note는 SPRITE_TEXTURES가 쓴다(단서 스프라이트) — 겹치면 안 된다.
     "11_floorlink": "res://scripts/interactions/floor_link.gd",
     "12_artintro": "res://scripts/game/art_room_intro.gd",
+    # 13_inkcan·14_beaker도 SPRITE_TEXTURES 쪽이다(#427).
 }
 
 
