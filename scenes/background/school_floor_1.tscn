@@ -1,4 +1,4 @@
-[gd_scene load_steps=153 format=3]
+[gd_scene load_steps=154 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
@@ -30,6 +30,7 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_metal.png" id="tex_prop_metal"]
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
 [ext_resource type="Texture2D" path="res://assets/sprites/key.png" id="9_key"]
+[ext_resource type="Texture2D" path="res://assets/sprites/note.png" id="10_note"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(3400, 40)
@@ -2096,10 +2097,10 @@ prompt_text = "편지 읽기"
 grants_flag = "read_principal_letter"
 
 
-[node name="PrincipalLetterVisual" type="Polygon2D" parent="PrincipalLetter"]
+[node name="PrincipalLetterVisual" type="Sprite2D" parent="PrincipalLetter"]
 z_index = 1
-color = Color(0.78, 0.76, 0.68, 1)
-polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+texture_filter = 1
+texture = ExtResource("10_note")
 
 
 [node name="PrincipalLetterZone" type="CollisionShape2D" parent="PrincipalLetter"]
@@ -2148,10 +2149,10 @@ prompt_text = "서랍 열기"
 grants_flag = "saw_student_cards"
 
 
-[node name="StudentCardsVisual" type="Polygon2D" parent="StudentCards"]
+[node name="StudentCardsVisual" type="Sprite2D" parent="StudentCards"]
 z_index = 1
-color = Color(0.7, 0.68, 0.6, 1)
-polygon = PackedVector2Array(-14, -8, 14, -8, 14, 8, -14, 8)
+texture_filter = 1
+texture = ExtResource("10_note")
 
 
 [node name="StudentCardsZone" type="CollisionShape2D" parent="StudentCards"]
@@ -2174,10 +2175,10 @@ prompt_text = "공책 읽기"
 grants_flag = "read_janitor_notebook"
 
 
-[node name="JanitorNotebookVisual" type="Polygon2D" parent="JanitorNotebook"]
+[node name="JanitorNotebookVisual" type="Sprite2D" parent="JanitorNotebook"]
 z_index = 1
-color = Color(0.45, 0.4, 0.32, 1)
-polygon = PackedVector2Array(-12, -10, 12, -10, 12, 10, -12, 10)
+texture_filter = 1
+texture = ExtResource("10_note")
 
 
 [node name="JanitorNotebookZone" type="CollisionShape2D" parent="JanitorNotebook"]
