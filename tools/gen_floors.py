@@ -276,10 +276,12 @@ def uv_for(polygon):
 TEXTURES = {f"tex_{stem}": f"{TEX_DIR}/{stem}.png"
             for stem in sorted(set(TEX.values()) | set(SPRITE.values()))}
 
-# 열쇠 도트 스프라이트(#333). 타일 무늬가 아니라 그림 한 장이라 TEX/SPRITE 표와
-# 따로 둔다 — 경로도 assets/tiles가 아니라 assets/sprites다.
-# 굽는 곳은 tools/gen_key_sprite.py, 쓰는 곳은 story_objects.json의 열쇠 시각 노드다.
-SPRITE_TEXTURES = {"9_key": "res://assets/sprites/key.png"}
+# 단서·열쇠 도트 스프라이트(#333, #390). 타일 무늬가 아니라 그림 한 장이라
+# TEX/SPRITE 표와 따로 둔다 — 경로도 assets/tiles가 아니라 assets/sprites다.
+# 굽는 곳은 tools/gen_key_sprite.py·tools/gen_note_sprite.py, 쓰는 곳은
+# story_objects.json의 열쇠·단서 시각 노드다.
+SPRITE_TEXTURES = {"9_key": "res://assets/sprites/key.png",
+                   "10_note": "res://assets/sprites/note.png"}
 
 # 텍스처 설정을 물려받을 부모가 없는 CanvasLayer 직속 노드. #307에서 벽·문·계단
 # 시각이 전부 레이어 0(`Structures`)으로 내려가면서 비었다가, #318에서 문

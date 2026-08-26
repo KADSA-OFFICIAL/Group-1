@@ -272,8 +272,13 @@ def out_size(box_w: int, box_h: int) -> tuple[int, int]:
 
 
 def bake_cell(width: int, rgba: bytearray, mask: bytearray,
-              x0: int, y0: int, x1: int, y1: int) -> int:
-    """칸 하나의 색. 그림이 COVER 미만이면 -1(투명)."""
+              x0: int, y0: int, x1: int, y1: int,
+              cover_num: int = COVER_NUM, cover_den: int = COVER_DEN) -> int:
+    """칸 하나의 색. 그림이 COVER 미만이면 -1(투명).
+
+    문턱을 인자로 받는 것은 `gen_note_sprite.py`(#390)가 이 함수를 그대로 쓰되
+    자기 값으로 부르기 위해서다 — 원본이 다르면 알맞은 문턱도 다르다.
+    """
     total = (y1 - y0) * (x1 - x0)
     if total <= 0:
         return -1
@@ -292,7 +297,7 @@ def bake_cell(width: int, rgba: bytearray, mask: bytearray,
             packed = (rgba[j] << 16) | (rgba[j + 1] << 8) | rgba[j + 2]
             counts[packed] = counts.get(packed, 0) + 1
 
-    if ink * COVER_DEN < total * COVER_NUM:
+    if ink * cover_den < total * cover_num:
         return -1
     # 최빈색. 같은 수면 작은 값 쪽으로 — 사전 순서에 기대면 결정론적이지 않다.
     return min(counts.items(), key=lambda kv: (-kv[1], kv[0]))[0]

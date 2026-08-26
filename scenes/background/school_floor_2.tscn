@@ -1,4 +1,4 @@
-[gd_scene load_steps=243 format=3]
+[gd_scene load_steps=244 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
@@ -31,6 +31,7 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_metal.png" id="tex_prop_metal"]
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
 [ext_resource type="Texture2D" path="res://assets/sprites/key.png" id="9_key"]
+[ext_resource type="Texture2D" path="res://assets/sprites/note.png" id="10_note"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(3400, 40)
@@ -3915,10 +3916,10 @@ prompt_text = "조사"
 grants_flag = "found_kangyujin"
 
 
-[node name="YujinClueVisual" type="Polygon2D" parent="YujinClue"]
+[node name="YujinClueVisual" type="Sprite2D" parent="YujinClue"]
 z_index = 1
-color = Color(0.35, 0.45, 0.55, 1)
-polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+texture_filter = 1
+texture = ExtResource("10_note")
 
 
 [node name="YujinClueZone" type="CollisionShape2D" parent="YujinClue"]
@@ -3993,10 +3994,10 @@ prompt_text = "조사"
 grants_flag = "found_baekseungho"
 
 
-[node name="SeunghoClueVisual" type="Polygon2D" parent="SeunghoClue"]
+[node name="SeunghoClueVisual" type="Sprite2D" parent="SeunghoClue"]
 z_index = 1
-color = Color(0.6, 0.5, 0.4, 1)
-polygon = PackedVector2Array(-14, -10, 14, -10, 14, 10, -14, 10)
+texture_filter = 1
+texture = ExtResource("10_note")
 
 
 [node name="SeunghoClueZone" type="CollisionShape2D" parent="SeunghoClue"]
