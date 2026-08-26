@@ -13,6 +13,11 @@ gen_floors.py의 add_props가 놓은 집기가 제자리를 벗어나거나, 벽
 들어가야 한다. 미닫이 교실문(SDPanel*)은 닫힌 자리뿐 아니라 **열린 자리**도
 본다 — 열렸을 때 사물함이나 집기에 겹치면 문이 가구를 뚫고 들어간다.
 
+스토리 단서끼리 상호작용 존(48x48)이 겹치는지도 본다(#441). 걷어낸
+verify_story_objects.py에서 다른 검사기와 겹치지 않던 유일한 검사다 — 나머지
+셋은 verify_floor_reach·verify_progression이 더 정확히 보거나(도달성·진행)
+지금 설계에서 무의미해졌다(단서는 충돌체가 없어 문을 막지 못한다).
+
 Godot 없이 도는 정적 검사.
   python3 tools/verify_props.py
 종료 코드: 오류 0건이면 0, 있으면 1
@@ -30,6 +35,23 @@ CLUE_CLEAR = 30
 ## 집기·벽에 붙는 것이 정상인 도입부 단서(#405) — CLUE_CLEAR 검사에서 뺀다.
 INTRO_ON_PROP = {"KoreanBook", "SiwooPainting", "Belongings", "DateWall"}
 
+# 스토리 단서끼리 중심이 이만큼은 떨어져 있어야 한다(#441 — 걷어낸
+# verify_story_objects.py에서 유일하게 겹치지 않던 검사를 여기로 옮겼다).
+#
+# `_find_interactable()`은 **우선순위 → 거리**로 고른다(#301: 잠긴 문 20 /
+# 단서 15 / 은신처 12 / 미닫이문 4 / 집기 조사 3). 급이 다르면 알아서
+# 갈리므로 문제가 되는 것은 **같은 급끼리 겹칠 때**다 — 스토리 단서 둘이
+# 붙어 있으면 뒤쪽을 영영 집을 수 없고, 그게 계단 열쇠면 진행이 막힌다.
+# 상호작용 존이 48x48(`RectangleShape2D_key_zone`)이라 56은 거기에 여유를
+# 조금 준 값이다.
+#
+# `POS_OVERRIDE`가 손으로 적는 좌표라 이 사고가 실제로 가능하다.
+CLUE_GAP = 56
+
+# 위 간격 검사에 넣을 스크립트. 은신처·문은 급이 달라 우선순위가 갈라 주고,
+# `Window_`·`Exam_`은 벽·집기에 붙는 것이 정상이라 이름으로 따로 뺀다.
+CLUE_SCRIPTS = ("interactable.gd", "pickup_item.gd")
+
 # 미닫이 교실문이 밀려나는 거리·방향은 씬의 travel 값에서 읽는다. 상수로 박으면
 # 한 짝/두 짝, 미는 방향이 바뀔 때마다 조용히 어긋난다.
 TRAVEL_RE = re.compile(
@@ -45,6 +67,9 @@ NODE_RE = re.compile(
     r'\[node name="([^"]+)" type="(\w+)" parent="([^"]*)"\]\n(.*?)(?=\n\[node|\Z)', re.S)
 POLY_RE = re.compile(r'polygon = PackedVector2Array\(([^)]*)\)')
 POS_RE = re.compile(r'^position = Vector2\(([-\d.]+), ([-\d.]+)\)', re.M)
+SCRIPT_RE = re.compile(r'^script = ExtResource\("([^"]+)"\)', re.M)
+EXT_SCRIPT_RE = re.compile(
+    r'\[ext_resource type="Script" path="res://scripts/interactions/([^"]+)" id="([^"]+)"\]')
 
 errors: list[str] = []
 warnings: list[str] = []
@@ -115,7 +140,10 @@ def check(fl: int) -> None:
     prop_polys: dict[str, str] = {}
     walls: list[list] = []
     rooms: dict[str, list] = {}
-    clues: list[tuple[str, float, float]] = []
+    clues: list[tuple[str, float, float, str]] = []
+
+    # 스크립트 ExtResource id -> 파일 이름. 단서 간격 검사가 종류를 가른다.
+    script_of = {rid: fname for fname, rid in EXT_SCRIPT_RE.findall(text)}
 
     for name, ntype, parent, body in NODE_RE.findall(text):
         poly_m = POLY_RE.search(body)
@@ -138,7 +166,9 @@ def check(fl: int) -> None:
         elif ntype == "Area2D" and parent == "." and "script" in body:
             pos = POS_RE.search(body)
             if pos:
-                clues.append((name, float(pos.group(1)), float(pos.group(2))))
+                sm = SCRIPT_RE.search(body)
+                clues.append((name, float(pos.group(1)), float(pos.group(2)),
+                              script_of.get(sm.group(1), "?") if sm else "?"))
 
     # 1. 충돌 PC_ ↔ 시각 PV_ 1:1, 폴리곤 동일
     for key in sorted(set(props) | set(visuals)):
@@ -192,7 +222,7 @@ def check(fl: int) -> None:
     # 있는 것이 정상**이다. 교실 창가는 원래 책상이 벽까지 들어차 있어
     # 어떤 좌표를 골라도 이 여유를 못 만든다.
     # 대신 실제로 다가갈 수 있는지는 verify_floor_reach가 도달 격자로 본다.
-    for name, px, py in clues:
+    for name, px, py, _script in clues:
         # 집기 조사(Exam_, #301)도 뺀다 — **집기 위에 있는 것이 정상**이다.
         # 그 집기를 조사하라고 붙인 것이라 떨어져 있으면 오히려 이상하다.
         # 도입부 단서(#405)도 뺀다 — 전부 **물건 위·벽에 붙는 것**이다.
@@ -204,6 +234,22 @@ def check(fl: int) -> None:
             if (x0 - CLUE_CLEAR < px < x1 + CLUE_CLEAR
                     and y0 - CLUE_CLEAR < py < y1 + CLUE_CLEAR):
                 errors.append(f"{tag}: 집기 {key}가 {name}({px:.0f},{py:.0f})를 덮는다")
+
+    # 5b. 스토리 단서끼리 상호작용 존이 겹치지 않는다 (#441)
+    #
+    # 겹치면 `_find_interactable()`이 둘 중 가까운 하나만 돌려주므로 뒤쪽을
+    # 영영 집을 수 없다. 우선순위가 같은 급끼리만 본다 — 은신처·문은 급이
+    # 달라 우선순위가 갈라 주고, Window_·Exam_은 벽·집기에 붙는 것이 정상이라
+    # 서로 가까울 수 있다(같은 방의 조사 대상 둘이 같은 집기 근처에 온다).
+    story = sorted((n, x, y) for n, x, y, s in clues
+                   if s in CLUE_SCRIPTS and not n.startswith(("Window_", "Exam_")))
+    for i, (na, xa, ya) in enumerate(story):
+        for nb, xb, yb in story[i + 1:]:
+            if abs(xa - xb) < CLUE_GAP and abs(ya - yb) < CLUE_GAP:
+                errors.append(
+                    f"{tag}: 단서 {na}({xa:.0f},{ya:.0f})와 "
+                    f"{nb}({xb:.0f},{yb:.0f})가 {CLUE_GAP}px 안에 있다 "
+                    f"— 상호작용 존이 겹쳐 하나를 집을 수 없다")
 
     # 6. 장식(PD_)은 충돌체가 없지만 벽·집기와 겹쳐 보이면 안 된다
     for key, (x0, y0, x1, y1) in sorted(decors.items()):
