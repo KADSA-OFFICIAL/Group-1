@@ -46,6 +46,12 @@ extends Area2D
 ## 창밖으로 사라지는 데 걸리는 시간(초).
 @export var cutscene_vanish_seconds: float = 0.8
 
+## 되돌릴 수 없는 하강이 시작됐다. **컷신(#468)이 붙은 뒤로는 씬이 곧바로
+## 해제되지 않는다** — `interact()`가 `travel_to()` 전에 컷신을 끝까지 기다리므로
+## 그동안 이 층의 `_process`가 계속 돈다. 층에서 도는 유예·연출은 이 신호를 받아
+## 스스로 멈춰야 한다(#472 — 미술실 3막 유예가 컷신 도중에 다 돌아 게임 오버가 났다).
+signal travel_started
+
 ## 되돌릴 수 없는 행동이라 두 번 돌지 않게 한다.
 var _played: bool = false
 
@@ -68,10 +74,16 @@ func interact(_player: Node) -> void:
 	if manager == null or not manager.has_method("travel_to"):
 		return
 
-	if not cutscene_lines.is_empty():
-		if _played:
-			return
-		_played = true
+	var with_cutscene := not cutscene_lines.is_empty()
+	if with_cutscene and _played:
+		return
+	_played = true
+
+	# 여기서부터는 되돌릴 수 없다. 컷신을 기다리는 동안에도 이 층은 살아 있으므로
+	# **컷신을 시작하기 전에** 알린다.
+	travel_started.emit()
+
+	if with_cutscene:
 		await _play_cutscene(game_state)
 
 	if game_state != null and not message.is_empty():

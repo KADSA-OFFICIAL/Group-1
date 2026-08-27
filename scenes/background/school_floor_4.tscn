@@ -911,6 +911,7 @@ door_after_message = "복도로 나가는 문. 수위가 저쪽에 있다. 지�
 janitor_path = NodePath("../IntroJanitor")
 cabinet_path = NodePath("../HideArtCabinet")
 cabinet_mark_path = NodePath("../WallGlow/Marks/Mark_HideArtCabinet")
+escape_path = NodePath("../PrepWindowEscape")
 janitor_walk = PackedVector2Array(570, 920, 570, 800, 430, 700, 200, 500)
 
 [node name="PT_BookDesk_note0" type="Polygon2D" parent="Props"]
