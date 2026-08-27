@@ -53,12 +53,12 @@ mouse_filter = 2
 script = ExtResource("3_alert")
 
 [node name="TopLeft" type="PanelContainer" parent="Root"]
-; 엔딩 조건 표시(#540) — 목표 / 소지품 / 단서 / 진엔딩 / 엔딩2 / 엔딩1
+; 엔딩 조건 표시(#540, #545) — 진엔딩 / 엔딩2 / 엔딩1
 layout_mode = 1
 offset_left = 16.0
 offset_top = 16.0
 offset_right = 448.0
-offset_bottom = 200.0
+offset_bottom = 106.0
 
 [node name="Margin" type="MarginContainer" parent="Root/TopLeft"]
 layout_mode = 2
@@ -69,25 +69,7 @@ theme_override_constants/margin_bottom = 8
 
 [node name="TextRows" type="VBoxContainer" parent="Root/TopLeft/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 3
-
-[node name="ObjectiveLabel" type="Label" parent="Root/TopLeft/Margin/TextRows"]
-layout_mode = 2
-text = "목표: 학교를 탈출하세요."
-
-[node name="InventoryLabel" type="Label" parent="Root/TopLeft/Margin/TextRows"]
-layout_mode = 2
-text = "소지품: 없음"
-
-; 확인한 단서 수(#529). 세는 규칙은 game_state.clue_score() 하나뿐이라
-; 엔딩의 "알아낸 것 N / M"과 늘 같은 숫자다.
-[node name="ClueLabel" type="Label" parent="Root/TopLeft/Margin/TextRows"]
-layout_mode = 2
-theme_override_colors/font_color = Color(0.85, 0.85, 0.90, 1)
-text = "단서: 0 / 0"
-
-[node name="EndingSeparator" type="HSeparator" parent="Root/TopLeft/Margin/TextRows"]
-layout_mode = 2
+theme_override_constants/separation = 4
 
 [node name="TrueEndingLabel" type="Label" parent="Root/TopLeft/Margin/TextRows"]
 layout_mode = 2
@@ -102,18 +84,48 @@ text = "엔딩 2: 0/3 (2층:0/1, 1층:0/2) [1개+ 필요]"
 [node name="BasicEndingLabel" type="Label" parent="Root/TopLeft/Margin/TextRows"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.75, 0.75, 0.78, 1)
-text = "엔딩 1: 1층 현관 열쇠 필요 (기본 탈출)"
+text = "엔딩 1: 1층 열쇠"
+
+[node name="TopRight" type="PanelContainer" parent="Root"]
+; 목표 및 소지품 표시(#545)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -380.0
+offset_top = 16.0
+offset_right = -16.0
+offset_bottom = 86.0
+grow_horizontal = 0
+
+[node name="Margin" type="MarginContainer" parent="Root/TopRight"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 8
+
+[node name="TextRows" type="VBoxContainer" parent="Root/TopRight/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ObjectiveLabel" type="Label" parent="Root/TopRight/Margin/TextRows"]
+layout_mode = 2
+text = "목표: 학교를 탈출하세요."
+
+[node name="InventoryLabel" type="Label" parent="Root/TopRight/Margin/TextRows"]
+layout_mode = 2
+text = "소지품: 없음"
 
 [node name="CloseUp" type="PanelContainer" parent="Root"]
-; 근접 클로즈업(#451). 목표·소지품·단서·엔딩 패널(TopLeft) **아래**에 둔다 —
-; 겹치면 목표 글이 가려진다. #540에서 엔딩 표시가 붙어 offset_top = 216.0으로 내려왔다.
+; 근접 클로즈업(#451). 층수 표시(y=114~160) 아래에 둔다 — 겹치지 않게 offset_top = 175.0.
 ; 평소에는 visible = false다.
 visible = false
 layout_mode = 1
 offset_left = 16.0
-offset_top = 216.0
+offset_top = 175.0
 offset_right = 176.0
-offset_bottom = 432.0
+offset_bottom = 391.0
 
 [node name="Margin" type="MarginContainer" parent="Root/CloseUp"]
 layout_mode = 2
