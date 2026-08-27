@@ -226,6 +226,18 @@ func _show_subtitle(speaker: String, text: String, emotion: String) -> void:
 		return
 
 	_draining = true
+
+	# **한 프레임 미루고 시작한다**(#569). 장면 대사는 줄을 한꺼번에 넘기는 것이
+	# 규약인데(#471), 첫 줄이 여기서 곧바로 배출을 시작하면 나머지 줄이 아직
+	# `_speech_queue` 에 안 붙은 상태다 — 그 시점에 대기 시간과 타이핑 배속이
+	# 정해지므로 **뒤에 네 줄이 밀려 있는데도 첫 줄만 "혼자 뜬 줄"로 취급**됐다
+	# (실측: 첫 줄만 2.40초 멈춤, 나머지는 1.00초).
+	#
+	# 같은 프레임의 방출은 전부 이 await 전에 `_speech_queue` 에 붙으므로,
+	# 한 프레임만 미루면 첫 줄도 밀린 줄로 보인다. 16ms 라 눈에 띄지 않는다.
+	if get_tree() != null:
+		await get_tree().process_frame
+
 	while not _speech_queue.is_empty() and is_instance_valid(subtitle):
 		var line: Array = _speech_queue.pop_front()
 		_current = line
@@ -236,14 +248,39 @@ func _show_subtitle(speaker: String, text: String, emotion: String) -> void:
 		# 컷신과 달리 본편에는 넘기는 입력이 없다 — 다 찍힐 때까지 기다린 뒤
 		# 읽는 시간을 준다. 뒤에 줄이 더 있으면 짧게 준다: 한 사람이 이어서
 		# 말하는데 매 줄 3초씩 쉬면 대화가 아니라 안내문이 된다.
-		var hold := notice_seconds if _speech_queue.is_empty() else queued_notice_seconds
-		await get_tree().create_timer(subtitle.last_typing_seconds + hold).timeout
+		await _hold_line(subtitle.last_typing_seconds)
 
 	# 기다리는 사이 씬이 바뀌었을 수 있다(체포·탈출).
 	if is_instance_valid(subtitle):
 		subtitle.clear()
 	_current = []
 	_draining = false
+
+
+## 한 줄이 화면에 머무는 시간을 기다린다 — 타이핑 + 읽는 시간(#569).
+##
+## **읽는 시간을 두 토막으로 나눠 기다린다.** 짧은 쪽(`queued_notice_seconds`)을
+## 먼저 기다리고, 그 사이에 다음 줄이 오지 않았을 때만 나머지를 채운다.
+##
+## 한 번에 정하면 **표시 도중에 도착한 줄을 못 본다** — 조사 문구가 뜬 뒤 1초 만에
+## 다음 단서를 조사해도, 앞 줄이 "혼자 뜬 줄"의 긴 대기(2.4초)를 끝까지 채운 뒤에야
+## 넘어간다. 나눠 기다리면 그 경우가 짧은 쪽으로 줄어든다.
+func _hold_line(typing_seconds: float) -> void:
+	var tree := get_tree()
+	if tree == null:
+		return
+	await tree.create_timer(typing_seconds + queued_notice_seconds).timeout
+
+	# 그 사이에 줄이 붙었으면 여기서 끝낸다 — 이어 말하는 중이다.
+	if not _speech_queue.is_empty():
+		return
+	var rest := notice_seconds - queued_notice_seconds
+	if rest <= 0.0:
+		return
+	tree = get_tree()
+	if tree == null:
+		return
+	await tree.create_timer(rest).timeout
 
 
 ## 화자와 본문이 같으면 같은 줄로 본다(#505). 감정은 보지 않는다 — 같은 문장을
