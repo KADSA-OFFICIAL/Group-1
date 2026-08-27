@@ -50,9 +50,12 @@ const CAM_IN_SECONDS := 0.7
 const CAM_HOLD_SECONDS := 0.35
 const CAM_OUT_SECONDS := 0.6
 
-## 수위가 한 칸 걷는 속도(px/초). 순찰 속도(130)보다 느리다 — 쫓는 것이 아니라
+## 들어올 때 걷는 속도(px/초). 순찰 속도(130)보다 느리다 — 쫓는 것이 아니라
 ## 둘러보는 걸음이다.
-const WALK_SPEED := 78.0
+const WALK_SPEED := 115.0
+## 나갈 때(#471). **열쇠를 가지러 가는 길이라 느릴 이유가 없다.** 78로 들고 날
+## 때 왕복 16초가 걸렸는데, 그동안 플레이어는 캐비넷에 갇혀 아무것도 못 한다.
+const EXIT_SPEED := 150.0
 ## 걸음마다 발소리를 내는 간격(초).
 const STEP_SOUND_EVERY := 0.55
 ## 캐비넷 표시를 이만큼 키워 눈에 띄게 한다(1막).
@@ -146,7 +149,7 @@ func _act1_warning() -> void:
 	_freeze(player, true)
 
 	Sfx.play(&"janitor_step")
-	_say(gs, "", "복도에서 발소리가 들린다. 열쇠 꾸러미가 부딪히는 소리.")
+	_say(gs, "", "복도에서 발소리. 열쇠 꾸러미가 부딪힌다.")
 	await _wait(1.1)
 
 	await _camera_to_door(player)
@@ -164,10 +167,7 @@ func _act1_warning() -> void:
 	if door != null and not door_after_message.is_empty():
 		door.set("message", door_after_message)
 
-	_say(gs, "이설", "(들어온다. 지금 나가면 마주쳐.)", "fear")
-	await _wait(2.0)
-	# **어디에 숨어야 하는지 말해 준다.** 숨기를 처음 쓰는 자리라 아는 척하면 안 된다.
-	_say(gs, "", "왼쪽 벽에 캐비넷이 있다. 저기라면 몸이 들어간다. — [E] 숨기")
+	_say(gs, "이설", "(들어온다. 왼쪽 벽 캐비넷에 숨어야 해.)", "fear")
 	_pulse_mark()
 
 	_hide_left = HIDE_SECONDS
@@ -232,40 +232,44 @@ func _act2_confession() -> void:
 	var jan := get_node_or_null(janitor_path) as Node2D
 	Sfx.play(&"door_open")
 	_glow(1.0, 0.3)
+	# **1막 안내 대사가 다 뜬 뒤에 입을 연다.** 캐비넷으로 곧장 달려간
+	# 플레이어는 그것이 아직 대기열에 남은 채로 여기 도착한다(#471).
+	await _drain()
+
+	# **걸음과 대사를 겹친다.** 다 걸어온 뒤에 말하게 하면 들어오는 5초가
+	# 통째로 침묵이다 — 걸으면서 딸 이야기를 시작하는 편이 자연스럽기도 하다.
+	# 줄마다 대기 시간을 손으로 잡지는 않는다: 잡으면 실제 표시 시간과 어긋나
+	# 장면이 대사를 앞지르거나(수위가 자백 도중 걸어 나감) 다 뜬 뒤 빈 화면을
+	# 보게 된다(#471에서 둘 다 겪었다). 속도는 HUD 대기열(#454)이 잡는다.
+	for line in [
+			["수위", "시우야. 니 그림은 아직 여기 있다.", ""],
+			["수위", "니 반 애들, 아빠가 하나씩 치웠어. 울면서 빌더라.", ""],
+			["수위", "니가 빌 때는 아무도 안 들어줬는데. 심판이야, 죄 있는 애들만.",
+				"suspicion"]]:
+		_say(gs, line[0], line[1], line[2])
+
 	if jan != null and janitor_walk.size() >= 2:
 		jan.position = janitor_walk[0]
 		jan.visible = true
 		for i in range(1, janitor_walk.size()):
 			await _walk_to(jan, janitor_walk[i])
-	await _wait(0.4)
-
-	_say(gs, "수위", "…또 열어 놨네.")
-	await _wait(2.2)
 	_face(jan, ROW_LEFT)
-	_say(gs, "수위", "시우야. 니 그림은 아직 여기 있다.")
-	await _wait(2.6)
-	_say(gs, "수위", "아빠가 다 치워 줬어. 니 반 애들.")
-	await _wait(2.6)
-	_say(gs, "수위", "하나씩. 울면서 빌더라.")
-	await _wait(2.6)
-	_say(gs, "수위", "니가 빌 때는 아무도 안 들어줬는데 말이야.")
-	await _wait(2.8)
-	_say(gs, "", "숨소리를 죽인다. 캐비넷 문틈으로 다 들린다.")
-	await _wait(2.4)
-	_say(gs, "수위", "이건 심판이야. 죄 있는 애들만.")
-	await _wait(2.8)
 
-	# 나간다.
-	_say(gs, "수위", "…문부터 잠가야겠다. 열쇠 가져와서.")
-	await _wait(2.0)
+	# 다 말하기 전에 나가면 안 된다.
+	await _drain()
+
+	# 나간다. **말과 걸음도 겹친다** — 말이 다 뜨기를 기다렸다 걷게 하면 그
+	# 사이가 빈 화면이고, 말하면서 몸을 돌려 나가는 것이 자연스럽다.
+	_say(gs, "수위", "…열쇠 가져와서 잠가야겠다.")
 	if jan != null and janitor_walk.size() >= 2:
 		for i in range(janitor_walk.size() - 2, -1, -1):
-			await _walk_to(jan, janitor_walk[i])
+			await _walk_to(jan, janitor_walk[i], EXIT_SPEED)
 		jan.visible = false
 	Sfx.play(&"janitor_step")
-	_say(gs, "", "발소리가 멀어진다. 계단 쪽이다.")
 	_glow(0.0, 0.8)
-	await _wait(1.6)
+	# **이 줄이 다 뜬 뒤에 유예를 켠다.** 안 기다리면 "지금밖에 없어"가 덮고,
+	# 20초 유예가 아직 읽는 중에 흐르기 시작한다(#471).
+	await _drain()
 
 	_scene_locked = false
 	_freeze(player, false)
@@ -274,10 +278,10 @@ func _act2_confession() -> void:
 
 ## 한 지점까지 걸어간다. 속도가 일정해야 발소리와 어긋나지 않으므로
 ## 거리에 비례한 시간을 준다.
-func _walk_to(jan: Node2D, target: Vector2) -> void:
+func _walk_to(jan: Node2D, target: Vector2, speed: float = WALK_SPEED) -> void:
 	var from: Vector2 = jan.position
 	var delta := target - from
-	var seconds: float = max(0.05, delta.length() / WALK_SPEED)
+	var seconds: float = max(0.05, delta.length() / speed)
 	_face(jan, _row_for(delta))
 
 	var tween := create_tween()
@@ -353,6 +357,13 @@ func _say(gs, speaker: String, text: String, emotion: String = "") -> void:
 
 func _wait(seconds: float) -> void:
 	await get_tree().create_timer(seconds).timeout
+
+
+## 자막 대기열이 빌 때까지 기다린다 — 장면이 대사를 앞지르지 않게(#471).
+func _drain() -> void:
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud != null and hud.has_method("await_speech_drained"):
+		await hud.call("await_speech_drained")
 
 
 ## 조작을 멈춘다. **게임 전체를 멈추면(`get_tree().paused`) 카메라 트윈도 멈춘다** —

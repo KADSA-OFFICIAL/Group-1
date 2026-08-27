@@ -117,6 +117,19 @@ func show_speech(speaker: String, text: String, emotion: String = "") -> void:
 	_show_subtitle(speaker, text, emotion)
 
 
+## **대기열이 통째로 빌 때까지** 기다린다(#471).
+##
+## `await_subtitle()`은 지금 찍히는 한 줄만 본다. 장면 연출(`art_room_intro.gd`)은
+## 고정 시간으로 대사를 흘리는데 그 시간이 실제 표시 시간과 맞지 않으면 **장면이
+## 대사를 앞질러 간다** — 수위가 자백을 다 하기도 전에 걸어 나가고, 다음 막의
+## 유예가 자백이 아직 떠 있는 채로 돌기 시작했다. 막 경계에서 이걸 부른다.
+func await_speech_drained() -> void:
+	while _draining:
+		if get_tree() == null:
+			return
+		await get_tree().process_frame
+
+
 ## 지금 찍히는 중인 자막이 끝날 때까지 기다린다. 이미 끝났으면 바로 돌아온다.
 ## 붙잡힘 연출이 대사를 자르지 않도록 floor_manager가 쓴다(#199).
 func await_subtitle() -> void:
