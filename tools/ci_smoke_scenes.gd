@@ -257,6 +257,15 @@ func _check_artroom_intro() -> void:
 	else:
 		_ok("도입부 1막 숨을 유예")
 
+	# 숨을 곳을 화면에 가리키는가(#478) — 월드 표시만으로는 어둠에 묻힌다.
+	var wp: Control = main.get_node_or_null("HUD/Root/Waypoint")
+	if wp == null:
+		_fault("도입부 1막: HUD에 Waypoint가 없다")
+	elif not await _until(func() -> bool: return wp.visible, 10.0):
+		_fault("도입부 1막: 숨을 곳 화면 표시가 안 뜬다(10초 대기)")
+	else:
+		_ok("도입부 1막 숨을 곳 화면 표시")
+
 	# ── 2막: 숨으면 수위가 실제로 들어온다 ────────────────────────
 	var jan := bg.get_node_or_null("IntroJanitor") as Node2D
 	if jan == null:
@@ -270,6 +279,10 @@ func _check_artroom_intro() -> void:
 		_fault("도입부 2막: 숨었는데 자백 장면이 시작되지 않는다")
 	else:
 		_ok("도입부 2막 시작")
+	if wp != null and not await _until(func() -> bool: return not wp.visible, 5.0):
+		_fault("도입부 2막: 숨었는데 숨을 곳 표시가 안 사라진다")
+	elif wp != null:
+		_ok("도입부 2막 표시 사라짐")
 	if jan != null and not await _until(func() -> bool: return jan.visible, 20.0):
 		_fault("도입부 2막: 수위가 안 보인다(20초 대기)")
 	# 장면 도중에는 캐비넷에서 못 나온다
