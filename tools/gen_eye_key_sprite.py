@@ -38,8 +38,21 @@ from gen_key_sprite import (background_mask, bake_cell, content_box, read_png,
                             write_png)
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+# **두 장을 굽는다**(#451). 같은 머리를 두 자리에 쓴다.
+#
+#   eye_key.png   정면 초상 — 가까이 갔을 때 화면 **왼쪽 위**에 뜨는 클로즈업.
+#   head_top.png  위에서 본 머리 — **맵 위에** 놓이는 그림.
+#
+# 정면 초상을 맵에 눕혀 놓으니 방향이 안 맞았다 — 다른 물건은 전부 위에서
+# 내려다본 그림인데(#289) 여기만 얼굴이 바닥에 서 있었다. 그렇다고 정면을
+# 버릴 수도 없다: 아래 MAX_SIDE 표대로 **눈구멍의 열쇠는 64에서만 읽히고**,
+# 그게 이 물건이 계단 열쇠라는 것을 말하는 유일한 그림이다.
+# 자리를 나누면 둘 다 산다 — 클로즈업이 열쇠를 보여 주므로 맵 그림은
+# 열쇠를 안 보여 줘도 되고, 그래서 더 줄일 수 있다.
 SRC = ROOT / "assets" / "sprites" / "source" / "eye_key_design.png"
 OUT = ROOT / "assets" / "sprites" / "eye_key.png"
+TOP_SRC = ROOT / "assets" / "sprites" / "source" / "head_top_design.png"
+TOP_OUT = ROOT / "assets" / "sprites" / "head_top.png"
 
 # 긴 변(여기서는 세로)의 도트 수 = 월드 픽셀 수(Sprite2D scale 1).
 #
@@ -59,6 +72,12 @@ OUT = ROOT / "assets" / "sprites" / "eye_key.png"
 # 원래 그것들보다 크기 때문이고, 단서 둘레는 `gen_floors.py`의
 # `PROP_CLUE_CLEAR`(중심에서 반경 76)가 비워 두므로 집기와 겹치지 않는다.
 MAX_SIDE = 64
+
+# 맵 위 그림(위에서 본 머리)의 긴 변. **정면보다 작아도 된다** — 여기서는
+# 열쇠가 안 보여도 되기 때문이다(클로즈업이 보여 준다). 원본 내용이 100x96
+# 이라 거의 정사각이고, 52면 52x50이다. 64를 그대로 쓰면 머리 하나가 인물
+# (74x76)만 해져 크기가 거짓말이 된다.
+TOP_MAX_SIDE = 52
 
 # 테두리에서 이어진 이 밝기(채널별) 이상만 배경으로 본다.
 #
@@ -91,17 +110,17 @@ COVER_DEN = 5
 HOLE_MAX = 8
 
 
-def out_size(box_w: int, box_h: int) -> tuple[int, int]:
-    """긴 변을 MAX_SIDE로 맞추고 짧은 변은 비율대로(정수 나눗셈, 최소 1)."""
+def out_size(box_w: int, box_h: int, side: int = MAX_SIDE) -> tuple[int, int]:
+    """긴 변을 `side`로 맞추고 짧은 변은 비율대로(정수 나눗셈, 최소 1)."""
     if box_w >= box_h:
-        return MAX_SIDE, max(1, (box_h * MAX_SIDE + box_w // 2) // box_w)
-    return max(1, (box_w * MAX_SIDE + box_h // 2) // box_h), MAX_SIDE
+        return side, max(1, (box_h * side + box_w // 2) // box_w)
+    return max(1, (box_w * side + box_h // 2) // box_h), side
 
 
-def bake() -> tuple[int, int, bytearray]:
-    if not SRC.exists():
-        raise SystemExit(f"원본이 없다: {SRC}")
-    w, h, rgba = read_png(SRC)
+def bake(src: pathlib.Path = SRC, side: int = MAX_SIDE) -> tuple[int, int, bytearray]:
+    if not src.exists():
+        raise SystemExit(f"원본이 없다: {src}")
+    w, h, rgba = read_png(src)
 
     # 열쇠 생성기의 flood fill은 모듈 상수 BG_MIN을 읽는다. 이 원본은 근거가
     # 다르지만 값이 같으므로, 어긋나면 조용히 다른 그림이 나오는 것을 막는다.
@@ -115,8 +134,11 @@ def bake() -> tuple[int, int, bytearray]:
     # **punch_holes를 부르지 않는다** — 위 독스트링 참조. 얼굴이 통째로 날아간다.
     bx0, by0, bx1, by1 = content_box(w, h, mask)
     box_w, box_h = bx1 - bx0, by1 - by0
-    ow, oh = out_size(box_w, box_h)
+    ow, oh = out_size(box_w, box_h, side)
     bg = sum(mask)
+    # 원본의 전경 색 수 — `check()`가 '축소가 뭉갰는지'를 **원본 대비**로 본다.
+    src_colors = len({(rgba[i * 4] << 16) | (rgba[i * 4 + 1] << 8) | rgba[i * 4 + 2]
+                      for i in range(w * h) if not mask[i]})
     print(f"  원본 {w}x{h} → 배경 {100.0 * bg / (w * h):.2f}% 제거 "
           f"→ 내용 {box_w}x{box_h} → 출력 {ow}x{oh}")
 
@@ -136,7 +158,7 @@ def bake() -> tuple[int, int, bytearray]:
             img[j + 1] = (packed >> 8) & 0xFF
             img[j + 2] = packed & 0xFF
             img[j + 3] = 255
-    return ow, oh, img
+    return ow, oh, img, src_colors
 
 
 def interior_holes(ow: int, oh: int, img: bytearray) -> int:
@@ -173,7 +195,7 @@ def interior_holes(ow: int, oh: int, img: bytearray) -> int:
                if img[i * 4 + 3] < 8 and not seen[i])
 
 
-def check(ow: int, oh: int, img: bytearray) -> None:
+def check(ow: int, oh: int, img: bytearray, src_colors: int) -> None:
     opaque = sum(1 for i in range(ow * oh) if img[i * 4 + 3] >= 8)
     if opaque == 0:
         raise SystemExit("빈 스프라이트다 — BG_MIN을 확인할 것")
@@ -188,34 +210,42 @@ def check(ow: int, oh: int, img: bytearray) -> None:
     # 색이 뭉개졌는지 — 머리카락(검정)·피(붉은색)·피부(흰색)·열쇠(금색)가
     # 갈려야 한다. 서로 다른 색이 손에 꼽을 만큼밖에 안 남으면 축소가 그림을
     # 죽인 것이다(#427의 '소금·후추' 반대 방향 실패).
+    #
+    # **문턱은 원본 대비다**(#451). 고정 8을 쓰면 원본이 원래 몇 색뿐인 그림을
+    # 통과시킬 수 없다 — 위에서 본 머리 원본은 정확히 3색이다(머리 63% / 피
+    # 28% / 살 9%). 손그림 쪽은 47458색이라 예전처럼 8을 그대로 요구한다.
     colors = {(img[i * 4] << 16) | (img[i * 4 + 1] << 8) | img[i * 4 + 2]
               for i in range(ow * oh) if img[i * 4 + 3] >= 8}
-    if len(colors) < 8:
-        raise SystemExit(f"남은 색이 {len(colors)}가지뿐이다 — 축소가 그림을 뭉갰다")
+    want = min(8, src_colors)
+    if len(colors) < want:
+        raise SystemExit(f"남은 색이 {len(colors)}가지뿐이다 "
+                         f"(원본 {src_colors}색, 최소 {want}) — 축소가 그림을 뭉갰다")
 
-    print(f"  불투명 {opaque} / {ow * oh} 픽셀, 색 {len(colors)}가지, "
-          f"안쪽 구멍 {holes}칸")
+    print(f"  불투명 {opaque} / {ow * oh} 픽셀, 색 {len(colors)}가지"
+          f"(원본 {src_colors}), 안쪽 구멍 {holes}칸")
     for y in range(oh):
         row = "".join(".#"[img[(y * ow + x) * 4 + 3] >= 8] for x in range(ow))
         print(f"  {row}")
 
 
-def main() -> int:
-    print(f"눈에 박힌 열쇠 스프라이트 (긴 변 {MAX_SIDE})")
-    ow, oh, img = bake()
-    check(ow, oh, img)
-
-    if OUT.exists():
-        old_w, old_h, old = read_png(OUT)
+def _emit(label: str, src: pathlib.Path, out: pathlib.Path, side: int) -> None:
+    print(f"{label} (긴 변 {side})")
+    ow, oh, img, src_colors = bake(src, side)
+    check(ow, oh, img, src_colors)
+    if out.exists():
+        old_w, old_h, old = read_png(out)
         if (old_w, old_h) == (ow, oh) and old == img:
             # 인코더가 달라도 diff가 나지 않게, 픽셀이 같으면 그대로 둔다.
-            print(f"{OUT.relative_to(ROOT)} 그대로 (픽셀 동일)")
-            return 0
+            print(f"  {out.relative_to(ROOT)} 그대로 (픽셀 동일)")
+            return
+    write_png(out, ow, oh, bytes(img))
+    print(f"  {out.relative_to(ROOT)} {ow}x{oh} 씀")
 
-    write_png(OUT, ow, oh, bytes(img))
-    print(f"{OUT.relative_to(ROOT)} {ow}x{oh} 씀")
+
+def main() -> int:
+    _emit("정면 클로즈업(왼쪽 위)", SRC, OUT, MAX_SIDE)
+    _emit("맵 위 머리(위에서 본 것)", TOP_SRC, TOP_OUT, TOP_MAX_SIDE)
     return 0
-
 
 if __name__ == "__main__":
     sys.exit(main())
