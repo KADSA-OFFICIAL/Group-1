@@ -16,12 +16,9 @@ const USABLE_ITEM_KEYS := {
 	"ink_can": "[Q] 던지기",
 }
 
-@onready var objective_label: Label = $Root/TopLeft/Margin/TextRows/ObjectiveLabel
-@onready var inventory_label: Label = $Root/TopLeft/Margin/TextRows/InventoryLabel
-## 확인한 단서 수(#529). 세는 규칙은 `game_state.clue_score()` 하나뿐이라
-## 엔딩의 "알아낸 것 N / M"과 늘 같은 숫자다.
-@onready var clue_label: Label = $Root/TopLeft/Margin/TextRows/ClueLabel
-## 엔딩 조건 현황 레이블(#540)
+@onready var objective_label: Label = $Root/TopRight/Margin/TextRows/ObjectiveLabel
+@onready var inventory_label: Label = $Root/TopRight/Margin/TextRows/InventoryLabel
+## 엔딩 조건 현황 레이블(#540, #545)
 @onready var true_ending_label: Label = $Root/TopLeft/Margin/TextRows/TrueEndingLabel
 @onready var report_ending_label: Label = $Root/TopLeft/Margin/TextRows/ReportEndingLabel
 @onready var basic_ending_label: Label = $Root/TopLeft/Margin/TextRows/BasicEndingLabel
@@ -71,15 +68,9 @@ func _ready() -> void:
 			game_state.connect("inventory_changed", Callable(self, "set_inventory"))
 			game_state.connect("inventory_changed", Callable(self, "_on_inventory_or_flags_changed"))
 		if game_state.has_signal("clues_changed"):
-			game_state.connect("clues_changed", Callable(self, "set_clues"))
 			game_state.connect("clues_changed", Callable(self, "_on_inventory_or_flags_changed"))
 		if game_state.has_signal("flags_changed"):
 			game_state.connect("flags_changed", Callable(self, "_on_inventory_or_flags_changed"))
-		# 처음 값은 시그널을 기다리지 않고 직접 읽는다 — 시작 플래그
-		# (`starting_flags`)로 이미 세워진 것이 있으면 그것까지 세야 한다.
-		if game_state.has_method("clue_score"):
-			var score: Array = game_state.call("clue_score")
-			set_clues(score[0], score[1])
 		var limit = game_state.get("max_items")
 		if limit != null:
 			max_items = limit
@@ -106,13 +97,11 @@ func set_objective(text: String) -> void:
 	objective_label.text = text
 
 
-## 확인한 단서 수(#529). 전체 수도 같이 보여 준다 — 남았는지 다 봤는지를
-## 알 수 없으면 "더 뒤져 볼까"를 판단할 수 없고, 엔딩이 이미 같은 수를 보여 준다.
-func set_clues(found: int, total: int) -> void:
-	clue_label.text = "단서: %d / %d" % [found, total]
+func set_clues(_found: int, _total: int) -> void:
+	pass
 
 
-## 각 엔딩 조건 및 층별 진행도 실시간 갱신(#540)
+## 각 엔딩 조건 및 층별 진행도 실시간 갱신(#540, #545)
 func _update_endings_ui() -> void:
 	var game_state = get_tree().get_first_node_in_group("game_state")
 	if game_state == null:
@@ -150,9 +139,9 @@ func _update_endings_ui() -> void:
 	if is_instance_valid(basic_ending_label):
 		var has_gate_key: bool = game_state.call("has_item", "front_gate_key") if game_state.has_method("has_item") else false
 		if has_gate_key:
-			basic_ending_label.text = "엔딩 1: 1층 현관 열쇠 보유 (기본 탈출 가능)"
+			basic_ending_label.text = "엔딩 1: 1층 열쇠 (보유)"
 		else:
-			basic_ending_label.text = "엔딩 1: 1층 현관 열쇠 필요 (기본 탈출)"
+			basic_ending_label.text = "엔딩 1: 1층 열쇠"
 
 
 func set_inventory(items: Array[String]) -> void:

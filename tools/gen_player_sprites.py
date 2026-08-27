@@ -77,6 +77,12 @@ BG_LUMA = 40
 # 여백이 넓은 알파 원본이 들어와도 걸리게 넉넉히 잡았다.
 ALPHA_BG = 8
 ALPHA_BG_RATIO = 0.5
+# 배경으로 볼 밝기 **하한**(R+G+B). 흰 배경 원본(#538)에 쓴다 — 테두리에서 이어지는
+# **밝은** 픽셀을 배경으로 본다. 실측: 배경은 753~765이고 인물의 가장 밝은 부분
+# (피부 (254,232,221) 등)은 704~710이라 그 사이가 넉넉히 비어 있다. 전체를
+# 밝기로만 자르면 피부까지 날아가므로 **flood fill이라야 한다**(수위 원본 #310과
+# 같은 이유 — 명찰·렌즈도 희다).
+WHITE_BG_LUMA = 735
 
 # 한 칸의 절반 이상이 캐릭터일 때만 칠한다 — 실루엣이 흐려지지 않게.
 COVER = 0.5
@@ -233,11 +239,15 @@ def background_mask(width: int, height: int, rgba: bytearray) -> bytearray:
     - **알파 배경**(뒷모습 원본 #519): 투명한 칸이 곧 배경이다. flood fill을 쓰면
       안 된다 — 새 원본은 머리가 순수 검정(0,0,0)이고 투명 배경도 RGB가 0이라,
       "테두리에서 이어지는 어두운 픽셀"에 **머리카락이 통째로 걸려 지워졌다.**
-    - **불투명 배경**(기존 정면·측면 원본): 배경이 칠해진 검정이라 알파로는 가릴 수
-      없다. 테두리에서 이어지는 어두운 픽셀만 배경으로 본다 — 인물 안의 어두운
-      부분(머리카락 (26,26,26)=78)은 테두리와 이어지지 않아 살아남는다.
+    - **불투명 검정 배경**(기존 정면·측면 원본): 알파로는 가릴 수 없다. 테두리에서
+      이어지는 **어두운** 픽셀만 배경으로 본다 — 인물 안의 어두운 부분(머리카락
+      (26,26,26)=78)은 테두리와 이어지지 않아 살아남는다.
+    - **불투명 흰 배경**(#538의 뒷모습 원본): 같은 flood fill인데 방향이 반대다 —
+      테두리에서 이어지는 **밝은** 픽셀을 배경으로 본다. 밝기로만 통째로 자르면
+      피부(704~710)까지 날아가므로 반드시 테두리에서 이어진 것만 본다.
 
-    어느 쪽인지는 **투명한 칸의 비율로 스스로 가린다** — 손으로 지정하는 인자를
+    어느 쪽인지는 **스스로 가린다** — 투명한 칸의 비율로 알파 배경을 가리고,
+    아니면 **테두리 픽셀의 밝기**로 검정/흰 배경을 가린다. 손으로 지정하는 인자를
     두면 원본을 갈아 끼울 때 같이 고쳐야 하는 자리가 하나 늘어난다.
     """
     transparent = sum(1 for i in range(width * height) if rgba[i * 4 + 3] < ALPHA_BG)
@@ -247,13 +257,20 @@ def background_mask(width: int, height: int, rgba: bytearray) -> bytearray:
 
     mask = bytearray(width * height)
     queue: deque[tuple[int, int]] = deque()
+    # 테두리 픽셀이 밝으면 흰 배경 원본이다. 네 모서리를 보고 정한다 —
+    # 한 점만 보면 그 자리에 인물이 걸친 원본에서 어긋난다.
+    corners = [0, (width - 1) * 4, (height - 1) * width * 4,
+               ((height - 1) * width + width - 1) * 4]
+    bright_bg = all(rgba[c] + rgba[c + 1] + rgba[c + 2] >= WHITE_BG_LUMA
+                    for c in corners)
 
     def push(x: int, y: int) -> None:
         i = y * width + x
         if mask[i]:
             return
         j = i * 4
-        if rgba[j] + rgba[j + 1] + rgba[j + 2] > BG_LUMA:
+        luma = rgba[j] + rgba[j + 1] + rgba[j + 2]
+        if luma < WHITE_BG_LUMA if bright_bg else luma > BG_LUMA:
             return
         mask[i] = 1
         queue.append((x, y))
