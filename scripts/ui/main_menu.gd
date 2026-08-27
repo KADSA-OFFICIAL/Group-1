@@ -9,6 +9,8 @@ extends Control
 @onready var start_button: Button = $Layout/StartButton
 @onready var fade_rect: ColorRect = $Fade
 
+const GameStateScript = preload("res://scripts/game/game_state.gd")
+
 
 func _ready() -> void:
 	start_button.pressed.connect(_on_start_pressed)
@@ -17,6 +19,7 @@ func _ready() -> void:
 
 func _on_start_pressed() -> void:
 	Sfx.play(&"ui_click")
+	GameStateScript.clear_checkpoint()
 	start_button.disabled = true
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 1.0, fade_seconds)

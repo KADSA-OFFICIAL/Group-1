@@ -146,17 +146,38 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	var game_state = get_tree().get_first_node_in_group("game_state")
+	var restored_floor := START_FLOOR
+	var is_restored := false
+
 	if game_state != null:
 		game_state.connect("game_over", _on_game_over)
+		# 체크포인트 복원 요청이 있는 경우(#564)
+		if game_state.has_method("is_pending_restore") and game_state.call("is_pending_restore"):
+			var cp: Dictionary = game_state.call("restore_from_checkpoint")
+			if not cp.is_empty():
+				is_restored = true
+				restored_floor = int(cp.get("floor", START_FLOOR))
+				var arrive_pos: Vector2 = cp.get("arrive_pos", Vector2.ZERO)
+				if restored_floor != START_FLOOR:
+					_swap_floor(restored_floor, arrive_pos)
 
-	_update_floor_label()
-	_apply_environment(current_floor)
+	if not is_restored or restored_floor == START_FLOOR:
+		_update_floor_label()
+		_apply_environment(current_floor)
+		janitor.sync_floor(_janitor_active(current_floor), current_floor, player, $Background)
+
 	Sfx.start_music()
-	janitor.sync_floor(_janitor_active(current_floor), current_floor, player, $Background)
 	fade_rect.color.a = 1.0
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 0.0, FADE_IN_SECONDS)
-	tween.tween_callback(_show_start_hint)
+	if is_restored:
+		var fl_text := "%d층" % restored_floor if restored_floor > 0 else YARD_LABEL
+		tween.tween_callback(func() -> void:
+			if game_state != null:
+				game_state.call("request_notice", "📌 %s 체크포인트에서 재개했습니다." % fl_text)
+		)
+	else:
+		tween.tween_callback(_show_start_hint)
 
 
 func _show_start_hint() -> void:
@@ -296,6 +317,14 @@ func _swap_floor(target: int, arrive: Vector2) -> void:
 	var camera: Camera2D = player.get_node_or_null("Camera2D")
 	if camera != null:
 		camera.reset_smoothing()
+
+	# 층 진입 시 자동 체크포인트 저장(#564) — 4층(도입부)을 제외한 본편 층(3, 2, 1, 0)
+	if target != START_FLOOR:
+		var game_state = get_tree().get_first_node_in_group("game_state")
+		if game_state != null and game_state.has_method("record_checkpoint"):
+			game_state.call("record_checkpoint", target, arrive)
+			var fl_text := "%d층" % target if target > 0 else YARD_LABEL
+			game_state.call("request_notice", "📌 %s 체크포인트 저장됨" % fl_text)
 
 
 func _update_floor_label() -> void:

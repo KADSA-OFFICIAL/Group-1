@@ -76,6 +76,12 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 22
 text = "다시 시작"
 
+[node name="RestartButton" type="Button" parent="Layout/Buttons"]
+custom_minimum_size = Vector2(220, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "처음부터 다시하기"
+
 [node name="TitleButton" type="Button" parent="Layout/Buttons"]
 custom_minimum_size = Vector2(220, 56)
 layout_mode = 2
