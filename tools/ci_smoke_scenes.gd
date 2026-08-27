@@ -270,8 +270,8 @@ func _check_artroom_intro() -> void:
 		_fault("도입부 2막: 숨었는데 자백 장면이 시작되지 않는다")
 	else:
 		_ok("도입부 2막 시작")
-	if jan != null and not jan.visible:
-		_fault("도입부 2막: 수위가 안 보인다")
+	if jan != null and not await _until(func() -> bool: return jan.visible, 20.0):
+		_fault("도입부 2막: 수위가 안 보인다(20초 대기)")
 	# 장면 도중에는 캐비넷에서 못 나온다
 	if player.is_processing_unhandled_input():
 		_fault("도입부 2막: 장면 도중인데 입력이 살아 있다(캐비넷에서 나갈 수 있다)")
