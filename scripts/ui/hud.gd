@@ -33,6 +33,9 @@ const USABLE_ITEM_KEYS := {
 ## 이설이 2층 머리를 보고 말하는 도중 수위 혼잣말이 끼어들자 그 줄이 통째로
 ## 사라졌다. 온 순서대로 한 줄씩, 앞 줄이 끝난 뒤에 보여 준다.
 var _speech_queue: Array[Array] = []
+## 지금 찍히는 중(또는 읽는 시간 중)인 줄. 중복을 버리는 데 쓴다(#505).
+## 빈 배열이면 아무것도 안 뜨고 있다.
+var _current: Array = []
 var _draining: bool = false
 var current_items: Array[String] = []
 var max_items: int = 5
@@ -138,14 +141,28 @@ func await_subtitle() -> void:
 		await subtitle.typing_finished
 
 
+## **같은 줄이 겹치면 버린다**(#505). `interactable.gd`는 E를 누를 때마다
+## `request_notice`를 부르고(되풀이 조사는 의도된 동작이다, #301) 대기열은 받은 것을
+## 그대로 쌓았다 — 그래서 E를 세 번 누르면 같은 문장이 세 번 떴고, 뒤에 줄이 있으면
+## 읽는 시간이 1.4초로 짧아져 깜빡이는 것처럼 보였다. 그 사이 다른 대사(수위 혼잣말·
+## 발소리)가 뒤로 밀리고, 유예가 도는 구간에서는 밀린 시간이 그대로 손해다.
+##
+## **자막이 끝난 뒤 다시 조사하면 다시 나온다** — 지금 떠 있는 줄과 대기열만 본다.
 func _show_subtitle(speaker: String, text: String, emotion: String) -> void:
-	_speech_queue.append([speaker, text, emotion])
+	var line_now: Array = [speaker, text, emotion]
+	if _same_line(_current, line_now):
+		return
+	for queued: Array in _speech_queue:
+		if _same_line(queued, line_now):
+			return
+	_speech_queue.append(line_now)
 	if _draining:
 		return
 
 	_draining = true
 	while not _speech_queue.is_empty() and is_instance_valid(subtitle):
 		var line: Array = _speech_queue.pop_front()
+		_current = line
 		subtitle.show_line(line[0], line[1], line[2])
 
 		# 컷신과 달리 본편에는 넘기는 입력이 없다 — 다 찍힐 때까지 기다린 뒤
@@ -157,7 +174,19 @@ func _show_subtitle(speaker: String, text: String, emotion: String) -> void:
 	# 기다리는 사이 씬이 바뀌었을 수 있다(체포·탈출).
 	if is_instance_valid(subtitle):
 		subtitle.clear()
+	_current = []
 	_draining = false
+
+
+## 화자와 본문이 같으면 같은 줄로 본다(#505). 감정은 보지 않는다 — 같은 문장을
+## 다른 감정으로 연달아 내보내는 자리가 없고, 있어도 두 번 읽힐 이유가 없다.
+func _same_line(a: Array, b: Array) -> bool:
+	return a.size() >= 2 and b.size() >= 2 and a[0] == b[0] and a[1] == b[1]
+
+
+## 지금 자막이 떠 있는가. 연출이 대사를 앞지르지 않게 보는 곳이 쓴다.
+func is_speaking() -> bool:
+	return _draining
 
 
 func _get_item_display_name(item_id: String) -> String:
