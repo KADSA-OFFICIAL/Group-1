@@ -1086,6 +1086,15 @@ def add_furniture(sc, floor):
 # TaehoNote는 #222에서 열쇠 지급을 뗐으므로 여기 들어가지 않는다(E 조사 단서).
 AUTO_PICKUP = {"SpareKeyHook", "HeadKey", "JanitorSafe"}
 
+# 접촉 획득물에 덧붙이는 설정(#459). **`to_pickup`이 `grants_flag`를 `pickup_id`로
+# 바꿔 쓰므로**, 곁들여 세우는 플래그는 story_objects.json이 아니라 여기에 적는다.
+PICKUP_EXTRA = {
+    # 2층 머리: 계단 열쇠를 주면서 조민혁을 찾은 것으로도 쳐 주고(#459), 열쇠를
+    # 뽑은 뒤에도 시신은 그 자리에 남긴다 — 문구가 "열쇠를 뽑아 냈다"인데 머리까지
+    # 사라지면 말과 화면이 어긋난다.
+    "HeadKey": 'grants_flag = "found_jominhyuk"\nkeep_after_pickup = true',
+}
+
 
 def to_pickup(body):
     """interactable(E 조사) 노드를 pickup_item(접촉 획득)으로 바꾼다."""
@@ -1099,10 +1108,13 @@ def to_pickup(body):
     body = body.replace("collision_layer = 2\ncollision_mask = 0",
                         "collision_layer = 0\ncollision_mask = 1")
     body = re.sub(r"^prompt_text = .*\n", "", body, flags=re.M)
+    node = re.search(r'\[node name="(\w+)"', body).group(1)
     # 접촉 획득은 다시 지나가기 쉬우므로 획득 기록이 없으면 층 재방문 때 중복된다.
     if "pickup_id = " not in body:
-        node = re.search(r'\[node name="(\w+)"', body).group(1)
         body = body.rstrip("\n") + f'\npickup_id = "{node.lower()}_taken"\n'
+    extra = PICKUP_EXTRA.get(node)
+    if extra:
+        body = body.rstrip('\n') + '\n' + extra + '\n'
     return body
 
 
