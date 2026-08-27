@@ -51,6 +51,7 @@ func _run() -> void:
 	for fl in DOOR_FLOORS:
 		await _check_floor(fl)
 	await _check_intro()
+	await _check_subtitle_queue()
 	await _check_artroom_intro()
 
 	print("")
@@ -189,6 +190,54 @@ func _check_intro() -> void:
 ##
 ## 조립 씬(`main.tscn`)째로 띄운다. 장면 진행자가 층 씬 안에 있고 플레이어·
 ## GameState·HUD를 전부 필요로 하기 때문이다.
+## 같은 자막이 겹쳐 나오지 않는가(#505).
+##
+## `interactable.gd`는 E를 누를 때마다 `request_notice`를 부르고(되풀이 조사는
+## 의도된 동작이다, #301) 대기열은 받은 것을 그대로 쌓았다 — E를 세 번 누르면
+## 같은 문장이 세 번 떴다. **대기열 길이로 본다**: 첫 줄은 곧바로 꺼내 찍히므로
+## 같은 줄 셋을 넣으면 대기열이 비어 있어야 하고, 다른 줄 둘을 넣으면 둘이 남는다.
+## 표시 횟수를 시그널로 세면 안 된다 — `request_speech`는 방출이라 한 프레임에
+## 다 잡힌다(#454).
+func _check_subtitle_queue() -> void:
+	var packed: PackedScene = load(MAIN)
+	var main: Node = packed.instantiate()
+	root.add_child(main)
+	for i in 8:
+		await process_frame
+	var gs: Node = get_first_node_in_group("game_state")
+	var hud: Node = get_first_node_in_group("hud")
+	if gs == null or hud == null:
+		_fault("자막: game_state 또는 hud를 못 찾았다")
+		main.free()
+		await process_frame
+		return
+	if not hud.has_method("is_speaking"):
+		_fault("자막: hud.is_speaking()이 없다")
+	# 시작 안내(`START_HINT`)가 흐르는 중이다 — 비워진 뒤에 검사한다.
+	await hud.call("await_speech_drained")
+	await _wait(0.3)
+
+	for i in 3:
+		gs.call("request_notice", "스모크 중복 검사 줄.")
+	await process_frame
+	var queue: Array = hud.get("_speech_queue")
+	if queue.size() != 0:
+		_fault("자막: 같은 줄 셋을 넣었는데 대기열에 %d줄 남았다(중복)" % queue.size())
+	else:
+		_ok("자막 중복 억제")
+
+	for t in ["스모크 줄 A.", "스모크 줄 B."]:
+		gs.call("request_notice", t)
+	await process_frame
+	queue = hud.get("_speech_queue")
+	if queue.size() != 2:
+		_fault("자막: 서로 다른 줄 둘이 대기열에 안 들어갔다(%d줄)" % queue.size())
+	else:
+		_ok("자막 대기열 서로 다른 줄 유지")
+	main.free()
+	await process_frame
+
+
 func _check_artroom_intro() -> void:
 	var packed: PackedScene = load(MAIN)
 	if packed == null:
@@ -320,23 +369,20 @@ func _check_artroom_intro() -> void:
 	var gs: Node = get_first_node_in_group("game_state")
 	var need := String(win.get("required_item_id")) if win != null else ""
 	var consts: Dictionary = intro.get_script().get_script_constant_map()
-	var grace_base: float = float(consts.get("GRACE_SECONDS", 20.0))
-	var grace_long: float = float(consts.get("GRACE_SECONDS_NO_BOOK", grace_base))
+	var grace_base: float = float(consts.get("GRACE_SECONDS", 44.0))
 	if gs == null or need.is_empty():
 		_fault("도입부 3막: game_state(%s) 또는 창문 요구 아이템(%s)을 못 찾았다"
 			% [gs, need])
 	elif bool(gs.call("has_item", need)):
 		_fault("도입부 3막: 스모크가 %s를 이미 들고 있어 책 없는 경로를 못 본다" % need)
 	else:
-		# 유예가 길어진다 — 캐비넷에서 책을 거쳐 창문까지가 더 멀다.
-		if grace_at_start <= grace_base + 1.0:
-			_fault("도입부 3막: 책이 없는데 유예가 안 늘었다 (%.1f초, 기본 %.1f초)"
+		# **유예는 책 유무로 가르지 않는다**(#506) — 읽는 시간이 걷는 시간보다 크고,
+		# 그 방향이 걷는 거리와 반대다(근거는 `GRACE_SECONDS` 주석). 상수와 같은지만 본다.
+		if absf(grace_at_start - grace_base) > 1.0:
+			_fault("도입부 3막: 유예가 상수와 다르다 (%.1f초, 상수 %.1f초)"
 				% [grace_at_start, grace_base])
-		elif grace_at_start > grace_long + 0.5:
-			_fault("도입부 3막: 유예가 상수보다 길다 (%.1f초 > %.1f초)"
-				% [grace_at_start, grace_long])
 		else:
-			_ok("도입부 3막 책 없는 런의 유예 %.1f초" % grace_at_start)
+			_ok("도입부 3막 유예 %.1f초" % grace_at_start)
 		# 국어책을 화면에서 가리킨다 — 2막에서 한 번 걷힌 표시가 다시 뜬다.
 		if wp == null:
 			_fault("도입부 3막: HUD에 Waypoint가 없다")
