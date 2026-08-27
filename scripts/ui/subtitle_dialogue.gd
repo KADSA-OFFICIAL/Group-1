@@ -44,6 +44,11 @@ const EMOTIONS: Dictionary = {
 		"name_color": Color(0.561, 0.690, 0.675),  # #8fb0ac
 		"typing_scale": 1.25,                      # 타자 속도 −20%
 	},
+	# 겁에 질렸을 때. 숨이 짧아 말이 빨라진다(#454).
+	"fear": {
+		"name_color": Color(0.812, 0.435, 0.404),  # #cf6f67
+		"typing_scale": 0.78,                      # 타자 속도 +28%
+	},
 }
 
 # 화자별 스탠딩 일러스트(#280). 컷신에서만 쓴다 — 본편 HUD는 화면을 가리면 안 된다.

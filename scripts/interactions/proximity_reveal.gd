@@ -15,7 +15,9 @@ extends Area2D
 @export var caption: String = ""
 ## 들어섰을 때 **한 번만** 나오는 대사. 화자가 비면 지문으로 나간다.
 @export var line_speaker: String = ""
-@export_multiline var line_text: String = ""
+## 순서대로 나온다. `line_emotions`를 순번으로 짝지어 준다(모자라면 기본 감정).
+@export var lines: PackedStringArray = PackedStringArray()
+@export var line_emotions: PackedStringArray = PackedStringArray()
 
 var _said: bool = false
 var _inside: int = 0
@@ -53,14 +55,21 @@ func _on_entered(body: Node2D) -> void:
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud != null and hud.has_method("show_close_up"):
 		hud.call("show_close_up", portrait, caption)
-	if not _said and not line_text.is_empty():
-		_said = true
-		var gs := get_tree().get_first_node_in_group("game_state")
-		if gs != null:
-			if line_speaker.is_empty():
-				gs.call("request_notice", line_text)
-			else:
-				gs.call("request_speech", line_speaker, line_text, "")
+	if _said or lines.is_empty():
+		return
+	_said = true
+	var gs := get_tree().get_first_node_in_group("game_state")
+	if gs == null:
+		return
+	# 한꺼번에 넘긴다. **여기서 기다리며 한 줄씩 내면 안 된다** — 임자가
+	# 사라지는 순간 남은 줄이 같이 죽는다(위 `_exit_tree()`와 같은 이유).
+	# 순서와 간격은 HUD 자막 대기열이 맡는다(#454).
+	for i in lines.size():
+		var emotion := line_emotions[i] if i < line_emotions.size() else ""
+		if line_speaker.is_empty():
+			gs.call("request_notice", lines[i])
+		else:
+			gs.call("request_speech", line_speaker, lines[i], emotion)
 
 
 func _on_exited(body: Node2D) -> void:
