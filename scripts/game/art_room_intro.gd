@@ -40,6 +40,22 @@ const HIDE_WARN_AT := 6.0
 ## 1780px, 전속력 5.6초**로 실측했다(#409). 3배 남짓 두어 길을 헤매도 닿게 한다 —
 ## 되돌릴 수 없는 실패라 인색하면 억울해진다.
 const GRACE_SECONDS := 20.0
+## 국어책을 아직 안 챙긴 런의 유예 (#477).
+##
+## **책 없이 3막에 들어오는 것이 정상 경로다** — 수위를 부르는 방아쇠가 둘인데
+## (#409) 그중 "단서 두 개 조사"는 책과 무관하다. 그런데 창문은 책을 요구하므로
+## 그 런은 캐비넷 → 책 → 창문을 다 돌아야 한다.
+##
+## 격자 BFS로 실측했다(`verify_floor_reach`의 격자, 전속력 320px/s):
+##
+## | 경로 | 거리 | 전속력 |
+## |---|---|---|
+## | 캐비넷 → 창문 (책 든 런) | 1800px | 5.62초 |
+## | 캐비넷 → 책 → 창문 (책 없는 런) | 2400px | 7.50초 |
+##
+## 20초가 5.62초의 3.6배이므로 같은 여유를 7.50초에 주면 27초다. 같은 20초를
+## 주면 더 먼 길을 같은 시간에 뛰어야 했다 — 되돌릴 수 없는 실패라 인색하면 억울해진다.
+const GRACE_SECONDS_NO_BOOK := 27.0
 const WARN_AT := 8.0
 
 ## 클로즈업 카메라. 문을 화면에 담되 조금 위를 본다 — 문에 정확히 맞추면
@@ -79,6 +95,10 @@ const ROW_UP := 3
 ## 숨을 자리와 그 표시. 1막에서 가리킨다.
 @export var cabinet_path: NodePath
 @export var cabinet_mark_path: NodePath
+## 국어책과 그 표시 (#477). 아직 안 챙긴 런에서 가리킨다 — 창문이 요구하는 물건이
+## 그것이고, 전에는 그 사실을 창문 앞에 서고 나서야 알 수 있었다.
+@export var book_path: NodePath
+@export var book_mark_path: NodePath
 ## 준비실 창문(`floor_link.gd`). 여기로 내려가기 시작하면 유예를 끊는다(#472).
 @export var escape_path: NodePath
 ## 수위 동선. 첫 점이 출발(문 밖), 마지막 점이 말하는 자리다. 생성기가 채운다.
@@ -122,11 +142,18 @@ func _on_escaped() -> void:
 	_hide_left = -1.0
 	_grace = -1.0
 	set_process(false)
-	_point_at_cabinet(false)
+	_clear_waypoint()
 
 
 func _on_investigated(_player: Node, name: String) -> void:
 	if _fired:
+		# 3막 도중에 국어책을 챙겼다 — 가리키던 표시를 걷는다 (#477).
+		# 남겨 두면 이미 가방에 있는 것을 계속 가리켜 "아직 덜 됐다"로 읽힌다.
+		if name == BACKSTOP_NODE and _grace > 0.0:
+			_seen[name] = true
+			_clear_waypoint()
+			_say(get_tree().get_first_node_in_group("game_state"), "이설",
+				"(챙겼어. 창문으로.)", "fear")
 		return
 	_seen[name] = true
 	if name == BACKSTOP_NODE or _clue_count() >= CLUES_TO_TRIGGER:
@@ -167,33 +194,65 @@ func _act1_warning() -> void:
 		door.set("message", door_after_message)
 
 	_say(gs, "이설", "(들어온다. 왼쪽 벽 캐비넷에 숨어야 해.)", "fear")
-	_pulse_mark()
-	_point_at_cabinet(true)
+	_pulse_mark(cabinet_mark_path)
+	_point_at(cabinet_path, "숨을 곳")
+
+	# 국어책을 아직 안 챙겼으면 **지금** 말한다 (#477). 나가는 유일한 길인 창문이
+	# 그 책을 요구하는데, 전에는 그 말을 창문 앞에 서고 나서야 들었다 — 그때는
+	# 3막 유예가 거의 다 돌아 있어 되돌릴 수 없었다.
+	#
+	# 화면 표시(`_point_at`)는 캐비넷이 쓴다 — 지금은 숨는 것이 먼저이고, 표시가
+	# 하나뿐이라 둘을 같이 가리키면 어디로 갈지가 흐려진다. 책은 월드 표시만 부풀린다.
+	if _missing_book():
+		_say(gs, "이설", "(국어책… 아직 책상 위야. 숨고 나서 챙기자.)", "fear")
+		_pulse_mark(book_mark_path)
 
 	_hide_left = HIDE_SECONDS
 	_hide_warned = false
 	set_process(true)
 
 
-## 숨을 곳을 **화면에** 가리킨다(#478). 월드 표시(`_pulse_mark`)만으로는
-## 부족하다 — 캐비넷이 화면 밖일 수 있고, 화면 안이어도 `WallFade` 마스크가
+## 월드의 한 곳을 **화면에** 가리킨다(#478). 월드 표시(`_pulse_mark`)만으로는
+## 부족하다 — 그 자리가 화면 밖일 수 있고, 화면 안이어도 `WallFade` 마스크가
 ## 389px 밖을 검게 칠해 어둠 속에서 부푼다.
-func _point_at_cabinet(on: bool) -> void:
+##
+## **표시는 하나뿐이다.** 1막은 숨을 곳, 3막은(책이 없으면) 국어책을 가리킨다 —
+## 둘을 같이 가리킬 수 없으니 그 순간에 가야 할 곳 하나만 가리킨다 (#477).
+func _point_at(target_path: NodePath, label: String) -> void:
 	var hud := get_tree().get_first_node_in_group("hud")
-	if hud == null:
+	var target := get_node_or_null(target_path) as Node2D
+	if hud == null or target == null or not hud.has_method("show_waypoint"):
 		return
-	if not on:
-		if hud.has_method("hide_waypoint"):
-			hud.call("hide_waypoint")
-		return
-	var cabinet := get_node_or_null(cabinet_path) as Node2D
-	if cabinet != null and hud.has_method("show_waypoint"):
-		hud.call("show_waypoint", cabinet.global_position, "숨을 곳")
+	hud.call("show_waypoint", target.global_position, label)
 
 
-## 캐비넷 표시를 한 번 부풀렸다 되돌린다. 문구만으로는 어두운 방에서 못 찾는다.
-func _pulse_mark() -> void:
-	var mark := get_node_or_null(cabinet_mark_path) as Node2D
+func _clear_waypoint() -> void:
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud != null and hud.has_method("hide_waypoint"):
+		hud.call("hide_waypoint")
+
+
+## 창문이 요구하는 물건을 아직 안 챙겼는가 (#477).
+##
+## **요구 조건을 여기 다시 적지 않고 창문 노드에서 읽는다** — 같은 값을 두 곳에
+## 적어 두면 한쪽만 고쳐져 안내와 실제 관문이 어긋난다. 관문이 없어지면(빈 문자열)
+## 아무 말도 하지 않는다.
+func _missing_book() -> bool:
+	var escape: Node = get_node_or_null(escape_path)
+	if escape == null:
+		return false
+	var need = escape.get("required_item_id")
+	if need == null or str(need).is_empty():
+		return false
+	var gs := get_tree().get_first_node_in_group("game_state")
+	if gs == null or not gs.has_method("has_item"):
+		return false
+	return not gs.call("has_item", str(need))
+
+
+## 표시 하나를 부풀렸다 되돌린다. 문구만으로는 어두운 방에서 못 찾는다.
+func _pulse_mark(mark_path: NodePath) -> void:
+	var mark := get_node_or_null(mark_path) as Node2D
 	if mark == null:
 		return
 	var base: Vector2 = mark.scale
@@ -217,7 +276,7 @@ func _tick_hide(delta: float) -> void:
 	if player != null and player.get("is_hiding") == true:
 		_hide_left = -1.0
 		set_process(false)
-		_point_at_cabinet(false)
+		_clear_waypoint()
 		_act2_confession()
 		return
 
@@ -230,7 +289,7 @@ func _tick_hide(delta: float) -> void:
 	if _hide_left <= 0.0:
 		_hide_left = -1.0
 		set_process(false)
-		_point_at_cabinet(false)
+		_clear_waypoint()
 		_caught("…거기 누구야.")
 
 
@@ -337,6 +396,13 @@ func _face(jan: Node2D, row: int) -> void:
 func _act3_grace(gs) -> void:
 	_say(gs, "이설", "(지금밖에 없어.)", "fear")
 	_grace = GRACE_SECONDS
+	# 책이 없으면 **다시** 알린다 (#477). 1막에서 한 번 말했지만 그 사이에
+	# 자백 28초가 지나갔고, 그동안 플레이어는 캐비넷에 갇혀 아무것도 못 했다.
+	# 여기서는 표시도 책으로 옮긴다 — 숨을 곳은 이미 다 쓴 안내다.
+	if _missing_book():
+		_grace = GRACE_SECONDS_NO_BOOK
+		_say(gs, "이설", "(국어책부터. 그거 가지러 온 거야.)", "fear")
+		_point_at(book_path, "국어책")
 	_warned = false
 	set_process(true)
 
@@ -351,6 +417,7 @@ func _tick_grace(delta: float) -> void:
 	if _grace <= 0.0:
 		_grace = -1.0
 		set_process(false)
+		_clear_waypoint()
 		_caught("…아직 여기 있었네.")
 
 
