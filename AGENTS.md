@@ -17,6 +17,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate→art_room→cabinet
 
 ### 구조 요약
 
+- **1층은 현관 로비 층이다**(#498). 캔버스가 다른 층(3400×2500)보다 낮은 **3400×1500**이고(북쪽 봉인 공백을 없앴다), 교실은 1칸뿐이다. 상단 방 띠 → 복도 180px → 하단 방 띠(계단실 왼쪽 · **현관 로비 가운데** · 수위실 · 창고). **로비는 복도가 아니라 방**이라 집기가 놓인다. **1층만 밝다** — `floor_manager`의 `FLOOR_DARKNESS`/`FLOOR_FADE_SCALE`이 어둠 `(0.16,0.16,0.20)`·마스크 2.6을 주고, 밝음의 출처는 정문 안쪽 `EntranceLight`와 항상 켜 두는 로비 광원(`room_lights.gd`의 `always_on`)이다. 1층 좌표를 고치면 `STAIRS[1]`·`FLOOR_BOUNDS[1]`·검사기 셋의 도착 지점을 같이 고친다.
 - `scenes/main/main.tscn` = 조립 씬: Darkness(CanvasModulate 어둠), Background(층 씬 인스턴스), Player, GameState, HUD, UI(FloorLabel·FadeRect). 루트 스크립트 `scripts/game/floor_manager.gd`가 층 전환·시작 힌트·페이드 담당.
 - 층 씬 `scenes/background/school_floor_1~5.tscn`: 2800×1800, 공통 뼈대(상단 교실 8칸). 계단실 2곳은 전 층 동일 좌표 — 좌상단 (120,720)~(560,1000), 중앙 하단 (1180,1400)~(1560,1680).
 - 벽 규약: 두께 16px, 방 문 폭 110px(가로 중앙, 방 중심 y<900이면 아래변/아니면 위변). 벽은 충돌(WC_*)+시각(WV_*)+광원 차단(Occ_/LO_*) 3종 세트 — 벽 수정 시 셋 다 갱신. 생성 도구는 `tools/`(재실행 경고는 각 스크립트 주석 참조).
