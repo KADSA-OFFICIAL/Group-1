@@ -64,6 +64,8 @@ theme_override_colors/font_color = Color(0.45, 0.45, 0.5, 1)
 theme_override_font_sizes/font_size = 14
 text = "다시 시작하면 4층부터입니다. 모은 물건은 남지 않습니다."
 horizontal_alignment = 1
+; 체크포인트 안내가 길어질 수 있다(#576) — 접히지 않으면 화면 밖으로 나간다.
+autowrap_mode = 2
 
 [node name="Buttons" type="HBoxContainer" parent="Layout"]
 layout_mode = 2
