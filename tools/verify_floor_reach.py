@@ -185,9 +185,11 @@ def main():
         sizes[fl] = (w, h)
         blocked, cols, rows = build_grid(walls, w, h)
         # 시작: 북쪽 복도 한가운데(1층은 상단 복도)
-        # 시드는 그 층에서 확실히 걸을 수 있는 자리 — 1층은 아래쪽 절반만
+        # 시드는 그 층에서 확실히 걸을 수 있는 자리. 1층 시드는 복도(홀) 안이다 —
+        # 방 띠가 1800까지 내려왔으므로(#479) 1700은 교실 안이라 집기에 걸린다.
+        # 1층은 아래쪽 절반만
         # 건물이고, 4층은 도입부라 캔버스 자체가 작다(#405).
-        start = {1: (200, 1700), 4: INTRO_START}.get(fl, (200, 700))
+        start = {1: (200, 1950), 4: INTRO_START}.get(fl, (200, 700))
         seen = flood(blocked, cols, rows, start)
         print(f"floor{fl}: 벽 {len(walls)}개, 도달 셀 {len(seen)}/{cols*rows}")
 
