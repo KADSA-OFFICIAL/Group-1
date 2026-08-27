@@ -398,7 +398,10 @@ script = ExtResource("11_floorlink")
 required_item_id = "korean_book"
 locked_message = "창문은 열린다. 그런데 국어책도 없이 이러려고 온 게 아니다."
 prompt_text = "창문으로 내려가기"
-message = "창틀을 넘어 난간에 발을 디뎠다. 아래층 창문까지 두 걸음."
+cutscene_speaker = "이설"
+cutscene_lines = PackedStringArray("창틀에 손을 얹었다. 밤공기가 차다.", "…4층이야. 아래를 보면 안 돼.", "(난간이 있어. 한 뼘이지만 있어.)", "한쪽 발을 내렸다. 신발 밑창이 미끄러진다.", "3층 창문. 두 걸음.", "…수위 아저씨가 열쇠를 가지러 간 사이에.")
+cutscene_emotions = PackedStringArray("", "fear", "fear", "fear", "", "suspicion")
+cutscene_look_at = Vector2(1465, 46)
 target_floor = 3
 arrive_at = Vector2(150, 100)
 
