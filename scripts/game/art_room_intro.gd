@@ -76,6 +76,8 @@ const ROW_UP := 3
 ## 숨을 자리와 그 표시. 1막에서 가리킨다.
 @export var cabinet_path: NodePath
 @export var cabinet_mark_path: NodePath
+## 준비실 창문(`floor_link.gd`). 여기로 내려가기 시작하면 유예를 끊는다(#472).
+@export var escape_path: NodePath
 ## 수위 동선. 첫 점이 출발(문 밖), 마지막 점이 말하는 자리다. 생성기가 채운다.
 @export var janitor_walk: PackedVector2Array = PackedVector2Array()
 
@@ -99,6 +101,24 @@ func _ready() -> void:
 		var node: Node = root.get_node_or_null(name)
 		if node != null and node.has_signal("interacted"):
 			node.interacted.connect(_on_investigated.bind(name))
+
+	var escape: Node = get_node_or_null(escape_path)
+	if escape != null and escape.has_signal("travel_started"):
+		escape.travel_started.connect(_on_escaped)
+
+
+## 창문으로 내려가기 시작했다 — 유예를 끊는다.
+##
+## **씬이 해제되기를 기다리면 안 된다.** #468에서 창문에 컷신이 붙은 뒤로는
+## `floor_link.gd`가 `travel_to()` 전에 컷신(약 18초)을 끝까지 기다리고, 그동안
+## 4층 씬은 살아 있어 여기 `_process`가 계속 돈다 — 유예(20초)가 컷신 도중에
+## 다 돌아 **창문에 제때 닿아도 게임 오버가 났다**(#472).
+##
+## 1막(숨을 유예)도 함께 끊는다. 숨기 전에 창문으로 나가는 것도 나간 것이다.
+func _on_escaped() -> void:
+	_hide_left = -1.0
+	_grace = -1.0
+	set_process(false)
 
 
 func _on_investigated(_player: Node, name: String) -> void:
