@@ -76,6 +76,7 @@ func request_speech(speaker: String, message: String, emotion: String = "") -> v
 	speech_requested.emit(speaker, message, emotion)
 
 
+
 ## 런이 실패로 끝났음을 알린다(붙잡힘 등). 접촉 판정은 매 프레임 들어오므로
 ## _is_finished로 첫 호출만 통과시킨다 — 호출자가 따로 가드할 필요가 없다.
 func trigger_game_over(reason: String = "") -> void:

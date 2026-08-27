@@ -3,6 +3,8 @@ extends CanvasLayer
 ## 자막이 다 찍힌 뒤 더 남겨 두는 시간(초). 실제 표시 시간은 타이핑 시간 + 이 값이라,
 ## 긴 조사 서술도 끝까지 읽을 수 있다(#193).
 @export var notice_seconds: float = 3.0
+## 뒤에 대기 중인 줄이 있을 때 주는 짧은 읽는 시간(초).
+@export var queued_notice_seconds: float = 1.4
 
 ## 인벤토리 슬롯에 조작 키를 덧붙일 아이템(#169).
 const USABLE_ITEM_KEYS := {
@@ -26,7 +28,11 @@ const USABLE_ITEM_KEYS := {
 	$Root/InventoryPanel/Margin/Rows/Slots/Slot5/ItemLabel,
 ]
 
-var notice_token: int = 0
+## 자막 대기열(#454). 대기열이 없으면 연달아 오는 대사가 서로를 **덮는다** —
+## 이설이 2층 머리를 보고 말하는 도중 수위 혼잣말이 끼어들자 그 줄이 통째로
+## 사라졌다. 온 순서대로 한 줄씩, 앞 줄이 끝난 뒤에 보여 준다.
+var _speech_queue: Array[Array] = []
+var _draining: bool = false
 var current_items: Array[String] = []
 var max_items: int = 5
 
@@ -119,17 +125,25 @@ func await_subtitle() -> void:
 
 
 func _show_subtitle(speaker: String, text: String, emotion: String) -> void:
-	notice_token += 1
-	var current_token := notice_token
+	_speech_queue.append([speaker, text, emotion])
+	if _draining:
+		return
 
-	subtitle.show_line(speaker, text, emotion)
+	_draining = true
+	while not _speech_queue.is_empty() and is_instance_valid(subtitle):
+		var line: Array = _speech_queue.pop_front()
+		subtitle.show_line(line[0], line[1], line[2])
 
-	# 컷신과 달리 본편에는 넘기는 입력이 없다 — 다 찍힐 때까지 기다린 뒤 읽는 시간을 준다.
-	await get_tree().create_timer(subtitle.last_typing_seconds + notice_seconds).timeout
+		# 컷신과 달리 본편에는 넘기는 입력이 없다 — 다 찍힐 때까지 기다린 뒤
+		# 읽는 시간을 준다. 뒤에 줄이 더 있으면 짧게 준다: 한 사람이 이어서
+		# 말하는데 매 줄 3초씩 쉬면 대화가 아니라 안내문이 된다.
+		var hold := notice_seconds if _speech_queue.is_empty() else queued_notice_seconds
+		await get_tree().create_timer(subtitle.last_typing_seconds + hold).timeout
 
 	# 기다리는 사이 씬이 바뀌었을 수 있다(체포·탈출).
-	if current_token == notice_token and is_instance_valid(subtitle):
+	if is_instance_valid(subtitle):
 		subtitle.clear()
+	_draining = false
 
 
 func _get_item_display_name(item_id: String) -> String:
