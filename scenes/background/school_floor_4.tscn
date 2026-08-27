@@ -1,4 +1,4 @@
-[gd_scene load_steps=40 format=3]
+[gd_scene load_steps=44 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 [ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="5_hiding"]
@@ -7,12 +7,16 @@
 [ext_resource type="Script" path="res://scripts/interactions/floor_link.gd" id="11_floorlink"]
 [ext_resource type="Script" path="res://scripts/game/art_room_intro.gd" id="12_artintro"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_cement.png" id="tex_floor_cement"]
+[ext_resource type="Texture2D" path="res://assets/tiles/floor_matte.png" id="tex_floor_matte"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_wood.png" id="tex_floor_wood"]
+[ext_resource type="Texture2D" path="res://assets/tiles/obj_bin.png" id="tex_obj_bin"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_bust.png" id="tex_obj_bust"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_canvas.png" id="tex_obj_canvas"]
+[ext_resource type="Texture2D" path="res://assets/tiles/obj_chair.png" id="tex_obj_chair"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_desk.png" id="tex_obj_desk"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_easel.png" id="tex_obj_easel"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_locker.png" id="tex_obj_locker"]
+[ext_resource type="Texture2D" path="res://assets/tiles/obj_rack.png" id="tex_obj_rack"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_shelf.png" id="tex_obj_shelf"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_sink.png" id="tex_obj_sink"]
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_cloth.png" id="tex_prop_cloth"]
@@ -425,6 +429,36 @@ prompt_text = "창밖 보기"
 [node name="Window_ArtRoomZone" type="CollisionShape2D" parent="Window_ArtRoom"]
 shape = SubResource("RectangleShape2D_window_zone")
 
+[node name="PD_FloorSplat_Work0" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_floor_matte")
+color = Color(0.2564, 0.359, 0.4872, 1)
+polygon = PackedVector2Array(190, 674, 250, 674, 250, 698, 190, 698)
+
+[node name="PD_FloorSplat_Work1" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_floor_matte")
+color = Color(0.4872, 0.2308, 0.2308, 1)
+polygon = PackedVector2Array(280, 784, 330, 784, 330, 808, 280, 808)
+
+[node name="PD_FloorSplat_Sink" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_floor_matte")
+color = Color(0.4615, 0.4103, 0.2051, 1)
+polygon = PackedVector2Array(830, 768, 880, 768, 880, 792, 830, 792)
+
+[node name="PD_FloorSplat_Easel0" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_floor_matte")
+color = Color(0.4872, 0.2308, 0.2308, 1)
+polygon = PackedVector2Array(360, 280, 405, 280, 405, 304, 360, 304)
+
+[node name="PD_FloorSplat_Easel1" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_floor_matte")
+color = Color(0.2564, 0.359, 0.4872, 1)
+polygon = PackedVector2Array(660, 280, 705, 280, 705, 304, 660, 304)
+
+[node name="PD_FloorStain_Still" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_floor_matte")
+color = Color(0.141, 0.1282, 0.1154, 1)
+polygon = PackedVector2Array(510, 346, 600, 346, 600, 368, 510, 368)
+
 [node name="PC_StillTable" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(470, 250, 660, 250, 660, 340, 470, 340)
 
@@ -445,6 +479,17 @@ texture = ExtResource("tex_obj_bust")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8595, 0.8333, 0.7812, 1)
 polygon = PackedVector2Array(536, 268, 594, 268, 594, 318, 536, 318)
+
+[node name="PT_StillVase" type="Polygon2D" parent="Props"]
+z_index = 1
+texture = ExtResource("tex_prop_metal")
+color = Color(0.6154, 0.641, 0.6923, 1)
+polygon = PackedVector2Array(604, 274, 634, 274, 634, 314, 604, 314)
+
+[node name="PT_StillFruit" type="Polygon2D" parent="Props"]
+z_index = 1
+color = Color(0.60, 0.30, 0.28, 1)
+polygon = PackedVector2Array(496, 280, 526, 280, 526, 310, 496, 310)
 
 [node name="PC_Easel0" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(300, 210, 354, 210, 354, 276, 300, 276)
@@ -491,6 +536,51 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.4806, 0.3794, 0.2655, 1)
 polygon = PackedVector2Array(520, 120, 574, 120, 574, 186, 520, 186)
 
+[node name="PC_ArtStool0" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(250, 370, 282, 370, 282, 402, 250, 402)
+
+[node name="PV_ArtStool0" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_chair")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.2973, 0.2432, 0.1892, 1)
+polygon = PackedVector2Array(250, 370, 282, 370, 282, 402, 250, 402)
+
+[node name="PC_ArtStool1" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(784, 220, 816, 220, 816, 252, 784, 252)
+
+[node name="PV_ArtStool1" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_chair")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.2844, 0.2326, 0.1809, 1)
+polygon = PackedVector2Array(784, 220, 816, 220, 816, 252, 784, 252)
+
+[node name="PC_ArtStool2" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(784, 370, 816, 370, 816, 402, 784, 402)
+
+[node name="PV_ArtStool2" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_chair")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.2714, 0.222, 0.1727, 1)
+polygon = PackedVector2Array(784, 370, 816, 370, 816, 402, 784, 402)
+
+[node name="PC_ArtStool3" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(390, 615, 422, 615, 422, 647, 390, 647)
+
+[node name="PV_ArtStool3" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_chair")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.2923, 0.2391, 0.186, 1)
+polygon = PackedVector2Array(390, 615, 422, 615, 422, 647, 390, 647)
+
+[node name="PC_ArtStool4" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(390, 725, 422, 725, 422, 757, 390, 757)
+
+[node name="PV_ArtStool4" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_chair")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.2793, 0.2285, 0.1777, 1)
+polygon = PackedVector2Array(390, 725, 422, 725, 422, 757, 390, 757)
+
 [node name="PC_BustShelf0" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(110, 42, 170, 42, 170, 90, 110, 90)
 
@@ -518,6 +608,22 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.8761, 0.8494, 0.7963, 1)
 polygon = PackedVector2Array(302, 42, 362, 42, 362, 90, 302, 90)
 
+[node name="PC_ClayStand" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(110, 150, 160, 150, 160, 200, 110, 200)
+
+[node name="PV_ClayStand" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_desk")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.3893, 0.3115, 0.3374, 1)
+polygon = PackedVector2Array(110, 150, 160, 150, 160, 200, 110, 200)
+
+[node name="PT_ClayBust" type="Polygon2D" parent="Props"]
+z_index = 1
+texture = ExtResource("tex_obj_bust")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.8387, 0.8133, 0.7624, 1)
+polygon = PackedVector2Array(120, 158, 150, 158, 150, 192, 120, 192)
+
 [node name="PC_CanvasRack0" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(900, 150, 1096, 150, 1096, 206, 900, 206)
 
@@ -536,6 +642,15 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.7071, 0.6705, 0.5974, 1)
 polygon = PackedVector2Array(900, 220, 1096, 220, 1096, 276, 900, 276)
 
+[node name="PC_DryingRack" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(900, 310, 960, 310, 960, 380, 900, 380)
+
+[node name="PV_DryingRack" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_rack")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.2324, 0.2446, 0.2813, 1)
+polygon = PackedVector2Array(900, 310, 960, 310, 960, 380, 900, 380)
+
 [node name="PC_PaintBox" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1036, 300, 1096, 300, 1096, 440, 1036, 440)
 
@@ -553,6 +668,26 @@ texture = ExtResource("tex_obj_sink")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.4018, 0.442, 0.4688, 1)
 polygon = PackedVector2Array(900, 700, 1096, 700, 1096, 764, 900, 764)
+
+[node name="PC_ArtBucket" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(850, 715, 882, 715, 882, 747, 850, 747)
+
+[node name="PV_ArtBucket" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_bin")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.2787, 0.4053, 0.3799, 1)
+polygon = PackedVector2Array(850, 715, 882, 715, 882, 747, 850, 747)
+
+[node name="PT_SinkSoap" type="Polygon2D" parent="Props"]
+z_index = 1
+color = Color(0.35, 0.38, 0.42, 1)
+polygon = PackedVector2Array(920, 706, 950, 706, 950, 726, 920, 726)
+
+[node name="PT_SinkBasin" type="Polygon2D" parent="Props"]
+z_index = 1
+texture = ExtResource("tex_prop_metal")
+color = Color(0.3077, 0.3846, 0.4359, 1)
+polygon = PackedVector2Array(970, 712, 1070, 712, 1070, 752, 970, 752)
 
 [node name="PC_WorkTop0" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(110, 600, 380, 600, 380, 670, 110, 670)
@@ -659,6 +794,17 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.7067, 0.6702, 0.5971, 1)
 polygon = PackedVector2Array(1030, 852, 1114, 852, 1114, 864, 1030, 864)
 
+[node name="WD_ExhibitionNotice" type="Polygon2D" parent="Structures"]
+z_index = 1
+texture = ExtResource("tex_prop_glass")
+color = Color(0.641, 0.6667, 0.6538, 1)
+polygon = PackedVector2Array(420, 36, 490, 36, 490, 46, 420, 46)
+
+[node name="PD_ColorMixingChart" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_cloth")
+color = Color(0.7051, 0.6923, 0.641, 1)
+polygon = PackedVector2Array(36, 720, 44, 720, 44, 780, 36, 780)
+
 [node name="PD_ArtBoard" type="Polygon2D" parent="Props"]
 color = Color(0.13, 0.19, 0.16, 1)
 polygon = PackedVector2Array(36, 530, 46, 530, 46, 700, 36, 700)
@@ -699,6 +845,17 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3851, 0.3055, 0.2257, 1)
 polygon = PackedVector2Array(1200, 620, 1420, 620, 1420, 672, 1200, 672)
 
+[node name="PT_PrepTools" type="Polygon2D" parent="Props"]
+z_index = 1
+color = Color(0.52, 0.42, 0.30, 1)
+polygon = PackedVector2Array(1220, 630, 1260, 630, 1260, 660, 1220, 660)
+
+[node name="PT_PrepNotes" type="Polygon2D" parent="Props"]
+z_index = 1
+texture = ExtResource("tex_prop_cloth")
+color = Color(0.7051, 0.6923, 0.641, 1)
+polygon = PackedVector2Array(1360, 630, 1400, 630, 1400, 662, 1360, 662)
+
 [node name="PC_PrepBust" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1200, 190, 1272, 190, 1272, 250, 1200, 250)
 
@@ -726,10 +883,48 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.4515, 0.3718, 0.5046, 1)
 polygon = PackedVector2Array(1200, 350, 1290, 350, 1290, 410, 1200, 410)
 
+[node name="PC_SupplyBox0" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1320, 190, 1370, 190, 1370, 240, 1320, 240)
+
+[node name="PV_SupplyBox0" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_shelf")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.2917, 0.2536, 0.2028, 1)
+polygon = PackedVector2Array(1320, 190, 1370, 190, 1370, 240, 1320, 240)
+
+[node name="PC_SupplyBox1" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1320, 250, 1370, 250, 1370, 300, 1320, 300)
+
+[node name="PV_SupplyBox1" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_shelf")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.2781, 0.2418, 0.1934, 1)
+polygon = PackedVector2Array(1320, 250, 1370, 250, 1370, 300, 1320, 300)
+
+[node name="PC_PaperBin" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1200, 430, 1240, 430, 1240, 470, 1200, 470)
+
+[node name="PV_PaperBin" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_bin")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.205, 0.2291, 0.2532, 1)
+polygon = PackedVector2Array(1200, 430, 1240, 430, 1240, 470, 1200, 470)
+
+[node name="PT_RollPaper" type="Polygon2D" parent="Props"]
+z_index = 1
+texture = ExtResource("tex_prop_cloth")
+color = Color(0.7051, 0.6923, 0.641, 1)
+polygon = PackedVector2Array(1208, 436, 1232, 436, 1232, 464, 1208, 464)
+
 [node name="PD_DateWallMark" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.7051, 0.6923, 0.641, 1)
 polygon = PackedVector2Array(1330, 854, 1600, 854, 1600, 864, 1330, 864)
+
+[node name="WD_ApronHanger" type="Polygon2D" parent="Structures"]
+z_index = 1
+color = Color(0.35, 0.38, 0.42, 1)
+polygon = PackedVector2Array(1500, 856, 1580, 856, 1580, 864, 1500, 864)
 
 [node name="HideArtCabinet" type="Area2D" parent="."]
 position = Vector2(76, 450)
@@ -916,6 +1111,15 @@ book_mark_path = NodePath("../WallGlow/Marks/Mark_KoreanBook")
 escape_path = NodePath("../PrepWindowEscape")
 janitor_walk = PackedVector2Array(570, 920, 570, 800, 430, 700, 200, 500)
 
+[node name="PT_ArtStool2_bag0" type="Polygon2D" parent="Props"]
+color = Color(0.30, 0.26, 0.32, 1)
+polygon = PackedVector2Array(787, 373, 808.1, 373, 808.1, 385.8, 787, 385.8)
+
+[node name="PT_DryingRack_tag0" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_cloth")
+color = Color(0.7051, 0.6923, 0.641, 1)
+polygon = PackedVector2Array(914.4, 313, 945.6, 313, 945.6, 320, 914.4, 320)
+
 [node name="PT_BookDesk_note0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.7051, 0.6923, 0.641, 1)
@@ -935,14 +1139,19 @@ texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4359, 0.3077, 1)
 polygon = PackedVector2Array(1723, 426, 1745, 426, 1745, 459.6, 1723, 459.6)
 
-[node name="PT_PrepTable_cup0" type="Polygon2D" parent="Props"]
-color = Color(0.66, 0.65, 0.60, 1)
-polygon = PackedVector2Array(1384, 626, 1417, 626, 1417, 636.4, 1384, 636.4)
-
 [node name="PT_PrepTable_bottle1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
 color = Color(0.3077, 0.3846, 0.4359, 1)
 polygon = PackedVector2Array(1295.7, 626, 1324.3, 626, 1324.3, 639.5, 1295.7, 639.5)
+
+[node name="PT_SupplyBox0_kit0" type="Polygon2D" parent="Props"]
+color = Color(0.44, 0.32, 0.22, 1)
+polygon = PackedVector2Array(1337.5, 193, 1352.5, 193, 1352.5, 205, 1337.5, 205)
+
+[node name="PT_SupplyBox1_files0" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_prop_cloth")
+color = Color(0.7051, 0.6923, 0.641, 1)
+polygon = PackedVector2Array(1335, 256, 1367, 256, 1367, 265, 1335, 265)
 
 [node name="Exam_ArtSink" type="Area2D" parent="."]
 position = Vector2(998, 732)
@@ -958,6 +1167,312 @@ shape = SubResource("RectangleShape2D_exam_zone")
 
 [node name="Mark_Exam_ArtSink" type="Polygon2D" parent="WallGlow/Marks"]
 position = Vector2(998, 732)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_BustShelf0" type="Area2D" parent="."]
+position = Vector2(140, 66)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "흰 석고 표면에 연필로 그려진 낙서가 희미하게 남아 있다."
+prompt_text = "석고상 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_BustShelf0"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_BustShelf0" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(140, 66)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_BustShelf1" type="Area2D" parent="."]
+position = Vector2(236, 66)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "석고상의 코와 귀가 닳아 있다. 소묘 수업 때 수없이 만진 흔적이다."
+prompt_text = "석고상 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_BustShelf1"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_BustShelf1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(236, 66)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_BustShelf2" type="Area2D" parent="."]
+position = Vector2(332, 66)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "석고상의 코와 귀가 닳아 있다. 소묘 수업 때 수없이 만진 흔적이다."
+prompt_text = "석고상 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_BustShelf2"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_BustShelf2" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(332, 66)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_CanvasRack0" type="Area2D" parent="."]
+position = Vector2(998, 178)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "캔버스들이 빼곡히 꽂혀 있다. 젯소와 유화 냄새가 난다."
+prompt_text = "캔버스 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_CanvasRack0"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_CanvasRack0" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(998, 178)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_CanvasRack1" type="Area2D" parent="."]
+position = Vector2(998, 248)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "캔버스들이 빼곡히 꽂혀 있다. 젯소와 유화 냄새가 난다."
+prompt_text = "캔버스 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_CanvasRack1"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_CanvasRack1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(998, 248)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_ClayStand" type="Area2D" parent="."]
+position = Vector2(135, 175)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "천이 덮인 정물대 위에 석고상과 화병이 놓여 있다. 미술 수업 때 소묘하던 대상들이다."
+prompt_text = "정물대 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_ClayStand"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_ClayStand" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(135, 175)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_DryingRack" type="Area2D" parent="."]
+position = Vector2(930, 345)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "표시등이 하나만 깜빡인다. 나머지는 꺼져 있다."
+prompt_text = "서버랙 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_DryingRack"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_DryingRack" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(930, 345)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Easel0" type="Area2D" parent="."]
+position = Vector2(327, 243)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "이젤에 미완성된 스케치가 걸려 있다. 목탄 가루가 날린다."
+prompt_text = "이젤 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Easel0"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Easel0" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(327, 243)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Easel1" type="Area2D" parent="."]
+position = Vector2(327, 393)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "이젤에 미완성된 스케치가 걸려 있다. 목탄 가루가 날린다."
+prompt_text = "이젤 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Easel1"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Easel1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(327, 393)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Easel2" type="Area2D" parent="."]
+position = Vector2(747, 243)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "수채화 물감이 마른 채 굳어 있다. 붓 자국이 거칠다."
+prompt_text = "이젤 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Easel2"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Easel2" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(747, 243)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Easel3" type="Area2D" parent="."]
+position = Vector2(747, 393)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "수채화 물감이 마른 채 굳어 있다. 붓 자국이 거칠다."
+prompt_text = "이젤 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Easel3"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Easel3" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(747, 393)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Easel4" type="Area2D" parent="."]
+position = Vector2(547, 153)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "수채화 물감이 마른 채 굳어 있다. 붓 자국이 거칠다."
+prompt_text = "이젤 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Easel4"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Easel4" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(547, 153)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_PaintBox" type="Area2D" parent="."]
+position = Vector2(1066, 370)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "물감장 서랍이 반쯤 열려 있다. 유채 물감 튜브가 색깔별로 꽂혀 있다."
+prompt_text = "물감장 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_PaintBox"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_PaintBox" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1066, 370)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_PaperBin" type="Area2D" parent="."]
+position = Vector2(1220, 450)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "안이 비어 있다. 봉투도 새것이다."
+prompt_text = "쓰레기통 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_PaperBin"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_PaperBin" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1220, 450)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_PrepBust" type="Area2D" parent="."]
+position = Vector2(1236, 220)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "흰 석고 표면에 연필로 그려진 낙서가 희미하게 남아 있다."
+prompt_text = "석고상 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_PrepBust"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_PrepBust" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1236, 220)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_PrepCanvas" type="Area2D" parent="."]
+position = Vector2(1245, 300)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "캔버스들이 빼곡히 꽂혀 있다. 젯소와 유화 냄새가 난다."
+prompt_text = "캔버스 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_PrepCanvas"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_PrepCanvas" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1245, 300)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_PrepPaint" type="Area2D" parent="."]
+position = Vector2(1245, 380)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "물감장 서랍이 반쯤 열려 있다. 유채 물감 튜브가 색깔별로 꽂혀 있다."
+prompt_text = "물감장 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_PrepPaint"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_PrepPaint" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1245, 380)
 z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
@@ -1012,6 +1527,60 @@ shape = SubResource("RectangleShape2D_exam_zone")
 
 [node name="Mark_Exam_PrepShelf2" type="Polygon2D" parent="WallGlow/Marks"]
 position = Vector2(1742, 480)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_StillTable" type="Area2D" parent="."]
+position = Vector2(565, 295)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "천이 덮인 정물대 위에 석고상과 화병이 놓여 있다. 미술 수업 때 소묘하던 대상들이다."
+prompt_text = "정물대 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_StillTable"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_StillTable" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(565, 295)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_SupplyBox0" type="Area2D" parent="."]
+position = Vector2(1345, 215)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "먼지가 고르게 앉았다. 한참 아무도 안 건드렸다."
+prompt_text = "선반 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_SupplyBox0"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_SupplyBox0" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1345, 215)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_SupplyBox1" type="Area2D" parent="."]
+position = Vector2(1345, 275)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "먼지가 고르게 앉았다. 한참 아무도 안 건드렸다."
+prompt_text = "선반 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_SupplyBox1"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_SupplyBox1" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1345, 275)
 z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
