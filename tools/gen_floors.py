@@ -498,11 +498,9 @@ FLOOR1 = {
         # 상단 띠 — **교실은 한 칸뿐이다**(#498). 실제 학교 1층이 행정·현관 층이고,
         # 교실 3칸은 "다른 층의 축소판"이라는 성격을 만들던 자리였다.
         ("Class1", "교실1", 20, F1_TOP_Y0, 700, F1_TOP_Y1, "bottom"),
-        # 두 번째 탈출 루트(#393). 아래변 문이 복도로 열리고, 북쪽 벽에는
-        # 바깥으로 나가는 문(Door_YardGate + YardGateDoor)이 따로 붙는다.
-        # 이 방은 교실이 아니라 **건물을 관통하는 통로**다.
-        ("YardExit", "운동장 출입구", 730, F1_TOP_Y0, 1350, F1_TOP_Y1, "bottom"),
-        ("Storage1", "창고", 1380, F1_TOP_Y0, 1900, F1_TOP_Y1, "bottom"),
+        # 운동장 출입구(#393)는 #513에서 폐지 — 탈출 루트를 현관 하나로 통일.
+        # 이전 YardExit(730~1350) + Storage1(1380~1900) 구간을 창고 하나로 채운다.
+        ("Storage1", "창고", 730, F1_TOP_Y0, 1900, F1_TOP_Y1, "bottom"),
         # 하단 띠 — 계단실(좌) · 화장실 둘 · **현관 로비(가운데)** · 수위실 · 창고.
         # 로비를 가운데 둔 것이 이 도면의 알맹이다: 계단이 왼쪽이라 내려오면
         # 복도를 따라 걷는 방향 정면 아래에 로비가 있고, 그 빛이 문 틈으로 샌다.
@@ -1010,6 +1008,7 @@ SCRIPTS = {
     "2_pickup": "res://scripts/interactions/pickup_item.gd",
     "3_interactable": "res://scripts/interactions/interactable.gd",
     "4_exit": "res://scripts/interactions/exit_door.gd",
+    "4_front_gate": "res://scripts/interactions/front_gate.gd",  # #513 자동 트리거
     "5_hiding": "res://scripts/interactions/hiding_spot.gd",
     "6_sliding": "res://scripts/interactions/sliding_door.gd",
     "7_roomlights": "res://scripts/game/room_lights.gd",
@@ -1087,8 +1086,7 @@ PLACEMENT = {
         # story_objects.json의 StairKey 항목은 남겨 둔다(4층 #219와 같은 처리,
         # 되돌리기 쉽게). 창고(← 행정실)는 그래서 단서 없는 방이 됐다.
         ("Entrance", ["ExitDoor"]),
-        # 두 번째 탈출 루트(#393). 열쇠를 묻지 않는다.
-        ("YardExit", ["YardGateDoor"]),
+        # YardExit + YardGateDoor 폐지(#513)
         ],
 }
 # 영구 봉인 계단(열쇠로도 열리지 않음). 2층 하단 중앙 계단은 그 아래가 1층
@@ -1116,11 +1114,7 @@ POS_OVERRIDE = {
     # 현관 로비 남쪽 외벽 앞(#498). 정문 그림(`Door_FrontGate`)이 y 1464~1480에
     # 그려지므로 그 48px 안쪽이다 — 안내와 실제 위치가 맞아야 한다.
     (1, "ExitDoor"): (1850, F1_BOT_Y1 - 48),
-    # 운동장 출입구 바깥문(#393)은 현관과 대칭으로 방 위변 벽 안쪽에 둔다
-    # (벽 안쪽 면 1036에서 32px 안). 방 한가운데 두면 "문을 연다"와 자리가
-    # 어긋나고, 복도 문과 바깥문이 한 점에 겹쳐 보인다.
-    # 운동장 출입구 북쪽 외벽 앞(#498). 상단 띠로 올라갔다.
-    (1, "YardGateDoor"): (1040, F1_TOP_Y0 + 48),
+    # YardGateDoor 폐지(#513)
     # 4층 창의체험부(750,1520)~(1640,1940) — 자동 배치는 방 한가운데라 대사와 어긋났다(#215).
     # 액자는 "벽에 걸린" 것이므로 아래쪽 벽 안쪽에 붙이고,
     # 상담기록부는 아래에 깐 책상 위(FURNITURE의 DeskCreativeDept)에 올린다.
@@ -3376,14 +3370,7 @@ def build_floor1():
         f"texture_scale = {ENTRANCE_LIGHT_SCALE}",
         ""]))
 
-    # 운동장 출입구 바깥문(#393) — 방 위변(건물 바깥쪽)에 보이는 문.
-    # 아래변 복도 문은 add_room이 내고, 이건 그 반대쪽 벽에 얹는 시각이다.
-    # 현관 정문과 같이 **벽은 뚫지 않는다** — 문 너머는 층 전환으로만 간다.
-    _yard = f1_room("YardExit")
-    yx0, yy0, yx1 = _yard[2], F1_TOP_Y0, _yard[4]
-    ycx = (yx0 + yx1) / 2
-    sc.poly2d("Door_YardGate", "WallGlow/Doors", C_DOOR,
-              rect(ycx - DOOR / 2, yy0, ycx + DOOR / 2, yy0 + T), z=1)
+    # Door_YardGate 폐지(#513) — 탈출 루트를 현관 하나로 통일
     add_furniture(sc, 1)
     add_story(sc, 1)
     add_hiding(sc, 1)
@@ -3447,12 +3434,8 @@ YARD_FENCE = 1600            # 담장 y (그 아래는 인도)
 # 그래도 트여 있어서 처음부터 보인다 — 헤맬 일은 없다(0층은 시야가 넓다).
 YARD_GATE_X0, YARD_GATE_X1 = 2260, 2540   # 정문 틈
 YARD_PORCH = (1560, 1840)    # 현관 틈
-# 운동장 출입구 옆문(#393) — 1층을 관통하는 통로가 나오는 두 번째 탈출구.
-# 현관 틈에서 **멀리** 뗀다: 붙여 두면 문 두 개가 한 현관으로 읽혀서 어느 쪽으로
-# 나왔는지 알 수 없고, 루트를 둘로 나눈 의미가 사라진다.
-YARD_SIDE = (600, 880)
+# YARD_SIDE 폐지(#513) — 운동장 정면 틈은 현관 앞 하나만 남는다.
 YARD_ARRIVE = (1700.0, 380.0)             # 현관 앞 등장 지점
-YARD_SIDE_ARRIVE = (740.0, 380.0)         # 옆문 앞 등장 지점(#393)
 
 # 운동장 색은 `TEX`·`SPRITE` 표보다 앞(파일 위쪽)에 있다 — 표가 색 문자열을
 # 키로 쓰므로 여기서 다시 정의하면 조회가 빗나가 그림이 안 붙는다(#405와 같은 함정).
@@ -3527,29 +3510,20 @@ def build_yard():
     sc.poly2d("Walk", "Ground", C_WALK, rect(0, YARD_FENCE + T, YW, YH))
 
     # ── 학교 정면 ────────────────────────────────────────────
-    # 나온 문이 등 뒤에 있다는 표시만 남기고 막는다 — 되돌아 들어갈 수는 없다.
-    # 문 자리가 둘이다(#393) — 현관(가운데)과 운동장 출입구(서쪽 옆문).
-    # 둘 다 나온 뒤에는 막는다. 어느 쪽으로 나왔든 되돌아 들어갈 수는 없다.
-    doors = [YARD_PORCH, YARD_SIDE]
+    # 현관 앞 틈 하나만 남긴다(#513) — 운동장 출입구 옆문 폐지.
     sc.poly2d("Facade", "Structures", C_WALL, rect(0, 0, YW, YARD_FACADE))
-    # 틈 사이사이의 벽을 왼쪽부터 이어 낸다. 문이 하나뿐이던 때의 FacadeL/R를
-    # 일반화한 것이라, 문을 더 뚫어도 여기는 고치지 않는다.
-    edges = [0.0]
-    for dx0, dx1 in sorted(doors):
-        edges += [float(dx0), float(dx1)]
-    edges.append(float(YW))
-    for i in range(0, len(edges), 2):
-        a, b = edges[i], edges[i + 1]
-        if b - a > 1.0:
-            sc.wall("Facade" + str(i // 2), rect(a, YARD_FACADE - T, b, YARD_FACADE))
-    for nm, (dx0, dx1) in (("Porch", YARD_PORCH), ("Side", YARD_SIDE)):
-        sc.wall(nm + "Seal", rect(dx0, YARD_FACADE - T, dx1, YARD_FACADE))
-        sc.poly2d(nm + "Door", "Structures", C_LEAF,
-                  rect(dx0 + 8, YARD_FACADE - T - 26, dx1 - 8, YARD_FACADE - T))
+    px0, px1 = float(YARD_PORCH[0]), float(YARD_PORCH[1])
+    sc.wall("FacadeL", rect(0.0, YARD_FACADE - T, px0, YARD_FACADE))
+    sc.wall("FacadeR", rect(px1, YARD_FACADE - T, float(YW), YARD_FACADE))
+    sc.wall("PorchSeal", rect(px0, YARD_FACADE - T, px1, YARD_FACADE))
+    sc.poly2d("PorchDoor", "Structures", C_LEAF,
+              rect(px0 + 8, YARD_FACADE - T - 26, px1 - 8, YARD_FACADE - T))
     # 정면 창문 — 위층에서 내려다보던 그 창들이다. 불은 하나도 안 켜져 있다.
+    # 현관 틈(YARD_PORCH) 위치의 창문은 건너뛴다.
     for i in range(14):
         wx = 140 + i * 230
-        if any(dx0 - 90 < wx < dx1 + 20 for dx0, dx1 in doors):
+        dx0, dx1 = float(YARD_PORCH[0]), float(YARD_PORCH[1])
+        if dx0 - 90 < wx < dx1 + 20:
             continue
         sc.poly2d("WD_Win" + str(i), "Structures", C_WINDOW,
                   rect(wx, YARD_FACADE - T - 34, wx + 130, YARD_FACADE - T - 8))
@@ -3590,10 +3564,7 @@ def build_yard():
         bx = 320 + i * 300
         if gx0 - 160 < bx < gx1 + 40:
             continue
-        # 옆문 앞도 비운다(#393) — 등장 지점(740, 380)이 벤치 안이면 집기에
-        # 끼인 채로 씬이 시작된다.
-        if YARD_SIDE[0] - 130 < bx < YARD_SIDE[1] + 40:
-            continue
+        # YARD_SIDE 폐지(#513) — 옆문 앞 벤치 회피 코드 제거
         _yard_prop(sc, "Bench" + str(i), bx, YARD_FACADE + 40, bx + 130,
                    YARD_FACADE + 74, C_BENCH)
     for i in range(5):
@@ -3614,19 +3585,17 @@ def build_yard():
 
     # ── 정문(탈출) ──────────────────────────────────────────
     gcx = (gx0 + gx1) / 2
+    # FrontGate: 자동 트리거(#513) — E키 없이 접촉하면 엔딩 시작.
     sc.node(NL.join([
         '[node name="FrontGate" type="Area2D" parent="."]',
         "position = Vector2(%s, %s)" % (n(gcx), n(YARD_FENCE + 8)),
         "collision_layer = 2",
         "collision_mask = 0",
-        'script = ExtResource("4_exit")',
-        'required_item_id = ""',
-        'prompt_text = "정문으로 나가기"',
+        'script = ExtResource("4_front_gate")',
         "",
         '[node name="Zone" type="CollisionShape2D" parent="FrontGate"]',
         'shape = SubResource("RectangleShape2D_door_zone")',
         ""]))
-    sc.mark("FrontGate", gcx, YARD_FENCE + 8, C_MARK_KEY, 9.0)
 
     # ── 뒤를 돌아보면 ────────────────────────────────────────
     # 수위는 나오지 않지만 **거기 있다**는 것만 남긴다. 정문 앞에서만 닿는다.
