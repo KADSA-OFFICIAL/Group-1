@@ -151,7 +151,7 @@ func _ready() -> void:
 
 	if game_state != null:
 		game_state.connect("game_over", _on_game_over)
-		# 체크포인트 복원 요청이 있는 경우(#564)
+		# 체크포인트 복원 요청이 있는 경우(#564, #570)
 		if game_state.has_method("is_pending_restore") and game_state.call("is_pending_restore"):
 			var cp: Dictionary = game_state.call("restore_from_checkpoint")
 			if not cp.is_empty():
@@ -159,7 +159,9 @@ func _ready() -> void:
 				restored_floor = int(cp.get("floor", START_FLOOR))
 				var arrive_pos: Vector2 = cp.get("arrive_pos", Vector2.ZERO)
 				if restored_floor != START_FLOOR:
-					_swap_floor(restored_floor, arrive_pos)
+					_swap_floor(restored_floor, arrive_pos, false)
+			if game_state.has_method("finish_restore"):
+				game_state.call("finish_restore")
 
 	if not is_restored or restored_floor == START_FLOOR:
 		_update_floor_label()
@@ -294,7 +296,7 @@ func _change_floor(target: int, arrive: Vector2) -> void:
 		changing_floor = false)
 
 
-func _swap_floor(target: int, arrive: Vector2) -> void:
+func _swap_floor(target: int, arrive: Vector2, record_cp: bool = true) -> void:
 	var old_background: Node = $Background
 	var next_background: Node2D = load(FLOOR_SCENES[target]).instantiate()
 	var background_index := old_background.get_index()
@@ -319,7 +321,7 @@ func _swap_floor(target: int, arrive: Vector2) -> void:
 		camera.reset_smoothing()
 
 	# 층 진입 시 자동 체크포인트 저장(#564) — 4층(도입부)을 제외한 본편 층(3, 2, 1, 0)
-	if target != START_FLOOR:
+	if record_cp and target != START_FLOOR:
 		var game_state = get_tree().get_first_node_in_group("game_state")
 		if game_state != null and game_state.has_method("record_checkpoint"):
 			game_state.call("record_checkpoint", target, arrive)

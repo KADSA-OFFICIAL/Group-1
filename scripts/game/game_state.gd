@@ -55,6 +55,10 @@ static func is_pending_restore() -> bool:
 	return _pending_restore and has_checkpoint()
 
 
+static func finish_restore() -> void:
+	_pending_restore = false
+
+
 static func clear_checkpoint() -> void:
 	_checkpoint.clear()
 	_pending_restore = false
@@ -92,7 +96,6 @@ func restore_from_checkpoint() -> Dictionary:
 	for fl in (cp["flags"] as Array):
 		flags.append(str(fl))
 	_is_finished = false
-	_pending_restore = false
 	inventory_changed.emit(items)
 	var score: Array = clue_score()
 	clues_changed.emit(score[0], score[1])
