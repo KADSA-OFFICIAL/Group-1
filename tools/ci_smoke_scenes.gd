@@ -304,12 +304,55 @@ func _check_artroom_intro() -> void:
 		_fault("도입부 3막: 자백이 끝났는데 유예 타이머가 안 돈다(60초 대기)")
 	else:
 		_ok("도입부 3막 유예 시작")
+	# **여기서 붙잡아 둔다** — 유예는 매 프레임 줄어들어 아래 검사까지 가면 값이 달라진다.
+	var grace_at_start := float(intro.get("_grace"))
 	if jan != null and jan.visible:
 		_fault("도입부 3막: 수위가 나갔는데 아직 보인다")
 	if not player.is_processing_unhandled_input():
 		_fault("도입부 3막: 장면이 끝났는데 입력이 안 돌아왔다")
 	else:
 		_ok("도입부 3막 조작 복귀")
+
+	# ── 책 없이 3막에 들어온 런(#477) ─────────────────────────────
+	# **이 스모크가 곧 그 런이다** — 국어책을 안 챙기고 단서 둘로 수위를 불렀다.
+	# 정상 경로인데(방아쇠 둘 중 하나가 책과 무관하다) 전에는 창문이 거절하고
+	# 유예가 다 돌아 그대로 죽었다. 안내도 창문 앞 말고는 없었다.
+	var gs: Node = get_first_node_in_group("game_state")
+	var need := String(win.get("required_item_id")) if win != null else ""
+	var consts: Dictionary = intro.get_script().get_script_constant_map()
+	var grace_base: float = float(consts.get("GRACE_SECONDS", 20.0))
+	var grace_long: float = float(consts.get("GRACE_SECONDS_NO_BOOK", grace_base))
+	if gs == null or need.is_empty():
+		_fault("도입부 3막: game_state(%s) 또는 창문 요구 아이템(%s)을 못 찾았다"
+			% [gs, need])
+	elif bool(gs.call("has_item", need)):
+		_fault("도입부 3막: 스모크가 %s를 이미 들고 있어 책 없는 경로를 못 본다" % need)
+	else:
+		# 유예가 길어진다 — 캐비넷에서 책을 거쳐 창문까지가 더 멀다.
+		if grace_at_start <= grace_base + 1.0:
+			_fault("도입부 3막: 책이 없는데 유예가 안 늘었다 (%.1f초, 기본 %.1f초)"
+				% [grace_at_start, grace_base])
+		elif grace_at_start > grace_long + 0.5:
+			_fault("도입부 3막: 유예가 상수보다 길다 (%.1f초 > %.1f초)"
+				% [grace_at_start, grace_long])
+		else:
+			_ok("도입부 3막 책 없는 런의 유예 %.1f초" % grace_at_start)
+		# 국어책을 화면에서 가리킨다 — 2막에서 한 번 걷힌 표시가 다시 뜬다.
+		if wp == null:
+			_fault("도입부 3막: HUD에 Waypoint가 없다")
+		elif not await _until(func() -> bool: return wp.visible, 5.0):
+			_fault("도입부 3막: 책이 없는데 국어책 표시가 안 뜬다(5초 대기)")
+		else:
+			_ok("도입부 3막 국어책 화면 표시")
+		# 챙기면 표시가 걷힌다 — 가방에 있는 것을 계속 가리키면 안 된다.
+		bg.get_node("KoreanBook").call("interact", player)
+		await process_frame
+		if not bool(gs.call("has_item", need)):
+			_fault("도입부 3막: 국어책을 조사했는데 가방에 안 들어왔다")
+		elif wp != null and not await _until(func() -> bool: return not wp.visible, 5.0):
+			_fault("도입부 3막: 국어책을 챙겼는데 표시가 안 사라진다")
+		else:
+			_ok("도입부 3막 국어책 챙긴 뒤 표시 정리")
 
 	# ── 창문으로 내려가기 시작하면 유예가 끊긴다(#472) ─────────────
 	# 컷신(#468)이 도는 18초 동안에도 4층 씬은 살아 있어 유예(20초)가 계속 돌았고,

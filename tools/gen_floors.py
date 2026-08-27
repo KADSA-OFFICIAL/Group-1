@@ -3718,7 +3718,10 @@ def build_intro():
         "collision_mask = 0",
         'script = ExtResource("11_floorlink")',
         'required_item_id = "korean_book"',
-        'locked_message = "창문은 열린다. 그런데 국어책도 없이 이러려고 온 게 아니다."',
+        # 거절 문구는 **지금 뭘 해야 하는지**를 말한다 (#477). 전에는 "이러려고 온
+        # 게 아니다"까지만 말해서, 책이 어디 있는지도 그것 말고 다른 길이 없다는 것도
+        # 알려 주지 않았다 — 그동안 3막 유예는 계속 돌았다.
+        'locked_message = "창문은 열린다. 그런데 국어책 없이는 안 된다 — 미술실 책상 위. 챙겨서 다시 오자."',
         'prompt_text = "창문으로 내려가기"',
         # `message`는 비운다 — 컷신이 창틀·난간·두 걸음을 이미 다 말한다(#468).
         # 내려가는 컷신(#468). 본편에서 계단이 아닌 유일한 하강이고, 수위가
@@ -3878,6 +3881,10 @@ def build_intro():
         'janitor_path = NodePath("../IntroJanitor")',
         'cabinet_path = NodePath("../HideArtCabinet")',
         'cabinet_mark_path = NodePath("../WallGlow/Marks/Mark_HideArtCabinet")',
+        # 국어책(#477). 아직 안 챙긴 런에서 1막·3막에 가리킨다 — 창문이 요구하는
+        # 물건이 이것이고, 단서 둘로 수위를 부른 플레이어는 책 없이 3막에 들어간다.
+        'book_path = NodePath("../KoreanBook")',
+        'book_mark_path = NodePath("../WallGlow/Marks/Mark_KoreanBook")',
         # 창문으로 내려가기 시작하면 유예를 끊는다(#472) — 컷신(#468)이 도는
         # 동안에도 이 층은 살아 있어 타이머가 계속 돌기 때문이다.
         'escape_path = NodePath("../PrepWindowEscape")',

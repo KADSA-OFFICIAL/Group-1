@@ -396,7 +396,7 @@ collision_layer = 2
 collision_mask = 0
 script = ExtResource("11_floorlink")
 required_item_id = "korean_book"
-locked_message = "창문은 열린다. 그런데 국어책도 없이 이러려고 온 게 아니다."
+locked_message = "창문은 열린다. 그런데 국어책 없이는 안 된다 — 미술실 책상 위. 챙겨서 다시 오자."
 prompt_text = "창문으로 내려가기"
 cutscene_speaker = "이설"
 cutscene_lines = PackedStringArray("창틀에 손을 얹었다. 밤공기가 차다.", "…4층이야. 아래를 보면 안 돼.", "(난간이 있어. 한 뼘이지만 있어.)", "한쪽 발을 내렸다. 신발 밑창이 미끄러진다.", "3층 창문. 두 걸음.", "…수위 아저씨가 열쇠를 가지러 간 사이에.")
@@ -911,6 +911,8 @@ door_after_message = "복도로 나가는 문. 수위가 저쪽에 있다. 지�
 janitor_path = NodePath("../IntroJanitor")
 cabinet_path = NodePath("../HideArtCabinet")
 cabinet_mark_path = NodePath("../WallGlow/Marks/Mark_HideArtCabinet")
+book_path = NodePath("../KoreanBook")
+book_mark_path = NodePath("../WallGlow/Marks/Mark_KoreanBook")
 escape_path = NodePath("../PrepWindowEscape")
 janitor_walk = PackedVector2Array(570, 920, 570, 800, 430, 700, 200, 500)
 
