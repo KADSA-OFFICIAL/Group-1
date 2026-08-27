@@ -229,7 +229,9 @@ func _show_subtitle(speaker: String, text: String, emotion: String) -> void:
 	while not _speech_queue.is_empty() and is_instance_valid(subtitle):
 		var line: Array = _speech_queue.pop_front()
 		_current = line
-		subtitle.show_line(line[0], line[1], line[2])
+		# 뒤에 줄이 더 있으면 더 빨리 찍는다(#563) — 밀려 있는 만큼 서두른다.
+		# 혼자 뜨는 대사는 평소 배속 그대로다.
+		subtitle.show_line(line[0], line[1], line[2], not _speech_queue.is_empty())
 
 		# 컷신과 달리 본편에는 넘기는 입력이 없다 — 다 찍힐 때까지 기다린 뒤
 		# 읽는 시간을 준다. 뒤에 줄이 더 있으면 짧게 준다: 한 사람이 이어서
