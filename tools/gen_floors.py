@@ -4182,7 +4182,6 @@ def build_intro():
         % ", ".join("%s, %s" % (n(x), n(y)) for x, y in walk),
         '']))
     add_clutter(sc)
-    add_examine(sc)
 
     sc.node('[node name="Walls" type="StaticBody2D" parent="."]' + NL)
     for nm, pos, shape in [
