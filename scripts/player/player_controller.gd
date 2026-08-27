@@ -81,6 +81,19 @@ const WALK_STEP_PX := 160.0
 ## 발이 미끄러지지 않는다(수위 #310과 같은 규약). 12프레임이 두 걸음이므로 한 걸음은
 ## 6프레임 — WALK_STEP_PX를 6으로 나눈다.
 const WALK_STRIDE := WALK_STEP_PX / 6.0
+## 옆모습 사이클에서 **몇 장 걸러 쓸지**(#555). 1이면 열두 장 전부다.
+##
+## `WALK_STEP_PX`를 또 올려서 대응하지 않은 이유: 그 상수는 **좌우와 상하가 함께
+## 쓴다.** 좌우는 12장이 두 걸음(한 장 = WALK_STRIDE 26.7px)이고 위아래는 두 장이
+## 두 걸음(한 장 = WALK_STEP_PX 160px)이라, 걸음 박자는 2.0/초로 같은데 **이미지
+## 전환은 좌우가 12장/초, 위아래가 2장/초로 6배 차이**다. 좌우로 걸을 때만 어색하다는
+## 보고(#387·#519에 이어 세 번째)의 원인이 그 격차다. `WALK_STEP_PX`를 올리면
+## 격차는 그대로인 채 위아래가 함께 느려져 두 장짜리 그림이 눈에 띄게 끊긴다.
+##
+## 2면 여섯 장(1·3·5·7·9·11번)만 화면에 나와 **초당 6장**이 되고, 한 바퀴는 여전히
+## 320px이라 **걸음 박자 2.0/초는 그대로**다. 열두 장이 전부 이어지는 손그림이라
+## 한 장 건너뛴 것도 그대로 이어진다. 되돌리려면 1로 두면 된다.
+const SIDE_FRAME_STEP := 2
 
 ## 잉크통 던지기(#169). 손에서 조금 앞에 놓고 던져야 벽에 붙어 있을 때
 ## 자기 발밑에서 터지지 않는다.
@@ -190,7 +203,12 @@ func _update_sprite(moving: bool, moved: float) -> void:
 		body.flip_h = false
 		return
 
-	var frame := int(_walk_distance / WALK_STRIDE) % WALK_TEXTURES.size()
+	# **한 장 걸러 쓴다**(#555). 열두 장을 전부 쓰면 이미지가 초당 12장 바뀌는데
+	# 위아래는 초당 2장이라, 걸음 박자가 2.0으로 같은데도 좌우만 화면이 6배 바쁘다.
+	# 표본을 성기게 뜨는 것이지 사이클을 줄이는 것이 아니다 — 한 바퀴는 여전히
+	# 12 x WALK_STRIDE = 320px 이고 걸음 박자도 그대로다.
+	var slot := int(_walk_distance / (WALK_STRIDE * float(SIDE_FRAME_STEP)))
+	var frame := (slot * SIDE_FRAME_STEP) % WALK_TEXTURES.size()
 	body.texture = WALK_TEXTURES[frame]
 	body.flip_h = not _facing_right
 
