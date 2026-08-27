@@ -114,6 +114,11 @@ C_STILL = "Color(0.30, 0.24, 0.26, 1)"        # 정물대 — 천을 덮어 둔 
 C_PALETTE = "Color(0.52, 0.42, 0.30, 1)"      # 팔레트(집기 위 소품)
 C_BRUSHJAR = "Color(0.44, 0.46, 0.50, 1)"     # 붓통
 C_TUBE = "Color(0.60, 0.30, 0.28, 1)"         # 물감 튜브
+C_PAINT_BLUE = "Color(0.20, 0.28, 0.38, 1)"   # 바닥 파란 물감 얼룩(#532)
+C_PAINT_RED = "Color(0.38, 0.18, 0.18, 1)"    # 바닥 붉은 물감 얼룩(#532)
+C_PAINT_YELLOW = "Color(0.36, 0.32, 0.16, 1)" # 바닥 노란 물감 얼룩(#532)
+C_PAINT_DARK = "Color(0.11, 0.10, 0.09, 1)"   # 마른 먹/물감 때(#532)
+C_VASE = "Color(0.48, 0.50, 0.54, 1)"         # 정물대 화병/도자기(#532)
 C_PIPE = "Color(0.225, 0.235, 0.255, 1)"      # 천장 배관(장식) — 바닥보다
                                               # 살짝만 밝게. 진하면 바닥 선이 된다
 
@@ -223,6 +228,11 @@ TEX = {
     C_YARD_PEBBLE: "yard_paving",
     C_YARD_TRACK: "yard_track",
     C_WALK: "yard_paving",
+    C_PAINT_BLUE: "floor_matte",
+    C_PAINT_RED: "floor_matte",
+    C_PAINT_YELLOW: "floor_matte",
+    C_PAINT_DARK: "floor_matte",
+    C_VASE: "prop_metal",
     C_WALL: "wall_brick",
     C_PILASTER: "wall_brick",
     C_STEP: "wall_brick",
@@ -2301,12 +2311,34 @@ EXAMINE_PROMPT = {
     C_SOFA: "소파 살펴보기",
     C_COPIER: "복사기 살펴보기",
     C_STALL: "칸막이 살펴보기",
+    C_EASEL: "이젤 살펴보기",
+    C_BUST: "석고상 살펴보기",
+    C_STILL: "정물대 살펴보기",
+    C_CANVASES: "캔버스 살펴보기",
+    C_PAINTBOX: "물감장 살펴보기",
 }
 
 # (집기 색, 방 종류) -> [묘사, ...]. 방 종류가 없는 항목이 기본값이다.
 # **방 종류를 본다**(#304) — 교무실 책상이 교실 책상과 같은 말을 하면 방이
 # 어디든 똑같아 보인다. 종류는 `prop_kind()`가 내는 값이고 복도는 "corridor"다.
 EXAMINE_LINES = {
+    (C_EASEL, None): [
+        "이젤에 미완성된 스케치가 걸려 있다. 목탄 가루가 날린다.",
+        "수채화 물감이 마른 채 굳어 있다. 붓 자국이 거칠다.",
+    ],
+    (C_BUST, None): [
+        "석고상의 코와 귀가 닳아 있다. 소묘 수업 때 수없이 만진 흔적이다.",
+        "흰 석고 표면에 연필로 그려진 낙서가 희미하게 남아 있다.",
+    ],
+    (C_STILL, None): [
+        "천이 덮인 정물대 위에 석고상과 화병이 놓여 있다. 미술 수업 때 소묘하던 대상들이다.",
+    ],
+    (C_CANVASES, None): [
+        "캔버스들이 빼곡히 꽂혀 있다. 젯소와 유화 냄새가 난다.",
+    ],
+    (C_PAINTBOX, None): [
+        "물감장 서랍이 반쯤 열려 있다. 유채 물감 튜브가 색깔별로 꽂혀 있다.",
+    ],
     (C_DESK, "classroom"): [
         "서랍이 반쯤 열려 있다. 지우개 가루뿐이다.",
         "상판에 커터칼로 판 이름이 있다. 절반쯤 지워졌다.",
@@ -3956,6 +3988,15 @@ def build_intro():
                     "운동장이 내려다보인다. 4층이라 뛰어내릴 높이는 아니다. "
                     "창틀 바깥으로 좁은 난간이 옆 창문까지 이어져 있다.")
 
+    # ── 바닥 물감 얼룩 및 마루 자국 (#532) ───────────────────
+    # 작업대·이젤·개수대 주변에 마른 물감 자국과 얼룩을 깔아 화실 느낌을 살린다.
+    sc.decor("FloorSplat_Work0", rect(190, 674, 250, 698), C_PAINT_BLUE)
+    sc.decor("FloorSplat_Work1", rect(280, 784, 330, 808), C_PAINT_RED)
+    sc.decor("FloorSplat_Sink", rect(830, 768, 880, 792), C_PAINT_YELLOW)
+    sc.decor("FloorSplat_Easel0", rect(360, 280, 405, 304), C_PAINT_RED)
+    sc.decor("FloorSplat_Easel1", rect(660, 280, 705, 304), C_PAINT_BLUE)
+    sc.decor("FloorStain_Still", rect(510, 346, 600, 368), C_PAINT_DARK)
+
     # ── 미술실 집기 ──────────────────────────────────────────
     # **이젤이 정물대를 둘러싼다.** 미술실은 책상이 줄지어 선 교실이 아니라
     # 가운데를 보고 둘러앉는 방이다 — 격자로 늘어놓으면 다시 교실이 된다.
@@ -3969,20 +4010,44 @@ def build_intro():
     sc.overlay_rects.append((486, 262, 644, 326))
     sc.poly2d("PT_StillBust", "Props", C_BUST, rect(536, 268, 594, 318), z=1)
     sc.overlay_rects.append((536, 268, 594, 318))
+    sc.poly2d("PT_StillVase", "Props", C_VASE, rect(604, 274, 634, 314), z=1)
+    sc.overlay_rects.append((604, 274, 634, 314))
+    sc.poly2d("PT_StillFruit", "Props", C_TUBE, rect(496, 280, 526, 310), z=1)
+    sc.overlay_rects.append((496, 280, 526, 310))
+
     for i, (ex, ey) in enumerate(((300, 210), (300, 360), (720, 210),
                                   (720, 360), (520, 120))):
         _intro_prop(sc, "Easel" + str(i), ex, ey, ex + 54, ey + 66, C_EASEL)
+
+    # 화실 목재 원형/사각 스툴 의자(#532)
+    _intro_prop(sc, "ArtStool0", 250, 370, 282, 402, C_CHAIR)
+    _intro_prop(sc, "ArtStool1", 784, 220, 816, 252, C_CHAIR)
+    _intro_prop(sc, "ArtStool2", 784, 370, 816, 402, C_CHAIR)
+    _intro_prop(sc, "ArtStool3", 390, 615, 422, 647, C_CHAIR)
+    _intro_prop(sc, "ArtStool4", 390, 725, 422, 757, C_CHAIR)
 
     # 벽을 따라 — 석고상 선반, 캔버스 랙, 물감장, 개수대.
     for i in range(3):
         bx = 110 + i * 96
         _intro_prop(sc, "BustShelf" + str(i), bx, IY0 + T + 6, bx + 60,
                     IY0 + T + 54, C_BUST)
+    _intro_prop(sc, "ClayStand", 110, 150, 160, 200, C_STILL)
+    sc.poly2d("PT_ClayBust", "Props", C_BUST, rect(120, 158, 150, 192), z=1)
+    sc.overlay_rects.append((120, 158, 150, 192))
+
     _intro_prop(sc, "CanvasRack0", 900, 150, 1096, 206, C_CANVASES)
     _intro_prop(sc, "CanvasRack1", 900, 220, 1096, 276, C_CANVASES)
+    _intro_prop(sc, "DryingRack", 900, 310, 960, 380, C_RACK)
     _intro_prop(sc, "PaintBox", 1036, 300, 1096, 440, C_PAINTBOX)
-    # 붓 씻는 개수대 — 미술실에서 가장 큰 설비다.
+
+    # 붓 씻는 개수대 + 세척용 물통(#532)
     _intro_prop(sc, "ArtSink", 900, 700, 1096, 764, C_SINK)
+    _intro_prop(sc, "ArtBucket", 850, 715, 882, 747, C_BUCKET)
+    sc.poly2d("PT_SinkSoap", "Props", C_CLOTHES, rect(920, 706, 950, 726), z=1)
+    sc.overlay_rects.append((920, 706, 950, 726))
+    sc.poly2d("PT_SinkBasin", "Props", C_WATER, rect(970, 712, 1070, 752), z=1)
+    sc.overlay_rects.append((970, 712, 1070, 752))
+
     # 작업대 — 물감을 짜고 붓을 씻는 큰 대. 교실 책상보다 넓고 밝다.
     for i in range(2):
         wy = 600 + i * 110
@@ -4011,6 +4076,9 @@ def build_intro():
     for i, wx in enumerate((150, 300, 940, 1030)):
         sc.wall_decor("StudentArt" + str(i),
                       rect(wx, IY1 - T - 12, wx + 84, IY1 - T), C_CANVASES)
+    # 벽면 미술 전시판 및 조색 차트(#532)
+    sc.wall_decor("ExhibitionNotice", rect(420, IY0 + T, 490, IY0 + T + 10), C_WBOARD)
+    sc.decor("ColorMixingChart", rect(IX0 + T, 720, IX0 + T + 8, 780), C_PAPER)
     # 칠판은 왼쪽 벽. 은신처 캐비넷(y 424~476)을 피해 아래에 건다.
     sc.decor("ArtBoard", rect(IX0 + T, 530, IX0 + T + 10, 700), C_BOARD)
 
@@ -4020,12 +4088,24 @@ def build_intro():
         _intro_prop(sc, "PrepShelf" + str(i), IX1 - T - 44, sy,
                     IX1 - T, sy + 120, C_SHELF)
     _intro_prop(sc, "PrepTable", 1200, 620, 1420, 672, C_DESK)
+    sc.poly2d("PT_PrepTools", "Props", C_PALETTE, rect(1220, 630, 1260, 660), z=1)
+    sc.overlay_rects.append((1220, 630, 1260, 660))
+    sc.poly2d("PT_PrepNotes", "Props", C_PAPER, rect(1360, 630, 1400, 662), z=1)
+    sc.overlay_rects.append((1360, 630, 1400, 662))
+
     # 준비실은 **미술실의 창고**다 — 석고상 여분, 캔버스 두루마리, 물감 상자.
     _intro_prop(sc, "PrepBust", 1200, 190, 1272, 250, C_BUST)
     _intro_prop(sc, "PrepCanvas", 1200, 270, 1290, 330, C_CANVASES)
     _intro_prop(sc, "PrepPaint", 1200, 350, 1290, 410, C_PAINTBOX)
+    _intro_prop(sc, "SupplyBox0", 1320, 190, 1370, 240, C_SHELF)
+    _intro_prop(sc, "SupplyBox1", 1320, 250, 1370, 300, C_SHELF)
+    _intro_prop(sc, "PaperBin", 1200, 430, 1240, 470, C_BIN)
+    sc.poly2d("PT_RollPaper", "Props", C_PAPER, rect(1208, 436, 1232, 464), z=1)
+    sc.overlay_rects.append((1208, 436, 1232, 464))
+
     # 날짜가 적힌 벽 — 조사 대상은 아래 PLACEMENT에서 붙는다.
     sc.decor("DateWallMark", rect(1330, IY1 - T - 10, 1600, IY1 - T), C_PAPER)
+    sc.wall_decor("ApronHanger", rect(1500, IY1 - T - 8, 1580, IY1 - T), C_CLOTHES)
 
     add_hiding(sc, 4)
     add_story(sc, 4)
