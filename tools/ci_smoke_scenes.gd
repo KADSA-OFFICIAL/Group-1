@@ -320,23 +320,20 @@ func _check_artroom_intro() -> void:
 	var gs: Node = get_first_node_in_group("game_state")
 	var need := String(win.get("required_item_id")) if win != null else ""
 	var consts: Dictionary = intro.get_script().get_script_constant_map()
-	var grace_base: float = float(consts.get("GRACE_SECONDS", 20.0))
-	var grace_long: float = float(consts.get("GRACE_SECONDS_NO_BOOK", grace_base))
+	var grace_base: float = float(consts.get("GRACE_SECONDS", 44.0))
 	if gs == null or need.is_empty():
 		_fault("도입부 3막: game_state(%s) 또는 창문 요구 아이템(%s)을 못 찾았다"
 			% [gs, need])
 	elif bool(gs.call("has_item", need)):
 		_fault("도입부 3막: 스모크가 %s를 이미 들고 있어 책 없는 경로를 못 본다" % need)
 	else:
-		# 유예가 길어진다 — 캐비넷에서 책을 거쳐 창문까지가 더 멀다.
-		if grace_at_start <= grace_base + 1.0:
-			_fault("도입부 3막: 책이 없는데 유예가 안 늘었다 (%.1f초, 기본 %.1f초)"
+		# **유예는 책 유무로 가르지 않는다**(#506) — 읽는 시간이 걷는 시간보다 크고,
+		# 그 방향이 걷는 거리와 반대다(근거는 `GRACE_SECONDS` 주석). 상수와 같은지만 본다.
+		if absf(grace_at_start - grace_base) > 1.0:
+			_fault("도입부 3막: 유예가 상수와 다르다 (%.1f초, 상수 %.1f초)"
 				% [grace_at_start, grace_base])
-		elif grace_at_start > grace_long + 0.5:
-			_fault("도입부 3막: 유예가 상수보다 길다 (%.1f초 > %.1f초)"
-				% [grace_at_start, grace_long])
 		else:
-			_ok("도입부 3막 책 없는 런의 유예 %.1f초" % grace_at_start)
+			_ok("도입부 3막 유예 %.1f초" % grace_at_start)
 		# 국어책을 화면에서 가리킨다 — 2막에서 한 번 걷힌 표시가 다시 뜬다.
 		if wp == null:
 			_fault("도입부 3막: HUD에 Waypoint가 없다")
