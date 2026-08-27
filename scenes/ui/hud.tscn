@@ -76,6 +76,42 @@ text = "목표: 학교를 탈출하세요."
 layout_mode = 2
 text = "소지품: 없음"
 
+[node name="CloseUp" type="PanelContainer" parent="Root"]
+; 근접 클로즈업(#451). 목표·소지품 패널(TopLeft, 16~92) **아래**에 둔다 —
+; 겹치면 목표 글이 가려진다. 평소에는 visible = false다.
+visible = false
+layout_mode = 1
+offset_left = 16.0
+offset_top = 104.0
+offset_right = 176.0
+offset_bottom = 320.0
+
+[node name="Margin" type="MarginContainer" parent="Root/CloseUp"]
+layout_mode = 2
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 10
+theme_override_constants/margin_bottom = 8
+
+[node name="Rows" type="VBoxContainer" parent="Root/CloseUp/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Image" type="TextureRect" parent="Root/CloseUp/Margin/Rows"]
+layout_mode = 2
+custom_minimum_size = Vector2(138, 192)
+; 도트 그림이라 Nearest다 — 46x64를 3배로 키워 보여 준다.
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Caption" type="Label" parent="Root/CloseUp/Margin/Rows"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.78, 0.76, 0.72, 1)
+text = ""
+horizontal_alignment = 1
+autowrap_mode = 2
+
 [node name="InventoryPanel" type="PanelContainer" parent="Root"]
 visible = false
 layout_mode = 1
