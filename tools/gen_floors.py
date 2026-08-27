@@ -176,15 +176,19 @@ TEX_MEAN = 0.78     # gen_tiles.py의 MEAN과 반드시 같아야 한다
 
 # ── 운동장 색(#356, #487) ─────────────────────────────────────
 # **`TEX`·`SPRITE`보다 앞에 둔다.** 두 표가 색 문자열을 키로 쓰기 때문이다.
-C_YARD = "Color(0.196, 0.150, 0.106, 1)"        # 다져진 흙
-C_YARD_PATH = "Color(0.245, 0.192, 0.138, 1)"    # 닳은 흙길 — 정문 유도 통행 흔적(#520)
-C_YARD_TRACK = "Color(0.232, 0.166, 0.112, 1)"  # 트랙 — 흙보다 살짝 붉다
-C_WALK = "Color(0.150, 0.152, 0.156, 1)"        # 정문 밖 인도
-C_FENCE = "Color(0.225, 0.235, 0.260, 1)"       # 담장 살
-C_GOAL = "Color(0.52, 0.54, 0.58, 1)"           # 축구 골대 — 밤에도 흰 철제
-C_TREE = "Color(0.13, 0.21, 0.15, 1)"           # 나무 수관
-C_LAMP = "Color(0.86, 0.78, 0.52, 1)"           # 가로등 불빛(광원 색)
-C_LAMPPOST = "Color(0.22, 0.23, 0.25, 1)"       # 가로등 기둥
+C_YARD = "Color(0.196, 0.150, 0.106, 1)"          # 기본 다져진 흙
+C_YARD_PATH_OUTER = "Color(0.222, 0.170, 0.120, 1)" # 흙길 외곽 은은한 번짐(#526)
+C_YARD_PATH = "Color(0.248, 0.192, 0.138, 1)"      # 닳은 흙길 본체(#520, #526)
+C_YARD_PATH_CORE = "Color(0.272, 0.214, 0.155, 1)" # 중앙 닳은 발자국 코어(#526)
+C_YARD_PATH_DARK = "Color(0.174, 0.132, 0.092, 1)" # 흙 눌림 음영 반점(#526)
+C_YARD_PEBBLE = "Color(0.320, 0.310, 0.290, 1)"   # 흙길 주변 잔자갈(#526)
+C_YARD_TRACK = "Color(0.232, 0.166, 0.112, 1)"    # 트랙 — 흙보다 살짝 붉다
+C_WALK = "Color(0.150, 0.152, 0.156, 1)"          # 정문 밖 인도
+C_FENCE = "Color(0.225, 0.235, 0.260, 1)"         # 담장 살
+C_GOAL = "Color(0.52, 0.54, 0.58, 1)"             # 축구 골대 — 밤에도 흰 철제
+C_TREE = "Color(0.13, 0.21, 0.15, 1)"             # 나무 수관
+C_LAMP = "Color(0.86, 0.78, 0.52, 1)"             # 가로등 불빛(광원 색)
+C_LAMPPOST = "Color(0.22, 0.23, 0.25, 1)"         # 가로등 기둥
 # 조회대. **흙보다 밝아야 한다**(#361) — 실내 팔레트의 C_SLAB(0.10,0.12,0.13)을
 # 그대로 썼더니 갈색 흙보다 어둡고 푸르러서 단상이 아니라 웅덩이로 읽혔다.
 C_PODIUM = "Color(0.30, 0.30, 0.31, 1)"
@@ -212,7 +216,11 @@ TEX = {
     # 벽·문·계단
     # 운동장(#487) — 실외 바닥은 이어붙는 판이 아니라 흩어진 알갱이다.
     C_YARD: "yard_dirt",
+    C_YARD_PATH_OUTER: "yard_dirt",
     C_YARD_PATH: "yard_dirt",
+    C_YARD_PATH_CORE: "yard_dirt",
+    C_YARD_PATH_DARK: "yard_dirt",
+    C_YARD_PEBBLE: "yard_paving",
     C_YARD_TRACK: "yard_track",
     C_WALK: "yard_paving",
     C_WALL: "wall_brick",
@@ -3471,6 +3479,139 @@ def _yard_prop(sc, key, x0, y0, x1, y1, color, solid=True):
     sc.prop_rects.append((key, (x0, y0, x1, y1), color))
 
 
+def _add_yard_paths(sc):
+    """현관에서 정문으로 이어지는 자연스러운 닳은 흙길과 발자국/자갈 패치(#526)."""
+    import math
+
+    def catmull_rom(p0, p1, p2, p3, t):
+        t2 = t * t
+        t3 = t2 * t
+        return (
+            0.5 * ((2 * p1[0]) + (-p0[0] + p2[0]) * t + (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * t2 + (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * t3),
+            0.5 * ((2 * p1[1]) + (-p0[1] + p2[1]) * t + (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * t2 + (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * t3),
+        )
+
+    def sample_spline(ctrl, samples_per_seg=4):
+        pts = []
+        num_segments = len(ctrl) - 3
+        for i in range(num_segments):
+            p0, p1, p2, p3 = ctrl[i], ctrl[i + 1], ctrl[i + 2], ctrl[i + 3]
+            for s in range(samples_per_seg if i < num_segments - 1 else samples_per_seg + 1):
+                t = s / float(samples_per_seg)
+                pts.append(catmull_rom(p0, p1, p2, p3, t))
+        return pts
+
+    def make_band_poly(pts, width_fn):
+        lefts, rights = [], []
+        n_pts = len(pts)
+        for i in range(n_pts):
+            p = pts[i]
+            if i == 0:
+                tx = pts[1][0] - pts[0][0]
+                ty = pts[1][1] - pts[0][1]
+            elif i == n_pts - 1:
+                tx = pts[-1][0] - pts[-2][0]
+                ty = pts[-1][1] - pts[-2][1]
+            else:
+                tx = pts[i + 1][0] - pts[i - 1][0]
+                ty = pts[i + 1][1] - pts[i - 1][1]
+            length = math.hypot(tx, ty) or 1.0
+            nx, ny = -ty / length, tx / length
+            w = width_fn(p[0], p[1], i / float(n_pts - 1))
+            lefts.append((round(p[0] - nx * w, 1), round(p[1] - ny * w, 1)))
+            rights.append((round(p[0] + nx * w, 1), round(p[1] + ny * w, 1)))
+        poly = lefts + rights[::-1]
+        return "PackedVector2Array(" + ", ".join(f"{x}, {y}" for x, y in poly) + ")"
+
+    # 1. 주 통행로 스플라인 제어점 (현관 1700, 300 -> 정문 2400, 1600)
+    ctrl = [(1700, 300), (1700, 300), (1705, 380), (1720, 480), (1750, 600),
+            (1795, 730), (1855, 860), (1930, 990), (2020, 1120), (2120, 1250),
+            (2225, 1370), (2320, 1480), (2385, 1550), (2400, 1600), (2400, 1600)]
+    pts = sample_spline(ctrl, 4)
+
+    # 3단계 다층 밴드 폭 함수 (외곽 완충 -> 본체 -> 중심 닳은 발자국 코어)
+    def w_outer(x, y, t):
+        if t < 0.12:
+            return 85.0 + 35.0 * (1.0 - t / 0.12)
+        elif t > 0.88:
+            return 60.0 + 55.0 * ((t - 0.88) / 0.12)
+        return 60.0 + 9.0 * math.sin(t * 19.0) + 5.0 * math.cos(t * 31.0)
+
+    def w_main(x, y, t):
+        if t < 0.12:
+            return 55.0 + 25.0 * (1.0 - t / 0.12)
+        elif t > 0.88:
+            return 38.0 + 38.0 * ((t - 0.88) / 0.12)
+        return 38.0 + 6.0 * math.sin(t * 19.0) + 3.5 * math.cos(t * 31.0)
+
+    def w_core(x, y, t):
+        if t < 0.12:
+            return 25.0 + 12.0 * (1.0 - t / 0.12)
+        elif t > 0.88:
+            return 18.0 + 16.0 * ((t - 0.88) / 0.12)
+        return 18.0 + 3.5 * math.sin(t * 19.0) + 2.0 * math.cos(t * 31.0)
+
+    sc.poly2d("YardPathOuter", "Ground", C_YARD_PATH_OUTER, make_band_poly(pts, w_outer))
+    sc.poly2d("YardPathMain", "Ground", C_YARD_PATH, make_band_poly(pts, w_main))
+    sc.poly2d("YardPathCore", "Ground", C_YARD_PATH_CORE, make_band_poly(pts, w_core))
+
+    # 2. 조회대/게양대 방면 은은한 샛길 흔적 (현관 앞 복도에서 갈라져 나간 발자국)
+    ctrl_branch = [(1750, 600), (1750, 600), (1650, 560), (1500, 520), (1350, 480), (1200, 460), (1200, 460)]
+    pts_branch = sample_spline(ctrl_branch, 3)
+    def w_branch(x, y, t):
+        return 22.0 * (1.0 - t * 0.4)
+    sc.poly2d("YardPathBranch", "Ground", C_YARD_PATH_OUTER, make_band_poly(pts_branch, w_branch))
+
+    # 3. 고정 시드 결정론적 흙 반점 / 발자국 / 잔자갈 디테일 패치
+    patches = [
+        ("Spot_Outer01", C_YARD_PATH_OUTER, 1710, 420, 32, 22, 0.3),
+        ("Spot_Outer02", C_YARD_PATH_OUTER, 1760, 670, 36, 24, -0.4),
+        ("Spot_Outer03", C_YARD_PATH_OUTER, 1890, 930, 40, 26, 0.5),
+        ("Spot_Outer04", C_YARD_PATH_OUTER, 2060, 1180, 38, 25, -0.3),
+        ("Spot_Outer05", C_YARD_PATH_OUTER, 2260, 1420, 42, 28, 0.4),
+        ("Spot_Outer06", C_YARD_PATH_OUTER, 2370, 1540, 35, 22, -0.2),
+        ("Spot_Main01", C_YARD_PATH, 1695, 360, 24, 16, 0.1),
+        ("Spot_Main02", C_YARD_PATH, 1735, 530, 26, 18, -0.3),
+        ("Spot_Main03", C_YARD_PATH, 1820, 790, 28, 20, 0.4),
+        ("Spot_Main04", C_YARD_PATH, 1960, 1050, 30, 20, -0.2),
+        ("Spot_Main05", C_YARD_PATH, 2160, 1310, 28, 19, 0.3),
+        ("Spot_Main06", C_YARD_PATH, 2340, 1500, 32, 22, -0.4),
+        ("Spot_Core01", C_YARD_PATH_CORE, 1715, 460, 16, 11, 0.2),
+        ("Spot_Core02", C_YARD_PATH_CORE, 1780, 700, 18, 12, -0.3),
+        ("Spot_Core03", C_YARD_PATH_CORE, 1880, 910, 20, 14, 0.4),
+        ("Spot_Core04", C_YARD_PATH_CORE, 2040, 1150, 19, 13, -0.2),
+        ("Spot_Core05", C_YARD_PATH_CORE, 2200, 1350, 21, 14, 0.3),
+        ("Spot_Dark01", C_YARD_PATH_DARK, 1660, 340, 18, 12, 0.5),
+        ("Spot_Dark02", C_YARD_PATH_DARK, 1770, 610, 20, 14, -0.4),
+        ("Spot_Dark03", C_YARD_PATH_DARK, 1910, 880, 22, 15, 0.3),
+        ("Spot_Dark04", C_YARD_PATH_DARK, 2100, 1220, 20, 13, -0.5),
+        ("Spot_Dark05", C_YARD_PATH_DARK, 2300, 1460, 24, 16, 0.4),
+    ]
+
+    for idx, (pname, pcolor, cx, cy, rx, ry, angle) in enumerate(patches):
+        pts_patch = []
+        for k in range(8):
+            theta = k * math.pi / 4.0
+            r_mod = 1.0 + 0.14 * math.sin(k * 2.3 + idx)
+            ex = rx * math.cos(theta) * r_mod
+            ey = ry * math.sin(theta) * r_mod
+            cos_a, sin_a = math.cos(angle), math.sin(angle)
+            pts_patch.append((round(ex * cos_a - ey * sin_a + cx, 1),
+                              round(ex * sin_a + ey * cos_a + cy, 1)))
+        poly_str = "PackedVector2Array(" + ", ".join(f"{x}, {y}" for x, y in pts_patch) + ")"
+        sc.poly2d(pname, "Ground", pcolor, poly_str)
+
+    # 4. 잔자갈/돌 알갱이 스펙클 (Pebbles)
+    pebbles = [
+        (1670, 380, 4, 3), (1740, 410, 3, 3), (1690, 520, 4, 4), (1780, 580, 3, 3),
+        (1740, 710, 4, 3), (1840, 750, 3, 4), (1820, 880, 4, 4), (1910, 960, 3, 3),
+        (1970, 1080, 4, 3), (2080, 1140, 3, 3), (2090, 1260, 4, 4), (2190, 1300, 3, 3),
+        (2240, 1410, 4, 3), (2350, 1450, 3, 4), (2320, 1530, 4, 3), (2420, 1570, 3, 3),
+    ]
+    for pidx, (px, py, pw, ph) in enumerate(pebbles):
+        sc.poly2d(f"Pebble_{pidx:02d}", "Ground", C_YARD_PEBBLE, rect(px, py, px + pw, py + ph))
+
+
 def build_yard():
     """탈출 뒤 걸어 나가는 운동장(#356)."""
     sc = Scene()
@@ -3509,11 +3650,10 @@ def build_yard():
               rect(240, YARD_FACADE + 120, YW - 240, YARD_FENCE - 150))
     sc.poly2d("Infield", "Ground", C_YARD,
               rect(430, YARD_FACADE + 250, YW - 430, YARD_FENCE - 280))
-    # 현관(1700, 380)에서 정문(2400, 1600)으로 이어지는 닳은 흙길(통행 흔적, #520).
-    # 밤에도 정문 방향을 알아볼 수 있도록 살짝 연한 흙빛으로 유도선을 깐다.
-    path_poly = "PackedVector2Array(1620, 300, 1780, 300, 1850, 680, 2520, 1480, 2520, 1600, 2280, 1600, 2280, 1480, 1690, 680)"
-    sc.poly2d("YardPath", "Ground", C_YARD_PATH, path_poly)
+    # 현관에서 정문으로 이어지는 유기적인 닳은 흙길과 디테일 패치(#520, #526)
+    _add_yard_paths(sc)
     sc.poly2d("Walk", "Ground", C_WALK, rect(0, YARD_FENCE + T, YW, YH))
+
 
     # ── 학교 정면 ────────────────────────────────────────────
     # 현관 앞 틈 하나만 남긴다(#513) — 운동장 출입구 옆문 폐지.
