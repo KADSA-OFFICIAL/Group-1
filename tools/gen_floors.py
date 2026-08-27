@@ -1182,6 +1182,21 @@ def add_furniture(sc, floor):
 # 층마다 조작이 달랐다. 메시지와 플래그는 그대로 옮긴다.
 # KeyCabinet은 #207에서 열쇠 지급을 뗐으므로 여기 들어가지 않는다(E 조사 단서).
 # TaehoNote는 #222에서 열쇠 지급을 뗐으므로 여기 들어가지 않는다(E 조사 단서).
+# 상호작용 표시(#301)를 물건 자리에서 비켜 내는 예외.
+#
+# 표시는 기본적으로 물건 위에 얹힌다 — 마름모가 작고(반 7px) 물건이 그보다 커서
+# 대개는 가리지 않는다. **그림 자체가 정보인 물건만** 예외다.
+#
+# 2층 머리(#438·#451): `head_top.png`(52x50)의 눈구멍에 박힌 열쇠가 "이것이 계단
+# 열쇠"라는 것을 말하는 유일한 그림인데, 표시가 `WallGlow`(어둠을 안 받는다) +
+# `z_index 5`라 그 위에서 가장 밝은 것이 마름모였다. 왼쪽(방 안쪽)으로 비킨다 —
+# 머리가 창고 오른쪽 아래 구석(2215, 950)에 있어 오른쪽으로 내면 벽에 가까워지고,
+# **표시가 벽·몸 안에 들어가면 시야 광선이 자기 표시를 가려 영영 안 켜진다**(#359).
+# 42px은 스프라이트 반폭(26)에 마름모 반폭(7)을 더한 33보다 크다.
+MARK_OFFSET = {
+    (2, "HeadKey"): (-42, 0),
+}
+
 AUTO_PICKUP = {"SpareKeyHook", "HeadKey", "JanitorSafe"}
 
 # 접촉 획득물에 덧붙이는 설정(#459). **`to_pickup`이 `grants_flag`를 `pickup_id`로
@@ -1395,7 +1410,11 @@ def add_story(sc, floor):
                           nodes[name]["body"], count=1, flags=re.M)
             sc.clue_pts.append((cx, cy))
             # 진행에 필요한 것은 호박색으로 눈에 띄게(#301).
-            sc.mark(name, cx, cy, C_MARK_KEY)
+            # 그림이 곧 정보인 물건은 표시를 옆으로 비킨다(#501) — 자리만 옮기고
+            # 크기·색·거리 규칙은 그대로다. `clue_pts`에는 **물건 자리**를 넣는다:
+            # 집기가 피해야 하는 것은 물건이고 표시는 충돌체가 없다.
+            mdx, mdy = MARK_OFFSET.get((floor, name), (0, 0))
+            sc.mark(name, cx + mdx, cy + mdy, C_MARK_KEY)
             if name in AUTO_PICKUP:
                 body = to_pickup(body)
             sc.node(body if body.endswith("\n") else body + "\n")
