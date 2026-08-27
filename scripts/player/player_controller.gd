@@ -12,9 +12,9 @@ const HIDDEN_PROMPT := "나오기"
 ## 걷기 그림은 열두 장 모두 오른쪽을 보고 있어 왼쪽으로 갈 때만 뒤집는다.
 ## tools/gen_player_sprites.py가 원본 아트에서 만든다.
 ##
-## **위로 걸을 때는 뒷모습 두 장을 번갈아 쓴다**(#519). 사용자가 뒷모습 걷기 두 포즈를
-## 그려서, 수위처럼(janitor.gd의 ROW_*) 방향에 따라 그림이 갈린다. **아래로 걸을 때는
-## 아직 측면 그림이다** — 정면 걷기 원본이 없다.
+## **위로 걸을 때는 뒷모습, 아래로 걸을 때는 정면 두 장을 번갈아 쓴다**(#519·#551).
+## 사용자가 방향마다 걷기 두 포즈를 그려서, 수위처럼(janitor.gd의 ROW_*) 방향에 따라
+## 그림이 갈린다. 좌우는 측면 12프레임이다.
 const IDLE_TEXTURE := preload("res://assets/sprites/player_idle.png")
 ## 걷기 **12프레임**(#384). 사용자가 걷기 사이클 전체(두 걸음, 2행×6열 시트)를
 ## 직접 그렸다 — 프레임마다 다른 실제 포즈이므로 수위(#375)처럼 반복되는 "기본
@@ -46,6 +46,14 @@ const WALK_TEXTURES := [
 const BACK_TEXTURES := [
 	preload("res://assets/sprites/player_back_1.png"),
 	preload("res://assets/sprites/player_back_2.png"),
+]
+## 정면 걷기 두 장(#551). 뒷모습과 완전히 같은 규약이다 — **한 장이 한 걸음**이고
+## 좌우 반전을 하지 않는다(정면을 보는 그림이라 반전할 것이 없다). 대기 포즈
+## (`IDLE_TEXTURE`)도 정면이지만 그쪽은 두 발을 모으고 서 있어 걷는 것으로 보이지
+## 않는다 — 아래로 걸을 때 그것을 쓰면 미끄러져 내려가는 것처럼 보인다.
+const FRONT_TEXTURES := [
+	preload("res://assets/sprites/player_front_1.png"),
+	preload("res://assets/sprites/player_front_2.png"),
 ]
 const SPRITE_OFFSET_Y := -24.0
 ## 한 걸음(6프레임)의 물리적 거리 — 정확히는 "12프레임 걷기 사이클이 화면에서
@@ -172,12 +180,13 @@ func _update_sprite(moving: bool, moved: float) -> void:
 	# 돌아가면 방향키를 누른 채 정면을 보는 것처럼 보인다.
 	_walk_distance += moved
 
-	# 위로 걸으면 뒷모습(#519). 대각선은 세로 성분이 더 큰 쪽만 뒷모습으로 본다 —
-	# 정확한 대각선(|x| == |y|)은 측면이다. 아래로 걸을 때는 정면 걷기 원본이
-	# 없어 지금처럼 측면을 쓴다.
-	if facing_direction.y < 0.0 and absf(facing_direction.y) > absf(facing_direction.x):
-		var back := int(_walk_distance / WALK_STEP_PX) % BACK_TEXTURES.size()
-		body.texture = BACK_TEXTURES[back]
+	# 위로 걸으면 뒷모습(#519), 아래로 걸으면 정면(#551). 대각선은 세로 성분이 더 큰
+	# 쪽만 세로 그림으로 본다 — 정확한 대각선(|x| == |y|)은 측면이다. 두 방향이 같은
+	# 계산을 쓰는 이유는 그림 규약이 같아서다(한 장이 한 걸음, 반전 없음).
+	if absf(facing_direction.y) > absf(facing_direction.x):
+		var pair: Array = BACK_TEXTURES if facing_direction.y < 0.0 else FRONT_TEXTURES
+		var step := int(_walk_distance / WALK_STEP_PX) % pair.size()
+		body.texture = pair[step]
 		body.flip_h = false
 		return
 
