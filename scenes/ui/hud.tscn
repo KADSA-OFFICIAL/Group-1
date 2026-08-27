@@ -53,13 +53,12 @@ mouse_filter = 2
 script = ExtResource("3_alert")
 
 [node name="TopLeft" type="PanelContainer" parent="Root"]
-; 세 줄이다(#529에서 단서 줄이 붙었다) — 목표 / 소지품 / 단서. 줄을 더 넣으면
-; 아래 CloseUp 패널도 같이 내려야 한다(겹치면 목표 글이 가려진다).
+; 엔딩 조건 표시(#540) — 목표 / 소지품 / 단서 / 진엔딩 / 엔딩2 / 엔딩1
 layout_mode = 1
 offset_left = 16.0
 offset_top = 16.0
-offset_right = 392.0
-offset_bottom = 122.0
+offset_right = 448.0
+offset_bottom = 200.0
 
 [node name="Margin" type="MarginContainer" parent="Root/TopLeft"]
 layout_mode = 2
@@ -70,6 +69,7 @@ theme_override_constants/margin_bottom = 8
 
 [node name="TextRows" type="VBoxContainer" parent="Root/TopLeft/Margin"]
 layout_mode = 2
+theme_override_constants/separation = 3
 
 [node name="ObjectiveLabel" type="Label" parent="Root/TopLeft/Margin/TextRows"]
 layout_mode = 2
@@ -83,18 +83,37 @@ text = "소지품: 없음"
 ; 엔딩의 "알아낸 것 N / M"과 늘 같은 숫자다.
 [node name="ClueLabel" type="Label" parent="Root/TopLeft/Margin/TextRows"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.85, 0.90, 1)
 text = "단서: 0 / 0"
 
+[node name="EndingSeparator" type="HSeparator" parent="Root/TopLeft/Margin/TextRows"]
+layout_mode = 2
+
+[node name="TrueEndingLabel" type="Label" parent="Root/TopLeft/Margin/TextRows"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1.0, 0.85, 0.50, 1)
+text = "진엔딩: 0/6 (4층:0/2, 3층:0/2, 2층:0/1, 1층:0/1)"
+
+[node name="ReportEndingLabel" type="Label" parent="Root/TopLeft/Margin/TextRows"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.70, 0.85, 1.0, 1)
+text = "엔딩 2: 0/3 (2층:0/1, 1층:0/2) [1개+ 필요]"
+
+[node name="BasicEndingLabel" type="Label" parent="Root/TopLeft/Margin/TextRows"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.75, 0.75, 0.78, 1)
+text = "엔딩 1: 1층 현관 열쇠 필요 (기본 탈출)"
+
 [node name="CloseUp" type="PanelContainer" parent="Root"]
-; 근접 클로즈업(#451). 목표·소지품·단서 패널(TopLeft, 16~122) **아래**에 둔다 —
-; 겹치면 목표 글이 가려진다. #529에서 단서 줄이 붙어 30px 내려왔다.
+; 근접 클로즈업(#451). 목표·소지품·단서·엔딩 패널(TopLeft) **아래**에 둔다 —
+; 겹치면 목표 글이 가려진다. #540에서 엔딩 표시가 붙어 offset_top = 216.0으로 내려왔다.
 ; 평소에는 visible = false다.
 visible = false
 layout_mode = 1
 offset_left = 16.0
-offset_top = 134.0
+offset_top = 216.0
 offset_right = 176.0
-offset_bottom = 350.0
+offset_bottom = 432.0
 
 [node name="Margin" type="MarginContainer" parent="Root/CloseUp"]
 layout_mode = 2
