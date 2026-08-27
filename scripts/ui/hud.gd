@@ -17,6 +17,7 @@ const USABLE_ITEM_KEYS := {
 @onready var subtitle: SubtitleDialogue = $Root/Subtitle
 @onready var inventory_panel: PanelContainer = $Root/InventoryPanel
 @onready var close_up: PanelContainer = $Root/CloseUp
+@onready var waypoint: Control = $Root/Waypoint
 @onready var close_up_image: TextureRect = $Root/CloseUp/Margin/Rows/Image
 @onready var close_up_caption: Label = $Root/CloseUp/Margin/Rows/Caption
 @onready var inventory_title: Label = $Root/InventoryPanel/Margin/Rows/InventoryTitle
@@ -188,6 +189,17 @@ func show_close_up(texture: Texture2D, caption: String = "") -> void:
 	close_up_caption.text = caption
 	close_up_caption.visible = not caption.is_empty()
 	close_up.visible = true
+
+
+## 월드의 한 곳을 화면에서 가리킨다(#478). 도입부에서 숨을 캐비넷을 알려 준다.
+func show_waypoint(world_position: Vector2, text: String = "") -> void:
+	if is_instance_valid(waypoint):
+		waypoint.call("show_at", world_position, text)
+
+
+func hide_waypoint() -> void:
+	if is_instance_valid(waypoint):
+		waypoint.call("clear")
 
 
 func hide_close_up() -> void:

@@ -122,6 +122,7 @@ func _on_escaped() -> void:
 	_hide_left = -1.0
 	_grace = -1.0
 	set_process(false)
+	_point_at_cabinet(false)
 
 
 func _on_investigated(_player: Node, name: String) -> void:
@@ -155,9 +156,7 @@ func _act1_warning() -> void:
 	await _camera_to_door(player)
 	_glow(1.0, 0.5)
 	Sfx.play(&"keys")
-	await _wait(0.5)
-	_say(gs, "수위", "…이 문 왜 열려 있어.")
-	await _wait(2.2)
+	await _wait(1.4)
 
 	await _camera_back(player)
 	_freeze(player, false)
@@ -169,10 +168,27 @@ func _act1_warning() -> void:
 
 	_say(gs, "이설", "(들어온다. 왼쪽 벽 캐비넷에 숨어야 해.)", "fear")
 	_pulse_mark()
+	_point_at_cabinet(true)
 
 	_hide_left = HIDE_SECONDS
 	_hide_warned = false
 	set_process(true)
+
+
+## 숨을 곳을 **화면에** 가리킨다(#478). 월드 표시(`_pulse_mark`)만으로는
+## 부족하다 — 캐비넷이 화면 밖일 수 있고, 화면 안이어도 `WallFade` 마스크가
+## 389px 밖을 검게 칠해 어둠 속에서 부푼다.
+func _point_at_cabinet(on: bool) -> void:
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud == null:
+		return
+	if not on:
+		if hud.has_method("hide_waypoint"):
+			hud.call("hide_waypoint")
+		return
+	var cabinet := get_node_or_null(cabinet_path) as Node2D
+	if cabinet != null and hud.has_method("show_waypoint"):
+		hud.call("show_waypoint", cabinet.global_position, "숨을 곳")
 
 
 ## 캐비넷 표시를 한 번 부풀렸다 되돌린다. 문구만으로는 어두운 방에서 못 찾는다.
@@ -201,6 +217,7 @@ func _tick_hide(delta: float) -> void:
 	if player != null and player.get("is_hiding") == true:
 		_hide_left = -1.0
 		set_process(false)
+		_point_at_cabinet(false)
 		_act2_confession()
 		return
 
@@ -213,6 +230,7 @@ func _tick_hide(delta: float) -> void:
 	if _hide_left <= 0.0:
 		_hide_left = -1.0
 		set_process(false)
+		_point_at_cabinet(false)
 		_caught("…거기 누구야.")
 
 
@@ -242,6 +260,8 @@ func _act2_confession() -> void:
 	# 장면이 대사를 앞지르거나(수위가 자백 도중 걸어 나감) 다 뜬 뒤 빈 화면을
 	# 보게 된다(#471에서 둘 다 겪었다). 속도는 HUD 대기열(#454)이 잡는다.
 	for line in [
+			# 문을 열고 들어서며 하는 말이다 — 1막에서 여기로 옮겼다(#478).
+			["수위", "…이 문 왜 열려 있어.", ""],
 			["수위", "시우야. 니 그림은 아직 여기 있다.", ""],
 			["수위", "니 반 애들, 아빠가 하나씩 치웠어. 울면서 빌더라.", ""],
 			["수위", "니가 빌 때는 아무도 안 들어줬는데. 심판이야, 죄 있는 애들만.",
