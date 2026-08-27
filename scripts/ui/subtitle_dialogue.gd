@@ -16,6 +16,29 @@ signal typing_finished
 
 const TYPING_SECONDS_PER_CHAR := 0.05
 
+## 타이핑 배속(#563). 이 값으로 나눈다 — 1.5면 예전보다 1.5배 빠르다.
+##
+## 왜 TYPING_SECONDS_PER_CHAR 를 직접 줄이지 않았나: 그 값은 "글자당 몇 초"라는
+## 뜻이고 감정 배율(_typing_scale)이 그 위에 곱해진다. 배속을 따로 두면
+## "기본 속도"와 "지금 얼마나 서두르는가"가 분리되어, 대기열 상태에 따라
+## 한쪽만 바꿀 수 있다.
+##
+## 대사 사이가 오래 걸린다는 보고에서 나왔다. 실측(글자당 0.05초 + 다 찍힌 뒤
+## 대기)으로 연속 5줄(67자씩)이 21.8초였다 — 단서 문구가 67~77자라 한 줄에
+## 타이핑만 3.35~3.85초가 든다.
+const TYPING_SPEED := 1.5
+## 뒤에 대기 중인 줄이 있을 때의 배속. 밀린 만큼 더 빨리 흘려보낸다.
+##
+## 두 단계로 나눈 이유: 혼자 뜨는 대사(조사 문구 한 줄 등)까지 2배로 하면
+## 읽기 전에 지나간다. 밀려 있을 때만 서두르면 **읽는 사람이 기다리는 시간**만
+## 줄고 한 줄짜리는 그대로다.
+##
+## **3배까지 올렸다**(사용자 요청: "초반 수위의 대사 속도를 좀더 빠르게"). 여기서
+## 더 올려도 화면에 머무는 시간은 거의 안 줄어든다 — 한 줄이 보이는 시간은
+## `타이핑 + hud.gd 의 queued_notice_seconds(1.0초)` 인데, 30자 대사의 타이핑이
+## 이미 0.5초라 대기 쪽이 더 크다. **그 1.0초는 읽는 시간이므로 건드리지 않았다.**
+const TYPING_SPEED_QUEUED := 3.0
+
 # 화자 있는 대사
 const SPEECH_MARGIN_X := 138.0                       # (76)
 const SPEECH_MARGIN_BOTTOM := 102.0                  # (56)
@@ -104,7 +127,8 @@ func _ready() -> void:
 
 
 ## 대사 한 줄을 표시하고 타이핑을 시작한다. speaker가 비면 지문·독백으로 배치한다.
-func show_line(speaker: String, text: String, emotion: String = "") -> void:
+func show_line(speaker: String, text: String, emotion: String = "",
+		queued: bool = false) -> void:
 	var monologue := speaker.is_empty()
 	var margin_x: float = MONOLOGUE_MARGIN_X if monologue else SPEECH_MARGIN_X
 
@@ -130,7 +154,7 @@ func show_line(speaker: String, text: String, emotion: String = "") -> void:
 	visible = true
 	if appearing:
 		_fade_in()
-	_start_typing(emotion)
+	_start_typing(emotion, queued)
 
 
 ## 타이핑 중이면 남은 글자를 즉시 전부 표시한다. 실제로 건너뛰었으면 true.
@@ -204,7 +228,7 @@ func _fade_portrait(target: Color) -> void:
 	portrait_tween.tween_property(portrait, "modulate", target, PORTRAIT_FADE)
 
 
-func _start_typing(emotion: String) -> void:
+func _start_typing(emotion: String, queued: bool = false) -> void:
 	if typing_tween != null:
 		typing_tween.kill()
 
@@ -216,7 +240,8 @@ func _start_typing(emotion: String) -> void:
 	if total_chars == 0:
 		total_chars = text_label.text.length()
 
-	var seconds := total_chars * TYPING_SECONDS_PER_CHAR * _typing_scale(emotion)
+	var speed := TYPING_SPEED_QUEUED if queued else TYPING_SPEED
+	var seconds := total_chars * TYPING_SECONDS_PER_CHAR * _typing_scale(emotion) / speed
 	last_typing_seconds = seconds
 	typing_tween = create_tween()
 	typing_tween.tween_property(text_label, "visible_characters", total_chars, seconds)
