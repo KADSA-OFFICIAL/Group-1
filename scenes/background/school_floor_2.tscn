@@ -3844,7 +3844,8 @@ script = ExtResource("2_pickup")
 message = "눈이 있어야 할 자리에서 열쇠를 뽑아 냈다. 손이 떨려 두 번 놓쳤다. — '2F 계단'"
 item_id = "stair_key_2"
 pickup_id = "found_head_key"
-
+grants_flag = "found_jominhyuk"
+keep_after_pickup = true
 
 [node name="HeadKeyVisual" type="Sprite2D" parent="HeadKey"]
 z_index = 1
@@ -3860,6 +3861,7 @@ shape = SubResource("RectangleShape2D_key_zone")
 collision_layer = 0
 collision_mask = 1
 script = ExtResource("17_proximity")
+skip_if_flag = "found_head_key"
 portrait = ExtResource("15_eyekey")
 caption = "2학년 2반 조민혁"
 line_speaker = "이설"

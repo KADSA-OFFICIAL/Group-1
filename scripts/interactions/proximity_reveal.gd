@@ -18,6 +18,16 @@ extends Area2D
 ## 순서대로 나온다. `line_emotions`를 순번으로 짝지어 준다(모자라면 기본 감정).
 @export var lines: PackedStringArray = PackedStringArray()
 @export var line_emotions: PackedStringArray = PackedStringArray()
+## 이 플래그가 서 있으면 **통째로 건너뛴다**(#459) — 그림도 대사도 안 나온다.
+##
+## 2층 머리가 그렇다. 클로즈업 그림이 눈에 열쇠가 박힌 모습이라 뽑아 낸 뒤에도
+## 띄우면 없는 물건을 보여 주게 되고, 층을 다시 들어올 때마다 발견 대사 다섯 줄이
+## 되풀이된다. `_said`는 노드 하나가 사는 동안만 기억하므로 층을 다시 열면 잊는다.
+##
+## **들어설 때만 본다.** 보고 있는 도중에 열쇠를 집어도 그림을 내리지 않는다 —
+## 이설이 아직 그 머리 이야기를 하고 있는 중이라 말 도중에 그림만 사라지면 어색하다.
+## 한 번 벗어나면 그다음부터는 안 뜬다.
+@export var skip_if_flag: String = ""
 
 var _said: bool = false
 var _inside: int = 0
@@ -52,6 +62,8 @@ func _on_entered(body: Node2D) -> void:
 	_inside += 1
 	if _inside != 1:
 		return
+	if _spent():
+		return
 	var hud := get_tree().get_first_node_in_group("hud")
 	if hud != null and hud.has_method("show_close_up"):
 		hud.call("show_close_up", portrait, caption)
@@ -79,6 +91,14 @@ func _on_exited(body: Node2D) -> void:
 	if _inside > 0:
 		return
 	_hide()
+
+
+## 이미 볼 것을 다 본 자리인가.
+func _spent() -> bool:
+	if skip_if_flag.is_empty():
+		return false
+	var gs := get_tree().get_first_node_in_group("game_state")
+	return gs != null and bool(gs.call("has_flag", skip_if_flag))
 
 
 func _hide() -> void:

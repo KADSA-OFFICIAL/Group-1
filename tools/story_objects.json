@@ -120,7 +120,7 @@
    "kids": [
     "[node name=\"HeadKeyVisual\" type=\"Sprite2D\" parent=\"HeadKey\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"16_headtop\")\n\n",
     "[node name=\"HeadKeyZone\" type=\"CollisionShape2D\" parent=\"HeadKey\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n",
-    "[node name=\"HeadKeyNear\" type=\"Area2D\" parent=\"HeadKey\"]\ncollision_layer = 0\ncollision_mask = 1\nscript = ExtResource(\"17_proximity\")\nportrait = ExtResource(\"15_eyekey\")\ncaption = \"2학년 2반 조민혁\"\nline_speaker = \"이설\"\nlines = PackedStringArray(\"…사람이야.\", \"(소리가 안 나와. 숨만 얕게 올라온다.)\", \"이 얼굴… 2학년 2반 조민혁.\", \"뉴스에서 실종됐다던 이름이야.\", \"눈에 박힌 건… 열쇠?\")\nline_emotions = PackedStringArray(\"fear\", \"fear\", \"suspicion\", \"suspicion\", \"fear\")\n\n",
+    "[node name=\"HeadKeyNear\" type=\"Area2D\" parent=\"HeadKey\"]\ncollision_layer = 0\ncollision_mask = 1\nscript = ExtResource(\"17_proximity\")\nskip_if_flag = \"found_head_key\"\nportrait = ExtResource(\"15_eyekey\")\ncaption = \"2학년 2반 조민혁\"\nline_speaker = \"이설\"\nlines = PackedStringArray(\"…사람이야.\", \"(소리가 안 나와. 숨만 얕게 올라온다.)\", \"이 얼굴… 2학년 2반 조민혁.\", \"뉴스에서 실종됐다던 이름이야.\", \"눈에 박힌 건… 열쇠?\")\nline_emotions = PackedStringArray(\"fear\", \"fear\", \"suspicion\", \"suspicion\", \"fear\")\n\n",
     "[node name=\"HeadKeyNearZone\" type=\"CollisionShape2D\" parent=\"HeadKey/HeadKeyNear\"]\nshape = SubResource(\"RectangleShape2D_near_zone\")\n\n"
    ]
   },
