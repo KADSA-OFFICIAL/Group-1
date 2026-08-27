@@ -218,13 +218,44 @@ func _physics_process(_delta: float) -> void:
 			return
 
 
+## 층별 기본 등장 지점. `travel_to()`가 등장 지점 없이 불렸을 때 쓴다.
+const DEFAULT_ARRIVES := {
+	0: YARD_ARRIVE,
+	1: Vector2(381, 772),
+	2: Vector2(579, 692),
+	3: Vector2(579, 692),
+	4: INTRO_ARRIVE,
+}
+
+
+## 디버그용 층 이동 단축키(#507) — 릴리스 빌드에서는 동작하지 않는다.
+## 숫자키 0~4로 해당 층의 기본 등장 지점으로 즉시 이동한다.
+func _input(event: InputEvent) -> void:
+	if not OS.is_debug_build() or changing_floor or game_over_active:
+		return
+	if not (event is InputEventKey and event.pressed and not event.echo):
+		return
+
+	match event.keycode:
+		KEY_0, KEY_KP_0:
+			travel_to(0)
+		KEY_1, KEY_KP_1:
+			travel_to(1)
+		KEY_2, KEY_KP_2:
+			travel_to(2)
+		KEY_3, KEY_KP_3:
+			travel_to(3)
+		KEY_4, KEY_KP_4:
+			travel_to(4)
+
+
 ## 계단이 아닌 곳에서 층을 바꾼다(#356) — 현관 문이 운동장으로 데려올 때 쓴다.
 ## `arrive`를 비워 두면 그 층의 기본 등장 지점으로 간다.
 func travel_to(target: int, arrive: Vector2 = Vector2.INF) -> void:
 	if changing_floor or not FLOOR_SCENES.has(target):
 		return
 	if arrive == Vector2.INF:
-		arrive = YARD_ARRIVE if target == YARD_FLOOR else Vector2.ZERO
+		arrive = DEFAULT_ARRIVES.get(target, Vector2.ZERO)
 	_change_floor(target, arrive)
 
 
