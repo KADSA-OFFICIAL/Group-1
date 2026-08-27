@@ -23,7 +23,7 @@ size = Vector2(3400, 40)
 size = Vector2(40, 1700)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_door_zone"]
-size = Vector2(140, 60)
+size = Vector2(260, 80)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_exam_zone"]
 size = Vector2(58, 50)
@@ -109,6 +109,11 @@ polygon = PackedVector2Array(240, 420, 3160, 420, 3160, 1450, 240, 1450)
 texture = ExtResource("tex_yard_dirt")
 color = Color(0.2513, 0.1923, 0.1359, 1)
 polygon = PackedVector2Array(430, 550, 2970, 550, 2970, 1320, 430, 1320)
+
+[node name="YardPath" type="Polygon2D" parent="Ground"]
+texture = ExtResource("tex_yard_dirt")
+color = Color(0.3141, 0.2462, 0.1769, 1)
+polygon = PackedVector2Array(1620, 300, 1780, 300, 1850, 680, 2520, 1480, 2520, 1600, 2280, 1600, 2280, 1480, 1690, 680)
 
 [node name="Walk" type="Polygon2D" parent="Ground"]
 texture = ExtResource("tex_yard_paving")
@@ -787,7 +792,7 @@ texture_scale = 1.35
 [node name="FrontGate" type="Area2D" parent="."]
 position = Vector2(2400, 1608)
 collision_layer = 2
-collision_mask = 0
+collision_mask = 3
 script = ExtResource("4_front_gate")
 
 [node name="Zone" type="CollisionShape2D" parent="FrontGate"]
