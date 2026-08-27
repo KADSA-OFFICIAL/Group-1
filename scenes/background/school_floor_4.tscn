@@ -181,11 +181,11 @@ polygon = PackedVector2Array(20, 20, 1780, 20, 1780, 23, 20, 23)
 
 [node name="WF_IntroTop" type="Polygon2D" parent="Structures"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(20, 36, 1780, 36, 1780, 52, 20, 52)
+polygon = PackedVector2Array(20, 36, 1780, 36, 1780, 66, 20, 66)
 
 [node name="WS_IntroTop" type="Polygon2D" parent="Structures"]
 color = Color(0.118, 0.124, 0.140, 1)
-polygon = PackedVector2Array(20, 52, 1780, 52, 1780, 56, 20, 56)
+polygon = PackedVector2Array(20, 66, 1780, 66, 1780, 70, 20, 70)
 
 [node name="WC_IntroLeft" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(20, 20, 36, 20, 36, 880, 20, 880)
@@ -226,11 +226,11 @@ polygon = PackedVector2Array(20, 864, 515, 864, 515, 867, 20, 867)
 
 [node name="WF_IntroBotL" type="Polygon2D" parent="Structures"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(20, 880, 515, 880, 515, 896, 20, 896)
+polygon = PackedVector2Array(20, 880, 515, 880, 515, 910, 20, 910)
 
 [node name="WS_IntroBotL" type="Polygon2D" parent="Structures"]
 color = Color(0.118, 0.124, 0.140, 1)
-polygon = PackedVector2Array(20, 896, 515, 896, 515, 900, 20, 900)
+polygon = PackedVector2Array(20, 910, 515, 910, 515, 914, 20, 914)
 
 [node name="WC_IntroBotR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(625, 864, 1780, 864, 1780, 880, 625, 880)
@@ -249,11 +249,11 @@ polygon = PackedVector2Array(625, 864, 1780, 864, 1780, 867, 625, 867)
 
 [node name="WF_IntroBotR" type="Polygon2D" parent="Structures"]
 color = Color(0.205, 0.216, 0.242, 1)
-polygon = PackedVector2Array(625, 880, 1780, 880, 1780, 896, 625, 896)
+polygon = PackedVector2Array(625, 880, 1780, 880, 1780, 910, 625, 910)
 
 [node name="WS_IntroBotR" type="Polygon2D" parent="Structures"]
 color = Color(0.118, 0.124, 0.140, 1)
-polygon = PackedVector2Array(625, 896, 1780, 896, 1780, 900, 625, 900)
+polygon = PackedVector2Array(625, 910, 1780, 910, 1780, 914, 625, 914)
 
 [node name="ArtDoorPanel" type="StaticBody2D" parent="."]
 
