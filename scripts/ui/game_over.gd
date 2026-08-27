@@ -48,7 +48,12 @@ func _ready() -> void:
 		var fl_name: String = "%d층" % fl if fl > 0 else "운동장"
 		retry_button.text = "%s에서 재시도" % fl_name
 		restart_button.visible = true
-		hint_label.text = "마지막 체크포인트: %s (소지품 및 단서 유지)" % fl_name
+		# **"소지품 및 단서 유지"라고 적혀 있었다**(#576). 체크포인트는 층에 들어선
+		# 순간을 찍으므로(`floor_manager._swap_floor` -> `record_checkpoint`)
+		# **그 층에서 모은 것은 사라진다** — 2층에서 계단 열쇠를 찾고 붙잡히면
+		# "소지품 유지"라고 적힌 버튼을 눌렀는데 빈손으로 돌아온다.
+		# 앞 층에서 가져온 것은 남으므로 그 차이가 읽히게 쓴다.
+		hint_label.text = "마지막 체크포인트: %s — 그 층에 들어설 때의 소지품·단서로 돌아갑니다" % fl_name
 	else:
 		retry_button.text = "다시 시작"
 		restart_button.visible = false
