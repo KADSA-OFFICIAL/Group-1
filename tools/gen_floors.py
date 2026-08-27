@@ -168,6 +168,23 @@ C_MARK_FLAVOR = "Color(0.60, 0.68, 0.78, 1)" # 그 밖의 조사(창밖·집기)
 TEX_DIR = "res://assets/tiles"
 TEX_MEAN = 0.78     # gen_tiles.py의 MEAN과 반드시 같아야 한다
 
+# ── 운동장 색(#356, #487) ─────────────────────────────────────
+# **`TEX`·`SPRITE`보다 앞에 둔다.** 두 표가 색 문자열을 키로 쓰기 때문이다.
+C_YARD = "Color(0.196, 0.150, 0.106, 1)"        # 다져진 흙
+C_YARD_TRACK = "Color(0.232, 0.166, 0.112, 1)"  # 트랙 — 흙보다 살짝 붉다
+C_WALK = "Color(0.150, 0.152, 0.156, 1)"        # 정문 밖 인도
+C_FENCE = "Color(0.225, 0.235, 0.260, 1)"       # 담장 살
+C_GOAL = "Color(0.52, 0.54, 0.58, 1)"           # 축구 골대 — 밤에도 흰 철제
+C_TREE = "Color(0.13, 0.21, 0.15, 1)"           # 나무 수관
+C_LAMP = "Color(0.86, 0.78, 0.52, 1)"           # 가로등 불빛(광원 색)
+C_LAMPPOST = "Color(0.22, 0.23, 0.25, 1)"       # 가로등 기둥
+# 조회대. **흙보다 밝아야 한다**(#361) — 실내 팔레트의 C_SLAB(0.10,0.12,0.13)을
+# 그대로 썼더니 갈색 흙보다 어둡고 푸르러서 단상이 아니라 웅덩이로 읽혔다.
+C_PODIUM = "Color(0.30, 0.30, 0.31, 1)"
+# 관람석. 실내 계단 디딤판(C_STEP)을 빌려 쓰던 것을 갈랐다(#487) —
+# 같은 색이면 SPRITE 조회가 계단까지 관람석 그림으로 바꿔 버린다.
+C_YARD_STAND = "Color(0.27, 0.28, 0.30, 1)"
+
 # 색 상수 -> 타일 이름. 여기 없는 색은 단색으로 남는다 — 열쇠·화살표·천장등처럼
 # 표식이거나, 마루 널 이음매(C_SEAM 2px)·칸막이 문
 # (C_STALLDOOR 5px)처럼 무늬가 들어갈 수 없을 만큼 얇은 것들이다.
@@ -186,6 +203,10 @@ TEX = {
     ROOM_FLOOR["lab"]: "floor_vinyl",
     ROOM_FLOOR["computer"]: "floor_panel",
     # 벽·문·계단
+    # 운동장(#487) — 실외 바닥은 이어붙는 판이 아니라 흩어진 알갱이다.
+    C_YARD: "yard_dirt",
+    C_YARD_TRACK: "yard_track",
+    C_WALK: "yard_paving",
     C_WALL: "wall_brick",
     C_PILASTER: "wall_brick",
     C_STEP: "wall_brick",
@@ -270,6 +291,11 @@ SPRITE = {
     C_COPIER: "obj_cabinet",
     C_FRIDGE: "obj_locker",
     C_PARTITION: "obj_panel",
+    # 운동장(#487) — 실내 집기 그림으로 대신하면 나무가 선반, 골대가 사물함이 된다.
+    C_TREE: "obj_tree",
+    C_GOAL: "obj_goal",
+    C_YARD_STAND: "obj_stand",
+    C_PODIUM: "obj_podium",
 }
 SPRITE_SIZE = 32    # gen_tiles.py의 OBJ와 반드시 같아야 한다
 
@@ -3308,17 +3334,8 @@ YARD_SIDE = (600, 880)
 YARD_ARRIVE = (1700.0, 380.0)             # 현관 앞 등장 지점
 YARD_SIDE_ARRIVE = (740.0, 380.0)         # 옆문 앞 등장 지점(#393)
 
-C_YARD = "Color(0.196, 0.150, 0.106, 1)"        # 다져진 흙
-C_YARD_TRACK = "Color(0.232, 0.166, 0.112, 1)"  # 트랙 — 흙보다 살짝 붉다
-C_WALK = "Color(0.150, 0.152, 0.156, 1)"        # 정문 밖 인도
-C_FENCE = "Color(0.225, 0.235, 0.260, 1)"       # 담장 살
-C_GOAL = "Color(0.52, 0.54, 0.58, 1)"           # 축구 골대 — 밤에도 흰 철제
-C_TREE = "Color(0.13, 0.21, 0.15, 1)"           # 나무 수관
-C_LAMP = "Color(0.86, 0.78, 0.52, 1)"           # 가로등 불빛(광원 색)
-C_LAMPPOST = "Color(0.22, 0.23, 0.25, 1)"       # 가로등 기둥
-# 조회대. **흙보다 밝아야 한다**(#361) — 실내 팔레트의 C_SLAB(0.10,0.12,0.13)을
-# 그대로 썼더니 갈색 흙보다 어둡고 푸르러서 단상이 아니라 웅덩이로 읽혔다.
-C_PODIUM = "Color(0.30, 0.30, 0.31, 1)"
+# 운동장 색은 `TEX`·`SPRITE` 표보다 앞(파일 위쪽)에 있다 — 표가 색 문자열을
+# 키로 쓰므로 여기서 다시 정의하면 조회가 빗나가 그림이 안 붙는다(#405와 같은 함정).
 
 
 def _yard_light(sc, key, x, y):
@@ -3439,7 +3456,7 @@ def build_yard():
     # 위로 올린다(#361).
     for i in range(3):
         _yard_prop(sc, "Stand" + str(i), YW - 520, YARD_FENCE - 300 + i * 44,
-                   YW - 120, YARD_FENCE - 268 + i * 44, C_STEP)
+                   YW - 120, YARD_FENCE - 268 + i * 44, C_YARD_STAND)
     _yard_prop(sc, "Podium", 980, YARD_FACADE + 90, 1300, YARD_FACADE + 190, C_PODIUM)
     _yard_prop(sc, "FlagPole", 1330, YARD_FACADE + 96, 1352, YARD_FACADE + 118,
                C_METAL)
@@ -3496,6 +3513,30 @@ def build_yard():
     sc.examine("Exam_LookBack", gcx - 170, YARD_FENCE - 70, "뒤를 돌아보기",
                "학교가 서 있다. 3층 어디쯤 창가에 불빛 하나가 멈춰 있다. "
                "손전등이다. 이쪽을 보고 있는지는 알 수 없다.")
+
+    # ── 둘러보기(#487) ──────────────────────────────────────
+    # 실내는 방마다 조사 대상이 둘씩 있는데(add_examine) 여기는 정문 앞 하나뿐이라
+    # 마지막 구간이 그냥 지나가는 길이었다. 집기 옆에 손으로 놓는다 — 운동장은
+    # 방이 없어 `add_examine`의 방 단위 배분을 쓸 수 없다.
+    for key, ex, ey, prompt, line in (
+        ("Exam_Goal", 350, my, "골대 살펴보기",
+         "골대 그물이 반쯤 뜯겨 나갔다. 바람이 지날 때마다 남은 그물코가 서로 부딪는다."),
+        ("Exam_Stand", YW - 580, YARD_FENCE - 240, "관람석 살펴보기",
+         "관람석 계단. 체육대회 때 여기 앉아 있었다. 그때는 운동장이 이렇게 넓은 줄 몰랐다."),
+        ("Exam_Podium", 1140, YARD_FACADE + 240, "조회대 살펴보기",
+         "조회대. 교장이 올라서서 말하던 자리다. '학교를 믿고 기다려 주세요.' "
+         "실종된 애들 얘기가 나올 때마다 그 말이었다."),
+        ("Exam_Flag", 1400, YARD_FACADE + 130, "게양대 살펴보기",
+         "게양대 줄이 풀려 쇠고리가 기둥을 때린다. 규칙적으로, 계속. "
+         "안에서 들었던 발소리와 박자가 비슷하다."),
+        ("Exam_Bikes", 2640, YARD_FACADE + 180, "자전거 살펴보기",
+         "자전거 몇 대가 그대로 서 있다. 안장에 먼지가 두껍다 — 하루 이틀 세워 둔 것이 아니다."),
+        # 가로등 기둥(x 409~431)과 나무 줄(180~276 / 530~626) 사이에 둔다 —
+        # 조사 범위 58x50이 기둥에 걸리면 집기와 겹친다.
+        ("Exam_Flowerbed", 330, YARD_FENCE - 82, "화단 살펴보기",
+         "화단 흙이 한 자리만 파였다가 다시 덮여 있다. 삽 자국이 아직 남아 있다."),
+    ):
+        sc.examine(key, ex, ey, prompt, line)
 
     sc.node('[node name="Walls" type="StaticBody2D" parent="."]' + NL)
     for nm, pos, shape in [

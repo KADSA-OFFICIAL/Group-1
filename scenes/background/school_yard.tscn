@@ -1,13 +1,20 @@
-[gd_scene load_steps=24 format=3]
+[gd_scene load_steps=31 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 [ext_resource type="Script" path="res://scripts/interactions/exit_door.gd" id="4_exit"]
 [ext_resource type="Script" path="res://scripts/game/interact_marks.gd" id="8_marks"]
+[ext_resource type="Texture2D" path="res://assets/tiles/obj_goal.png" id="tex_obj_goal"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_locker.png" id="tex_obj_locker"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_panel.png" id="tex_obj_panel"]
+[ext_resource type="Texture2D" path="res://assets/tiles/obj_podium.png" id="tex_obj_podium"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_shelf.png" id="tex_obj_shelf"]
+[ext_resource type="Texture2D" path="res://assets/tiles/obj_stand.png" id="tex_obj_stand"]
+[ext_resource type="Texture2D" path="res://assets/tiles/obj_tree.png" id="tex_obj_tree"]
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_glass.png" id="tex_prop_glass"]
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
+[ext_resource type="Texture2D" path="res://assets/tiles/yard_dirt.png" id="tex_yard_dirt"]
+[ext_resource type="Texture2D" path="res://assets/tiles/yard_paving.png" id="tex_yard_paving"]
+[ext_resource type="Texture2D" path="res://assets/tiles/yard_track.png" id="tex_yard_track"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(3400, 40)
@@ -66,7 +73,8 @@ texture_filter = 1
 texture_repeat = 2
 
 [node name="Floor" type="Polygon2D" parent="."]
-color = Color(0.196, 0.150, 0.106, 1)
+texture = ExtResource("tex_yard_dirt")
+color = Color(0.2513, 0.1923, 0.1359, 1)
 polygon = PackedVector2Array(0, 0, 3400, 0, 3400, 1700, 0, 1700)
 
 [node name="Ground" type="Node2D" parent="."]
@@ -99,15 +107,18 @@ full_distance = 300.0
 [node name="PropBodies" type="StaticBody2D" parent="."]
 
 [node name="Track" type="Polygon2D" parent="Ground"]
-color = Color(0.232, 0.166, 0.112, 1)
+texture = ExtResource("tex_yard_track")
+color = Color(0.2974, 0.2128, 0.1436, 1)
 polygon = PackedVector2Array(240, 420, 3160, 420, 3160, 1450, 240, 1450)
 
 [node name="Infield" type="Polygon2D" parent="Ground"]
-color = Color(0.196, 0.150, 0.106, 1)
+texture = ExtResource("tex_yard_dirt")
+color = Color(0.2513, 0.1923, 0.1359, 1)
 polygon = PackedVector2Array(430, 550, 2970, 550, 2970, 1320, 430, 1320)
 
 [node name="Walk" type="Polygon2D" parent="Ground"]
-color = Color(0.150, 0.152, 0.156, 1)
+texture = ExtResource("tex_yard_paving")
+color = Color(0.1923, 0.1949, 0.2, 1)
 polygon = PackedVector2Array(0, 1616, 3400, 1616, 3400, 1700, 0, 1700)
 
 [node name="Facade" type="Polygon2D" parent="Structures"]
@@ -524,45 +535,54 @@ polygon = PackedVector2Array(2540, 1552, 2556, 1552, 2556, 1616, 2540, 1616)
 polygon = PackedVector2Array(250, 820, 300, 820, 300, 1080, 250, 1080)
 
 [node name="PV_GoalL" type="Polygon2D" parent="Props"]
-color = Color(0.52, 0.54, 0.58, 1)
+texture = ExtResource("tex_obj_goal")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.6457, 0.6705, 0.7202, 1)
 polygon = PackedVector2Array(250, 820, 300, 820, 300, 1080, 250, 1080)
 
 [node name="PC_GoalR" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(3100, 820, 3150, 820, 3150, 1080, 3100, 1080)
 
 [node name="PV_GoalR" type="Polygon2D" parent="Props"]
-color = Color(0.52, 0.54, 0.58, 1)
+texture = ExtResource("tex_obj_goal")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.6795, 0.7056, 0.7578, 1)
 polygon = PackedVector2Array(3100, 820, 3150, 820, 3150, 1080, 3100, 1080)
 
 [node name="PC_Stand0" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(2880, 1300, 3280, 1300, 3280, 1332, 2880, 1332)
 
 [node name="PV_Stand0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_wall_brick")
-color = Color(0.2821, 0.3077, 0.359, 1)
+texture = ExtResource("tex_obj_stand")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.3446, 0.3574, 0.3828, 1)
 polygon = PackedVector2Array(2880, 1300, 3280, 1300, 3280, 1332, 2880, 1332)
 
 [node name="PC_Stand1" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(2880, 1344, 3280, 1344, 3280, 1376, 2880, 1376)
 
 [node name="PV_Stand1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_wall_brick")
-color = Color(0.2821, 0.3077, 0.359, 1)
+texture = ExtResource("tex_obj_stand")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.3287, 0.3409, 0.3652, 1)
 polygon = PackedVector2Array(2880, 1344, 3280, 1344, 3280, 1376, 2880, 1376)
 
 [node name="PC_Stand2" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(2880, 1388, 3280, 1388, 3280, 1420, 2880, 1420)
 
 [node name="PV_Stand2" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_wall_brick")
-color = Color(0.2821, 0.3077, 0.359, 1)
+texture = ExtResource("tex_obj_stand")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.3544, 0.3675, 0.3937, 1)
 polygon = PackedVector2Array(2880, 1388, 3280, 1388, 3280, 1420, 2880, 1420)
 
 [node name="PC_Podium" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(980, 390, 1300, 390, 1300, 490, 980, 490)
 
 [node name="PV_Podium" type="Polygon2D" parent="Props"]
-color = Color(0.30, 0.30, 0.31, 1)
+texture = ExtResource("tex_obj_podium")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.407, 0.407, 0.4205, 1)
 polygon = PackedVector2Array(980, 390, 1300, 390, 1300, 490, 980, 490)
 
 [node name="PC_FlagPole" type="CollisionPolygon2D" parent="PropBodies"]
@@ -578,56 +598,72 @@ polygon = PackedVector2Array(1330, 396, 1352, 396, 1352, 418, 1330, 418)
 polygon = PackedVector2Array(180, 1470, 276, 1470, 276, 1566, 180, 1566)
 
 [node name="PV_Tree0" type="Polygon2D" parent="Props"]
-color = Color(0.13, 0.21, 0.15, 1)
+texture = ExtResource("tex_obj_tree")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.1614, 0.2606, 0.1861, 1)
 polygon = PackedVector2Array(180, 1470, 276, 1470, 276, 1566, 180, 1566)
 
 [node name="PC_Tree1" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(530, 1470, 626, 1470, 626, 1566, 530, 1566)
 
 [node name="PV_Tree1" type="Polygon2D" parent="Props"]
-color = Color(0.13, 0.21, 0.15, 1)
+texture = ExtResource("tex_obj_tree")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.1737, 0.2805, 0.2004, 1)
 polygon = PackedVector2Array(530, 1470, 626, 1470, 626, 1566, 530, 1566)
 
 [node name="PC_Tree2" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(880, 1470, 976, 1470, 976, 1566, 880, 1566)
 
 [node name="PV_Tree2" type="Polygon2D" parent="Props"]
-color = Color(0.13, 0.21, 0.15, 1)
+texture = ExtResource("tex_obj_tree")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.166, 0.2682, 0.1916, 1)
 polygon = PackedVector2Array(880, 1470, 976, 1470, 976, 1566, 880, 1566)
 
 [node name="PC_Tree3" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1230, 1470, 1326, 1470, 1326, 1566, 1230, 1566)
 
 [node name="PV_Tree3" type="Polygon2D" parent="Props"]
-color = Color(0.13, 0.21, 0.15, 1)
+texture = ExtResource("tex_obj_tree")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.1584, 0.2558, 0.1827, 1)
 polygon = PackedVector2Array(1230, 1470, 1326, 1470, 1326, 1566, 1230, 1566)
 
 [node name="PC_Tree4" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1580, 1470, 1676, 1470, 1676, 1566, 1580, 1566)
 
 [node name="PV_Tree4" type="Polygon2D" parent="Props"]
-color = Color(0.13, 0.21, 0.15, 1)
+texture = ExtResource("tex_obj_tree")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.172, 0.2777, 0.1984, 1)
 polygon = PackedVector2Array(1580, 1470, 1676, 1470, 1676, 1566, 1580, 1566)
 
 [node name="PC_Tree5" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1930, 1470, 2026, 1470, 2026, 1566, 1930, 1566)
 
 [node name="PV_Tree5" type="Polygon2D" parent="Props"]
-color = Color(0.13, 0.21, 0.15, 1)
+texture = ExtResource("tex_obj_tree")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.1643, 0.2654, 0.1896, 1)
 polygon = PackedVector2Array(1930, 1470, 2026, 1470, 2026, 1566, 1930, 1566)
 
 [node name="PC_Tree7" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(2630, 1470, 2726, 1470, 2726, 1566, 2630, 1566)
 
 [node name="PV_Tree7" type="Polygon2D" parent="Props"]
-color = Color(0.13, 0.21, 0.15, 1)
+texture = ExtResource("tex_obj_tree")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.169, 0.2729, 0.195, 1)
 polygon = PackedVector2Array(2630, 1470, 2726, 1470, 2726, 1566, 2630, 1566)
 
 [node name="PC_Tree8" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(2980, 1470, 3076, 1470, 3076, 1566, 2980, 1566)
 
 [node name="PV_Tree8" type="Polygon2D" parent="Props"]
-color = Color(0.13, 0.21, 0.15, 1)
+texture = ExtResource("tex_obj_tree")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.1626, 0.2626, 0.1876, 1)
 polygon = PackedVector2Array(2980, 1470, 3076, 1470, 3076, 1566, 2980, 1566)
 
 [node name="PC_Bench0" type="CollisionPolygon2D" parent="PropBodies"]
@@ -818,6 +854,114 @@ shape = SubResource("RectangleShape2D_exam_zone")
 
 [node name="Mark_Exam_LookBack" type="Polygon2D" parent="WallGlow/Marks"]
 position = Vector2(2230, 1530)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Goal" type="Area2D" parent="."]
+position = Vector2(350, 950)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "골대 그물이 반쯤 뜯겨 나갔다. 바람이 지날 때마다 남은 그물코가 서로 부딪는다."
+prompt_text = "골대 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Goal"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Goal" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(350, 950)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Stand" type="Area2D" parent="."]
+position = Vector2(2820, 1360)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "관람석 계단. 체육대회 때 여기 앉아 있었다. 그때는 운동장이 이렇게 넓은 줄 몰랐다."
+prompt_text = "관람석 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Stand"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Stand" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2820, 1360)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Podium" type="Area2D" parent="."]
+position = Vector2(1140, 540)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "조회대. 교장이 올라서서 말하던 자리다. '학교를 믿고 기다려 주세요.' 실종된 애들 얘기가 나올 때마다 그 말이었다."
+prompt_text = "조회대 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Podium"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Podium" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1140, 540)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Flag" type="Area2D" parent="."]
+position = Vector2(1400, 430)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "게양대 줄이 풀려 쇠고리가 기둥을 때린다. 규칙적으로, 계속. 안에서 들었던 발소리와 박자가 비슷하다."
+prompt_text = "게양대 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Flag"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Flag" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1400, 430)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Bikes" type="Area2D" parent="."]
+position = Vector2(2640, 480)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "자전거 몇 대가 그대로 서 있다. 안장에 먼지가 두껍다 — 하루 이틀 세워 둔 것이 아니다."
+prompt_text = "자전거 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Bikes"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Bikes" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(2640, 480)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Flowerbed" type="Area2D" parent="."]
+position = Vector2(330, 1518)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "화단 흙이 한 자리만 파였다가 다시 덮여 있다. 삽 자국이 아직 남아 있다."
+prompt_text = "화단 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Flowerbed"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Flowerbed" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(330, 1518)
 z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
