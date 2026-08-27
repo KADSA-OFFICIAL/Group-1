@@ -635,6 +635,98 @@ def solid_obj(fn):
     return wrapped
 
 
+# ── 운동장 재질(#487) ────────────────────────────────────────────
+# 실외 바닥은 실내 마루와 성격이 다르다 — 이어붙는 판이 아니라 흩어진 알갱이다.
+# 그래서 널·장 같은 큰 단위가 없고 잔 잡음 위에 넓은 얼룩만 얹는다.
+
+def p_dirt(dx: int, dy: int, gw: int, gh: int) -> float:
+    """운동장 다져진 흙. 굵은 자갈 알갱이 + 발이 다져 놓은 넓은 얼룩."""
+    dx, dy = dx % gw, dy % gh
+    v = 0.86 + jit(0.05, dx // 4, dy // 4, 181)       # 다져진 자리마다 톤 차이
+    v += jit(0.05, dx, dy, 182)                       # 잔 알갱이
+    r = rnd(dx, dy, 183)
+    if r > 0.972:
+        v += 0.10                                     # 드러난 자갈
+    elif r < 0.045:
+        v -= 0.12                                     # 파인 자리
+    v += wear(dx, dy, gw, gh, 184, 0.16, 0.06)        # 물 지나간 자국
+    return v
+
+
+def p_track(dx: int, dy: int, gw: int, gh: int) -> float:
+    """트랙. 흙보다 곱고 레인 선이 가로로 지난다(64px마다 = 칸 두 개)."""
+    dx, dy = dx % gw, dy % gh
+    v = 0.86 + jit(0.05, dx, dy, 191)                 # 고운 우레탄 알갱이
+    v += jit(0.05, dx // 2, dy // 2, 192)
+    if dy % (SUB * 2) == 0:
+        v += 0.22                                     # 레인 선(2px)
+    elif dy % (SUB * 2) == 1:
+        v += 0.08                                     # 선 아래 그늘로 한 단
+    if rnd(dx, dy, 194) > 0.985:
+        v -= 0.14                                     # 벗겨진 자리
+    v += wear(dx, dy, gw, gh, 193, 0.16, 0.06)
+    return v
+
+
+def p_paving(dx: int, dy: int, gw: int, gh: int) -> float:
+    """정문 밖 인도. 32px 보도블록 — 줄눈이 칸 경계와 정확히 맞는다."""
+    dx, dy = dx % gw, dy % gh
+    v = 0.90 + jit(0.08, dx // SUB, dy // SUB, 201)   # 장마다 톤
+    v += jit(0.03, dx, dy, 202)
+    if dx % SUB == 0 or dy % SUB == 0:
+        v -= 0.22                                     # 줄눈 — 장 경계가 또렷해야
+        if dx % SUB == 0 and dy % SUB == 0:
+            v -= 0.06                                 # 모서리는 더 깊다
+    v += wear(dx, dy, gw, gh, 203, 0.10, 0.05)
+    return v
+
+
+# ── 운동장 오브젝트(#487) ────────────────────────────────────────
+# 실내 집기 그림으로 대신하면 나무가 선반이 되고 골대가 사물함이 된다.
+
+def o_tree(dx: int, dy: int, gw: int, gh: int) -> float:
+    """화단 나무. 위에서 본 둥근 수관 — 잎 덩어리가 뭉쳐 있다."""
+    # 수관이 **밝고** 바깥이 어둡다. 화분(o_plant)은 반대인데, 저쪽은 밝은
+    # 실내 바닥 위에 놓이는 물건이고 나무는 캄캄한 흙 위에 선 덩어리다 —
+    # 바깥을 밝히면 사각형 잔디밭 한가운데 검은 원이 있는 것처럼 보인다.
+    cx0, cy0 = (gw - 1) / 2.0, (gh - 1) / 2.0
+    r = (((dx - cx0) / (gw * 0.48)) ** 2 + ((dy - cy0) / (gh * 0.48)) ** 2) ** 0.5
+    if r > 1.0:
+        return 0.42 + jit(0.05, dx, dy, 433)          # 수관 밖 — 그늘진 흙
+    v = 0.88 + jit(0.14, dx // 2, dy // 2, 431)       # 잎 덩어리
+    v += jit(0.07, dx, dy, 432)
+    if r > 0.86:
+        v -= 0.16                                     # 가장자리 잎이 어둡다
+    return v
+
+
+def o_goal(dx: int, dy: int, gw: int, gh: int) -> float:
+    """축구 골대. 흰 철제 틀 + 그물(뒤가 비친다)."""
+    if _edge(dx, dy, gw, gh) == 0:
+        return 0.99                                   # 틀
+    if (dx + dy) % 4 == 0 or (dx - dy) % 4 == 0:
+        return 0.86                                   # 그물코
+    return 0.58 + jit(0.05, dx, dy, 441)              # 그물 사이
+
+
+def o_stand(dx: int, dy: int, gw: int, gh: int) -> float:
+    """관람석. 콘크리트 단이 가로로 쌓인다."""
+    step = max(2, gh // 3)
+    v = 0.80 + 0.05 * ((dy // step) % 2)
+    if dy % step == 0:
+        v = 0.97                                      # 단 윗면 모서리
+    return v + jit(0.04, dx, dy, 451)
+
+
+def o_podium(dx: int, dy: int, gw: int, gh: int) -> float:
+    """조회대. 뒤쪽 난간 / 단 상판 / 앞 계단."""
+    if dy < gh * 0.30:
+        return 0.93 + jit(0.03, dx, dy, 461)          # 난간
+    if dy > gh * 0.78:
+        return 0.72 + jit(0.04, dx, dy, 462)          # 앞 계단
+    return 0.85 + jit(0.05, dx, dy, 463)              # 상판
+
+
 OBJECTS = {
     "obj_desk": solid_obj(o_desk),
     "obj_chair": solid_obj(o_chair),
@@ -653,6 +745,11 @@ OBJECTS = {
     "obj_easel": solid_obj(o_easel),
     "obj_bust": solid_obj(o_bust),
     "obj_canvas": solid_obj(o_canvas),
+    # 운동장 전용(#487)
+    "obj_tree": solid_obj(o_tree),
+    "obj_goal": solid_obj(o_goal),
+    "obj_stand": solid_obj(o_stand),
+    "obj_podium": solid_obj(o_podium),
 }
 
 
@@ -668,6 +765,10 @@ PATTERNS = {
     "prop_metal": (p_metal, SMALL),
     "prop_cloth": (p_cloth, SMALL),
     "prop_glass": (p_glass, SMALL),
+    # 운동장(#487)
+    "yard_dirt": (p_dirt, FLOOR),
+    "yard_track": (p_track, FLOOR),
+    "yard_paving": (p_paving, FLOOR),
 }
 
 # #242가 이미 격자를 그리는 면. 여기에는 선이 있는 무늬를 쓸 수 없다 —
