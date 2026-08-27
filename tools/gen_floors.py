@@ -177,6 +177,7 @@ TEX_MEAN = 0.78     # gen_tiles.py의 MEAN과 반드시 같아야 한다
 # ── 운동장 색(#356, #487) ─────────────────────────────────────
 # **`TEX`·`SPRITE`보다 앞에 둔다.** 두 표가 색 문자열을 키로 쓰기 때문이다.
 C_YARD = "Color(0.196, 0.150, 0.106, 1)"        # 다져진 흙
+C_YARD_PATH = "Color(0.245, 0.192, 0.138, 1)"    # 닳은 흙길 — 정문 유도 통행 흔적(#520)
 C_YARD_TRACK = "Color(0.232, 0.166, 0.112, 1)"  # 트랙 — 흙보다 살짝 붉다
 C_WALK = "Color(0.150, 0.152, 0.156, 1)"        # 정문 밖 인도
 C_FENCE = "Color(0.225, 0.235, 0.260, 1)"       # 담장 살
@@ -211,6 +212,7 @@ TEX = {
     # 벽·문·계단
     # 운동장(#487) — 실외 바닥은 이어붙는 판이 아니라 흩어진 알갱이다.
     C_YARD: "yard_dirt",
+    C_YARD_PATH: "yard_dirt",
     C_YARD_TRACK: "yard_track",
     C_WALK: "yard_paving",
     C_WALL: "wall_brick",
@@ -3476,7 +3478,7 @@ def build_yard():
     sc.rect_shapes = [
         ("RectangleShape2D_wall_h", "Vector2(" + str(YW) + ", 40)"),
         ("RectangleShape2D_wall_v", "Vector2(40, " + str(YH) + ")"),
-        ("RectangleShape2D_door_zone", "Vector2(140, 60)"),
+        ("RectangleShape2D_door_zone", "Vector2(260, 80)"),
         ("RectangleShape2D_exam_zone",
          "Vector2(" + str(EXAMINE_ZONE[0]) + ", " + str(EXAMINE_ZONE[1]) + ")"),
     ]
@@ -3507,6 +3509,10 @@ def build_yard():
               rect(240, YARD_FACADE + 120, YW - 240, YARD_FENCE - 150))
     sc.poly2d("Infield", "Ground", C_YARD,
               rect(430, YARD_FACADE + 250, YW - 430, YARD_FENCE - 280))
+    # 현관(1700, 380)에서 정문(2400, 1600)으로 이어지는 닳은 흙길(통행 흔적, #520).
+    # 밤에도 정문 방향을 알아볼 수 있도록 살짝 연한 흙빛으로 유도선을 깐다.
+    path_poly = "PackedVector2Array(1620, 300, 1780, 300, 1850, 680, 2520, 1480, 2520, 1600, 2280, 1600, 2280, 1480, 1690, 680)"
+    sc.poly2d("YardPath", "Ground", C_YARD_PATH, path_poly)
     sc.poly2d("Walk", "Ground", C_WALK, rect(0, YARD_FENCE + T, YW, YH))
 
     # ── 학교 정면 ────────────────────────────────────────────
@@ -3585,12 +3591,12 @@ def build_yard():
 
     # ── 정문(탈출) ──────────────────────────────────────────
     gcx = (gx0 + gx1) / 2
-    # FrontGate: 자동 트리거(#513) — E키 없이 접촉하면 엔딩 시작.
+    # FrontGate: 자동 트리거(#513, #520) — E키 없이 접촉하면 엔딩 시작.
     sc.node(NL.join([
         '[node name="FrontGate" type="Area2D" parent="."]',
         "position = Vector2(%s, %s)" % (n(gcx), n(YARD_FENCE + 8)),
         "collision_layer = 2",
-        "collision_mask = 0",
+        "collision_mask = 3",
         'script = ExtResource("4_front_gate")',
         "",
         '[node name="Zone" type="CollisionShape2D" parent="FrontGate"]',
