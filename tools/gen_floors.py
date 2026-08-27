@@ -3647,7 +3647,13 @@ def build_intro():
         'required_item_id = "korean_book"',
         'locked_message = "창문은 열린다. 그런데 국어책도 없이 이러려고 온 게 아니다."',
         'prompt_text = "창문으로 내려가기"',
-        'message = "창틀을 넘어 난간에 발을 디뎠다. 아래층 창문까지 두 걸음."',
+        # `message`는 비운다 — 컷신이 창틀·난간·두 걸음을 이미 다 말한다(#468).
+        # 내려가는 컷신(#468). 본편에서 계단이 아닌 유일한 하강이고, 수위가
+        # 자백하고 내려간 직후라 긴장이 가장 높은 자리다 — 계단처럼 지나가면 안 된다.
+        'cutscene_speaker = "이설"',
+        'cutscene_lines = PackedStringArray(\"창틀에 손을 얹었다. 밤공기가 차다.\", \"…4층이야. 아래를 보면 안 돼.\", \"(난간이 있어. 한 뼘이지만 있어.)\", \"한쪽 발을 내렸다. 신발 밑창이 미끄러진다.\", \"3층 창문. 두 걸음.\", \"…수위 아저씨가 열쇠를 가지러 간 사이에.\")',
+        'cutscene_emotions = PackedStringArray(\"\", \"fear\", \"fear\", \"fear\", \"\", \"suspicion\")',
+        "cutscene_look_at = Vector2(1465, %s)" % n(IY0 + T + 10),
         "target_floor = 3",
         # 3층 도착지는 **교실1 창가**다. 가운데(2학년부, 1700)에 떨어뜨리면
         # 계단 열쇠가 있는 방에 착지해 3층 강제 동선이 1720px로 줄었다 —

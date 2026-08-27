@@ -214,6 +214,17 @@ func _check_artroom_intro() -> void:
 			_fault("main: 4층에 %s가 없다" % want)
 	_ok("4층 도입부 노드")
 
+	# 창문 컷신(#468) — 생성기가 대사를 안 실으면 계단처럼 지나가 버린다.
+	var win: Node = bg.get_node_or_null("PrepWindowEscape")
+	if win != null:
+		var cl: PackedStringArray = win.get("cutscene_lines")
+		if cl.is_empty():
+			_fault("창문: 내려가는 컷신 대사가 비어 있다")
+		elif not String(win.get("cutscene_speaker")) == "이설":
+			_fault("창문: 컷신 화자가 이설이 아니다 (%s)" % win.get("cutscene_speaker"))
+		else:
+			_ok("창문 컷신 대사 %d줄" % cl.size())
+
 	# 단서 하나로는 안 오고
 	bg.get_node("SiwooPainting").call("interact", null)
 	await _wait(0.2)
