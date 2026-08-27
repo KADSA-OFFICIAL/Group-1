@@ -232,7 +232,9 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
   - 상호작용 표시(#301)는 210px에서 뜨므로 투명 구간 안이다. 길을 잃기 쉬워지는 것은 의도된 대가다 — 되돌리려면 `scale`만 올리면 된다.
   - **방 이름도 거리로 껐다 켠다**(#307). 벽이 캄캄해졌는데 라벨만 허공에 떠 있으면 더 이상하다. `WallGlow/Labels`에 `interact_marks.gd`를 붙이되 반경을 키운다(300px 완전 / 420px부터) — 어느 방인지 알고 다가갈 수 있어야 한다. 같은 스크립트가 표시와 라벨을 함께 다루므로 `Mark_` 앞머리가 없는 자식은 임자 확인을 건너뛰고, 라벨은 `Control`이라 중심을 `get_global_rect()`로 잡는다.
   - **문도 같은 이유로 거리 기반이다**(#318). `WallGlow/Doors`에 라벨과 같은 반경(300/420)의 `interact_marks.gd`를 붙였다 — 방 내부(#292)는 계속 숨기되, 복도에서 문의 위치는 손전등 없이도 알 수 있어야 한다.
-- UI: R 인벤토리 패널(5슬롯), 좌상단 HUD(목표/소지품)+층 표시, 하단 알림(game_state.request_notice).
+- UI: R 인벤토리 패널(5슬롯), 좌상단 HUD(**목표 / 소지품 / 단서 `N / M`** — 세 줄, #529)+층 표시, 하단 알림(game_state.request_notice).
+  - **단서 수는 `game_state.clue_score()` 하나가 센다**(#529) — 엔딩의 "알아낸 것 N / M"과 같은 함수라 화면과 엔딩이 어긋나지 않는다. `set_flag()`가 `clues_changed`를 방출하고 HUD가 받는다. 문 개방 같은 진행 플래그로는 숫자가 안 변한다(받는 쪽이 그 함수로 다시 세므로). 처음 값은 시그널을 기다리지 않고 HUD가 직접 읽는다 — `starting_flags`로 미리 세워 둔 것이 있으면 그것까지 세야 한다.
+  - **줄을 더 넣으면 `CloseUp` 패널(#451)도 같이 내려야 한다.** `TopLeft`이 16~122(세 줄)이고 클로즈업이 134부터다 — 겹치면 목표 글이 가려진다.
 - 1층 탈출 출구 통일(#513): 현관(`ExitDoor`) 하나만 남긴다. 운동장 출입구(YardExit) 방과 `Door_YardGate`·`YardGateDoor` 폐지. 엔딩 판정은 현관에서 이미 `SceneTree` 메타에 실린다.
 - 운동장 정문 자동 트리거 및 자연스러운 흙길 디테일(#513, #520, #526): `FrontGate`(운동장)는 `front_gate.gd`(`collision_mask = 3`)로 자동 엔딩 전환. 현관에서 정문까지 부드러운 스플라인 곡선의 3단계 다층 흙길(`C_YARD_PATH_OUTER` / `C_YARD_PATH` / `C_YARD_PATH_CORE`), 조회대 방면 샛길, 발자국·흙 반점 패치 및 잔자갈 디테일(`C_YARD_PEBBLE`)이 배치되어 자연스러운 통행로를 형성한다. 운동장 시야는 `YARD_DARKNESS`와 `YARD_FADE_SCALE = 25.0`으로 넓고 은은하게 밝아진다.
 - 디버그 층 이동(#507): `OS.is_debug_build()`에서 숫자키 `0~4`(키패드 포함)로 원하는 층의 기본 등장 지점으로 즉시 이동(`floor_manager.travel_to`). 0=운동장, 1~3=본편 층, 4=도입부 미술실.

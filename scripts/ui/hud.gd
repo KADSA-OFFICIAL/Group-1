@@ -18,6 +18,9 @@ const USABLE_ITEM_KEYS := {
 
 @onready var objective_label: Label = $Root/TopLeft/Margin/TextRows/ObjectiveLabel
 @onready var inventory_label: Label = $Root/TopLeft/Margin/TextRows/InventoryLabel
+## 확인한 단서 수(#529). 세는 규칙은 `game_state.clue_score()` 하나뿐이라
+## 엔딩의 "알아낸 것 N / M"과 늘 같은 숫자다.
+@onready var clue_label: Label = $Root/TopLeft/Margin/TextRows/ClueLabel
 ## 하단 알림은 프롤로그·엔딩과 같은 자막 표시를 쓴다(#193).
 @onready var subtitle: SubtitleDialogue = $Root/Subtitle
 @onready var inventory_panel: PanelContainer = $Root/InventoryPanel
@@ -62,6 +65,13 @@ func _ready() -> void:
 			game_state.connect("speech_requested", Callable(self, "show_speech"))
 		if game_state.has_signal("inventory_changed"):
 			game_state.connect("inventory_changed", Callable(self, "set_inventory"))
+		if game_state.has_signal("clues_changed"):
+			game_state.connect("clues_changed", Callable(self, "set_clues"))
+		# 처음 값은 시그널을 기다리지 않고 직접 읽는다 — 시작 플래그
+		# (`starting_flags`)로 이미 세워진 것이 있으면 그것까지 세야 한다.
+		if game_state.has_method("clue_score"):
+			var score: Array = game_state.call("clue_score")
+			set_clues(score[0], score[1])
 		var limit = game_state.get("max_items")
 		if limit != null:
 			max_items = limit
@@ -81,6 +91,12 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func set_objective(text: String) -> void:
 	objective_label.text = text
+
+
+## 확인한 단서 수(#529). 전체 수도 같이 보여 준다 — 남았는지 다 봤는지를
+## 알 수 없으면 "더 뒤져 볼까"를 판단할 수 없고, 엔딩이 이미 같은 수를 보여 준다.
+func set_clues(found: int, total: int) -> void:
+	clue_label.text = "단서: %d / %d" % [found, total]
 
 
 func set_inventory(items: Array[String]) -> void:

@@ -6,6 +6,10 @@ signal notice_requested(message: String)
 ## 프롤로그와 같은 두 가지 자막 배치 중 하나를 고를 수 있다.
 signal speech_requested(speaker: String, message: String, emotion: String)
 signal game_over(reason: String)
+## 확인한 단서 수가 바뀌었다(#529). HUD 왼쪽 위의 `단서: N / M` 표시가 듣는다.
+## **플래그 이름이 아니라 점수를 넘긴다** — 문 개방 같은 진행 플래그도 `flags`에
+## 들어가므로 무엇을 세는지는 `clue_score()` 한 곳만 알면 된다(엔딩도 그 함수를 쓴다).
+signal clues_changed(found: int, total: int)
 
 @export var starting_items: Array[String] = []
 ## 시작 시 미리 세워 둘 플래그. 뒤쪽 층을 바로 확인할 때(예: stairs_f4_unlocked) 에디터에서 채워 쓴다.
@@ -55,6 +59,10 @@ func remove_item(item_id: String) -> void:
 func set_flag(flag: String) -> void:
 	if not flag.is_empty() and flag not in flags:
 		flags.append(flag)
+		# 단서가 아닌 플래그(문 개방 등)여도 방출한다 — 받는 쪽은 `clue_score()`가
+		# 다시 센 값을 쓰므로 숫자가 안 변하면 화면도 그대로다.
+		var score: Array = clue_score()
+		clues_changed.emit(score[0], score[1])
 
 
 func has_flag(flag: String) -> bool:
