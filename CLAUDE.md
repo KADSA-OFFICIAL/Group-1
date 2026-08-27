@@ -237,6 +237,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
   - **줄을 더 넣으면 `CloseUp` 패널(#451)도 같이 내려야 한다.** `TopLeft`이 16~122(세 줄)이고 클로즈업이 134부터다 — 겹치면 목표 글이 가려진다.
 - 1층 탈출 출구 통일(#513): 현관(`ExitDoor`) 하나만 남긴다. 운동장 출입구(YardExit) 방과 `Door_YardGate`·`YardGateDoor` 폐지. 엔딩 판정은 현관에서 이미 `SceneTree` 메타에 실린다.
 - 운동장 정문 자동 트리거 및 자연스러운 흙길 디테일(#513, #520, #526): `FrontGate`(운동장)는 `front_gate.gd`(`collision_mask = 3`)로 자동 엔딩 전환. 현관에서 정문까지 부드러운 스플라인 곡선의 3단계 다층 흙길(`C_YARD_PATH_OUTER` / `C_YARD_PATH` / `C_YARD_PATH_CORE`), 조회대 방면 샛길, 발자국·흙 반점 패치 및 잔자갈 디테일(`C_YARD_PEBBLE`)이 배치되어 자연스러운 통행로를 형성한다. 운동장 시야는 `YARD_DARKNESS`와 `YARD_FADE_SCALE = 25.0`으로 넓고 은은하게 밝아진다.
+- 4층 미술실 및 준비실 시각 디테일(#532): 바닥 물감 얼룩 6종(`C_PAINT_BLUE/RED/YELLOW/DARK`), 정물대 화병(`C_VASE`)·과일·천 주름, 화실 목재 스툴 5개(`ArtStool0..4`), 조소 작업대(`ClayStand`) 및 점토상, 건조대(`DryingRack`), 개수대 세척 물통(`ArtBucket`) 및 비누/세면대, 준비실 미술 재료 상자(`SupplyBox0..1`)·롤도화지통(`PaperBin`)·벽면 앞치마 걸이(`ApronHanger`), 전시 안내판 및 조색 차트가 추가되어 화실 분위기를 완성한다.
 - 디버그 층 이동(#507): `OS.is_debug_build()`에서 숫자키 `0~4`(키패드 포함)로 원하는 층의 기본 등장 지점으로 즉시 이동(`floor_manager.travel_to`). 0=운동장, 1~3=본편 층, 4=도입부 미술실.
 - 수위 접근 방향 표시(#327): `HUD/Root/JanitorAlert`(`scripts/ui/janitor_alert.gd`)가 들리는 거리(720px, `EARSHOT`과 같은 값) 안에서 **화면 테두리 중 수위가 있는 쪽에 쐐기**를 띄운다. 가까울수록 진하고, 추격 중에는 붉게 맥동한다.
   - 소리 단서(#9)는 좌우 감쇠만 주고 **위아래를 구분 못 한다.** #307로 시야 밖을 완전히 가린 뒤로는 수위를 볼 수 있는 거리가 389px뿐이라, 소리만으로는 어느 복도로 도망칠지 고를 수 없었다.
