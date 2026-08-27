@@ -302,7 +302,9 @@ SPRITE_TEXTURES = {"9_key": "res://assets/sprites/key.png",
                    "10_note": "res://assets/sprites/note.png",
                    "13_inkcan": "res://assets/sprites/ink_can.png",
                    "14_beaker": "res://assets/sprites/beaker.png",
-                   "15_eyekey": "res://assets/sprites/eye_key.png"}
+                   "15_eyekey": "res://assets/sprites/eye_key.png",
+                   # 맵 위 머리는 위에서 본 그림, 왼쪽 위 클로즈업은 정면(#451).
+                   "16_headtop": "res://assets/sprites/head_top.png"}
 
 # 텍스처 설정을 물려받을 부모가 없는 CanvasLayer 직속 노드. #307에서 벽·문·계단
 # 시각이 전부 레이어 0(`Structures`)으로 내려가면서 비었다가, #318에서 문
@@ -920,6 +922,7 @@ SCRIPTS = {
     # 9_key·10_note는 SPRITE_TEXTURES가 쓴다(단서 스프라이트) — 겹치면 안 된다.
     "11_floorlink": "res://scripts/interactions/floor_link.gd",
     "12_artintro": "res://scripts/game/art_room_intro.gd",
+    "17_proximity": "res://scripts/interactions/proximity_reveal.gd",
     # 13_inkcan·14_beaker도 SPRITE_TEXTURES 쪽이다(#427). 15_eyekey도 그렇다(#438).
 }
 
@@ -3029,6 +3032,8 @@ def build_common(fl, spec):
                       ("RectangleShape2D_wall_v", f"Vector2(40, {H})")]
     sc.rect_shapes += [("RectangleShape2D_stair_zone", "Vector2(240, 56)"),
                        ("RectangleShape2D_key_zone", "Vector2(48, 48)"),
+                       # 근접 클로즈업(#451) — 조사 존(48)보다 훨씬 넓다.
+                       ("RectangleShape2D_near_zone", "Vector2(240, 240)"),
                        ("RectangleShape2D_door_zone", "Vector2(140, 60)"),
                       ("RectangleShape2D_window_zone", "Vector2(170, 52)"),
                       ("RectangleShape2D_exam_zone",
@@ -3145,6 +3150,7 @@ def build_floor1():
                       ("RectangleShape2D_wall_v", f"Vector2(40, {H})"),
                       ("RectangleShape2D_stair_zone", "Vector2(240, 56)"),
                       ("RectangleShape2D_key_zone", "Vector2(48, 48)"),
+                      ("RectangleShape2D_near_zone", "Vector2(240, 240)"),
                       ("RectangleShape2D_door_zone", "Vector2(140, 60)"),
                       ("RectangleShape2D_window_zone", "Vector2(170, 52)"),
                       ("RectangleShape2D_exam_zone",

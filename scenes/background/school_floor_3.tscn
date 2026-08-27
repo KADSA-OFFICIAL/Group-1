@@ -1,4 +1,4 @@
-[gd_scene load_steps=252 format=3]
+[gd_scene load_steps=253 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
@@ -45,6 +45,9 @@ size = Vector2(240, 56)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_key_zone"]
 size = Vector2(48, 48)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_near_zone"]
+size = Vector2(240, 240)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_door_zone"]
 size = Vector2(140, 60)

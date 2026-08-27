@@ -14,6 +14,9 @@ const USABLE_ITEM_KEYS := {
 ## 하단 알림은 프롤로그·엔딩과 같은 자막 표시를 쓴다(#193).
 @onready var subtitle: SubtitleDialogue = $Root/Subtitle
 @onready var inventory_panel: PanelContainer = $Root/InventoryPanel
+@onready var close_up: PanelContainer = $Root/CloseUp
+@onready var close_up_image: TextureRect = $Root/CloseUp/Margin/Rows/Image
+@onready var close_up_caption: Label = $Root/CloseUp/Margin/Rows/Caption
 @onready var inventory_title: Label = $Root/InventoryPanel/Margin/Rows/InventoryTitle
 @onready var slot_labels: Array[Label] = [
 	$Root/InventoryPanel/Margin/Rows/Slots/Slot1/ItemLabel,
@@ -26,6 +29,12 @@ const USABLE_ITEM_KEYS := {
 var notice_token: int = 0
 var current_items: Array[String] = []
 var max_items: int = 5
+
+
+## 층 씬 안의 노드가 HUD를 부를 수 있게 그룹에 든다(#451). 조립 씬 루트까지의
+## 경로를 층 씬에서는 알 수 없다 — `floor_manager`·`game_state`와 같은 방식이다.
+func _enter_tree() -> void:
+	add_to_group("hud")
 
 
 func _ready() -> void:
@@ -136,3 +145,23 @@ func _get_item_display_name(item_id: String) -> String:
 			return "잉크통"
 		_:
 			return item_id
+
+
+## 화면 왼쪽 위 클로즈업(#451) — 가까이 가야 보이는 것을 크게 보여 준다.
+##
+## 맵 위 그림은 위에서 내려다본 것이라 **무엇인지까지는 말하지 못한다.** 2층
+## 창고의 머리가 그렇다 — 위에서 보면 검은 덩어리와 피지만, 정면에서는 눈구멍에
+## 열쇠가 박힌 것이 보인다. 두 그림을 자리로 나눠 둘 다 쓴다.
+##
+## 목표·소지품 패널(`TopLeft`) **아래**에 둔다. 겹치면 목표 글이 가려진다.
+func show_close_up(texture: Texture2D, caption: String = "") -> void:
+	if texture == null:
+		return
+	close_up_image.texture = texture
+	close_up_caption.text = caption
+	close_up_caption.visible = not caption.is_empty()
+	close_up.visible = true
+
+
+func hide_close_up() -> void:
+	close_up.visible = false
