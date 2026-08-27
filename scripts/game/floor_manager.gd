@@ -39,6 +39,7 @@ const YARD_ARRIVE := Vector2(1700, 380)
 ## `player.tscn`에 박아 두면 운동장에서 빈 아래쪽이 보인다.
 const FLOOR_BOUNDS := {
 	0: Rect2(0, 0, 3400, 1700),
+	1: Rect2(0, 0, 3400, 1500),   # 현관 로비 층(#498) — 북쪽 봉인 공백을 없앴다
 	4: Rect2(0, 0, 1800, 1000),   # 도입부(#405) — 두 방뿐이라 훨씬 작다
 }
 const DEFAULT_BOUNDS := Rect2(0, 0, 3400, 2500)
@@ -51,6 +52,21 @@ const YARD_DARKNESS := Color(0.30, 0.31, 0.36, 1)
 const INDOOR_FADE_SCALE := 2.0
 const YARD_FADE_SCALE := 5.0
 
+## **층마다 다르게 두는 예외**(#498). 1층은 현관 로비 층이라 다른 층보다 밝다 —
+## 네 층을 기어 내려온 끝이라는 감각이 0층(운동장)에만 있었고, 그 사이에
+## "밖에 가까워진다"는 단계가 없었다. 값은 완전 검정(다른 층)과 운동장(0.30)
+## 사이다. 밝음의 **출처**는 현관 빛(`gen_floors`의 `EntranceLight`)이고
+## 이 표는 그 빛이 닿지 않는 데까지 층 전체를 조금 들어 올린다.
+const FLOOR_DARKNESS := {
+	1: Color(0.16, 0.16, 0.20, 1),
+}
+## 시야 마스크도 같이 넓힌다 — 2.6이면 완전 암전이 389 → 506px이다.
+## 손전등 반경(333px)보다 여전히 넓어서 "손전등으로 길을 찾는다"는 규칙(#74)은
+## 그대로다. 로비가 넓어(970x680) 2.0이면 방 안에서도 반대쪽 벽이 안 보였다.
+const FLOOR_FADE_SCALE := {
+	1: 2.6,
+}
+
 # 층별 계단실 사각형. 인덱스 0 = 위쪽(좌측) 계단, 1 = 하단 중앙 계단.
 # 1층은 도면상 계단이 한 곳뿐이라 목록 길이가 1이다.
 const STAIR_A := Rect2(300, 720, 440, 280)
@@ -62,7 +78,10 @@ const NO_STAIRWELL := {2: [1]}
 
 const STAIRS := {
 	0: [],   # 운동장 — 계단 없음(#356)
-	1: [Rect2(220, 2120, 440, 320)],
+	# 현관 로비 층(#498) — 하단 방 띠(800~1480) 왼쪽. `gen_floors.FLOOR1["stair"]`와
+	# 같은 자리여야 한다(`verify_stairs`가 대조). **위가 복도여야 한다** —
+	# `_arrive_on`이 사각형 위쪽에서 도착 지점을 잡는다.
+	1: [Rect2(220, 800, 440, 320)],
 	2: [STAIR_A, STAIR_B],
 	3: [STAIR_A, STAIR_B],
 	4: [],   # 도입부 — 계단 없음. 창문으로 3층에 내려간다(#405)
@@ -265,9 +284,11 @@ func _janitor_active(target: int) -> bool:
 func _apply_environment(target: int) -> void:
 	var outside := target == YARD_FLOOR
 	if darkness != null:
-		darkness.color = YARD_DARKNESS if outside else INDOOR_DARKNESS
+		var base_dark: Color = YARD_DARKNESS if outside else INDOOR_DARKNESS
+		darkness.color = FLOOR_DARKNESS.get(target, base_dark)
 	if fade_mask != null:
-		var k := YARD_FADE_SCALE if outside else INDOOR_FADE_SCALE
+		var base_k: float = YARD_FADE_SCALE if outside else INDOOR_FADE_SCALE
+		var k: float = FLOOR_FADE_SCALE.get(target, base_k)
 		fade_mask.scale = Vector2(k, k)
 	var camera: Camera2D = player.get_node_or_null("Camera2D")
 	if camera != null:

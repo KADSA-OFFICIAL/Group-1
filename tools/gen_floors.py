@@ -71,6 +71,12 @@ WALL_FACE = 20                            # 가로 벽 아래 앞면 높이(#268
 # **그리는 방법이 아니라 도구가 틀렸다.** 폴리곤에는 빛의 성질이 없다 —
 # 가장자리가 안 번지고, 아래를 덮을 뿐 밝히지 못하고, 벽에 안 막힌다.
 MOON_ENERGY = 1.25   # 창 하나가 내는 밝기. 어둠은 (0.1, 0.1, 0.13)이다
+## 1층 현관 빛(#498). 정문 유리로 가로등 빛이 들어오는 것으로 읽히게 따뜻한
+## 색(`C_LAMP`)을 쓴다. 달빛(1.25)보다 밝지만 **손전등(1.3)을 크게 넘기지 않는다** —
+## 압도하면 "손전등으로 길을 찾는다"는 규칙(#74)이 로비에서 깨진다.
+ENTRANCE_ENERGY = 1.35
+## 512px 그라디언트에 곱한다 → 반경 약 460px. 로비(970x680)의 아래 절반을 덮는다.
+ENTRANCE_LIGHT_SCALE = 1.8
 MOON_SCALE = 0.72    # 512px 그라디언트에 곱한다 → 반경 약 185px
 MOON_INSET = 24      # 광원을 창에서 방 안으로 들여놓는 거리
 WINDOW_ZONE = (170, 52)   # 창가 조사(E) 범위
@@ -468,47 +474,54 @@ for _spec in LAYOUT.values():
         _spec[_band] = close_gaps(_spec[_band])
 
 
-# 1층: 도면이 다르다 — 상단 교실 3칸+운동장출입구+교무실, 하단 계단(좌)·화장실·현관·수위실·창고2
-# 1층 방 띠 아래끝. 복도(홀)는 여기서 하단 띠(BOT_Y0)까지다 — 예전에는 1500이라
-# 620px짜리 빈 홀이 맵 높이의 4분의 1을 먹었다(#479). 손전등 반경 333px,
-# 시야 마스크가 389px에서 완전히 검으므로 그 한가운데서는 위아래 벽이 둘 다
-# 안 보였다. 하단 띠는 현관 정문이 아래쪽 외벽에 붙어야 해서 움직이지 않는다 —
-# 대신 위쪽 방을 깊게 늘려 그만큼을 방이 먹게 한다.
+# ── 1층: 현관 로비 층 (#498) ────────────────────────────────────
+# 1층은 다른 층의 축소판이 아니라 **탈출하는 층**이다. 교실을 늘리는 대신
+# 현관이 층에 들어선 순간 보이게 하고, 그 빛으로 층을 밝힌다.
 #
-# **1800도 여전히 휑했다**(#495). 320px 띠는 위아래 벽이 둘 다 보이기는 하지만
-# 벽면 사이 288px가 3360px 길이로 이어져 967,680px²의 맨바닥이 남았다. 복도
-# 밀도는 이미 다른 층과 같아서(1층 12.1% / 2층 13.1% / 3층 14.8%) 더 붙일 것도
-# 없고, **복도 바닥에는 아무것도 놓지 않는다**(#271·#274·#277에서 다섯 번 실패).
-# 그래서 채우는 대신 띠를 줄여 방에 넘긴다 — 맨바닥이 497,280px²로 절반이 되고
-# 방 다섯 칸이 140px씩 깊어져 집기가 그만큼 늘어난다.
-#
-# **180px은 다른 층(160px)보다 조금 넓게 남긴 값이다.** 1층은 복도가 하나뿐이라
-# 위·아래 양쪽 방의 문이 모두 이 띠에 붙고, 수위 순찰의 문 앞 대기 지점도 여기
-# 몰린다(`verify_janitor_route`가 그 자리를 본다).
-F1_ROOM_Y1 = 1940
+# **캔버스가 다른 층(3400x2500)보다 낮다.** 도면상 1층은 아래쪽 절반만 건물이라
+# 북쪽 절반(y 0~1020, 맵의 40%)이 걸어 들어갈 수도 채울 수도 없는 봉인 공백이었다.
+# 그것을 없앴다 — 면적 8.5M → 5.1M px². 운동장(`YW/YH`)·도입부(`IW/IH`)가 이미
+# 자기 캔버스를 갖는 것과 같은 방식이고, `floor_manager.FLOOR_BOUNDS[1]`이
+# 카메라 한계를 맞춘다(`verify_floor_reach.check_camera`가 대조한다).
+F1W, F1H = 3400, 1500
+
+# 띠 셋. **계단실은 하단 띠 안에 있고 그 위가 복도여야 한다** —
+# `floor_manager._arrive_on`이 계단실 사각형 **위쪽에서** 도착 지점을 잡으므로
+# (`r.position.y - ARRIVE_DY`) 그 자리가 복도가 아니면 벽이나 방 안에 떨어진다.
+F1_TOP_Y0, F1_TOP_Y1 = 20, 620        # 상단 방 띠 — 교실1·운동장 출입구·창고·교무실
+F1_COR_Y0, F1_COR_Y1 = 620, 800       # 복도 180px. 다른 층(160px)보다 조금 넓다
+F1_BOT_Y0, F1_BOT_Y1 = 800, 1480      # 하단 방 띠 — 계단·화장실·현관 로비·수위실·창고
+F1_STAIR_H = 320                      # 계단실 깊이. 하단 띠보다 얕아 아래에 자투리가 남는다
 
 FLOOR1 = {
     "rooms": [   # (키, 라벨, x0, y0, x1, y1, 문 위치)
-        ("Class1", "교실1", 20, 1020, 460, F1_ROOM_Y1, "bottom"),
-        ("Class2", "교실2", 490, 1020, 810, F1_ROOM_Y1, "bottom"),
-        ("Class3", "교실3", 840, 1020, 1360, F1_ROOM_Y1, "bottom"),
+        # 상단 띠 — **교실은 한 칸뿐이다**(#498). 실제 학교 1층이 행정·현관 층이고,
+        # 교실 3칸은 "다른 층의 축소판"이라는 성격을 만들던 자리였다.
+        ("Class1", "교실1", 20, F1_TOP_Y0, 700, F1_TOP_Y1, "bottom"),
         # 두 번째 탈출 루트(#393). 아래변 문이 복도로 열리고, 북쪽 벽에는
         # 바깥으로 나가는 문(Door_YardGate + YardGateDoor)이 따로 붙는다.
-        # 이 방은 교실이 아니라 **건물을 관통하는 통로**다 — 복도에서 들어와
-        # 반대쪽으로 걸어 나가면 운동장이다.
-        ("YardExit", "운동장 출입구", 1390, 1020, 1920, F1_ROOM_Y1, "bottom"),
-        # 하단 띠는 전부 2120~2480. 예전엔 화장실·창고만 2370이라 그 아래
-        # 2370~2500에 걸어 들어갈 수 있는 빈 띠가 남았고, 방 사이 틈이 그 입구
-        # 노릇을 했다(수위가 거기 스폰되면 영영 안 보인다).
-        ("MensRoom1", "남자 화장실", 900, 2120, 1160, 2480, "top"),
-        ("WomensRoom1", "여자 화장실", 1190, 2120, 1450, 2480, "top"),
-        ("Entrance", "현관", 1600, 2120, 2000, 2480, "top"),           # 탈출구
-        ("JanitorRoom", "수위실", 2100, 2120, 2560, 2480, "top"),
-        ("Storage1", "창고", 2620, 2120, 2960, 2480, "top"),
-        ("Storage2", "창고", 3000, 2120, 3380, 2480, "top"),
+        # 이 방은 교실이 아니라 **건물을 관통하는 통로**다.
+        ("YardExit", "운동장 출입구", 730, F1_TOP_Y0, 1350, F1_TOP_Y1, "bottom"),
+        ("Storage1", "창고", 1380, F1_TOP_Y0, 1900, F1_TOP_Y1, "bottom"),
+        # 하단 띠 — 계단실(좌) · 화장실 둘 · **현관 로비(가운데)** · 수위실 · 창고.
+        # 로비를 가운데 둔 것이 이 도면의 알맹이다: 계단이 왼쪽이라 내려오면
+        # 복도를 따라 걷는 방향 정면 아래에 로비가 있고, 그 빛이 문 틈으로 샌다.
+        ("MensRoom1", "남자 화장실", 700, F1_BOT_Y0, 1010, F1_BOT_Y1, "top"),
+        ("WomensRoom1", "여자 화장실", 1040, F1_BOT_Y0, 1350, F1_BOT_Y1, "top"),
+        # **현관은 복도가 아니라 방이다**(#498). 방이라 집기를 놓을 수 있다 —
+        # 신발장·벤치·화분. "복도 바닥에는 아무것도 놓지 않는다"(#271·#274·#277)는
+        # 복도 규약이고 방에는 걸리지 않는다. 키는 `Entrance` 그대로 둔다:
+        # `prop_kind`가 이 키로 신발장·벤치를 고르고 `PLACEMENT`가 ExitDoor를 여기 넣는다.
+        ("Entrance", "현관", 1380, F1_BOT_Y0, 2320, F1_BOT_Y1, "top"),
+        ("JanitorRoom", "수위실", 2350, F1_BOT_Y0, 2900, F1_BOT_Y1, "top"),
+        ("Storage2", "창고", 2930, F1_BOT_Y0, 3380, F1_BOT_Y1, "top"),
     ],
-    "staff": (1950, 1020, 3380, F1_ROOM_Y1),   # 교무실
-    "stair": (220, 2120, 660, 2440),     # 1층 계단 — 다른 층과 위치가 다르다
+    # 교무실은 상단 띠 **오른쪽 끝**이다. `_close_floor1`이 교무실 왼쪽 틈만
+    # 닫으므로(오른쪽은 닫지 않는다) 가운데 두면 30px 틈이 남는다.
+    "staff": (1930, F1_TOP_Y0, 3380, F1_TOP_Y1),
+    # 1층 계단은 한 곳뿐이고 하단 띠 왼쪽이다. **`floor_manager.STAIRS[1]`과
+    # 같은 자리여야 한다**(`verify_stairs`가 대조한다).
+    "stair": (220, F1_BOT_Y0, 660, F1_BOT_Y0 + F1_STAIR_H),
 }
 
 
@@ -540,6 +553,15 @@ def _close_floor1():
 
 
 _close_floor1()
+
+
+def f1_room(key):
+    """1층 방 하나를 키로 찾는다. **순서에 기대지 않는다** — `_close_floor1()`이
+    표를 다시 쓰고, 방을 더하거나 지우면 인덱스가 밀린다."""
+    for r in FLOOR1["rooms"]:
+        if r[0] == key:
+            return r
+    raise SystemExit(f"1층 방 {key}가 표에 없다")
 
 
 # ── 유틸 ────────────────────────────────────────────────────
@@ -678,7 +700,7 @@ class Scene:
             'texture = SubResource("GradientTexture2D_moon")',
             f"texture_scale = {MOON_SCALE}",
             ""]))
-    def room_lights(self, key, x0, y0, x1, y1):
+    def room_lights(self, key, x0, y0, x1, y1, always_on=False):
         """방 창문 달빛을 묶는 Area2D(#292). 평소에는 꺼져 있다.
 
         광원을 늘 켜 두면 **닫힌 문 너머 방 안이 다 보인다** — Godot 2D에는
@@ -696,6 +718,8 @@ class Scene:
             "collision_layer = 0",
             "collision_mask = 1",
             'script = ExtResource("7_roomlights")',
+            # 늘 켜 두는 방(#498) — 1층 현관 로비뿐이다.
+            *(["always_on = true"] if always_on else []),
             "",
             f'[node name="Zone" type="CollisionShape2D" parent="Lights/Room_{key}"]',
             f"position = Vector2({n((x0 + x1) / 2)}, {n((y0 + y1) / 2)})",
@@ -1089,11 +1113,14 @@ LOCKED = {2: "stair_key_2", 3: "stair_key_3"}
 # 특정 단서의 위치를 방 안 자동 배치 대신 직접 지정한다.
 # 현관(ExitDoor)은 바깥으로 나가는 아래쪽 정문 앞에 둬야 안내와 실제 위치가 맞는다.
 POS_OVERRIDE = {
-    (1, "ExitDoor"): (1800, 2432),
+    # 현관 로비 남쪽 외벽 앞(#498). 정문 그림(`Door_FrontGate`)이 y 1464~1480에
+    # 그려지므로 그 48px 안쪽이다 — 안내와 실제 위치가 맞아야 한다.
+    (1, "ExitDoor"): (1850, F1_BOT_Y1 - 48),
     # 운동장 출입구 바깥문(#393)은 현관과 대칭으로 방 위변 벽 안쪽에 둔다
     # (벽 안쪽 면 1036에서 32px 안). 방 한가운데 두면 "문을 연다"와 자리가
     # 어긋나고, 복도 문과 바깥문이 한 점에 겹쳐 보인다.
-    (1, "YardGateDoor"): (1655, 1068),
+    # 운동장 출입구 북쪽 외벽 앞(#498). 상단 띠로 올라갔다.
+    (1, "YardGateDoor"): (1040, F1_TOP_Y0 + 48),
     # 4층 창의체험부(750,1520)~(1640,1940) — 자동 배치는 방 한가운데라 대사와 어긋났다(#215).
     # 액자는 "벽에 걸린" 것이므로 아래쪽 벽 안쪽에 붙이고,
     # 상담기록부는 아래에 깐 책상 위(FURNITURE의 DeskCreativeDept)에 올린다.
@@ -1155,6 +1182,21 @@ def add_furniture(sc, floor):
 # 층마다 조작이 달랐다. 메시지와 플래그는 그대로 옮긴다.
 # KeyCabinet은 #207에서 열쇠 지급을 뗐으므로 여기 들어가지 않는다(E 조사 단서).
 # TaehoNote는 #222에서 열쇠 지급을 뗐으므로 여기 들어가지 않는다(E 조사 단서).
+# 상호작용 표시(#301)를 물건 자리에서 비켜 내는 예외.
+#
+# 표시는 기본적으로 물건 위에 얹힌다 — 마름모가 작고(반 7px) 물건이 그보다 커서
+# 대개는 가리지 않는다. **그림 자체가 정보인 물건만** 예외다.
+#
+# 2층 머리(#438·#451): `head_top.png`(52x50)의 눈구멍에 박힌 열쇠가 "이것이 계단
+# 열쇠"라는 것을 말하는 유일한 그림인데, 표시가 `WallGlow`(어둠을 안 받는다) +
+# `z_index 5`라 그 위에서 가장 밝은 것이 마름모였다. 왼쪽(방 안쪽)으로 비킨다 —
+# 머리가 창고 오른쪽 아래 구석(2215, 950)에 있어 오른쪽으로 내면 벽에 가까워지고,
+# **표시가 벽·몸 안에 들어가면 시야 광선이 자기 표시를 가려 영영 안 켜진다**(#359).
+# 42px은 스프라이트 반폭(26)에 마름모 반폭(7)을 더한 33보다 크다.
+MARK_OFFSET = {
+    (2, "HeadKey"): (-42, 0),
+}
+
 AUTO_PICKUP = {"SpareKeyHook", "HeadKey", "JanitorSafe"}
 
 # 접촉 획득물에 덧붙이는 설정(#459). **`to_pickup`이 `grants_flag`를 `pickup_id`로
@@ -1219,13 +1261,10 @@ HIDE_POS = {
     # 준비실 왼쪽 벽 한가운데는 **연결문 틈**이다 — 기본 자리(L, 0.5)로 두면
     # 적재함이 문을 막고 선다. 오른쪽 벽 아래쪽으로 옮긴다(#405).
     (4, "HidePrepShelf"): ("R", 0.75),
-    # 1층 교실3이 920px로 깊어지자(#495) 기본 자리(R, 0.7 = y1664)가 **책상
-    # 격자 속 주머니**가 됐다. 교실 통로는 방 중심(가로)·창가·문 앞(세로) 셋인데
-    # 열 사이 틈은 20px라 플레이어가 못 지나가므로, 통로에서 먼 세로 위치는
-    # 사물함 열과 책상 열 사이에 갇힌다(`verify_hiding_spots`가 잡았다).
-    # 방 중심 통로 높이(0.5)로 올려 붙인다 — 은신처는 충돌체가 없어
-    # (`collision_layer 2`·`mask 0`) 통로를 막지 않는다.
-    (1, "HideClass3"): ("R", 0.5),
+    # #495의 (1, "HideClass3") 우회는 없어졌다 — 교실3 자체가 없다(#498).
+    # 그때 배운 것은 남는다: **깊은 방에서는 통로에서 먼 세로 위치가 주머니가
+    # 된다.** 교실 통로는 방 중심(가로)·창가·문 앞(세로) 셋뿐이고 책상 열 사이
+    # 틈은 20px라 못 지나간다. 새 교실1은 600px 깊이라 기본 자리로 닿는다.
 }
 # 노드 중심을 벽면에서 이만큼 띄운다(#342). **시각은 벽에 붙이고 중심만 띄운다** —
 # 도달성 격자가 벽을 플레이어 반경(10)만큼 부풀리므로 중심이 벽에 딱 붙으면
@@ -1277,16 +1316,18 @@ EXTRA_HIDING = {
          "컴퓨터 책상 밑. 케이블 뭉치에 발이 걸린다.")],
     1: [("HideClass1_1", "Class1", "locker", "사물함에 숨기",
          "교실1 뒤 사물함. 문이 반쯤 어긋나 닫힌다."),
-        ("HideMusicRoom", "Class3", "curtain", "커튼 뒤에 숨기",
-         "교실3 창가 커튼 뒤. 유리에 닿은 등이 서늘하다."),
+        ("HideClass1Curtain", "Class1", "curtain", "커튼 뒤에 숨기",
+         "교실1 창가 커튼 뒤. 유리에 닿은 등이 서늘하다."),
         ("HideEmptyRoom", "Storage2", "files", "적재함에 숨기",
          "창고 구석 적재함. 먼지가 목을 긁는다."),
         ("HideStorage1", "Storage1", "files", "적재함에 숨기",
          "창고 적재함 뒤. 먼지가 목을 긁는다."),
         ("HideWomensRoom1", "WomensRoom1", "stall", "칸에 숨기",
          "화장실 칸 안. 문고리를 안에서 붙잡았다."),
-        ("HideClass3", "Class3", "clean", "청소함에 숨기",
-         "교실3 청소함. 빗자루 사이로 문이 보인다."),
+        # 현관 로비에도 하나 둔다(#498). 이 층에서 가장 밝고 열린 자리라
+        # 숨을 곳이 하나는 있어야 한다 — 정문까지 왕복하는 동선이 다 로비를 지난다.
+        ("HideLobbyLocker", "Entrance", "locker", "신발장 뒤에 숨기",
+         "현관 신발장 뒤. 유리문으로 든 빛이 발끝에 닿는다."),
         ("HideStaffRoom", "StaffRoom", "files", "서류 캐비닛에 숨기",
          "교무실 캐비닛 사이. 결재판 냄새가 난다."),
         ("HideStorage2", "Storage2", "gear", "적재 선반에 숨기",
@@ -1369,7 +1410,11 @@ def add_story(sc, floor):
                           nodes[name]["body"], count=1, flags=re.M)
             sc.clue_pts.append((cx, cy))
             # 진행에 필요한 것은 호박색으로 눈에 띄게(#301).
-            sc.mark(name, cx, cy, C_MARK_KEY)
+            # 그림이 곧 정보인 물건은 표시를 옆으로 비킨다(#501) — 자리만 옮기고
+            # 크기·색·거리 규칙은 그대로다. `clue_pts`에는 **물건 자리**를 넣는다:
+            # 집기가 피해야 하는 것은 물건이고 표시는 충돌체가 없다.
+            mdx, mdy = MARK_OFFSET.get((floor, name), (0, 0))
+            sc.mark(name, cx + mdx, cy + mdy, C_MARK_KEY)
             if name in AUTO_PICKUP:
                 body = to_pickup(body)
             sc.node(body if body.endswith("\n") else body + "\n")
@@ -3072,11 +3117,18 @@ def add_infill(sc, fl, spec):
     if fl == 1:
         stx0, _sty0, stx1, sty1 = FLOOR1["stair"]
         bottom = [(stx0, stx1)] + [(x0, x1) for _, _, x0, y0, x1, _y1, _d
-                                    in FLOOR1["rooms"] if y0 == BOT_Y0]
-        for i, (gx0, gx1) in enumerate(gaps_in(bottom, EDGE, W - EDGE)):
-            fill_band_gap(sc, f"GapBot{i}", gx0, gx1, BOT_Y0, BOT_Y1)
-        # 계단실은 2440에서 끝나는데 하단 띠는 2480까지다 — 그 아래 띠를 메운다.
-        fill_band_gap(sc, "GapStair", stx0, stx1, sty1, BOT_Y1)
+                                    in FLOOR1["rooms"] if y0 == F1_BOT_Y0]
+        for i, (gx0, gx1) in enumerate(gaps_in(bottom, EDGE, F1W - EDGE)):
+            fill_band_gap(sc, f"GapBot{i}", gx0, gx1, F1_BOT_Y0, F1_BOT_Y1)
+        # 계단실은 하단 띠보다 얕다 — 그 아래 자투리를 메운다.
+        fill_band_gap(sc, "GapStair", stx0, stx1, sty1, F1_BOT_Y1)
+        # 상단 띠에도 틈이 생기면(방 표를 고칠 때) 같이 메운다. 교무실은
+        # `rooms`가 아니라 `staff`에 있어 따로 넣어야 한다.
+        top = [(x0, x1) for _, _, x0, y0, x1, _y1, _d in FLOOR1["rooms"]
+               if y0 == F1_TOP_Y0]
+        top.append((FLOOR1["staff"][0], FLOOR1["staff"][2]))
+        for i, (gx0, gx1) in enumerate(gaps_in(top, EDGE, F1W - EDGE)):
+            fill_band_gap(sc, f"GapTop{i}", gx0, gx1, F1_TOP_Y0, F1_TOP_Y1)
         return
 
     def bridge_lane(gx0, gx1):
@@ -3236,8 +3288,8 @@ def build_common(fl, spec):
 def build_floor1():
     sc = Scene()
     sc.floor_no = 1
-    sc.rect_shapes = [("RectangleShape2D_wall_h", f"Vector2({W}, 40)"),
-                      ("RectangleShape2D_wall_v", f"Vector2(40, {H})"),
+    sc.rect_shapes = [("RectangleShape2D_wall_h", f"Vector2({F1W}, 40)"),
+                      ("RectangleShape2D_wall_v", f"Vector2(40, {F1H})"),
                       ("RectangleShape2D_stair_zone", "Vector2(240, 56)"),
                       ("RectangleShape2D_key_zone", "Vector2(48, 48)"),
                       ("RectangleShape2D_near_zone", "Vector2(240, 240)"),
@@ -3246,7 +3298,7 @@ def build_floor1():
                       ("RectangleShape2D_exam_zone",
                        f"Vector2({EXAMINE_ZONE[0]}, {EXAMINE_ZONE[1]})")]
     sc.node('[node name="SchoolFloor" type="Node2D"]\n' + TEX_FLAGS)
-    sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, W, H))
+    sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, F1W, F1H))
     sc.node('[node name="Ground" type="Node2D" parent="."]\n')
     sc.node('[node name="WallGlow" type="CanvasLayer" parent="."]\n'
             'layer = 1\nfollow_viewport_enabled = true\n')
@@ -3292,28 +3344,51 @@ def build_floor1():
     add_stairwell(sc, "StairA", *FLOOR1["stair"])
     add_stair_markers(sc, "StairA", *FLOOR1["stair"], floor=1)
     # 1층 계단에는 자물쇠가 없다(#396) — LOCKED 주석 참조.
-    # 1층 건물은 도면상 아래쪽 절반뿐이다. 북쪽 빈 구역에 경계벽을 세우고
-    # 안쪽을 메워, 플레이어가 들어가지도 수위가 스폰되지도 않게 한다.
-    sc.wall("Floor1North", rect(0, 1004, W, 1020))
-    fill_void(sc, "VoidFillN", 0, W, lambda x: 0.0, 1004)
+    # **북쪽 봉인 공백이 없어졌다**(#498). 예전에는 도면상 건물이 아래쪽 절반뿐이라
+    # y 0~1020(맵의 40%)에 경계벽을 세우고 안을 메웠다 — 걸어 들어갈 수도 채울
+    # 수도 없는 구역이었다. 캔버스를 1500으로 줄여 그 절반을 통째로 없앴다.
 
     # 현관 정문 — 방 아래변(건물 바깥쪽)에 보이는 문. ExitDoor 상호작용도 이 앞이다.
-    ex0, ey1, ex1 = 1600, 2480, 2000
+    _lobby = f1_room("Entrance")
+    ex0, ey1, ex1 = _lobby[2], F1_BOT_Y1, _lobby[4]
     sc.poly2d("Door_FrontGate", "WallGlow/Doors", C_DOOR,
               rect((ex0 + ex1) / 2 - DOOR / 2, ey1 - T, (ex0 + ex1) / 2 + DOOR / 2, ey1), z=1)
+
+    # ── 현관 빛(#498) ────────────────────────────────────────
+    # **이 층이 밝은 이유다.** 층 어둠을 올린 것(`floor_manager`의 층별 표)만으로는
+    # "왜 밝은지"가 화면에 없다 — 밝음의 출처가 정문이어야 계단에서 내려온
+    # 플레이어가 그쪽으로 걷는다.
+    #
+    # 광원 묶음을 **항상 켜 둔다**(`always_on`). 다른 방 달빛은 문이 열렸거나
+    # 안에 있을 때만 켜지지만(#292 — 닫힌 문 너머가 보이면 안 된다), 여기서는
+    # 문 틈으로 새는 그 빛이 곧 연출이다. 그림자를 켜므로 빛은 로비 벽에 막히고
+    # **문 틈으로만** 복도로 나간다.
+    sc.room_lights("Entrance", ex0, F1_BOT_Y0, ex1, F1_BOT_Y1, always_on=True)
+    sc.node(NL.join([
+        '[node name="EntranceLight" type="PointLight2D" parent="Lights/Room_Entrance"]',
+        f"position = Vector2({n((ex0 + ex1) / 2)}, {n(F1_BOT_Y1 - 110)})",
+        f"color = {C_LAMP}",
+        f"energy = {ENTRANCE_ENERGY}",
+        "shadow_enabled = true",
+        "shadow_filter = 1",
+        "shadow_filter_smooth = 4.0",
+        'texture = SubResource("GradientTexture2D_moon")',
+        f"texture_scale = {ENTRANCE_LIGHT_SCALE}",
+        ""]))
 
     # 운동장 출입구 바깥문(#393) — 방 위변(건물 바깥쪽)에 보이는 문.
     # 아래변 복도 문은 add_room이 내고, 이건 그 반대쪽 벽에 얹는 시각이다.
     # 현관 정문과 같이 **벽은 뚫지 않는다** — 문 너머는 층 전환으로만 간다.
-    yx0, yy0, yx1 = 1390, 1020, 1920
+    _yard = f1_room("YardExit")
+    yx0, yy0, yx1 = _yard[2], F1_TOP_Y0, _yard[4]
     ycx = (yx0 + yx1) / 2
     sc.poly2d("Door_YardGate", "WallGlow/Doors", C_DOOR,
               rect(ycx - DOOR / 2, yy0, ycx + DOOR / 2, yy0 + T), z=1)
     add_furniture(sc, 1)
     add_story(sc, 1)
     add_hiding(sc, 1)
-    # 1층은 아래쪽 절반만 건물이라 큰 홀 하나가 복도 역할을 한다.
-    corridors = [(F1_ROOM_Y1, BOT_Y0)]
+    # 복도는 상단 방 띠와 하단 방 띠 사이 하나다(180px, #495·#498).
+    corridors = [(F1_COR_Y0, F1_COR_Y1)]
     add_ground(sc, corridors)
     add_infill(sc, 1, None)
     add_props(sc, corridors)
@@ -3321,7 +3396,7 @@ def build_floor1():
     add_examine(sc)
     add_sliding_doors(sc)
 
-    add_outer(sc)
+    add_outer(sc, F1W, F1H)
     return sc
 
 
@@ -3343,13 +3418,15 @@ def fill_void(sc, key, x0, x1, top_fn, y_bottom, step=100):
         x = right
 
 
-def add_outer(sc):
+def add_outer(sc, w=W, h=H):
+    """맵 테두리 외벽. **캔버스가 층마다 다르므로 크기를 받는다**(#498) —
+    1층은 3400x1500이라 전역 W/H로 세우면 아래쪽 외벽이 맵 밖에 선다."""
     sc.node('[node name="Walls" type="StaticBody2D" parent="."]\n')
     for nm, pos, shape in [
-        ("TopWall", f"Vector2({W/2}, 0)", "RectangleShape2D_wall_h"),
-        ("BottomWall", f"Vector2({W/2}, {H})", "RectangleShape2D_wall_h"),
-        ("LeftWall", f"Vector2(0, {H/2})", "RectangleShape2D_wall_v"),
-        ("RightWall", f"Vector2({W}, {H/2})", "RectangleShape2D_wall_v"),
+        ("TopWall", f"Vector2({w/2}, 0)", "RectangleShape2D_wall_h"),
+        ("BottomWall", f"Vector2({w/2}, {h})", "RectangleShape2D_wall_h"),
+        ("LeftWall", f"Vector2(0, {h/2})", "RectangleShape2D_wall_v"),
+        ("RightWall", f"Vector2({w}, {h/2})", "RectangleShape2D_wall_v"),
     ]:
         sc.node(f'[node name="{nm}" type="CollisionShape2D" parent="Walls"]\n'
                 f'position = {pos}\nshape = SubResource("{shape}")\n')

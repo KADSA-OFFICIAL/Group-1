@@ -15,6 +15,11 @@ extends Area2D
 ## **안 보이는 Area2D도 몸을 감지한다** — `visible`은 그리기만 끄고 물리는
 ## 그대로다. 그래서 광원 묶음 자체를 Area2D로 두고 `visible`로 껐다 켠다.
 
+## **늘 켜 두는 방**(#498). 1층 현관 로비가 그렇다 — 그 층이 밝은 이유가
+## "현관에서 새어 나오는 빛"이라, 문을 닫아도 복도에서 그 빛이 보여야 한다.
+## 닫힌 문 너머가 보이는 것(#292)이 여기서는 문제가 아니라 연출이다.
+@export var always_on: bool = false
+
 ## 문이 열어 둔 횟수. 한 방에 문이 여럿일 수 있어 셈으로 둔다.
 var _holders: int = 0
 ## 방 안에 있는 플레이어 수(0 또는 1).
@@ -22,7 +27,7 @@ var _inside: int = 0
 
 
 func _ready() -> void:
-	visible = false
+	visible = always_on
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
 
@@ -67,4 +72,4 @@ func _on_body_exited(body: Node2D) -> void:
 
 
 func _apply() -> void:
-	visible = _holders > 0 or _inside > 0
+	visible = always_on or _holders > 0 or _inside > 0
