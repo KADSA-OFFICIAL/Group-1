@@ -121,6 +121,20 @@ const SIWOO_FLAGS := [
 const COVERUP_FLAGS := [
 	"read_principal_letter", "read_janitor_notebook", "read_crisis_manual"]
 
+## 층별 진엔딩(총 6개) 필수 단서 플래그(#540)
+const TRUE_ENDING_BY_FLOOR := {
+	4: ["read_siwoo_painting", "read_siwoo_counseling"],
+	3: ["found_imnayeon", "found_jominhyuk"],
+	2: ["found_kangyujin"],
+	1: ["read_janitor_notebook"],
+}
+
+## 층별 엔딩 2(은폐 증거, 총 3개 중 1개 이상 필요) 단서 플래그(#540)
+const REPORT_ENDING_BY_FLOOR := {
+	2: ["read_crisis_manual"],
+	1: ["read_principal_letter", "read_janitor_notebook"],
+}
+
 
 ## 히든 엔딩 조건인가 — 실종 학생 셋을 **전부** 찾고 시우의 이야기를 **전부** 봤는가.
 ##
@@ -140,6 +154,34 @@ func saw_coverup() -> bool:
 		if f in flags:
 			return true
 	return false
+
+
+## 진엔딩 진행 상황 반환(#540): { "found": N, "total": 6, "by_floor": { 4: [found, total], 3: [found, total], 2: [found, total], 1: [found, total] } }
+func get_true_ending_stats() -> Dictionary:
+	var res := { "found": 0, "total": 6, "by_floor": {} }
+	for fl in [4, 3, 2, 1]:
+		var clues: Array = TRUE_ENDING_BY_FLOOR.get(fl, [])
+		var got := 0
+		for c in clues:
+			if c in flags:
+				got += 1
+		res.found += got
+		res.by_floor[fl] = [got, clues.size()]
+	return res
+
+
+## 엔딩 2 진행 상황 반환(#540): { "found": N, "total": 3, "by_floor": { 2: [found, total], 1: [found, total] } }
+func get_report_ending_stats() -> Dictionary:
+	var res := { "found": 0, "total": 3, "by_floor": {} }
+	for fl in [2, 1]:
+		var clues: Array = REPORT_ENDING_BY_FLOOR.get(fl, [])
+		var got := 0
+		for c in clues:
+			if c in flags:
+				got += 1
+		res.found += got
+		res.by_floor[fl] = [got, clues.size()]
+	return res
 
 
 ## 현관에서 어떤 엔딩으로 갈 것인가(#353).
