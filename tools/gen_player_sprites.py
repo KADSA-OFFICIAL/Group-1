@@ -50,9 +50,13 @@ SRC_WALK = ROOT / "assets" / "sprites" / "source" / "player_walk_design.png"
 # 않아 세로 창으로 행을 가를 필요가 없고, 원본이 둘 다 512x512 알파 배경이다.
 SRC_BACK = (ROOT / "assets" / "sprites" / "source" / "player_back1_design.png",
             ROOT / "assets" / "sprites" / "source" / "player_back2_design.png")
+# 정면 걷기 두 포즈(#551). 뒷모습과 완전히 같은 형태다 — 한 파일에 한 포즈이고
+# 둘 다 2048x2048 흰 배경이라 같은 굽기 경로(`_bake_pair`)를 지나간다.
+SRC_FRONT = (ROOT / "assets" / "sprites" / "source" / "player_front1_design.png",
+             ROOT / "assets" / "sprites" / "source" / "player_front2_design.png")
 OUT_DIR = ROOT / "assets" / "sprites"
 
-# 출력 캔버스. 열세 장이 같은 크기여야 Sprite2D 오프셋(SPRITE_OFFSET_Y)을 하나로 쓸 수
+# 출력 캔버스. 열일곱 장이 같은 크기여야 Sprite2D 오프셋(SPRITE_OFFSET_Y)을 하나로 쓸 수
 # 있다. 폭은 가장 벌어진 포즈(뒤로 뻗은 다리 + 앞으로 뻗은 팔)가 잘리지 않을 만큼
 # 필요하다 — #381의 활보 포즈 기준 대칭 중심 정렬 최소 72.1칸이라 여유를 두고 74로
 # 잡았다(`_check_fits`가 검사한다). #384의 12프레임 걷기 사이클은 보폭이 이보다 훨씬
@@ -130,6 +134,12 @@ BACK_HEAD_ROWS = 0.10
 # 두 뒷모습 포즈의 키가 이만큼(원본 px) 넘게 다르면 멈춘다. 배율이 하나뿐이라
 # 어긋나면 번갈아 나올 때 인물이 커졌다 작아진다.
 BACK_HEIGHT_TOLERANCE = 8
+
+# 정면 걷기도 같은 값을 쓴다(#551). 실측: 위 6~20%에서 두 포즈가 모두 1263.5로 같고
+# 30%부터 팔이 들어와 8px 벌어진다 — 뒷모습(6~14%)보다 오히려 넉넉하다.
+FRONT_HEAD_ROWS = 0.10
+# 실측 키 1745 / 1744로 1px 차이다.
+FRONT_HEIGHT_TOLERANCE = 8
 
 
 # --------------------------------------------------------------------------- PNG
@@ -394,7 +404,7 @@ def _write(name: str, px: bytearray, note: str) -> None:
     opaque = sum(1 for i in range(CANVAS_W * CANVAS_H) if px[i * 4 + 3])
     if opaque < 200:
         raise SystemExit(f"{name}: 칠해진 칸이 {opaque}개뿐이다 — 잘라낼 위치를 확인할 것")
-    # 발끝은 캔버스 바닥에 붙어야 한다. 네 장이 같은 오프셋(SPRITE_OFFSET_Y) 하나를
+    # 발끝은 캔버스 바닥에 붙어야 한다. 열일곱 장이 같은 오프셋(SPRITE_OFFSET_Y) 하나를
     # 쓰므로, 어긋나면 프레임이 바뀔 때 인물이 위아래로 튄다.
     if not any(px[((CANVAS_H - 1) * CANVAS_W + x) * 4 + 3] for x in range(CANVAS_W)):
         raise SystemExit(f"{name}: 발끝이 캔버스 바닥(y={CANVAS_H - 1})에 닿지 않는다 "
@@ -404,7 +414,7 @@ def _write(name: str, px: bytearray, note: str) -> None:
 
 
 def build_all() -> None:
-    for src in (SRC, SRC_WALK, *SRC_BACK):
+    for src in (SRC, SRC_WALK, *SRC_BACK, *SRC_FRONT):
         if not src.exists():
             raise SystemExit(f"원본 아트가 없다: {src}")
 
@@ -445,28 +455,42 @@ def build_all() -> None:
         _write(name, px, f"원본 {box[1] - box[0] + 1}x{box[3] - box[2] + 1}  "
                          f"배율 1px = 원본 {walk_scale:.2f}px")
 
-    # ── 뒷모습 걷기 두 장(#519) ────────────────────────────────
-    # 위로 걸을 때 쓴다. **측면과 같은 캔버스·같은 인물 크기**여야 한다 —
-    # 열다섯 장이 `SPRITE_OFFSET_Y` 하나를 공유하므로, 배율은 측면과 똑같이
-    # "측면 포즈가 캔버스에서 차지한 높이(side_canvas_h)"에 맞춰 거꾸로 잡는다.
-    back = []
-    for src in SRC_BACK:
-        bwidth, bheight, brgba = read_png(src)
-        bmask = background_mask(bwidth, bheight, brgba)
-        bbx = bbox(bwidth, bheight, bmask, 0, bwidth - 1)
-        back.append((src, bwidth, bheight, brgba, bmask, bbx))
-    bheights = [b[5][3] - b[5][2] + 1 for b in back]
-    if max(bheights) - min(bheights) > BACK_HEIGHT_TOLERANCE:
-        raise SystemExit(f"뒷모습 두 포즈의 키가 너무 다르다 {bheights} — 배율이 "
+    # ── 방향 전용 걷기 두 장씩(#519 뒷모습 · #551 정면) ────────
+    _bake_pair(SRC_BACK, "player_back", "뒷모습", BACK_HEAD_ROWS,
+               BACK_HEIGHT_TOLERANCE, side_canvas_h)
+    _bake_pair(SRC_FRONT, "player_front", "정면", FRONT_HEAD_ROWS,
+               FRONT_HEIGHT_TOLERANCE, side_canvas_h)
+
+
+def _bake_pair(sources: tuple[pathlib.Path, ...], prefix: str, label: str,
+               head_rows: float, tolerance: int, side_canvas_h: float) -> None:
+    """한 방향의 걷기 두 장을 굽는다(#519·#551).
+
+    위/아래로 걸을 때 쓴다. **측면과 같은 캔버스·같은 인물 크기**여야 한다 —
+    열일곱 장이 `SPRITE_OFFSET_Y` 하나를 공유하므로, 배율은 측면과 똑같이
+    "측면 포즈가 캔버스에서 차지한 높이(side_canvas_h)"에 맞춰 거꾸로 잡는다.
+
+    뒷모습과 정면이 같은 함수를 지나가는 이유는 원본 형태가 같아서다 — 한 파일에
+    한 포즈, 흰 배경, 시트가 아니므로 세로 창으로 행을 가를 필요가 없다. 두 벌을
+    따로 적어 두면 한쪽만 고쳐서 인물 크기가 어긋날 자리가 생긴다.
+    """
+    poses = []
+    for src in sources:
+        width, height, rgba = read_png(src)
+        mask = background_mask(width, height, rgba)
+        box = bbox(width, height, mask, 0, width - 1)
+        poses.append((width, height, rgba, mask, box))
+    heights = [p[4][3] - p[4][2] + 1 for p in poses]
+    if max(heights) - min(heights) > tolerance:
+        raise SystemExit(f"{label} 두 포즈의 키가 너무 다르다 {heights} — 배율이 "
                          "하나뿐이라 번갈아 나올 때 인물이 커졌다 작아진다")
-    for i, (src, bwidth, bheight, brgba, bmask, bbx) in enumerate(back, start=1):
-        anchor = head_anchor(bwidth, bmask, bbx, BACK_HEAD_ROWS)
-        back_scale = (bbx[3] - bbx[2] + 1) / side_canvas_h
-        name = f"player_back_{i}"
-        px = _cut(name, bwidth, bheight, brgba, bmask, bbx, (0, bwidth - 1),
-                  anchor, back_scale)
-        _write(name, px, f"뒷모습  원본 {bbx[1] - bbx[0] + 1}x{bbx[3] - bbx[2] + 1}  "
-                         f"머리 중심 {anchor:.1f}  배율 1px = 원본 {back_scale:.2f}px")
+    for i, (width, height, rgba, mask, box) in enumerate(poses, start=1):
+        anchor = head_anchor(width, mask, box, head_rows)
+        scale = (box[3] - box[2] + 1) / side_canvas_h
+        name = f"{prefix}_{i}"
+        px = _cut(name, width, height, rgba, mask, box, (0, width - 1), anchor, scale)
+        _write(name, px, f"{label}  원본 {box[1] - box[0] + 1}x{box[3] - box[2] + 1}  "
+                         f"머리 중심 {anchor:.1f}  배율 1px = 원본 {scale:.2f}px")
 
 
 def _check_fits(name: str, box: tuple[int, int, int, int], anchor_x: float,
