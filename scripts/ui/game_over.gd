@@ -24,9 +24,13 @@ const DEFAULT_MESSAGE := "이설은 학교에서 나오지 못했다."
 @export var fade_seconds: float = 1.0
 
 @onready var message_label: Label = $Layout/MessageLabel
+@onready var hint_label: Label = $Layout/HintLabel
 @onready var retry_button: Button = $Layout/Buttons/RetryButton
+@onready var restart_button: Button = $Layout/Buttons/RestartButton
 @onready var title_button: Button = $Layout/Buttons/TitleButton
 @onready var fade_rect: ColorRect = $Fade
+
+const GameStateScript = preload("res://scripts/game/game_state.gd")
 
 var leaving: bool = false
 
@@ -35,7 +39,20 @@ func _ready() -> void:
 	message_label.text = MESSAGES.get(pending_reason, DEFAULT_MESSAGE)
 
 	retry_button.pressed.connect(_on_retry_pressed)
+	restart_button.pressed.connect(_on_restart_pressed)
 	title_button.pressed.connect(_on_title_pressed)
+
+	if GameStateScript.has_checkpoint():
+		var cp := GameStateScript.get_checkpoint()
+		var fl: int = int(cp.get("floor", 0))
+		var fl_name: String = "%d층" % fl if fl > 0 else "운동장"
+		retry_button.text = "%s에서 재시도" % fl_name
+		restart_button.visible = true
+		hint_label.text = "마지막 체크포인트: %s (소지품 및 단서 유지)" % fl_name
+	else:
+		retry_button.text = "다시 시작"
+		restart_button.visible = false
+		hint_label.text = "다시 시작하면 4층부터입니다. 모은 물건은 남지 않습니다."
 
 	fade_rect.color.a = 1.0
 	var tween := create_tween()
@@ -44,6 +61,13 @@ func _ready() -> void:
 
 
 func _on_retry_pressed() -> void:
+	if GameStateScript.has_checkpoint():
+		GameStateScript.set_pending_restore(true)
+	_leave(retry_scene_path)
+
+
+func _on_restart_pressed() -> void:
+	GameStateScript.clear_checkpoint()
 	_leave(retry_scene_path)
 
 
@@ -58,6 +82,7 @@ func _leave(scene_path: String) -> void:
 
 	Sfx.play(&"ui_click")
 	retry_button.disabled = true
+	restart_button.disabled = true
 	title_button.disabled = true
 
 	var tween := create_tween()

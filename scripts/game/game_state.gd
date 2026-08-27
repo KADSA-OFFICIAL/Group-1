@@ -23,15 +23,80 @@ var flags: Array[String] = []
 # 런이 끝났는지(붙잡힘 등). 끝난 뒤 들어오는 중복 신호를 여기서 흡수한다.
 var _is_finished: bool = false
 
+## 세션 내 체크포인트 저장소(#564).
+## 씬이 재로드되어도 static 변수는 메모리에 유지된다.
+static var _checkpoint: Dictionary = {}
+static var _pending_restore: bool = false
+
+
+## 체크포인트 데이터 저장
+static func save_checkpoint(floor_num: int, arrive_pos: Vector2, current_items: Array[String], current_flags: Array[String]) -> void:
+	_checkpoint = {
+		"floor": floor_num,
+		"arrive_pos": arrive_pos,
+		"items": current_items.duplicate(),
+		"flags": current_flags.duplicate(),
+	}
+
+
+static func has_checkpoint() -> bool:
+	return not _checkpoint.is_empty() and _checkpoint.has("floor")
+
+
+static func get_checkpoint() -> Dictionary:
+	return _checkpoint.duplicate(true)
+
+
+static func set_pending_restore(value: bool) -> void:
+	_pending_restore = value
+
+
+static func is_pending_restore() -> bool:
+	return _pending_restore and has_checkpoint()
+
+
+static func clear_checkpoint() -> void:
+	_checkpoint.clear()
+	_pending_restore = false
+
 
 func _enter_tree() -> void:
 	add_to_group("game_state")
 
 
 func _ready() -> void:
-	items = starting_items.duplicate()
-	flags = starting_flags.duplicate()
+	if is_pending_restore():
+		var _cp = restore_from_checkpoint()
+	else:
+		items = starting_items.duplicate()
+		flags = starting_flags.duplicate()
+		inventory_changed.emit(items)
+		var score: Array = clue_score()
+		clues_changed.emit(score[0], score[1])
+
+
+## 현재 상태를 체크포인트로 기록한다.
+func record_checkpoint(floor_num: int, arrive_pos: Vector2) -> void:
+	save_checkpoint(floor_num, arrive_pos, items, flags)
+
+
+## 저장된 체크포인트로부터 상태(인벤토리, 플래그)를 복원한다.
+func restore_from_checkpoint() -> Dictionary:
+	if not has_checkpoint():
+		return {}
+	var cp := get_checkpoint()
+	items.clear()
+	for it in (cp["items"] as Array):
+		items.append(str(it))
+	flags.clear()
+	for fl in (cp["flags"] as Array):
+		flags.append(str(fl))
+	_is_finished = false
+	_pending_restore = false
 	inventory_changed.emit(items)
+	var score: Array = clue_score()
+	clues_changed.emit(score[0], score[1])
+	return cp
 
 
 func has_item(item_id: String) -> bool:
