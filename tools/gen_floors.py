@@ -876,6 +876,31 @@ def add_lights_root(sc):
         '']))
 
 
+# 방 이름 라벨은 **문 쪽에 붙인다**(#490). 방 한가운데 두면 문 앞에서 라벨까지
+# 거리가 방 깊이의 절반 + 복도에서 떨어진 만큼이라, 거리로 밝기를 매기는
+# `interact_marks`(420px에서 뜨고 300px에서 최대, #307)에 걸려 어느 방인지 못
+# 읽는다. 1층 교실은 깊이가 780이 된 뒤로(#479) 문 바로 앞에서도 안 보였다.
+LABEL_DOOR_INSET = 120
+
+
+def label_pos(x0, y0, x1, y1, door):
+    """라벨 자리 — 문에서 안쪽으로 LABEL_DOOR_INSET.
+
+    방이 얕아 그 자리가 중심보다 문 반대쪽이 되면 중심에 둔다(라벨이 벽에
+    붙지 않게). 문이 없는 방(막힌 공간·도입부)은 중심 그대로다.
+    """
+    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+    if door == "bottom":
+        cy = max(cy, y1 - LABEL_DOOR_INSET)
+    elif door == "top":
+        cy = min(cy, y0 + LABEL_DOOR_INSET)
+    elif door == "left":
+        cx = min(cx, x0 + LABEL_DOOR_INSET)
+    elif door == "right":
+        cx = max(cx, x1 - LABEL_DOOR_INSET)
+    return cx, cy
+
+
 def add_room(sc, key, label, x0, y0, x1, y1, door):
     """축정렬 방: 바닥 + 사방 벽(+문 틈). door in {top,bottom,left,right,None}."""
     sc.rooms[key] = (x0, y0, x1, y1)
@@ -883,7 +908,7 @@ def add_room(sc, key, label, x0, y0, x1, y1, door):
                          lambda x, v=y0: v, lambda x, v=y1: v)
     sc.poly2d(key, "Rooms", room_floor(key, label), rect(x0, y0, x1, y1))
     if label:
-        sc.label(key, label, (x0 + x1) / 2, (y0 + y1) / 2)
+        sc.label(key, label, *label_pos(x0, y0, x1, y1, door))
 
     cx = (x0 + x1) / 2
     dl, dr = cx - DOOR / 2, cx + DOOR / 2
