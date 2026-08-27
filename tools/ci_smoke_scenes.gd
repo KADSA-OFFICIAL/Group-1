@@ -25,6 +25,9 @@ const INTRO := "res://scenes/ui/intro.tscn"
 const DOOR_SETTLE := 0.6
 ## 프레임을 돌리는 사이 한 번에 기다릴 시간.
 const TICK := 0.05
+## `WallFade` 마스크가 완전히 검어지는 거리(main.tscn의 Mask, scale 2 기준 389px).
+## 이 밖에 있는 수위는 숨은 이설에게 **안 보인다**(#465).
+const FADE_RADIUS := 389.0
 
 var _fail: Array[String] = []
 var _checked := 0
@@ -63,6 +66,17 @@ func _run() -> void:
 
 func _wait(seconds: float) -> void:
 	await create_timer(seconds).timeout
+
+
+## 조건이 참이 될 때까지 기다린다. 참이 됐으면 true, 시간을 넘기면 false.
+func _until(cond: Callable, seconds: float) -> bool:
+	var waited := 0.0
+	while waited < seconds:
+		if bool(cond.call()):
+			return true
+		await _wait(TICK)
+		waited += TICK
+	return bool(cond.call())
 
 
 ## 층 씬을 붙이고 미닫이문 전부를 열고 닫아 본다.
@@ -213,27 +227,65 @@ func _check_artroom_intro() -> void:
 	else:
 		_ok("도입부 발동 조건")
 
-	# 장면이 끝나면 조작이 돌아오고 카메라가 제자리로 와야 한다
 	var player: Node = main.get_node_or_null("Player")
 	var cam := player.get_node_or_null("Camera2D") as Camera2D if player != null else null
-	var waited := 0.0
-	while player != null and not player.is_physics_processing() and waited < 20.0:
-		await _wait(TICK)
-		waited += TICK
-	if player != null and not player.is_physics_processing():
-		_fault("도입부: 장면이 끝났는데 조작이 안 돌아온다(20초 대기)")
+
+	# ── 1막: 조작이 돌아오고 숨을 유예가 돈다(#465) ─────────────────
+	if not await _until(func() -> bool:
+			return player != null and player.is_physics_processing(), 20.0):
+		_fault("도입부 1막: 장면이 끝났는데 조작이 안 돌아온다(20초 대기)")
 	elif cam != null:
 		if not cam.offset.is_equal_approx(Vector2.ZERO):
-			_fault("도입부: 클로즈업 뒤 카메라 offset이 안 돌아왔다 (%s)" % cam.offset)
+			_fault("도입부 1막: 클로즈업 뒤 카메라 offset이 안 돌아왔다 (%s)" % cam.offset)
 		if not cam.zoom.is_equal_approx(Vector2(1.25, 1.25)):
-			_fault("도입부: 클로즈업 뒤 카메라 zoom이 안 돌아왔다 (%s)" % cam.zoom)
-		_ok("도입부 카메라 복귀")
-
-	# 유예가 시작됐는가
-	if float(intro.get("_grace")) <= 0.0:
-		_fault("도입부: 장면이 끝났는데 유예 타이머가 안 돈다")
+			_fault("도입부 1막: 클로즈업 뒤 카메라 zoom이 안 돌아왔다 (%s)" % cam.zoom)
+		_ok("도입부 1막 카메라 복귀")
+	if not await _until(func() -> bool:
+			return float(intro.get("_hide_left")) > 0.0, 10.0):
+		_fault("도입부 1막: 숨을 유예가 안 돈다(10초 대기)")
 	else:
-		_ok("도입부 유예 시작")
+		_ok("도입부 1막 숨을 유예")
+
+	# ── 2막: 숨으면 수위가 실제로 들어온다 ────────────────────────
+	var jan := bg.get_node_or_null("IntroJanitor") as Node2D
+	if jan == null:
+		_fault("도입부: IntroJanitor가 없다")
+	elif jan.visible:
+		_fault("도입부: 숨기 전인데 수위가 벌써 보인다")
+	bg.get_node("HideArtCabinet").call("interact", player)
+	if player.get("is_hiding") != true:
+		_fault("도입부 2막: 캐비넷에 숨지 못했다")
+	if not await _until(func() -> bool: return bool(intro.get("_scene_locked")), 5.0):
+		_fault("도입부 2막: 숨었는데 자백 장면이 시작되지 않는다")
+	else:
+		_ok("도입부 2막 시작")
+	if jan != null and not jan.visible:
+		_fault("도입부 2막: 수위가 안 보인다")
+	# 장면 도중에는 캐비넷에서 못 나온다
+	if player.is_processing_unhandled_input():
+		_fault("도입부 2막: 장면 도중인데 입력이 살아 있다(캐비넷에서 나갈 수 있다)")
+	else:
+		_ok("도입부 2막 입력 잠금")
+	# 캐비넷 앞까지 오는가 — WallFade 마스크가 389px 밖을 검게 칠한다
+	var cabinet := bg.get_node("HideArtCabinet") as Node2D
+	if jan != null and not await _until(func() -> bool:
+			return jan.position.distance_to(cabinet.position) <= FADE_RADIUS, 30.0):
+		_fault("도입부 2막: 수위가 캐비넷 %dpx 안까지 안 온다 (가장 가까웠던 곳 %.0fpx)"
+			% [FADE_RADIUS, jan.position.distance_to(cabinet.position)])
+	else:
+		_ok("도입부 2막 수위가 캐비넷 앞까지")
+
+	# ── 3막: 수위가 나가고 유예가 돈다 ────────────────────────────
+	if not await _until(func() -> bool: return float(intro.get("_grace")) > 0.0, 60.0):
+		_fault("도입부 3막: 자백이 끝났는데 유예 타이머가 안 돈다(60초 대기)")
+	else:
+		_ok("도입부 3막 유예 시작")
+	if jan != null and jan.visible:
+		_fault("도입부 3막: 수위가 나갔는데 아직 보인다")
+	if not player.is_processing_unhandled_input():
+		_fault("도입부 3막: 장면이 끝났는데 입력이 안 돌아왔다")
+	else:
+		_ok("도입부 3막 조작 복귀")
 
 	main.free()
 	await process_frame
