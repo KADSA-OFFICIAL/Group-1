@@ -298,5 +298,21 @@ func _check_artroom_intro() -> void:
 	else:
 		_ok("도입부 3막 조작 복귀")
 
+	# ── 창문으로 내려가기 시작하면 유예가 끊긴다(#472) ─────────────
+	# 컷신(#468)이 도는 18초 동안에도 4층 씬은 살아 있어 유예(20초)가 계속 돌았고,
+	# 창문에 제때 닿아도 컷신 도중에 게임 오버가 났다.
+	if win != null and not win.has_signal("travel_started"):
+		_fault("창문: 하강 시작을 알리는 travel_started 신호가 없다")
+	elif win != null:
+		win.emit_signal("travel_started")
+		await process_frame
+		if float(intro.get("_grace")) > 0.0:
+			_fault("도입부: 창문으로 내려가기 시작했는데 유예가 계속 돈다 (%.1f초)"
+				% intro.get("_grace"))
+		elif intro.is_processing():
+			_fault("도입부: 창문으로 내려가기 시작했는데 타이머가 안 꺼졌다")
+		else:
+			_ok("창문 하강 시 유예 정지")
+
 	main.free()
 	await process_frame

@@ -3805,6 +3805,9 @@ def build_intro():
         'janitor_path = NodePath("../IntroJanitor")',
         'cabinet_path = NodePath("../HideArtCabinet")',
         'cabinet_mark_path = NodePath("../WallGlow/Marks/Mark_HideArtCabinet")',
+        # 창문으로 내려가기 시작하면 유예를 끊는다(#472) — 컷신(#468)이 도는
+        # 동안에도 이 층은 살아 있어 타이머가 계속 돌기 때문이다.
+        'escape_path = NodePath("../PrepWindowEscape")',
         'janitor_walk = PackedVector2Array(%s)'
         % ", ".join("%s, %s" % (n(x), n(y)) for x, y in walk),
         '']))
