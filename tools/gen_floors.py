@@ -304,7 +304,9 @@ SPRITE_TEXTURES = {"9_key": "res://assets/sprites/key.png",
                    "14_beaker": "res://assets/sprites/beaker.png",
                    "15_eyekey": "res://assets/sprites/eye_key.png",
                    # 맵 위 머리는 위에서 본 그림, 왼쪽 위 클로즈업은 정면(#451).
-                   "16_headtop": "res://assets/sprites/head_top.png"}
+                   "16_headtop": "res://assets/sprites/head_top.png",
+                   # 도입부 연출용 수위(#465). 순찰체(janitor.tscn)와 같은 시트를 쓴다.
+                   "18_janitor": "res://assets/sprites/janitor_sheet.png"}
 
 # 텍스처 설정을 물려받을 부모가 없는 CanvasLayer 직속 노드. #307에서 벽·문·계단
 # 시각이 전부 레이어 0(`Structures`)으로 내려가면서 비었다가, #318에서 문
@@ -3747,7 +3749,46 @@ def build_intro():
         'color = %s' % C_MOON_LIGHT,
         'polygon = %s' % rect(dl + 6, IY1 - T - 7, dr - 6, IY1 - T),
         '']))
+    # ── 도입부 수위(#465) ────────────────────────────────────────────
+    # **순찰체(`janitor.tscn`)가 아니다.** 저쪽은 A* 격자를 까는 추격 AI라
+    # 한 장면 연출에 끌어오면 4층에 순찰 격자를 깔아야 한다. 여기 필요한 것은
+    # 정해진 길을 따라 걷는 그림 하나뿐이다.
+    #
+    # **손전등을 들려 준다.** `WallFade` 마스크가 플레이어에게서 389px 밖을
+    # 완전히 검게 칠하므로, 어두운 방에서 수위가 어디 있는지 보이는 단서가
+    # 이 빛뿐이다. 밤 수위가 등을 든 모습이 자연스럽기도 하다.
+    sc.node(NL.join([
+        '[node name="IntroJanitor" type="Node2D" parent="."]',
+        'visible = false',
+        'position = Vector2(%s, %s)' % (n(dcx), n(IY1 + 40)),
+        '']))
+    sc.node(NL.join([
+        '[node name="IntroJanitorBody" type="Sprite2D" parent="IntroJanitor"]',
+        'z_index = 2',
+        'texture_filter = 1',
+        'offset = Vector2(0, -24)',
+        'texture = ExtResource("18_janitor")',
+        'hframes = 3',
+        'vframes = 4',
+        '']))
+    sc.node(NL.join([
+        '[node name="IntroJanitorLight" type="PointLight2D" parent="IntroJanitor"]',
+        'position = Vector2(0, -8)',
+        'color = Color(0.98, 0.92, 0.72, 1)',
+        'energy = 1.1',
+        'texture = SubResource("GradientTexture2D_moon")',
+        'texture_scale = 0.34',
+        '']))
+
     # 장면 진행자. 단서 노드의 `interacted`를 이름으로 찾아 잇는다.
+    #
+    # 동선은 **집기를 피해** 손으로 고른 좌표다(집기 배치는 위 add_art_room 참고).
+    # 마지막 지점이 캐비넷(IX0+56, 450)에서 389px 안이어야 한다 — 그래야 숨은
+    # 이설에게 수위가 보인다.
+    walk = [(dcx, IY1 + 40),      # 문 밖(출발)
+            (dcx, 800),           # 문을 열고 들어선 자리
+            (430, 700),           # 작업대와 책상 사이 통로
+            (200, 500)]           # 캐비넷 코앞 — 여기서 말한다
     sc.node(NL.join([
         '[node name="ArtRoomIntro" type="Node" parent="."]',
         'script = ExtResource("12_artintro")',
@@ -3755,6 +3796,11 @@ def build_intro():
         'door_glow_path = NodePath("../WallGlow/Doors/ArtDoorGlow")',
         'door_path = NodePath("../ArtRoomDoor")',
         'door_after_message = "복도로 나가는 문. 수위가 저쪽에 있다. 지금 나가면 마주친다."',
+        'janitor_path = NodePath("../IntroJanitor")',
+        'cabinet_path = NodePath("../HideArtCabinet")',
+        'cabinet_mark_path = NodePath("../WallGlow/Marks/Mark_HideArtCabinet")',
+        'janitor_walk = PackedVector2Array(%s)'
+        % ", ".join("%s, %s" % (n(x), n(y)) for x, y in walk),
         '']))
     add_clutter(sc)
     add_examine(sc)
