@@ -2,9 +2,14 @@ extends CanvasLayer
 
 ## 자막이 다 찍힌 뒤 더 남겨 두는 시간(초). 실제 표시 시간은 타이핑 시간 + 이 값이라,
 ## 긴 조사 서술도 끝까지 읽을 수 있다(#193).
-@export var notice_seconds: float = 3.0
+##
+## **3.0에서 줄였다**(#514). 여러 줄이 연달아 들어오면 뒤 줄이 한참 뒤에 떠서
+## 이미 지나간 일을 말했다 — 수위 자백 네 줄(41자 기준)이 19.7초였다(실측).
+## 40자 한 줄이 타이핑 2.0초 + 이 값이라, 2.4면 마지막 줄이 4.4초는 화면에 남는다.
+@export var notice_seconds: float = 2.4
 ## 뒤에 대기 중인 줄이 있을 때 주는 짧은 읽는 시간(초).
-@export var queued_notice_seconds: float = 1.4
+## 이어 말하는 중이라 짧다 — 매 줄 `notice_seconds`씩 쉬면 대화가 아니라 안내문이 된다.
+@export var queued_notice_seconds: float = 1.0
 
 ## 인벤토리 슬롯에 조작 키를 덧붙일 아이템(#169).
 const USABLE_ITEM_KEYS := {
