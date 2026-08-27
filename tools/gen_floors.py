@@ -2311,34 +2311,12 @@ EXAMINE_PROMPT = {
     C_SOFA: "소파 살펴보기",
     C_COPIER: "복사기 살펴보기",
     C_STALL: "칸막이 살펴보기",
-    C_EASEL: "이젤 살펴보기",
-    C_BUST: "석고상 살펴보기",
-    C_STILL: "정물대 살펴보기",
-    C_CANVASES: "캔버스 살펴보기",
-    C_PAINTBOX: "물감장 살펴보기",
 }
 
 # (집기 색, 방 종류) -> [묘사, ...]. 방 종류가 없는 항목이 기본값이다.
 # **방 종류를 본다**(#304) — 교무실 책상이 교실 책상과 같은 말을 하면 방이
 # 어디든 똑같아 보인다. 종류는 `prop_kind()`가 내는 값이고 복도는 "corridor"다.
 EXAMINE_LINES = {
-    (C_EASEL, None): [
-        "이젤에 미완성된 스케치가 걸려 있다. 목탄 가루가 날린다.",
-        "수채화 물감이 마른 채 굳어 있다. 붓 자국이 거칠다.",
-    ],
-    (C_BUST, None): [
-        "석고상의 코와 귀가 닳아 있다. 소묘 수업 때 수없이 만진 흔적이다.",
-        "흰 석고 표면에 연필로 그려진 낙서가 희미하게 남아 있다.",
-    ],
-    (C_STILL, None): [
-        "천이 덮인 정물대 위에 석고상과 화병이 놓여 있다. 미술 수업 때 소묘하던 대상들이다.",
-    ],
-    (C_CANVASES, None): [
-        "캔버스들이 빼곡히 꽂혀 있다. 젯소와 유화 냄새가 난다.",
-    ],
-    (C_PAINTBOX, None): [
-        "물감장 서랍이 반쯤 열려 있다. 유채 물감 튜브가 색깔별로 꽂혀 있다.",
-    ],
     (C_DESK, "classroom"): [
         "서랍이 반쯤 열려 있다. 지우개 가루뿐이다.",
         "상판에 커터칼로 판 이름이 있다. 절반쯤 지워졌다.",
@@ -4182,7 +4160,6 @@ def build_intro():
         % ", ".join("%s, %s" % (n(x), n(y)) for x, y in walk),
         '']))
     add_clutter(sc)
-    add_examine(sc)
 
     sc.node('[node name="Walls" type="StaticBody2D" parent="."]' + NL)
     for nm, pos, shape in [
