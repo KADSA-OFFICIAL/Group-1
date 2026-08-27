@@ -101,19 +101,7 @@ def _check_yard(fail):
     elif (float(v.group(1)), float(v.group(2))) != (ax, ay):
         fail(f"운동장 등장 지점 {v.group(1)},{v.group(2)} != 생성기 {ax},{ay}")
 
-    # 옆문 등장 지점(#393)은 floor_manager가 아니라 **문 노드가 들고 있다**
-    # (`exit_door.gd`의 arrive_at). 상수를 한 벌 더 두는 대신 씬 값과 대조한다.
-    side = _re.search(r"^YARD_SIDE_ARRIVE = \(([\d.]+), ([\d.]+)\)", gen, _re.M)
-    if side is None:
-        fail("gen_floors.py에서 YARD_SIDE_ARRIVE를 못 찾았다")
-        return
-    sx, sy = float(side.group(1)), float(side.group(2))
-    f1 = (ROOT / "scenes/background/school_floor_1.tscn").read_text(encoding="utf-8")
-    d = _re.search(r'name="YardGateDoor"[^\[]*?arrive_at = Vector2\(([-\d.]+), ([-\d.]+)\)',
-                   f1, _re.S)
-    if d is None:
-        fail("1층에 운동장 출입구 문(YardGateDoor)의 arrive_at이 없다")
-    elif (float(d.group(1)), float(d.group(2))) != (sx, sy):
+    # YARD_SIDE_ARRIVE / YardGateDoor 검증 폐지(#513)
         fail(f"옆문 등장 지점 {d.group(1)},{d.group(2)} != 생성기 {sx},{sy}")
 
     path = ROOT / "scenes/background/school_yard.tscn"
@@ -123,10 +111,9 @@ def _check_yard(fail):
     text = path.read_text(encoding="utf-8")
     if '[node name="FrontGate" type="Area2D"' not in text:
         fail("운동장에 정문(FrontGate)이 없다")
-    # 문 자리는 둘이다(#393). 둘 다 나온 뒤에는 벽으로 막혀 있어야 한다.
-    for seal in ("WC_PorchSeal", "WC_SideSeal"):
-        if f'name="{seal}"' not in text:
-            fail(f"운동장 정면에 {seal}이 없다 — 나온 문이 뚫린 채로 남는다")
+    # 현관 씰(WC_PorchSeal) 하나만 확인한다(#513 — 옆문 WC_SideSeal 폐지).
+    if 'name="WC_PorchSeal"' not in text:
+        fail("운동장 정면에 WC_PorchSeal이 없다 — 현관이 뚫린 채로 남는다")
 
     # 등장 지점이 집기 안이면 플레이어가 끼인 채로 씬이 시작된다. 운동장 집기는
     # `add_props()`를 안 타서 서로도 등장 지점도 피해 주지 않는다(#361과 같은
@@ -139,12 +126,12 @@ def _check_yard(fail):
         nums = [float(x) for x in pm.group(2).split(",")]
         xs, ys = nums[0::2], nums[1::2]
         props.append((pm.group(1), min(xs), min(ys), max(xs), max(ys)))
-    for label, (px, py) in (("현관", (ax, ay)), ("옆문", (sx, sy))):
-        if not (0 < px < yw and 0 < py < yh):
-            fail(f"{label} 등장 지점 {px},{py}이 운동장(0,0~{yw},{yh}) 밖이다")
-        for nm, x0, y0, x1, y1 in props:
-            if x0 - pad < px < x1 + pad and y0 - pad < py < y1 + pad:
-                fail(f"{label} 등장 지점 {px},{py}이 집기 {nm} 안이다")
+    # 현관 등장 지점만 확인한다(#513 — 옆문 폐지).
+    if not (0 < ax < yw and 0 < ay < yh):
+        fail(f"현관 등장 지점 {ax},{ay}이 운동장(0,0~{yw},{yh}) 밖이다")
+    for nm, x0, y0, x1, y1 in props:
+        if x0 - pad < ax < x1 + pad and y0 - pad < ay < y1 + pad:
+            fail(f"현관 등장 지점 {ax},{ay}이 집기 {nm} 안이다")
 
 
 def no_stairwell():
