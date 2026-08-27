@@ -12,9 +12,9 @@ const HIDDEN_PROMPT := "나오기"
 ## 걷기 그림은 열두 장 모두 오른쪽을 보고 있어 왼쪽으로 갈 때만 뒤집는다.
 ## tools/gen_player_sprites.py가 원본 아트에서 만든다.
 ##
-## **위아래로 걸을 때도 측면 걷기가 나온다.** 수위는 원본 열 장으로 정면·좌·우·뒷모습
-## 네 행을 갖지만(janitor.gd의 ROW_*) 플레이어는 측면 그림뿐이다 — 뒷모습 원본이
-## 생기면 수위처럼 방향에 따라 그림을 바꿀 수 있다.
+## **위로 걸을 때는 뒷모습 두 장을 번갈아 쓴다**(#519). 사용자가 뒷모습 걷기 두 포즈를
+## 그려서, 수위처럼(janitor.gd의 ROW_*) 방향에 따라 그림이 갈린다. **아래로 걸을 때는
+## 아직 측면 그림이다** — 정면 걷기 원본이 없다.
 const IDLE_TEXTURE := preload("res://assets/sprites/player_idle.png")
 ## 걷기 **12프레임**(#384). 사용자가 걷기 사이클 전체(두 걸음, 2행×6열 시트)를
 ## 직접 그렸다 — 프레임마다 다른 실제 포즈이므로 수위(#375)처럼 반복되는 "기본
@@ -40,6 +40,13 @@ const WALK_TEXTURES := [
 	preload("res://assets/sprites/player_walk_11.png"),
 	preload("res://assets/sprites/player_walk_12.png"),
 ]
+## 뒷모습 걷기 두 장(#519). **한 장이 한 걸음**이다 — 측면은 6프레임이 한 걸음이지만
+## 이쪽은 두 장이 두 걸음이라, 한 프레임이 `WALK_STEP_PX`만큼 유지된다. 그래서 걸음
+## 박자(초당 2걸음)가 측면과 같다. 좌우 반전은 하지 않는다(등을 보이는 그림이다).
+const BACK_TEXTURES := [
+	preload("res://assets/sprites/player_back_1.png"),
+	preload("res://assets/sprites/player_back_2.png"),
+]
 const SPRITE_OFFSET_Y := -24.0
 ## 한 걸음(6프레임)의 물리적 거리 — 정확히는 "12프레임 걷기 사이클이 화면에서
 ## 얼마나 자주 넘어가는가"를 정하는 다이얼이다.
@@ -56,7 +63,12 @@ const SPRITE_OFFSET_Y := -24.0
 ## 연결된다 — 그래서 104(#375 기준의 2배, 전환 빈도는 절반)로 올려도 미끄러지는
 ## 느낌 없이 그냥 차분해진다. 이동 속도(`speed`)는 그대로다 — 이 상수는 순수하게
 ## "다리 애니메이션이 얼마나 자주 넘어가는가"만 조절한다.
-const WALK_STEP_PX := 104.0
+## **104에서 다시 올렸다**(#519). 104면 초당 프레임이 320 ÷ (104/6) = 18.5장이고
+## 초당 걸음이 3.1인데, 도트 걷기 사이클은 8~12장/초가 보통이고 3.1걸음/초는 걷기가
+## 아니라 종종걸음이다(사용자 보고: "너무 빨리 전환된다"). 160이면 **12.0장/초,
+## 2.0걸음/초** — 사람이 걷는 박자다. 이 상수는 이동 속도(`speed` 320)와 무관하게
+## "애니메이션이 얼마나 자주 넘어가는가"만 정한다.
+const WALK_STEP_PX := 160.0
 ## 한 프레임이 유지되는 이동 거리. 시간이 아니라 거리로 재야 벽에 스쳐 느려질 때
 ## 발이 미끄러지지 않는다(수위 #310과 같은 규약). 12프레임이 두 걸음이므로 한 걸음은
 ## 6프레임 — WALK_STEP_PX를 6으로 나눈다.
@@ -159,6 +171,16 @@ func _update_sprite(moving: bool, moved: float) -> void:
 	# 벽을 밀고 있으면 moved가 0이라 프레임이 그 자리에 멈춘다 — 대기 포즈로
 	# 돌아가면 방향키를 누른 채 정면을 보는 것처럼 보인다.
 	_walk_distance += moved
+
+	# 위로 걸으면 뒷모습(#519). 대각선은 세로 성분이 더 큰 쪽만 뒷모습으로 본다 —
+	# 정확한 대각선(|x| == |y|)은 측면이다. 아래로 걸을 때는 정면 걷기 원본이
+	# 없어 지금처럼 측면을 쓴다.
+	if facing_direction.y < 0.0 and absf(facing_direction.y) > absf(facing_direction.x):
+		var back := int(_walk_distance / WALK_STEP_PX) % BACK_TEXTURES.size()
+		body.texture = BACK_TEXTURES[back]
+		body.flip_h = false
+		return
+
 	var frame := int(_walk_distance / WALK_STRIDE) % WALK_TEXTURES.size()
 	body.texture = WALK_TEXTURES[frame]
 	body.flip_h = not _facing_right
