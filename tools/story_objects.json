@@ -56,7 +56,7 @@
   "JanitorSafe": {
    "body": "[node name=\"JanitorSafe\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(480, 1600)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"금고 문이 반쯤 열려 있다. 안에는 서류 봉투와 열쇠꾸러미. 현관 열쇠를 꺼냈다.\"\nprompt_text = \"금고 열기\"\ngrants_item_id = \"front_gate_key\"\ngrants_flag = \"front_gate_key_taken\"\n\n",
    "kids": [
-    "[node name=\"SafeVisual\" type=\"Polygon2D\" parent=\"JanitorSafe\"]\nz_index = 1\ncolor = Color(0.35, 0.35, 0.4, 1)\npolygon = PackedVector2Array(-12, -12, 12, -12, 12, 12, -12, 12)\n\n",
+    "[node name=\"SafeVisual\" type=\"Sprite2D\" parent=\"JanitorSafe\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"9_key\")\n\n",
     "[node name=\"SafeZone\" type=\"CollisionShape2D\" parent=\"JanitorSafe\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
    ]
   },

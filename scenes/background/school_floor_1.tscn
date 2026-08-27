@@ -1,4 +1,4 @@
-[gd_scene load_steps=94 format=3]
+[gd_scene load_steps=95 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
@@ -28,6 +28,7 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_grain.png" id="tex_prop_grain"]
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_metal.png" id="tex_prop_metal"]
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
+[ext_resource type="Texture2D" path="res://assets/sprites/key.png" id="9_key"]
 [ext_resource type="Texture2D" path="res://assets/sprites/note.png" id="10_note"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
@@ -1358,10 +1359,10 @@ item_id = "front_gate_key"
 pickup_id = "front_gate_key_taken"
 
 
-[node name="SafeVisual" type="Polygon2D" parent="JanitorSafe"]
+[node name="SafeVisual" type="Sprite2D" parent="JanitorSafe"]
 z_index = 1
-color = Color(0.35, 0.35, 0.4, 1)
-polygon = PackedVector2Array(-12, -12, 12, -12, 12, 12, -12, 12)
+texture_filter = 1
+texture = ExtResource("9_key")
 
 
 [node name="SafeZone" type="CollisionShape2D" parent="JanitorSafe"]
