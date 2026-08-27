@@ -46,6 +46,10 @@ from collections import deque
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / "assets" / "sprites" / "source" / "player_design.png"
 SRC_WALK = ROOT / "assets" / "sprites" / "source" / "player_walk_design.png"
+# 뒷모습 걷기 두 포즈(#519). **한 파일에 한 포즈**다 — 측면처럼 시트로 묶여 있지
+# 않아 세로 창으로 행을 가를 필요가 없고, 원본이 둘 다 512x512 알파 배경이다.
+SRC_BACK = (ROOT / "assets" / "sprites" / "source" / "player_back1_design.png",
+            ROOT / "assets" / "sprites" / "source" / "player_back2_design.png")
 OUT_DIR = ROOT / "assets" / "sprites"
 
 # 출력 캔버스. 열세 장이 같은 크기여야 Sprite2D 오프셋(SPRITE_OFFSET_Y)을 하나로 쓸 수
@@ -65,7 +69,14 @@ BOB_HEADROOM = 4
 CANVAS_H = FIGURE_H + BOB_HEADROOM
 
 # 배경으로 볼 밝기 상한(R+G+B). 머리카락은 (26,26,26)=78이라 걸리지 않는다.
+# **불투명 배경 원본에만 쓴다** — 아래 알파 규칙 참고.
 BG_LUMA = 40
+# 알파가 이보다 낮으면 투명으로 본다. 그리고 투명한 칸이 이 비율을 넘으면
+# **알파 배경 원본**으로 보고 밝기 규칙을 쓰지 않는다(#519) — 뒷모습 원본은
+# 87.9%가 투명하고, 기존 불투명 원본은 0%다. 0.5는 그 사이 어디에 둬도 같지만,
+# 여백이 넓은 알파 원본이 들어와도 걸리게 넉넉히 잡았다.
+ALPHA_BG = 8
+ALPHA_BG_RATIO = 0.5
 
 # 한 칸의 절반 이상이 캐릭터일 때만 칠한다 — 실루엣이 흐려지지 않게.
 COVER = 0.5
@@ -104,6 +115,15 @@ WALK_SCALE_POSE = "player_walk_1"
 # 키 차이가 크지 않다(실측 378~380, 2px) — #381의 두 발이 다 공중에 뜨는 포즈처럼
 # 극단적으로 짧아지는 컷이 없다. 그래도 사고를 잡을 여유는 남겨 둔다.
 WALK_HEIGHT_TOLERANCE = 20
+
+# 뒷모습 머리 중심을 잡을 때 볼 실루엣 위쪽 비율(#519). 머리(단발)만 들어가는
+# 창이라야 한다 — 넓게 잡으면 팔이 들어와 포즈마다 중심이 달라지고, 두 장을
+# 번갈아 쓰는 그림에서 그 차이는 곧 좌우 흔들림이다. 실측: 위 6~14%에서 두 포즈가
+# 모두 313.5로 같고, 20%부터 팔이 들어와 4px 벌어진다.
+BACK_HEAD_ROWS = 0.10
+# 두 뒷모습 포즈의 키가 이만큼(원본 px) 넘게 다르면 멈춘다. 배율이 하나뿐이라
+# 어긋나면 번갈아 나올 때 인물이 커졌다 작아진다.
+BACK_HEIGHT_TOLERANCE = 8
 
 
 # --------------------------------------------------------------------------- PNG
@@ -208,7 +228,23 @@ def write_png(path: pathlib.Path, width: int, height: int, rgba: bytes) -> None:
 # ------------------------------------------------------------------- 배경 제거
 
 def background_mask(width: int, height: int, rgba: bytearray) -> bytearray:
-    """테두리에서 이어지는 어두운 픽셀만 배경(1)으로 표시한다."""
+    """배경(1)을 표시한다. **원본에 따라 규칙이 다르다.**
+
+    - **알파 배경**(뒷모습 원본 #519): 투명한 칸이 곧 배경이다. flood fill을 쓰면
+      안 된다 — 새 원본은 머리가 순수 검정(0,0,0)이고 투명 배경도 RGB가 0이라,
+      "테두리에서 이어지는 어두운 픽셀"에 **머리카락이 통째로 걸려 지워졌다.**
+    - **불투명 배경**(기존 정면·측면 원본): 배경이 칠해진 검정이라 알파로는 가릴 수
+      없다. 테두리에서 이어지는 어두운 픽셀만 배경으로 본다 — 인물 안의 어두운
+      부분(머리카락 (26,26,26)=78)은 테두리와 이어지지 않아 살아남는다.
+
+    어느 쪽인지는 **투명한 칸의 비율로 스스로 가린다** — 손으로 지정하는 인자를
+    두면 원본을 갈아 끼울 때 같이 고쳐야 하는 자리가 하나 늘어난다.
+    """
+    transparent = sum(1 for i in range(width * height) if rgba[i * 4 + 3] < ALPHA_BG)
+    if transparent > width * height * ALPHA_BG_RATIO:
+        return bytearray(1 if rgba[i * 4 + 3] < ALPHA_BG else 0
+                         for i in range(width * height))
+
     mask = bytearray(width * height)
     queue: deque[tuple[int, int]] = deque()
 
@@ -262,6 +298,28 @@ def bbox(width: int, height: int, mask: bytearray, x0: int, x1: int,
     if bottom < y0:
         raise SystemExit(f"x {x0}~{x1} y {y0}~{y1} 구간에 캐릭터가 없다")
     return left, right, top, bottom
+
+
+def head_anchor(width: int, mask: bytearray, box: tuple[int, int, int, int],
+                rows_ratio: float) -> float:
+    """실루엣 위쪽 `rows_ratio`만큼의 가로 중심 = **머리 중심**(#519).
+
+    측면 12장은 시트 좌표를 손으로 적어 뒀지만(`_WALK_HEADS`), 뒷모습은 원본이
+    한 장에 한 포즈라 그림에서 바로 잰다 — 손으로 적은 숫자가 원본과 어긋날 자리를
+    없앤다. 기준을 머리로 잡는 이유는 측면과 같다: 걷는 동안 팔다리는 움직이지만
+    머리는 몸통 위에 그대로 있다.
+    """
+    rows = max(1, int((box[3] - box[2] + 1) * rows_ratio))
+    left, right = box[1], box[0]
+    for y in range(box[2], box[2] + rows):
+        row = y * width
+        for x in range(box[0], box[1] + 1):
+            if not mask[row + x]:
+                left = min(left, x)
+                right = max(right, x)
+    if right < left:
+        raise SystemExit("머리 중심을 잡을 수 없다 — 실루엣 위쪽이 비어 있다")
+    return (left + right) / 2.0
 
 
 # --------------------------------------------------------------------- 축소
@@ -329,7 +387,7 @@ def _write(name: str, px: bytearray, note: str) -> None:
 
 
 def build_all() -> None:
-    for src in (SRC, SRC_WALK):
+    for src in (SRC, SRC_WALK, *SRC_BACK):
         if not src.exists():
             raise SystemExit(f"원본 아트가 없다: {src}")
 
@@ -369,6 +427,29 @@ def build_all() -> None:
         px = _cut(name, wwidth, wheight, wrgba, wmask, box, xlim, anchor, walk_scale)
         _write(name, px, f"원본 {box[1] - box[0] + 1}x{box[3] - box[2] + 1}  "
                          f"배율 1px = 원본 {walk_scale:.2f}px")
+
+    # ── 뒷모습 걷기 두 장(#519) ────────────────────────────────
+    # 위로 걸을 때 쓴다. **측면과 같은 캔버스·같은 인물 크기**여야 한다 —
+    # 열다섯 장이 `SPRITE_OFFSET_Y` 하나를 공유하므로, 배율은 측면과 똑같이
+    # "측면 포즈가 캔버스에서 차지한 높이(side_canvas_h)"에 맞춰 거꾸로 잡는다.
+    back = []
+    for src in SRC_BACK:
+        bwidth, bheight, brgba = read_png(src)
+        bmask = background_mask(bwidth, bheight, brgba)
+        bbx = bbox(bwidth, bheight, bmask, 0, bwidth - 1)
+        back.append((src, bwidth, bheight, brgba, bmask, bbx))
+    bheights = [b[5][3] - b[5][2] + 1 for b in back]
+    if max(bheights) - min(bheights) > BACK_HEIGHT_TOLERANCE:
+        raise SystemExit(f"뒷모습 두 포즈의 키가 너무 다르다 {bheights} — 배율이 "
+                         "하나뿐이라 번갈아 나올 때 인물이 커졌다 작아진다")
+    for i, (src, bwidth, bheight, brgba, bmask, bbx) in enumerate(back, start=1):
+        anchor = head_anchor(bwidth, bmask, bbx, BACK_HEAD_ROWS)
+        back_scale = (bbx[3] - bbx[2] + 1) / side_canvas_h
+        name = f"player_back_{i}"
+        px = _cut(name, bwidth, bheight, brgba, bmask, bbx, (0, bwidth - 1),
+                  anchor, back_scale)
+        _write(name, px, f"뒷모습  원본 {bbx[1] - bbx[0] + 1}x{bbx[3] - bbx[2] + 1}  "
+                         f"머리 중심 {anchor:.1f}  배율 1px = 원본 {back_scale:.2f}px")
 
 
 def _check_fits(name: str, box: tuple[int, int, int, int], anchor_x: float,
