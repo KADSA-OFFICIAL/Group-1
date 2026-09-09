@@ -40,20 +40,28 @@ const WALK_TEXTURES := [
 	preload("res://assets/sprites/player_walk_11.png"),
 	preload("res://assets/sprites/player_walk_12.png"),
 ]
-## 뒷모습 걷기 두 장(#519). **한 장이 한 걸음**이다 — 측면은 6프레임이 한 걸음이지만
-## 이쪽은 두 장이 두 걸음이라, 한 프레임이 `WALK_STEP_PX`만큼 유지된다. 그래서 걸음
-## 박자(초당 2걸음)가 측면과 같다. 좌우 반전은 하지 않는다(등을 보이는 그림이다).
+## 뒷모습 달리기 네 장(#519에서 두 장, #585에서 네 장). **한 장이 반 걸음**이다 —
+## 네 장이 두 걸음이라 한 프레임이 `WALK_STEP_PX / 2`만큼 유지되고, 걸음 박자(초당
+## 2걸음)는 측면과 같다. 좌우 반전은 하지 않는다(등을 보이는 그림이다).
+##
+## **3·4번은 1·2번을 좌우로 뒤집어 구운 것이다**(#585). 원본 시트의 뒤 절반이 미러가
+## 아니라 복제라, 그대로 두 장만 쓰면 한쪽 다리만 까딱거린다. 뒤집어 만들면 다리
+## 교대가 정의상 정확하다. 그림 자체가 뒤집혀 있으므로 여기서 flip_h를 걸면 안 된다.
 const BACK_TEXTURES := [
 	preload("res://assets/sprites/player_back_1.png"),
 	preload("res://assets/sprites/player_back_2.png"),
+	preload("res://assets/sprites/player_back_3.png"),
+	preload("res://assets/sprites/player_back_4.png"),
 ]
-## 정면 걷기 두 장(#551). 뒷모습과 완전히 같은 규약이다 — **한 장이 한 걸음**이고
-## 좌우 반전을 하지 않는다(정면을 보는 그림이라 반전할 것이 없다). 대기 포즈
-## (`IDLE_TEXTURE`)도 정면이지만 그쪽은 두 발을 모으고 서 있어 걷는 것으로 보이지
-## 않는다 — 아래로 걸을 때 그것을 쓰면 미끄러져 내려가는 것처럼 보인다.
+## 정면 달리기 네 장(#551에서 두 장, #585에서 네 장). 뒷모습과 완전히 같은 규약이다
+## — 한 장이 반 걸음이고, 3·4번이 1·2번의 좌우 반전이라 여기서 flip_h를 걸지 않는다.
+## 대기 포즈(`IDLE_TEXTURE`)도 정면이지만 그쪽은 두 발을 모으고 서 있어 걷는 것으로
+## 보이지 않는다 — 아래로 걸을 때 그것을 쓰면 미끄러져 내려가는 것처럼 보인다.
 const FRONT_TEXTURES := [
 	preload("res://assets/sprites/player_front_1.png"),
 	preload("res://assets/sprites/player_front_2.png"),
+	preload("res://assets/sprites/player_front_3.png"),
+	preload("res://assets/sprites/player_front_4.png"),
 ]
 const SPRITE_OFFSET_Y := -24.0
 ## 한 걸음(6프레임)의 물리적 거리 — 정확히는 "12프레임 걷기 사이클이 화면에서
@@ -198,7 +206,9 @@ func _update_sprite(moving: bool, moved: float) -> void:
 	# 계산을 쓰는 이유는 그림 규약이 같아서다(한 장이 한 걸음, 반전 없음).
 	if absf(facing_direction.y) > absf(facing_direction.x):
 		var pair: Array = BACK_TEXTURES if facing_direction.y < 0.0 else FRONT_TEXTURES
-		var step := int(_walk_distance / WALK_STEP_PX) % pair.size()
+		# 한 바퀴(두 걸음)가 측면과 같은 2 x WALK_STEP_PX가 되도록 나눈다 — 장수가
+		# 둘에서 넷으로 늘어도(#585) 걸음 박자는 그대로다.
+		var step := int(_walk_distance / (2.0 * WALK_STEP_PX / pair.size())) % pair.size()
 		body.texture = pair[step]
 		body.flip_h = false
 		return
