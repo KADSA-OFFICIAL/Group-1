@@ -59,6 +59,10 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
   - 창문에는 **내려가는 컷신**이 붙는다(#468, `floor_link.gd`의 `cutscene_*`). 본편에서 계단이 아닌 유일한 하강이고 수위가 자백하고 내려간 직후(#465)라, 계단처럼 지나가면 안 된다. 조작을 멈추고 카메라를 창문에 붙인 뒤 이설을 창틀까지 걸리고 창밖으로 흐린다. `_played`로 두 번 안 돈다.
     - **까만 화면 위에 자막을 못 올린다.** `main.tscn`에서 `HUD`와 `UI`가 둘 다 CanvasLayer **layer 3**인데 `UI`가 뒤에 선언돼 위로 오므로, 층 전환 페이드의 `FadeRect`가 알파 1이 되면 자막이 그 아래로 들어간다. 컷신 전용 씬도 못 쓴다 — `GameState`가 `main.tscn` 안에 있어 씬을 떠났다 오면 진행이 초기화된다. 그래서 **층 씬 안에서, 페이드 전에** 한다.
     - 플레이어 그림을 흐릴 때는 `Visuals/Anchor`를 흐린다 — `Visuals`가 CanvasLayer(2)라 **부모를 흐려도 안 따라온다.**
+    - **걷기 그림을 컷신이 직접 굴린다**(#594, `player_controller.gd`의 `begin_scripted_motion`/`scripted_step`/`end_scripted_motion`). 컷신은 조작을 끊으려고 `set_physics_process(false)`를 거는데 프레임을 정하는 `_update_sprite()`가 **그 안에서만** 불린다 — 그래서 위치만 트윈으로 옮기던 때는 이설이 **대기 포즈로 미끄러져** 창틀까지 갔다. `floor_link.gd`의 `_walk_player()`가 프레임마다 위치와 걸음을 함께 넘긴다(가감속은 트윈의 `TRANS_SINE`과 같은 곡선을 손으로 낸다). 창문이 위쪽 외벽이라 뒷모습 네 장이 돌아 등을 보이고 걸어가는 그림이 된다.
+      - **애니메이션 거리를 인자로 받는다**(`cutscene_walk_anim_speed`, px/초). 평소처럼 실제 이동 거리로 굴리면 안 된다 — 창틀까지가 한 걸음(`WALK_STEP_PX` 160px)도 안 돼서 그림이 한 장도 안 바뀐다. 걸음 박자(2.0걸음/초)를 유지하려고 시간으로 굴린다.
+      - **사라지는 동안에도 걷는다**(`cutscene_vanish_rise` 26px). 제자리에서 알파만 내리면 창밖으로 넘어가는 것이 아니라 그 자리에서 지워지는 것으로 읽힌다.
+      - `begin_scripted_motion()`이 머리 위 `[E]` 프롬프트도 감춘다 — 물리 처리가 꺼지면 마지막 상태로 붙박여 컷신 내내 떠 있었다. `art_room_intro.gd`의 `_freeze`는 아직 이 API를 쓰지 않는다(그쪽은 제자리에 서서 보는 장면이라 걸음이 필요 없다).
     - **`exit_door.gd`를 쓰지 않는다.** 저쪽은 탈출구라 엔딩 판정을 하고(`ending_kind`·`clue_score`를 메타에 싣고) 음악을 끄고 탈출음을 낸다 — 도입부의 하강은 탈출이 아니라 진행이다.
     - 층 전환은 계단과 같은 `floor_manager.travel_to()`를 타므로 페이드도 계단과 똑같다.
     - **`MAX_FLOOR`는 3이다**(4가 아니라). 4로 두면 3층 계단에서 위로 올라갈 때 빈 `STAIRS[4]`를 인덱싱해 죽는다. `gen_floors.py`의 같은 상수는 계단 방향 표지가 갈 수 없는 곳을 가리키지 않게 한다.
