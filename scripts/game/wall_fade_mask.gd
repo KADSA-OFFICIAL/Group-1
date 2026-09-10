@@ -9,5 +9,12 @@ extends Sprite2D
 @onready var _player: Node2D = get_node_or_null("../../Player")
 
 func _process(_delta: float) -> void:
-	if _player:
-		global_position = _player.global_position
+	if _player == null:
+		return
+	# 몸이 아니라 **그림과 같은 자리**를 따라간다(#597). 몸은 physics tick(60Hz)마다
+	# 계단처럼 움직이는데 카메라는 그린 프레임마다 매끈하게 따라가므로, 몸을 따라가면
+	# 60Hz 초과 모니터에서 시야 원만 인물과 따로 떨린다.
+	var at: Vector2 = _player.global_position
+	if _player.has_method("visual_position"):
+		at = _player.call("visual_position")
+	global_position = at
