@@ -3940,6 +3940,8 @@ def build_intro():
         ("RectangleShape2D_wall_h", "Vector2(" + str(IW) + ", 40)"),
         ("RectangleShape2D_wall_v", "Vector2(40, " + str(IH) + ")"),
         ("RectangleShape2D_door_zone", "Vector2(140, 60)"),
+        # 준비실 연결문은 **세로 벽**에 있다 — 문 존도 세워야 한다(#591).
+        ("RectangleShape2D_door_zone_v", "Vector2(60, 140)"),
         ("RectangleShape2D_key_zone", "Vector2(48, 48)"),
         ("RectangleShape2D_window_zone",
          "Vector2(" + str(WINDOW_ZONE[0]) + ", " + str(WINDOW_ZONE[1]) + ")"),
@@ -4011,6 +4013,33 @@ def build_intro():
     sc.wall("IntroMidB", rect(IXM, mb, IXM + T, IY1))
     sc.poly2d("Door_ArtPrep", "WallGlow/Doors", C_DOOR,
               rect(IXM, mt, IXM + T, mb), z=1)
+    # 연결문은 다른 층 방문과 같은 한 짝짜리 미닫이문이다(#591). 문 그림만
+    # 내던 때는 그대로 걸어 통과됐고(투명문), 닫힌 문이 방 안을 가려야 한다는
+    # 규약(#256·#292)도 이 문만 빠져 있어 미술실에서 준비실이 훤히 보였다.
+    #
+    # **세로 벽이므로 세로로 민다** — `travel = 0` / `travel_y = DOOR`. 밀린
+    # 자리(y mb ~ mb+DOOR)는 `IntroMidB` 벽 위라 문짝이 벽 뒤로 숨는다.
+    # `travel`은 0이어도 적어야 한다(sliding_door의 기본값이 110이고,
+    # verify_props가 씬에서 그 값을 읽어 열린 자리를 검사한다).
+    slide = "SlideDoor_ArtPrep"
+    sc.node('[node name="%s" type="Area2D" parent="."]' % slide + NL
+            + "collision_layer = 2" + NL + "collision_mask = 1" + NL
+            + 'script = ExtResource("6_sliding")' + NL
+            + "travel = 0" + NL + "travel_y = %s" % n(DOOR) + NL
+            + 'leaf_visual = NodePath("../WallGlow/Doors/SDVis_ArtPrep")' + NL
+            # 준비실 달빛은 이 문이 켠다(#292) — 닫혀 있으면 창문 빛도 안 보인다.
+            + 'room_lights = NodePath("../Lights/Room_ArtPrep")' + NL)
+    sc.node('[node name="Zone" type="CollisionShape2D" parent="%s"]' % slide
+            + NL + "position = Vector2(%s, %s)" % (n(IXM + T / 2), n(mcy)) + NL
+            + 'shape = SubResource("RectangleShape2D_door_zone_v")' + NL)
+    sc.node('[node name="SDPanel" type="StaticBody2D" parent="%s"]' % slide + NL)
+    # 충돌 + 광원 차단체 한 쌍. 이름을 `...DoorCollision`으로 두어
+    # verify_scenes의 벽↔차단체 1:1 검사에 편입시킨다(#256).
+    sc.solid("ArtPrepDoorCollision", slide + "/SDPanel",
+             rect(IXM, mt, IXM + T, mb))
+    # 문짝 시각은 WallGlow/Doors 안에(#318). 같은 문의 Door_ 마커보다 z가 높다.
+    sc.poly2d("SDVis_ArtPrep", "WallGlow/Doors", C_LEAF,
+              rect(IXM, mt, IXM + T, mb), z=2)
 
     # ── 창문과 달빛 ──────────────────────────────────────────
     # 위쪽이 외벽이다. 준비실 창문이 탈출구가 된다(#404 2번에서 배선).
