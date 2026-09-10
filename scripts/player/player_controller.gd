@@ -223,6 +223,45 @@ func _update_sprite(moving: bool, moved: float) -> void:
 	body.flip_h = not _facing_right
 
 
+## ── 연출용 이동(#594) ────────────────────────────────────────────
+## 컷신은 조작을 끊으려고 `set_physics_process(false)`를 거는데, 걷기 프레임을
+## 정하는 `_update_sprite()`가 **그 안에서만** 불린다 — 그래서 컷신이
+## `global_position`을 직접 옮기면 이설이 대기 포즈로 미끄러졌다(창문 하강 #468).
+##
+## 컷신이 매 프레임 `scripted_step()`을 부르면 그 자리에서 프레임이 넘어간다.
+## 애니메이션 거리를 **인자로 받는 이유**는 연출 구간이 짧기 때문이다 — 창틀까지는
+## 한 걸음(`WALK_STEP_PX` 160px)도 안 되므로 실제 이동 거리로 굴리면 그림이 한 장도
+## 안 바뀐다. 부르는 쪽이 `speed * delta`를 넘겨 평소 걸음 박자로 굴린다.
+
+
+## 조작을 끊고 연출용 이동에 들어간다. 머리 위 프롬프트도 감춘다 — 물리 처리가
+## 꺼지면 마지막 상태로 붙박여서 컷신 내내 `[E] …`가 떠 있었다.
+func begin_scripted_motion() -> void:
+	velocity = Vector2.ZERO
+	set_physics_process(false)
+	set_process_unhandled_input(false)
+	interact_prompt.visible = false
+
+
+## 연출이 이설을 `to`로 옮기고 걷기 그림을 `anim_px`만큼 굴린다.
+## `facing`이 0이면 직전 방향을 유지한다(제자리에서 몸이 돌지 않게).
+func scripted_step(to: Vector2, facing: Vector2, anim_px: float) -> void:
+	if facing != Vector2.ZERO:
+		facing_direction = facing.normalized()
+		if not is_zero_approx(facing.x):
+			_facing_right = facing.x > 0.0
+	global_position = to
+	visuals.global_position = to
+	_update_sprite(anim_px > 0.0, anim_px)
+
+
+## 대기 포즈로 되돌리고 조작을 돌려준다.
+func end_scripted_motion() -> void:
+	_update_sprite(false, 0.0)
+	set_physics_process(true)
+	set_process_unhandled_input(true)
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("throw_ink"):
 		if _throw_ink():

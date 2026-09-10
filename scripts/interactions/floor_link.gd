@@ -45,6 +45,14 @@ extends Area2D
 @export var cutscene_line_seconds: float = 2.6
 ## 창밖으로 사라지는 데 걸리는 시간(초).
 @export var cutscene_vanish_seconds: float = 0.8
+## 걷기 그림을 굴릴 속도(px/초, #594). **시간으로 굴리는 이유**: 창틀까지는 한
+## 걸음(`WALK_STEP_PX` 160px)도 안 되므로 평소처럼 실제 이동 거리로 프레임을
+## 넘기면 그림이 한 장도 안 바뀐다. 평소 걷는 속도를 넣어 걸음 박자(2.0걸음/초)를
+## 맞춘다.
+@export var cutscene_walk_anim_speed: float = 320.0
+## 사라지면서 창틀 위로 더 올라가는 거리(px, #594). 제자리에서 흐려지면 창밖으로
+## 넘어가는 것이 아니라 그 자리에서 지워지는 것으로 보인다.
+@export var cutscene_vanish_rise: float = 26.0
 
 ## 되돌릴 수 없는 하강이 시작됐다. **컷신(#468)이 붙은 뒤로는 씬이 곧바로
 ## 해제되지 않는다** — `interact()`가 `travel_to()` 전에 컷신을 끝까지 기다리므로
@@ -102,9 +110,12 @@ func _play_cutscene(game_state) -> void:
 	# (`art_room_intro.gd`와 같은 이유).
 	var cam: Camera2D = null
 	if player != null:
-		player.set("velocity", Vector2.ZERO)
-		player.set_physics_process(false)
-		player.set_process_unhandled_input(false)
+		if player.has_method("begin_scripted_motion"):
+			player.call("begin_scripted_motion")
+		else:
+			player.set("velocity", Vector2.ZERO)
+			player.set_physics_process(false)
+			player.set_process_unhandled_input(false)
 		cam = player.get_node_or_null("Camera2D") as Camera2D
 
 	if cam != null:
@@ -113,12 +124,11 @@ func _play_cutscene(game_state) -> void:
 		into.tween_property(cam, "zoom", Vector2(cutscene_zoom, cutscene_zoom), 0.6) 			.set_trans(Tween.TRANS_SINE)
 		await into.finished
 
-	# 창틀 앞까지 걸어간다.
+	# 창틀 앞까지 **걸어간다**(#594). 트윈으로 위치만 옮기면 `_update_sprite()`가
+	# `_physics_process` 안에서만 돌기 때문에 대기 포즈 그대로 미끄러졌다.
+	# 창문이 위쪽 외벽이라 뒷모습 네 장이 돌아 등을 보이고 걸어가는 그림이 된다.
 	if player != null:
-		var step := create_tween()
-		step.tween_property(player, "global_position", look,
-			cutscene_step_seconds).set_trans(Tween.TRANS_SINE)
-		await step.finished
+		await _walk_player(player, look, cutscene_step_seconds, null)
 
 	# 대사. 순서와 간격은 HUD 자막 대기열이 맡는다(#454).
 	if game_state != null:
@@ -131,13 +141,18 @@ func _play_cutscene(game_state) -> void:
 					cutscene_lines[i], emotion)
 
 	# 창밖으로 사라진다. 그림은 `Visuals`(CanvasLayer 2)에 있어 부모를 흐려도
-	# 안 따라오므로 그쪽을 직접 흐린다.
+	# 안 따라오므로 그쪽을 직접 흐린다. **흐리는 동안에도 걸음이 굴러가며 창틀
+	# 위로 올라간다**(#594) — 제자리에서 지워지면 넘어가는 것으로 안 읽힌다.
 	var visuals := player.get_node_or_null("Visuals") as CanvasLayer if player != null else null
+	var body: CanvasItem = null
 	if visuals != null:
-		var body := visuals.get_node_or_null("Anchor") as CanvasItem
-		if body != null:
-			await create_tween().tween_property(body, "modulate:a", 0.0,
-				cutscene_vanish_seconds).finished
+		body = visuals.get_node_or_null("Anchor") as CanvasItem
+	if player != null:
+		await _walk_player(player, look + Vector2(0.0, -cutscene_vanish_rise),
+			cutscene_vanish_seconds, body)
+	elif body != null:
+		await create_tween().tween_property(body, "modulate:a", 0.0,
+			cutscene_vanish_seconds).finished
 
 	# 대사가 다 흐를 때까지 기다린 뒤 넘긴다.
 	await get_tree().create_timer(
@@ -147,10 +162,43 @@ func _play_cutscene(game_state) -> void:
 	if cam != null:
 		cam.offset = Vector2.ZERO
 		cam.zoom = Vector2(1.25, 1.25)
-	if visuals != null:
-		var body2 := visuals.get_node_or_null("Anchor") as CanvasItem
-		if body2 != null:
-			body2.modulate.a = 1.0
+	if body != null:
+		body.modulate.a = 1.0
 	if player != null:
-		player.set_physics_process(true)
-		player.set_process_unhandled_input(true)
+		if player.has_method("end_scripted_motion"):
+			player.call("end_scripted_motion")
+		else:
+			player.set_physics_process(true)
+			player.set_process_unhandled_input(true)
+
+
+## 이설을 `to`까지 걸린다(#594). 트윈이 아니라 프레임마다 손으로 옮기는 이유는
+## **걷기 그림을 같이 굴려야** 하기 때문이다 — `player_controller.scripted_step()`이
+## 위치와 프레임을 함께 받는다. `fade`가 있으면 걷는 동안 함께 흐려진다.
+##
+## 가감속은 트윈의 `TRANS_SINE`(EASE_IN_OUT)과 같은 곡선이다.
+func _walk_player(player: Node2D, to: Vector2, seconds: float,
+		fade: CanvasItem) -> void:
+	var from := player.global_position
+	var facing := to - from
+	if facing == Vector2.ZERO:
+		# 이미 창틀에 서 있으면 방향이 안 나온다 — 창문은 위쪽 외벽이다.
+		facing = Vector2.UP
+	if seconds <= 0.0 or not player.has_method("scripted_step"):
+		player.global_position = to
+		if fade != null:
+			fade.modulate.a = 0.0
+		return
+
+	var elapsed := 0.0
+	while elapsed < seconds:
+		await get_tree().process_frame
+		elapsed = minf(elapsed + get_process_delta_time(), seconds)
+		var u := elapsed / seconds
+		# sine ease-in-out — 트윈이 쓰던 곡선과 같다.
+		var eased := 0.5 - 0.5 * cos(PI * u)
+		var spot := from.lerp(to, eased)
+		player.call("scripted_step", spot, facing,
+			cutscene_walk_anim_speed * get_process_delta_time())
+		if fade != null:
+			fade.modulate.a = 1.0 - u

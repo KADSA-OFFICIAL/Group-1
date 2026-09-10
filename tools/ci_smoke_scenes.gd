@@ -417,5 +417,52 @@ func _check_artroom_intro() -> void:
 		else:
 			_ok("창문 하강 시 유예 정지")
 
+	# ── 창문 컷신에서 걷기 그림이 굴러가는지(#594) ────────────────
+	# 컷신은 조작을 끊으려고 `set_physics_process(false)`를 거는데, 걷기 프레임을
+	# 정하는 `_update_sprite()`가 그 안에서만 불린다 — 그래서 위치만 옮기던
+	# 시절에는 이설이 **대기 포즈로 미끄러졌다**. 연출용 이동 API를 직접 굴려
+	# 프레임이 실제로 넘어가는지 본다(컷신 전체를 돌리면 20초가 넘는다).
+	var spr: Sprite2D = null
+	var prompt: CanvasItem = null
+	if player != null:
+		spr = player.get_node_or_null("Visuals/Anchor/Body") as Sprite2D
+		prompt = player.get_node_or_null("Visuals/Anchor/InteractPrompt") as CanvasItem
+	if player == null or spr == null or not player.has_method("scripted_step"):
+		_fault("컷신 걷기: 연출용 이동 API(scripted_step)나 스프라이트가 없다")
+	else:
+		var pmap: Dictionary = player.get_script().get_script_constant_map()
+		var backs: Array = pmap.get("BACK_TEXTURES", [])
+		player.call("begin_scripted_motion")
+		await process_frame
+		if player.is_physics_processing():
+			_fault("컷신 걷기: 연출 이동에 들어갔는데 조작이 살아 있다")
+		if prompt != null and prompt.visible:
+			_fault("컷신 걷기: 컷신 동안 머리 위 [E] 프롬프트가 남았다")
+		# 창문은 위쪽 외벽이다 — 위로 걸으면 뒷모습 네 장이 돌아야 한다.
+		var from: Vector2 = player.get("global_position")
+		var seen := {}
+		var wrong := 0
+		for i in 40:
+			player.call("scripted_step", from + Vector2(0.0, -float(i) * 5.3),
+				Vector2.UP, 320.0 / 60.0)
+			seen[spr.texture] = true
+			if not backs.has(spr.texture):
+				wrong += 1
+		if seen.size() < 2:
+			_fault("컷신 걷기: 연출 이동인데 그림이 %d장뿐이다 — 대기 포즈로 미끄러진다"
+				% seen.size())
+		elif wrong > 0:
+			_fault("컷신 걷기: 위로 걷는데 뒷모습이 아닌 프레임이 %d번 나왔다" % wrong)
+		else:
+			_ok("컷신 걷기 프레임 %d장 순환" % seen.size())
+		player.call("end_scripted_motion")
+		await process_frame
+		if spr.texture != pmap.get("IDLE_TEXTURE"):
+			_fault("컷신 걷기: 끝났는데 대기 포즈로 안 돌아왔다")
+		elif not player.is_physics_processing():
+			_fault("컷신 걷기: 끝났는데 조작이 안 돌아왔다")
+		else:
+			_ok("컷신 걷기 뒤 대기 포즈·조작 복귀")
+
 	main.free()
 	await process_frame
