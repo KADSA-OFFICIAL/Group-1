@@ -1,7 +1,8 @@
-[gd_scene load_steps=44 format=3]
+[gd_scene load_steps=48 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 [ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="5_hiding"]
+[ext_resource type="Script" path="res://scripts/interactions/sliding_door.gd" id="6_sliding"]
 [ext_resource type="Script" path="res://scripts/game/room_lights.gd" id="7_roomlights"]
 [ext_resource type="Script" path="res://scripts/game/interact_marks.gd" id="8_marks"]
 [ext_resource type="Script" path="res://scripts/interactions/floor_link.gd" id="11_floorlink"]
@@ -16,6 +17,7 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_desk.png" id="tex_obj_desk"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_easel.png" id="tex_obj_easel"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_locker.png" id="tex_obj_locker"]
+[ext_resource type="Texture2D" path="res://assets/tiles/obj_panel.png" id="tex_obj_panel"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_rack.png" id="tex_obj_rack"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_shelf.png" id="tex_obj_shelf"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_sink.png" id="tex_obj_sink"]
@@ -34,6 +36,9 @@ size = Vector2(40, 1000)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_door_zone"]
 size = Vector2(140, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_door_zone_v"]
+size = Vector2(60, 140)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_key_zone"]
 size = Vector2(48, 48)
@@ -73,6 +78,9 @@ polygon = PackedVector2Array(1120, 20, 1136, 20, 1136, 395, 1120, 395)
 
 [sub_resource type="OccluderPolygon2D" id="Occ_WC_IntroMidB"]
 polygon = PackedVector2Array(1120, 505, 1136, 505, 1136, 880, 1120, 880)
+
+[sub_resource type="OccluderPolygon2D" id="Occ_ArtPrepDoorCollision"]
+polygon = PackedVector2Array(1120, 395, 1136, 395, 1136, 505, 1120, 505)
 
 [sub_resource type="Gradient" id="Gradient_moon"]
 offsets = PackedFloat32Array(0, 0.5, 1)
@@ -310,6 +318,36 @@ texture_filter = 1
 texture_repeat = 2
 texture = ExtResource("tex_prop_grain")
 color = Color(0.5769, 0.4103, 0.2564, 1)
+polygon = PackedVector2Array(1120, 395, 1136, 395, 1136, 505, 1120, 505)
+
+[node name="SlideDoor_ArtPrep" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("6_sliding")
+travel = 0
+travel_y = 110
+leaf_visual = NodePath("../WallGlow/Doors/SDVis_ArtPrep")
+room_lights = NodePath("../Lights/Room_ArtPrep")
+
+[node name="Zone" type="CollisionShape2D" parent="SlideDoor_ArtPrep"]
+position = Vector2(1128, 450)
+shape = SubResource("RectangleShape2D_door_zone_v")
+
+[node name="SDPanel" type="StaticBody2D" parent="SlideDoor_ArtPrep"]
+
+[node name="ArtPrepDoorCollision" type="CollisionPolygon2D" parent="SlideDoor_ArtPrep/SDPanel"]
+polygon = PackedVector2Array(1120, 395, 1136, 395, 1136, 505, 1120, 505)
+
+[node name="LO_ArtPrepDoorCollision" type="LightOccluder2D" parent="SlideDoor_ArtPrep/SDPanel"]
+occluder = SubResource("Occ_ArtPrepDoorCollision")
+
+[node name="SDVis_ArtPrep" type="Polygon2D" parent="WallGlow/Doors"]
+z_index = 2
+texture_filter = 1
+texture_repeat = 2
+texture = ExtResource("tex_obj_panel")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.8965, 0.7878, 0.5976, 1)
 polygon = PackedVector2Array(1120, 395, 1136, 395, 1136, 505, 1120, 505)
 
 [node name="Room_ArtRoom" type="Area2D" parent="Lights"]
