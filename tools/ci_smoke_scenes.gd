@@ -16,9 +16,10 @@ extends SceneTree
 ##
 ##     godot --headless --script res://tools/ci_smoke_scenes.gd
 
-## 미닫이문이 있는 층. **4층은 뺀다** — 도입부라 미술실 문이 미닫이가 아니라
-## 고정 패널(`ArtDoorPanel`)이다(#405). 4층은 `_check_artroom_intro()`가 따로 본다.
-const DOOR_FLOORS := [1, 2, 3]
+## 미닫이문이 있는 층. 4층은 도입부라 **복도** 문이 미닫이가 아니라 고정
+## 패널(`ArtDoorPanel`)이지만(#405), 미술실↔준비실 연결문은 미닫이다(#591) —
+## 그래서 4층도 본다. 4층 도입부 연출 자체는 `_check_artroom_intro()`가 따로 본다.
+const DOOR_FLOORS := [1, 2, 3, 4]
 const MAIN := "res://scenes/main/main.tscn"
 const INTRO := "res://scenes/ui/intro.tscn"
 ## 문을 열고 닫는 데 주는 시간. `sliding_door.gd`의 `open_time`보다 넉넉해야 한다.
