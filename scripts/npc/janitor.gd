@@ -308,6 +308,22 @@ var _facing: Vector2 = Vector2.DOWN
 ## 걸음 프레임을 고르는 누적 이동 거리.
 var _walk_distance: float = 0.0
 
+## ── 고정 시간 간격 보간(#597) ──────────────────────────────────
+## 이설과 원인이 같다(`player_controller.gd`의 같은 항목 참조). 몸은 physics
+## tick(60Hz)마다 계단처럼 나아가는데 카메라는 그린 프레임마다 매끈하게 따라가므로,
+## 60Hz를 넘는 모니터에서는 **수위 그림만** 배경에 대해 앞뒤로 떨린다. 그림(`Body`)을
+## 직전 tick과 이번 tick 사이로 보간해 카메라와 같은 시점을 보게 한다.
+##
+## `Body`는 몸의 자식이라 부모가 이미 계단처럼 움직인다 — 그래서 절대 좌표가 아니라
+## **몸에서의 차이**를 `position`에 준다. `offset`은 위로 걸을 때 1px 흔드는 데 이미
+## 쓰고 있으므로(`_update_sprite`) 건드리지 않는다.
+##
+## 층 전환은 수위를 스폰 지점으로 옮기므로 한 tick에 갈 수 있는 거리를 넘으면
+## 보간하지 않고 붙인다(추격 속도 240으로도 한 tick에 4px이다).
+const INTERP_SNAP_PX := 64.0
+var _interp_prev: Vector2 = Vector2.ZERO
+var _interp_curr: Vector2 = Vector2.ZERO
+
 var step_timer: float = 0.0
 var step_count: int = 0
 
@@ -325,7 +341,31 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	_body_modulate = body.modulate
+	# 보간 자리는 _apply_active()가 끝에서 잡는다(#597).
 	_apply_active(false)
+
+
+## 그림만 직전 tick과 이번 tick 사이로 보간한다(#597). 층을 벗어나 물리 처리가
+## 꺼진 동안에는 보간할 tick이 없으므로 몸에 그대로 붙인다.
+func _process(_delta: float) -> void:
+	if not is_physics_processing():
+		body.position = Vector2.ZERO
+		return
+	var at := _interp_prev.lerp(_interp_curr,
+		clampf(Engine.get_physics_interpolation_fraction(), 0.0, 1.0))
+	body.position = at - global_position
+
+
+func _reset_interpolation() -> void:
+	_interp_prev = global_position
+	_interp_curr = global_position
+
+
+func _record_interpolation() -> void:
+	_interp_prev = _interp_curr
+	_interp_curr = global_position
+	if _interp_prev.distance_squared_to(_interp_curr) > INTERP_SNAP_PX * INTERP_SNAP_PX:
+		_interp_prev = _interp_curr
 
 
 ## floor_manager가 층 전환마다 호출한다. active=true면 층 씬의 벽으로 격자를
@@ -371,6 +411,10 @@ func _apply_active(active: bool) -> void:
 	Sfx.set_chasing(false)
 	if active and player != null:
 		_spawn_away_from(player.position)
+	# 스폰까지 끝난 뒤에 보간 자리를 잡는다(#597) — 먼저 잡으면 첫 tick까지
+	# 그림이 직전 층 좌표에 남는다(전환 페이드 중이라 보이지는 않지만).
+	_reset_interpolation()
+	body.position = Vector2.ZERO
 
 
 # ── 격자 ─────────────────────────────────────────────────────────
@@ -766,6 +810,7 @@ func _physics_process(delta: float) -> void:
 	if blind_timer > 0.0:
 		Sfx.set_chasing(false)
 		_hold_blinded(delta)
+		_record_interpolation()
 		return
 
 	_update_awareness(delta)
@@ -798,6 +843,7 @@ func _physics_process(delta: float) -> void:
 	_update_footsteps(delta, hunting)
 	_advance_sprite(delta)
 	Sfx.set_chasing(hunting)
+	_record_interpolation()
 
 	if debug_draw:
 		queue_redraw()

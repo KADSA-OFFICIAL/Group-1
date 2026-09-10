@@ -130,12 +130,42 @@ var _facing_right: bool = true
 ## 나머지가 걷기 프레임 번호다.
 var _walk_distance: float = 0.0
 
+## ── 고정 시간 간격 보간(#597) ──────────────────────────────────
+## 60Hz를 넘는 모니터에서 **이설만** 두두둑 떨리던 원인은 표본 시점이 둘로
+## 갈려 있던 것이다. 몸은 `_physics_process`(60Hz)에서 한 tick에 5.33px씩
+## 계단처럼 나아가는데, 카메라는 `position_smoothing_enabled`이고
+## `process_callback`이 기본값(idle)이라 **그린 프레임마다** 매끈하게 따라간다.
+## 화면에 보이는 이설의 자리는 `몸(계단) - 카메라(직선)`이라 톱니가 되고,
+## 배경은 정적이라 카메라와 정확히 같이 움직여 매끈하므로 **인물만** 떨린다.
+## 그 톱니가 잔상처럼 겹쳐 보이는 것이다. 모사 실측(화면 좌표, zoom 1.25 x
+## 창 배율 1.6): 60Hz 0.01px / 144Hz **9.48px** / 165Hz 9.45px / 240Hz 7.88px.
+## 60Hz에서 멀쩡했던 것은 tick과 프레임이 1:1이라 두 표본이 같은 시점이어서다.
+##
+## 그래서 **그림만** 직전 tick과 이번 tick 사이를
+## `Engine.get_physics_interpolation_fraction()`으로 보간한다. 몸·충돌·상호작용
+## 존·수위 판정은 그대로 60Hz다 — 판정을 건드리지 않는다. 대가는 그림이 최대
+## 한 tick(16.7ms) 뒤에 오는 것으로, 고정 시간 간격 보간의 표준적인 맞바꿈이다.
+##
+## **엔진 전역 보간(`physics/common/physics_interpolation`)을 켜지 않는다.**
+## 이 프로젝트는 시각 노드를 `Visuals` CanvasLayer로 떼어 `_process`에서 손으로
+## 위치를 맞추는 구조(#250)라, 전역 보간은 `_process`에서 변형을 쓰는 노드와
+## 싸운다. 필요한 노드만 손으로 보간한다.
+##
+## 한 tick에 갈 수 있는 거리를 넘으면 **보간하지 않고 붙인다** — 층 전환·체크포인트
+## 재시작은 위치를 통째로 옮기므로(`floor_manager`의 `player.position = arrive`)
+## 그대로 보간하면 한 프레임 동안 그림이 맵을 가로질러 흐른다. 걸어서는 한 tick에
+## 5.33px 이상 갈 수 없으니 64px은 넉넉한 문턱이다.
+const INTERP_SNAP_PX := 64.0
+var _interp_prev: Vector2 = Vector2.ZERO
+var _interp_curr: Vector2 = Vector2.ZERO
+
 
 func _ready() -> void:
 	# 상호작용 표시(#301)가 거리를 재려고 찾는다. 플레이어는 조립 씬(main)
 	# 소속이라 층 씬에서 이름으로는 못 찾는다.
 	add_to_group("player")
 	_light_energy = player_light.energy
+	_reset_interpolation()
 	visuals.global_position = global_position
 
 
@@ -144,7 +174,38 @@ func _ready() -> void:
 ## follow_viewport CanvasLayer 안이라 global_position이 곧 월드 좌표다
 ## (벽 페이드 마스크 wall_fade_mask.gd가 쓰는 방식과 같다).
 func _process(_delta: float) -> void:
-	visuals.global_position = global_position
+	var at := visual_position()
+	visuals.global_position = at
+	# 손전등도 같은 시점을 봐야 한다(#597). 몸에 붙여 두면 그림은 매끈한데 빛과
+	# 그림자 경계만 60Hz로 떨려서 오히려 눈에 띈다. 충돌·상호작용 존은 몸에 그대로
+	# 둔다 — 여기서 옮기는 것은 보이는 것뿐이다.
+	player_light.position = at - global_position
+
+
+## 이번에 그릴 프레임에서 이설이 있어야 할 자리(#597). 직전 tick과 이번 tick 사이를
+## 프레임이 놓인 만큼 보간한다. 어둠 마스크(wall_fade_mask.gd)도 이 값을 따라간다 —
+## 몸을 따라가면 그림은 매끈한데 시야 원만 떨린다.
+func visual_position() -> Vector2:
+	# 컷신은 `set_physics_process(false)`로 조작을 끊고 `scripted_step()`이 매 프레임
+	# 직접 옮긴다(#594) — 보간할 tick이 없으므로 그대로 베낀다.
+	if not is_physics_processing():
+		return global_position
+	return _interp_prev.lerp(_interp_curr,
+		clampf(Engine.get_physics_interpolation_fraction(), 0.0, 1.0))
+
+
+func _reset_interpolation() -> void:
+	_interp_prev = global_position
+	_interp_curr = global_position
+
+
+## 이번 tick이 끝난 자리를 적는다. `_physics_process`의 모든 갈래 끝에서 부른다 —
+## 숨은 동안에도 적어야 나올 때 직전 자리에서 흐르지 않는다.
+func _record_interpolation() -> void:
+	_interp_prev = _interp_curr
+	_interp_curr = global_position
+	if _interp_prev.distance_squared_to(_interp_curr) > INTERP_SNAP_PX * INTERP_SNAP_PX:
+		_interp_prev = _interp_curr
 
 
 ## 은신처(hiding_spot.gd)가 숨길 때, 플레이어가 E로 나올 때 호출된다.
@@ -163,6 +224,7 @@ func _physics_process(_delta: float) -> void:
 		# 숨은 자리에 고정. 프롬프트만 갱신해 "나오기" 안내를 유지한다.
 		velocity = Vector2.ZERO
 		_update_interact_prompt()
+		_record_interpolation()
 		return
 
 	var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
@@ -181,6 +243,7 @@ func _physics_process(_delta: float) -> void:
 
 	interaction_area.position = facing_direction * 22.0
 	_update_interact_prompt()
+	_record_interpolation()
 
 
 ## 대기/걷기 포즈 전환. 사람 그림이라 이동 각도로 회전시키면 안 된다
@@ -252,6 +315,9 @@ func scripted_step(to: Vector2, facing: Vector2, anim_px: float) -> void:
 			_facing_right = facing.x > 0.0
 	global_position = to
 	visuals.global_position = to
+	# 연출이 프레임마다 옮기므로 보간 자리도 같이 당긴다 — 안 그러면 조작이
+	# 돌아오는 순간 직전 tick 자리가 컷신 시작 지점이라 그림이 되돌아갔다 온다.
+	_reset_interpolation()
 	_update_sprite(anim_px > 0.0, anim_px)
 
 
