@@ -53,6 +53,19 @@ const PROP_BODIES := "PropBodies"
 var direction: Vector2 = Vector2.RIGHT
 var travelled: float = 0.0
 var landed: bool = false
+
+## ── 고정 시간 간격 보간(#601) ──────────────────────────────────
+## #597과 같은 원인이다. 캔은 `_physics_process`(60Hz)에서 움직이는데 카메라는
+## 그린 프레임마다 매끈하게 따라가므로, 60Hz를 넘는 모니터에서 캔만 앞뒤로 떨린다.
+## 캔은 한 tick에 **9.3px** 나아가 이설(5.33px)보다 진폭이 크다. 회전도 tick당
+## 6도씩 끊긴다.
+##
+## 레이캐스트·피격 판정은 그대로 물리 프레임에 남는다 — 공간 질의는 거기서만
+## 믿을 수 있다. 그림만 직전 tick과 이번 tick 사이로 보간한다.
+var _interp_prev: Vector2 = Vector2.ZERO
+var _interp_curr: Vector2 = Vector2.ZERO
+var _spin_prev: float = 0.0
+var _spin_curr: float = 0.0
 ## 조준은 **첫 물리 프레임에** 한다(#600). 던지는 순간은 `_unhandled_input`
 ## 안이라 물리 프레임이 아니고, 공간 질의(`direct_space_state`)는 물리 프레임에서만
 ## 믿을 수 있다. 한 tick(16.7ms) 늦게 정해지는 것은 눈에 보이지 않는다.
@@ -70,6 +83,9 @@ func launch(from: Vector2, throw_direction: Vector2) -> void:
 	position = from
 	direction = throw_direction.normalized() if throw_direction != Vector2.ZERO \
 		else Vector2.DOWN
+	# `_ready`는 `add_child`에서 이미 돌았고 자리는 지금 정해진다 — 보간 자리도
+	# 여기서 잡아야 첫 프레임에 원점에서 날아오지 않는다.
+	_reset_interpolation()
 
 
 func _physics_process(delta: float) -> void:
@@ -98,10 +114,33 @@ func _physics_process(delta: float) -> void:
 		return
 
 	position = next_position
-	can.rotation += TAU * delta   # 굴러가는 느낌
+	# 그림(위치·회전)은 `_process`가 보간해서 얹는다(#601) — 여기서는 이번 tick의
+	# 값만 적는다. `can.rotation`을 직접 굴리면 보간이 매 프레임 덮어써 무의미하다.
+	_spin_prev = _spin_curr
+	_spin_curr += TAU * delta   # 굴러가는 느낌
+	_interp_prev = _interp_curr
+	_interp_curr = position
 	travelled += step
 	if travelled >= MAX_RANGE:
 		_land(position)
+
+
+## 캔 그림만 tick 사이를 보간한다(#601). 터진 뒤에는 캔이 보이지 않고 터짐
+## 그림은 제자리에서 사라지므로 아무것도 하지 않는다.
+func _process(_delta: float) -> void:
+	if landed:
+		return
+	var fraction := clampf(Engine.get_physics_interpolation_fraction(), 0.0, 1.0)
+	can.position = _interp_prev.lerp(_interp_curr, fraction) - position
+	can.rotation = lerp_angle(_spin_prev, _spin_curr, fraction)
+
+
+func _reset_interpolation() -> void:
+	_interp_prev = position
+	_interp_curr = position
+	_spin_prev = can.rotation
+	_spin_curr = can.rotation
+	can.position = Vector2.ZERO
 
 
 ## 사거리 안에 수위가 있고 벽으로 막히지 않았으면 그쪽으로 던진다(#600 ①).
