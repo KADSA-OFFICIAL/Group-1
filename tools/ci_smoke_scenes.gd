@@ -22,6 +22,7 @@ extends SceneTree
 const DOOR_FLOORS := [1, 2, 3, 4]
 const MAIN := "res://scenes/main/main.tscn"
 const INTRO := "res://scenes/ui/intro.tscn"
+const INK := "res://scenes/items/ink_projectile.tscn"
 ## 문을 열고 닫는 데 주는 시간. `sliding_door.gd`의 `open_time`보다 넉넉해야 한다.
 const DOOR_SETTLE := 0.6
 ## 프레임을 돌리는 사이 한 번에 기다릴 시간.
@@ -54,6 +55,7 @@ func _run() -> void:
 	await _check_intro()
 	await _check_subtitle_queue()
 	await _check_artroom_intro()
+	await _check_ink_throw()
 
 	print("")
 	if _fail.is_empty():
@@ -466,3 +468,84 @@ func _check_artroom_intro() -> void:
 
 	main.free()
 	await process_frame
+
+
+## 잉크통(#169)이 실제로 수위를 맞히는가(#600).
+##
+## **정적 검사로는 절대 못 잡는 유형이다.** 물리 레이의 의미(`hit_from_inside`가
+## 기본 false라 출발점을 품은 충돌체는 보고되지 않는다)와 던지는 방향이 얽힌
+## 문제라, 프레임을 돌려 실제로 던져 봐야 드러난다. 실제로 이 셋 다 게임에
+## 들어간 채로 남아 있었다(#600) — 던지면 거의 늘 "빗나갔다"였다.
+##
+## 수위를 미리 **잉크에 멀게 해 세워 둔다**(`blind_timer = 3.0`). 그러면
+## `_physics_process`가 곧바로 돌아 나가 추격·접촉 판정이 아예 안 돌므로,
+## 검사 도중에 이설을 붙잡아 게임 오버 씬으로 넘어가는 일이 없다. 맞으면
+## `blind()`가 `maxf`로 5초를 새로 얹으므로 4.5초를 넘는지로 가른다.
+func _check_ink_throw() -> void:
+	var packed: PackedScene = load(MAIN)
+	if packed == null:
+		_fault("잉크: main 씬을 못 읽었다")
+		return
+	var main: Node = packed.instantiate()
+	root.add_child(main)
+	for _i in 8:
+		await process_frame
+
+	# 수위는 4층(도입부)에서 활동하지 않는다(JANITOR_FREE_FLOOR) — 3층으로 내린다.
+	main.call("travel_to", 3)
+	if not await _until(func() -> bool:
+			return not bool(main.get("changing_floor")), 6.0):
+		_fault("잉크: 3층 전환이 끝나지 않는다")
+		main.free()
+		return
+
+	var player := main.get_node_or_null("Player") as Node2D
+	var janitor := main.get_node_or_null("Janitor") as Node2D
+	if player == null or janitor == null:
+		_fault("잉크: Player 또는 Janitor가 없다")
+		main.free()
+		return
+	if not janitor.is_physics_processing():
+		_fault("잉크: 3층인데 수위가 활동 상태가 아니다")
+		main.free()
+		return
+
+	# ① 수위를 **등지고** 던져도 맞는다(자동 조준). 예전에는 바라보는 방향으로만
+	#    날아가서, 도망치면서 던지면 캔이 수위 반대편으로 갔다.
+	if await _throw_ink(main, player, janitor, 200.0, Vector2.LEFT):
+		_ok("잉크 자동 조준(등지고 200px)")
+	else:
+		_fault("잉크: 수위를 등지고 던졌는데 안 맞았다(자동 조준)")
+
+	# ② 코앞에서도 통과하지 않는다. 캔이 수위 충돌체 **안에서** 출발하는 거리다.
+	if await _throw_ink(main, player, janitor, 28.0, Vector2.RIGHT):
+		_ok("잉크 근접 피격(28px)")
+	else:
+		_fault("잉크: 코앞(28px)에서 던졌는데 몸을 통과했다")
+
+	main.free()
+	await process_frame
+
+
+## 수위를 이설 오른쪽 `gap`px에 세우고 `facing` 방향으로 잉크통을 던진다.
+## 캔은 플레이어가 던질 때와 같은 부모(조립 씬)에, 같은 스폰 거리(24px)로 낸다.
+func _throw_ink(main: Node, player: Node2D, janitor: Node2D,
+		gap: float, facing: Vector2) -> bool:
+	janitor.set("blind_timer", 3.0)
+	janitor.global_position = player.global_position + Vector2(gap, 0.0)
+	await process_frame
+
+	var packed: PackedScene = load(INK)
+	if packed == null:
+		_fault("잉크: 잉크통 씬을 못 읽었다")
+		return false
+	var can: Node2D = packed.instantiate()
+	main.add_child(can)
+	can.call("launch", player.global_position + facing * 24.0, facing)
+
+	var hit := await _until(func() -> bool:
+		return float(janitor.get("blind_timer")) > 4.5, 2.0)
+	if is_instance_valid(can):
+		can.free()
+	janitor.set("blind_timer", 0.0)
+	return hit
