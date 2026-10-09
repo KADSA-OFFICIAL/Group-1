@@ -255,6 +255,12 @@ func _check_player_footsteps() -> void:
 	var consts: Dictionary = player.get_script().get_script_constant_map()
 	var step_px: float = consts.get("WALK_STEP_PX", 160.0)
 	var phase: float = consts.get("FOOTSTEP_PHASE_PX", 0.0)
+	# **물리 처리를 끈다**(컷신이 이설을 붙잡는 방식). 켜 두면 입력이 없는
+	# _physics_process가 매 tick `_update_sprite(false, …)`로 걸은 거리를 0으로
+	# 되돌려서, 프레임 사이에 tick이 끼는 느린 기계(CI)에서는 "걸음 사이" 호출이
+	# 다시 첫 걸음 경계를 넘었다 — 로컬은 프레임이 빨라 tick이 안 끼어 통과했다.
+	player.set_physics_process(false)
+	player.call("_update_sprite", false, 0.0)
 
 	# (움직이는가, 이번에 나아간 거리, 이 호출에서 발소리가 나야 하는가)
 	var plan := [
@@ -269,6 +275,8 @@ func _check_player_footsteps() -> void:
 	for row in plan:
 		var before := _player_step_voices()
 		player.call("_update_sprite", row[0], row[1])
+		# 물리 tick을 반드시 하나 끼운다 — 기계 속도와 상관없이 CI와 같은 조건.
+		await physics_frame
 		await process_frame
 		var rang := _player_step_voices() > before
 		if rang != row[2]:
@@ -280,6 +288,7 @@ func _check_player_footsteps() -> void:
 		# 다음 줄이 새 발소리를 셀 수 있게 지금 울리는 것을 끊는다.
 		_stop_player_step_voices()
 	_ok("이설 발소리 박자")
+	player.set_physics_process(true)
 	main.free()
 	await process_frame
 
