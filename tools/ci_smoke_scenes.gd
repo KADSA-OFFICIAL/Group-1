@@ -56,6 +56,7 @@ func _run() -> void:
 	# 테마는 본편 씬보다 먼저 본다 — main.tscn을 띄우면 start_music이 테마를 걷는다.
 	await _check_themes()
 	_check_variants()
+	await _check_player_footsteps()
 	await _check_intro()
 	await _check_subtitle_queue()
 	await _check_artroom_intro()
@@ -238,6 +239,68 @@ func _check_themes() -> void:
 
 
 ## 소리 변형(#611) — 수위 발소리가 같은 파일을 연달아 쓰지 않고 넷을 고루 쓰는가.
+## 이설 발소리(#621) — 걷기 그림과 같은 자로 한 걸음(WALK_STEP_PX)마다 한 번.
+## `_update_sprite(moving, moved)`가 걷기 그림과 발소리를 함께 정하므로 그것을
+## 직접 부른다(입력을 흉내 내면 벽·집기에 막혀 거리가 들쭉날쭉하다).
+func _check_player_footsteps() -> void:
+	var main: Node = (load(MAIN) as PackedScene).instantiate()
+	root.add_child(main)
+	for i in 4:
+		await process_frame
+	var player: Node = main.get_node_or_null("Player")
+	if player == null:
+		_fault("이설 발소리: Player가 없다")
+		main.free()
+		return
+	var consts: Dictionary = player.get_script().get_script_constant_map()
+	var step_px: float = consts.get("WALK_STEP_PX", 160.0)
+	var phase: float = consts.get("FOOTSTEP_PHASE_PX", 0.0)
+
+	# (움직이는가, 이번에 나아간 거리, 이 호출에서 발소리가 나야 하는가)
+	var plan := [
+		[true, phase * 0.5, false],          # 출발 직후 — 첫 걸음 전
+		[true, phase, true],                 # 첫 걸음 경계를 넘음
+		[true, 0.0, false],                  # 벽 밀기 — 이동 0
+		[true, step_px * 0.5, false],        # 걸음 사이
+		[true, step_px * 0.5, true],         # 둘째 걸음
+		[false, 0.0, false],                 # 멈춤
+		[true, phase * 0.5, false],          # 다시 출발 — 다시 첫 걸음 전부터
+	]
+	for row in plan:
+		var before := _player_step_voices()
+		player.call("_update_sprite", row[0], row[1])
+		await process_frame
+		var rang := _player_step_voices() > before
+		if rang != row[2]:
+			_fault("이설 발소리: moving=%s moved=%.0f에서 %s"
+				% [row[0], row[1], "소리가 났다" if rang else "소리가 안 났다"])
+			main.free()
+			await process_frame
+			return
+		# 다음 줄이 새 발소리를 셀 수 있게 지금 울리는 것을 끊는다.
+		_stop_player_step_voices()
+	_ok("이설 발소리 박자")
+	main.free()
+	await process_frame
+
+
+func _player_step_voices() -> int:
+	var count := 0
+	for p in root.get_node("Sfx").get("_players"):
+		var player := p as AudioStreamPlayer
+		if player.playing and player.stream != null \
+				and player.stream.resource_path.get_file().begins_with("player_step"):
+			count += 1
+	return count
+
+
+func _stop_player_step_voices() -> void:
+	for p in root.get_node("Sfx").get("_players"):
+		var player := p as AudioStreamPlayer
+		if player.stream != null and player.stream.resource_path.get_file().begins_with("player_step"):
+			player.stop()
+
+
 func _check_variants() -> void:
 	var sfx: Node = root.get_node_or_null("Sfx")
 	if sfx == null:

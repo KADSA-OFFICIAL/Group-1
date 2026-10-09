@@ -28,6 +28,9 @@ const VOLUMES := {
 	"caught": -6.0,
 	"escape": -8.0,
 	"ui_click": -14.0,
+	# 이설 발소리(#621) — 초당 두 번 계속 나므로 가장 작다. 수위 발소리(위치를
+	# 알려 주는 단서, StepSound -4dB)를 덮으면 안 된다.
+	"player_step": -15.0,
 }
 
 ## 같은 소리의 변형(#611). 하나를 고정 간격으로 되풀이하면 메트로놈처럼
@@ -35,6 +38,7 @@ const VOLUMES := {
 ## 이 중 하나를 고르되 바로 앞에 쓴 것은 피한다. 파일은 gen_sfx.py가 굽는다.
 const VARIANTS := {
 	"janitor_step": ["janitor_step", "janitor_step_2", "janitor_step_3", "janitor_step_4"],
+	"player_step": ["player_step", "player_step_2", "player_step_3", "player_step_4"],
 }
 ## 변형이 있는 소리는 재생할 때마다 음높이도 이 비율 안에서 흔든다.
 ## ±5%였을 때 걸음마다 음높이가 들쭉날쭉해 가볍게 들렸다 — 무게는 일정해야 한다.

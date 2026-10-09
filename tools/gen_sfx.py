@@ -234,22 +234,78 @@ def footstep(seed: int, heel: float, toe_delay: float, click_hz: float,
         gain(hit(noise, toe_delay + 0.06, 0.04, 0.040, "high", 2400.0, 0.7), 0.04),
     )
 
-    # 복도 반사. 간격을 고르게 두면 금속성 울림(콤 필터)이 되므로 서로소에 가깝게
-    # 흩는다. 반사는 벽이 고역을 먹으므로 저역 통과를 건다.
-    reflections = [0.0] * (len(dry) + int(RATE * 0.22))
-    for delay, amount in ((0.023, 0.32), (0.041, 0.25), (0.067, 0.19),
-                          (0.097, 0.14), (0.131, 0.09), (0.173, 0.05),
-                          (0.211, 0.03)):
-        start = int(RATE * delay)
-        for i, value in enumerate(dry):
-            reflections[start + i] += value * amount
     # 피크를 직접 맞춘다. 저역 노이즈는 시드마다 세기가 크게 흔들려서(같은
     # 이득으로 0.45~0.88) 변형끼리 한 걸음만 쿵 튀었다. 왼발/오른발 차이는
     # heel로만 낸다. 기준은 예전 발소리(피크 0.58) 언저리 — StepSound의
     # volume_db(-4)와 거리 감쇠가 그 크기에 맞춰져 있다.
-    out = mix(dry, biquad(reflections, "low", 1400.0, 0.7))
+    out = mix(dry, hallway(dry, 1400.0))
     peak = max(abs(value) for value in out)
     return gain(out, FOOTSTEP_PEAK * heel / peak)
+
+
+def hallway(dry: list[float], low_pass: float, amount: float = 1.0) -> list[float]:
+    """빈 복도의 짧은 반사. 수위와 이설이 같은 복도를 걸으므로 같은 공간을 쓴다.
+
+    간격을 고르게 두면 금속성 울림(콤 필터)이 되므로 서로소에 가깝게 흩는다.
+    반사는 벽이 고역을 먹으므로 저역 통과를 건다.
+    """
+    reflections = [0.0] * (len(dry) + int(RATE * 0.22))
+    for delay, level in ((0.023, 0.32), (0.041, 0.25), (0.067, 0.19),
+                         (0.097, 0.14), (0.131, 0.09), (0.173, 0.05),
+                         (0.211, 0.03)):
+        start = int(RATE * delay)
+        for i, value in enumerate(dry):
+            reflections[start + i] += value * level * amount
+    return biquad(reflections, "low", low_pass, 0.7)
+
+
+def sneaker_step(seed: int, heel: float, toe_delay: float, body_hz: float,
+                 toe_weight: float) -> list[float]:
+    """이설의 운동화 한 걸음(#621). 수위(footstep)와 **귀로 갈려야** 한다.
+
+    수위 발소리는 위치를 알려 주는 단서라(#9) 주인공 발소리가 그것을 덮거나
+    닮으면 안 된다. 그래서 축마다 반대로 간다:
+
+    - 굽 딸깍이 거의 없다 — 고무 밑창. 아주 작은 밑창 가장자리 소리만 남긴다.
+    - 몸통이 높다(300~380Hz, 수위 160Hz). 몸무게(저역)는 짧고 작다.
+    - 뒤꿈치 → 앞꿈치가 짧다(42~54ms, 수위 94~110ms). 가볍고 빠른 걸음.
+    - 같은 복도라 반사는 같은 공간(hallway)이되 조금 약하고 덜 어둡게.
+
+    음정 있는 발진기는 쓰지 않는다(#611 — "뽁"의 원인).
+    """
+    noise = Noise(seed=seed)
+    dry = mix(
+        # 밑창 가장자리가 바닥에 닿는 아주 작은 소리.
+        gain(hit(noise, 0.03, 0.0015, 0.004, "band", 1900.0, 1.0), 0.10 * heel),
+        # 뒤꿈치: 고무가 받는 둔탁함 — 이 소리의 몸통.
+        gain(hit(noise, 0.09, 0.002, 0.018, "band", body_hz, 1.0), 1.00 * heel),
+        # 몸무게 — 수위보다 훨씬 짧고 작다.
+        gain(hit(noise, 0.08, 0.004, 0.020, "low", 150.0, 0.7), 0.45 * heel),
+        # 앞꿈치: 밑창이 내려앉으며 살짝 눌리는 소리.
+        offset(gain(hit(noise, 0.07, 0.004, 0.016, "band", body_hz * 1.3, 1.0),
+                    0.55 * toe_weight), toe_delay),
+        offset(gain(hit(noise, 0.05, 0.003, 0.012, "band", 950.0, 1.0),
+                    0.16 * toe_weight), toe_delay),
+        # 밑창이 바닥을 스치는 소리 — 아주 작게.
+        gain(hit(noise, toe_delay + 0.04, 0.02, 0.025, "high", 3000.0, 0.7), 0.03),
+    )
+    out = mix(dry, hallway(dry, 1800.0, 0.7))
+    peak = max(abs(value) for value in out)
+    return gain(out, PLAYER_STEP_PEAK * heel / peak)
+
+
+# 수위(0.62)보다 낮다. 크기의 최종 조정은 sound_manager의 VOLUMES에서 한다 —
+# 여기서는 변형끼리 고르게만 맞춘다.
+PLAYER_STEP_PEAK = 0.55
+
+# 이설 발소리 변형(#621). 왼발(1·3)·오른발(2·4) 차이는 수위보다 더 작게 —
+# 가벼운 걸음은 좌우가 거의 같다.
+PLAYER_STEPS = {
+    "player_step":   dict(seed=62101, heel=1.00, toe_delay=0.050, body_hz=340.0, toe_weight=1.00),
+    "player_step_2": dict(seed=62102, heel=0.94, toe_delay=0.044, body_hz=380.0, toe_weight=0.92),
+    "player_step_3": dict(seed=62103, heel=1.00, toe_delay=0.054, body_hz=310.0, toe_weight=0.96),
+    "player_step_4": dict(seed=62104, heel=0.95, toe_delay=0.047, body_hz=360.0, toe_weight=0.90),
+}
 
 
 FOOTSTEP_PEAK = 0.62
@@ -278,6 +334,9 @@ def build_all() -> dict[str, list[float]]:
     # 예전 발소리가 공용 noise에서 꺼내 쓰던 만큼(0.16초) 넘긴다. 안 넘기면
     # 뒤에 오는 문·은신·잉크·스팅어가 전부 다른 노이즈를 받아 바이트가 바뀐다.
     noise_burst(0.16, noise)
+    # 이설 발소리(#621)도 각자 고정 시드 — 공용 noise를 건드리지 않는다.
+    for name, params in PLAYER_STEPS.items():
+        sounds[name] = sneaker_step(**params)
 
     # 열쇠꾸러미 — 짧은 고음 클릭 여러 개를 어긋나게 겹친다.
     keys_layers = []
