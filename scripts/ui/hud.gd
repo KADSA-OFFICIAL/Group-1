@@ -269,7 +269,9 @@ func _hold_line(typing_seconds: float) -> void:
 	var tree := get_tree()
 	if tree == null:
 		return
-	await tree.create_timer(typing_seconds + queued_notice_seconds).timeout
+	# `process_always = false` — 일시정지(#624) 중에는 타이핑 트윈이 서 있으므로
+	# 머무는 시간도 같이 서야 한다. 안 그러면 메뉴를 닫았을 때 줄이 사라져 있다.
+	await tree.create_timer(typing_seconds + queued_notice_seconds, false).timeout
 
 	# 그 사이에 줄이 붙었으면 여기서 끝낸다 — 이어 말하는 중이다.
 	if not _speech_queue.is_empty():
@@ -280,7 +282,7 @@ func _hold_line(typing_seconds: float) -> void:
 	tree = get_tree()
 	if tree == null:
 		return
-	await tree.create_timer(rest).timeout
+	await tree.create_timer(rest, false).timeout
 
 
 ## 화자와 본문이 같으면 같은 줄로 본다(#505). 감정은 보지 않는다 — 같은 문장을
