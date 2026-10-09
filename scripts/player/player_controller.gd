@@ -121,6 +121,14 @@ const INK_SPAWN_OFFSET := 24.0
 ## `interact_priority`가 없는 상호작용의 기본값(#301).
 const DEFAULT_INTERACT_PRIORITY := 5
 
+## 발소리(#621). 걷기 그림과 같은 자(`_walk_distance`)로 재므로 한 걸음
+## (`WALK_STEP_PX`)마다 한 번, 그림과 같은 박자로 난다. 벽을 밀면 이동이 0이라
+## 안 나고, 멈추면 `_walk_distance`가 0으로 돌아가 다음 출발이 다시 첫 걸음이다.
+##
+## 첫 걸음을 이만큼 늦춘다 — 0에 두면 방향키를 톡 칠 때마다 소리가 났다.
+## 걸음 박자(160px = 0.5초)의 15% 남짓이라 걷기 시작하는 소리로는 늦게 안 들린다.
+const FOOTSTEP_PHASE_PX := 24.0
+
 var facing_direction: Vector2 = Vector2.DOWN
 var is_hiding: bool = false
 var _light_energy: float = 1.0
@@ -262,7 +270,10 @@ func _update_sprite(moving: bool, moved: float) -> void:
 
 	# 벽을 밀고 있으면 moved가 0이라 프레임이 그 자리에 멈춘다 — 대기 포즈로
 	# 돌아가면 방향키를 누른 채 정면을 보는 것처럼 보인다.
+	var steps_before := floori((_walk_distance - FOOTSTEP_PHASE_PX) / WALK_STEP_PX)
 	_walk_distance += moved
+	if floori((_walk_distance - FOOTSTEP_PHASE_PX) / WALK_STEP_PX) > steps_before:
+		Sfx.play(&"player_step")
 
 	# 위로 걸으면 뒷모습(#519), 아래로 걸으면 정면(#551). 대각선은 세로 성분이 더 큰
 	# 쪽만 세로 그림으로 본다 — 정확한 대각선(|x| == |y|)은 측면이다. 두 방향이 같은
