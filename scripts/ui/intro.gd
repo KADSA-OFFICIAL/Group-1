@@ -74,6 +74,9 @@ func _ready() -> void:
 	choice_panel.visible = false
 	dialogue.apply_font(scene_caption)
 	_apply_scene()
+	# 타이틀 테마에서 크로스페이드(#606). 두 장면 내내 한 곡이다 — 장면마다
+	# 바꾸면 페이드 0.5초 사이에 음악이 끊겨 장면 전환보다 그게 더 들린다.
+	Sfx.play_theme(&"prologue")
 
 	# 테스트용 건너뛰기(#231) — 릴리스로 내보낸 빌드에서는 숨긴다.
 	# focus_mode는 씬에서 FOCUS_NONE이다. 포커스를 받으면 대사를 넘기려고
@@ -200,6 +203,10 @@ func _finish(scene_path: String) -> void:
 	if finished:
 		return
 	finished = true
+	# 본편으로 가면 앰비언트가 이어받는다(floor_manager → start_music). 페이드를
+	# 화면 페이드와 함께 시작해야 검은 화면 뒤에서 음악만 뚝 끊기지 않는다.
+	if scene_path == game_scene_path:
+		Sfx.stop_theme()
 	# 장면 전환 도중에 건너뛰면 그 트윈이 계속 돌아 페이드를 도로 걷어낸다.
 	if scene_tween != null and scene_tween.is_valid():
 		scene_tween.kill()

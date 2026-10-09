@@ -13,6 +13,8 @@ const GameStateScript = preload("res://scripts/game/game_state.gd")
 
 
 func _ready() -> void:
+	# 게임오버·엔딩에서 돌아와도 여기서 다시 튼다(#606). 이미 울리고 있으면 그대로 둔다.
+	Sfx.play_theme(&"title")
 	start_button.pressed.connect(_on_start_pressed)
 	start_button.grab_focus()
 
