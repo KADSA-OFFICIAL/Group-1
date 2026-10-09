@@ -65,6 +65,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
       - `begin_scripted_motion()`이 머리 위 `[E]` 프롬프트도 감춘다 — 물리 처리가 꺼지면 마지막 상태로 붙박여 컷신 내내 떠 있었다. `art_room_intro.gd`의 `_freeze`는 아직 이 API를 쓰지 않는다(그쪽은 제자리에 서서 보는 장면이라 걸음이 필요 없다).
     - **`exit_door.gd`를 쓰지 않는다.** 저쪽은 탈출구라 엔딩 판정을 하고(`ending_kind`·`clue_score`를 메타에 싣고) 음악을 끄고 탈출음을 낸다 — 도입부의 하강은 탈출이 아니라 진행이다.
     - 층 전환은 계단과 같은 `floor_manager.travel_to()`를 타므로 페이드도 계단과 똑같다.
+    - **대사 끝은 고정 시간이 아니라 자막 대기열로 맞춘다**(#618, #471과 같은 규칙). 예전에는 줄당 `cutscene_line_seconds`(2.6초) × 6줄 = 15.6초를 고정으로 기다렸는데, 자막이 빨라진 뒤(#514·#563·#569) 실제 표시는 약 10.4초라 **마지막 대사 뒤 6초를 빈 화면으로** 기다렸다(사용자 보고). 지금은 사라지는 연출 뒤 `hud.await_speech_drained()`를 기다리고 곧바로 넘긴다 — 스모크가 배출 끝과 층 전환 시작 사이를 1초 안으로 본다.
     - **`MAX_FLOOR`는 3이다**(4가 아니라). 4로 두면 3층 계단에서 위로 올라갈 때 빈 `STAIRS[4]`를 인덱싱해 죽는다. `gen_floors.py`의 같은 상수는 계단 방향 표지가 갈 수 없는 곳을 가리키지 않게 한다.
 - **운동장 `scenes/background/school_yard.tscn`(0층, #356)**: 탈출 뒤 걸어 나가는 바깥 구간. `build_yard()`가 만든다.
   - **3400×1700이라 층과 크기가 다르다.** `player.tscn`에 박혀 있던 카메라 한계(3400×2500)를 `floor_manager`의 `FLOOR_BOUNDS`가 층마다 덮어쓴다 — 안 그러면 운동장에서 씬 아래 빈 공간이 보인다. 크기가 어긋나면 `verify_stairs`가 잡는다(`YW/YH`·`YARD_ARRIVE` ↔ `FLOOR_BOUNDS`·`YARD_ARRIVE` 대조).
