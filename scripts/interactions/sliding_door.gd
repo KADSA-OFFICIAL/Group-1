@@ -83,8 +83,10 @@ func _on_body_entered(body: Node2D) -> void:
 	if not body.is_in_group("janitor"):
 		return
 	_janitors += 1
+	# 소리는 내지 않는다(#609). Sfx는 위치가 없어서 층 반대편에서 지나가도
+	# 바로 옆처럼 들렸다 — 교실 안에 숨어 있는데 "띠용"이 났다. 수위의 문
+	# 소리는 거리로 줄어드는 janitor.tscn의 DoorSound가 맡는다.
 	if _janitors == 1:
-		Sfx.play(&"door_open")
 		_apply()
 
 
