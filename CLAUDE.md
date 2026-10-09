@@ -352,6 +352,9 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
   - **미닫이문 검사는 1~3층만 한다.** 4층은 도입부라 미술실 문이 미닫이가 아니라 고정 패널(`ArtDoorPanel`)이다(#405) — 4층은 도입부 전용 검사가 따로 본다.
   - 새 런타임 동작을 넣었으면 여기에 검사를 더할 것. 임시 스크립트를 쓰고 지우기를 열 번 넘게 반복한 끝에 상설로 만든 것이다.
 - .tscn 수정 시 `load_steps` = ext_resource 수 + sub_resource 수 + 1 유지.
+- **게임을 끄는 길은 `Sfx.quit_cleanly()` 하나다**(#615). `Sfx`가 `auto_accept_quit`를 끄고 창 닫기 요청을 받아 소리를 전부 멈춘 뒤 **0.1초 기다렸다** 끝낸다. 루프 음악이 재생 중인 채로 끝내면 오디오 스레드가 재생 상태를 정리하기 전에 엔진이 내려가 `AudioStreamWAV`·`AudioStreamPlaybackWAV`가 남는다 — `stop()` 직후에 끝내도 남는다(실측 5/5회). `get_tree().quit()`을 직접 부르면 누수가 돌아온다.
+  - **트리 전체의 플레이어를 끈다**(`find_children`). 수위의 발소리·열쇠·문 소리는 `janitor.tscn`의 `AudioStreamPlayer2D`라 `Sfx` 밖에 있고, 그것만 남아도 한 쌍이 샌다(실측).
+  - **자막·컷신 도중에 닫으면 `GDScriptFunctionState` 1~2개가 여전히 남는다.** 멈춘 코루틴이 종료 시점에 남는 GDScript 엔진 동작이다 — `create_timer` 대신 노드 `Timer`(static 함수·인스턴스 메서드 둘 다), 매 프레임 `process_frame` 루프, 종료 전 씬 내리기를 다 해 봤는데 1~2개는 그대로였다 — 원래 `create_timer`일 때는 코루틴 1개 + `SceneTreeTimer` 1개가 남는다. 종료 때만 생기고 플레이 중에 쌓이지 않으며 OS가 회수한다. 없애려면 종료 시점에 멈춘 코루틴이 하나도 없어야 하는데, 그건 컷신·자막 구조를 다 바꾸는 일이라 하지 않았다.
 - project.godot에 사용자의 미커밋 변경이 있을 수 있음 — 내 커밋에 섞지 말 것(필요 시 stash로 분리).
 - .gd 스크립트를 새로 만들면 사용자 에디터가 .uid 파일을 생성함 — 발견 시 해당 이슈 브랜치에 커밋.
 
