@@ -151,15 +151,133 @@ def dc_block(samples: list[float], pole: float = 0.995) -> list[float]:
 #
 # 톤을 바꾸고 싶으면 여기 숫자만 고치고 다시 돌린다.
 
+# ── 필터·발소리 (#611) ───────────────────────────────────────────
+
+def biquad(samples: list[float], kind: str, freq: float, q: float) -> list[float]:
+    """2차 필터(RBJ 쿡북). 1차 저역 통과(noise_burst의 low_pass)로는 '어느 대역이
+    울리는가'를 못 고른다 — 구두 뒤꿈치의 딱 소리와 바닥의 둔탁함은 대역이 다르다.
+
+    kind: "low" / "high" / "band"(정점 이득 0dB).
+    """
+    w0 = math.tau * freq / RATE
+    cos_w, alpha = math.cos(w0), math.sin(w0) / (2.0 * q)
+    if kind == "low":
+        b0, b1, b2 = (1 - cos_w) / 2, 1 - cos_w, (1 - cos_w) / 2
+    elif kind == "high":
+        b0, b1, b2 = (1 + cos_w) / 2, -(1 + cos_w), (1 + cos_w) / 2
+    else:
+        b0, b1, b2 = alpha, 0.0, -alpha
+    a0, a1, a2 = 1 + alpha, -2 * cos_w, 1 - alpha
+    b0, b1, b2, a1, a2 = b0 / a0, b1 / a0, b2 / a0, a1 / a0, a2 / a0
+
+    out: list[float] = []
+    x1 = x2 = y1 = y2 = 0.0
+    for x in samples:
+        y = b0 * x + b1 * x1 + b2 * x2 - a1 * y1 - a2 * y2
+        x2, x1, y2, y1 = x1, x, y1, y
+        out.append(y)
+    return out
+
+
+def hit(noise: Noise, seconds: float, attack: float, decay: float,
+        kind: str, freq: float, q: float) -> list[float]:
+    """필터 건 노이즈 한 번의 타격. 지수 감쇠라 꼬리가 자연스럽게 사라진다.
+
+    **발진기(삼각파·구형파)를 쓰지 않는다.** 예전 발소리는 삼각파가 90→55Hz로
+    떨어지는 성분이 있어서 음정이 들렸고 그게 "뽁"이었다(#611). 신발과 바닥은
+    음정 없이 대역만 있다.
+    """
+    total = int(RATE * seconds)
+    attack_samples = max(int(RATE * attack), 1)
+    raw = []
+    for i in range(total):
+        env = min(1.0, i / attack_samples) * math.exp(-i / (RATE * decay))
+        raw.append(noise.next() * env)
+    return biquad(raw, kind, freq, q)
+
+
+def offset(samples: list[float], seconds: float) -> list[float]:
+    return chain(silence(seconds), samples)
+
+
+def footstep(seed: int, heel: float, toe_delay: float, click_hz: float,
+             toe_weight: float) -> list[float]:
+    """구두 한 걸음 — 뒤꿈치 착지 → 앞꿈치 내려앉음 + 복도 반사음.
+
+    수위는 몸이 무거운 중년 남자가 밤에 느릿느릿 도는 것이다. 무게는 **소리의
+    대역과 길이**가 정한다:
+
+    - 굽 딸깍은 낮고(1.1~1.5kHz) 작게. 2.5~3kHz로 또렷하게 냈더니 구두굽이
+      또각거리는 가벼운 걸음이 됐다(사용자: "너무 경박해").
+    - 바닥 둔탁함(160Hz)과 몸무게(90Hz)를 길게. 둔탁함은 노트북 스피커가 내는
+      대역 안에 둔다 — 90Hz만 키우면 작은 스피커에서는 사라지고 딸깍만 남는다.
+    - 뒤꿈치 → 앞꿈치를 90~110ms로 벌린다. 발을 굴리는 시간이 길수록 무겁다.
+      붙어 있으면 공이 튀는 소리(뽁)다.
+    - 복도 반사는 어둡고(1.4kHz 저역 통과) 조금 길게. 빈 건물이 소리를 먹는다.
+
+    음정 있는 발진기는 쓰지 않는다(#611 — 예전 "뽁"의 원인).
+    """
+    noise = Noise(seed=seed)
+    dry = mix(
+        # 뒤꿈치: 굽이 닿는 소리. 무디게, 작게.
+        gain(hit(noise, 0.05, 0.0015, 0.008, "band", click_hz, 1.0), 0.22 * heel),
+        # 뒤꿈치: 바닥이 받는 둔탁함 — 이 소리의 몸통.
+        gain(hit(noise, 0.16, 0.003, 0.040, "band", 160.0, 1.1), 1.70 * heel),
+        # 몸무게 — 가장 낮은 대역, 가장 길게.
+        gain(hit(noise, 0.20, 0.006, 0.055, "low", 90.0, 0.7), 1.30 * heel),
+        # 앞꿈치: 밑창이 내려앉는 소리. 뒤꿈치보다 약하고 더 무디다.
+        offset(gain(hit(noise, 0.10, 0.008, 0.030, "band", 520.0, 0.9),
+                    0.22 * toe_weight), toe_delay),
+        offset(gain(hit(noise, 0.14, 0.006, 0.035, "band", 150.0, 1.1),
+                    0.80 * toe_weight), toe_delay),
+        # 밑창이 바닥을 스치는 소리 — 두 타격 사이를 잇는다. 아주 작게.
+        gain(hit(noise, toe_delay + 0.06, 0.04, 0.040, "high", 2400.0, 0.7), 0.04),
+    )
+
+    # 복도 반사. 간격을 고르게 두면 금속성 울림(콤 필터)이 되므로 서로소에 가깝게
+    # 흩는다. 반사는 벽이 고역을 먹으므로 저역 통과를 건다.
+    reflections = [0.0] * (len(dry) + int(RATE * 0.22))
+    for delay, amount in ((0.023, 0.32), (0.041, 0.25), (0.067, 0.19),
+                          (0.097, 0.14), (0.131, 0.09), (0.173, 0.05),
+                          (0.211, 0.03)):
+        start = int(RATE * delay)
+        for i, value in enumerate(dry):
+            reflections[start + i] += value * amount
+    # 피크를 직접 맞춘다. 저역 노이즈는 시드마다 세기가 크게 흔들려서(같은
+    # 이득으로 0.45~0.88) 변형끼리 한 걸음만 쿵 튀었다. 왼발/오른발 차이는
+    # heel로만 낸다. 기준은 예전 발소리(피크 0.58) 언저리 — StepSound의
+    # volume_db(-4)와 거리 감쇠가 그 크기에 맞춰져 있다.
+    out = mix(dry, biquad(reflections, "low", 1400.0, 0.7))
+    peak = max(abs(value) for value in out)
+    return gain(out, FOOTSTEP_PEAK * heel / peak)
+
+
+FOOTSTEP_PEAK = 0.62
+
+# 발소리 변형(#611). 같은 파일을 0.52초마다 되풀이하면 메트로놈이다 —
+# 왼발(1·3)은 무겁고 앞꿈치가 늦게, 오른발(2·4)은 조금 가볍게 둔다. 차이는
+# 작게 — 크게 벌리면 절뚝이는 걸음이 된다.
+# 재생 쪽(sound_manager.VARIANTS)이 번갈아 고르고 음높이도 흔든다.
+JANITOR_STEPS = {
+    "janitor_step":   dict(seed=61101, heel=1.00, toe_delay=0.104, click_hz=1250.0, toe_weight=1.00),
+    "janitor_step_2": dict(seed=61102, heel=0.93, toe_delay=0.094, click_hz=1450.0, toe_weight=0.90),
+    "janitor_step_3": dict(seed=61103, heel=1.00, toe_delay=0.110, click_hz=1150.0, toe_weight=0.95),
+    "janitor_step_4": dict(seed=61104, heel=0.91, toe_delay=0.098, click_hz=1350.0, toe_weight=0.88),
+}
+
+
 def build_all() -> dict[str, list[float]]:
     noise = Noise()
     sounds: dict[str, list[float]] = {}
 
-    # 수위 발소리 — 낮고 둔탁하게. 순찰 속도(130)에 맞춰 짧게 끊는다.
-    sounds["janitor_step"] = mix(
-        gain(noise_burst(0.16, noise, low_pass=0.14, release=0.85), 0.9),
-        gain(tone(0.10, 90, 55, triangle, release=0.7), 0.35),
-    )
+    # 수위 발소리 — 구두 한 걸음(뒤꿈치 → 앞꿈치 + 복도 반사), 변형 넷(#611).
+    # 각자 고정 시드를 쓴다 — 공용 noise를 쓰면 다른 소리를 하나 더할 때마다
+    # 발소리가 바뀐다.
+    for name, params in JANITOR_STEPS.items():
+        sounds[name] = footstep(**params)
+    # 예전 발소리가 공용 noise에서 꺼내 쓰던 만큼(0.16초) 넘긴다. 안 넘기면
+    # 뒤에 오는 문·은신·잉크·스팅어가 전부 다른 노이즈를 받아 바이트가 바뀐다.
+    noise_burst(0.16, noise)
 
     # 열쇠꾸러미 — 짧은 고음 클릭 여러 개를 어긋나게 겹친다.
     keys_layers = []
