@@ -46,6 +46,19 @@ const CHASE_RELEASE_DELAY := 2.5
 ## 정적이 튀어나와 오히려 어색하다.
 const AMBIENCE_DUCK_DB := -30.0
 
+# ── 테마 (#606) ──────────────────────────────────────────────────
+## 타이틀·프롤로그 음악. 본편 앰비언트와 겹치지 않는 구간이라 따로 둔다 —
+## start_music/stop_music은 추격 상태까지 얽혀 있어 거기 끼우면 안 된다.
+## 프롤로그는 자막만 흐르는 장면이라 타이틀보다 한 단 낮다(실측 RMS가
+## 타이틀 0.138 / 프롤로그 0.088 / 앰비언트 0.158이라 그만큼 올려 맞췄다).
+const THEME_DB := {
+	"title": -13.0,
+	"prologue": -11.0,
+}
+## 타이틀 → 프롤로그 크로스페이드. 시작 버튼의 페이드(0.8초)와 인트로 첫
+## 페이드인(0.5초)이 이어지는 동안 바뀌도록 그보다 조금 길게 잡았다.
+const THEME_FADE := 1.6
+
 var _streams: Dictionary = {}
 var _players: Array[AudioStreamPlayer] = []
 var _next_voice: int = 0
@@ -56,8 +69,13 @@ var _music_on: bool = false
 var _chase_active: bool = false     # 지금 음악이 추격 상태인가
 var _chase_wanted: bool = false     # 수위가 쫓고 있는가(매 프레임 갱신)
 var _chase_release: float = 0.0
-var _ambience_tween: Tween = null
-var _chase_tween: Tween = null
+## 플레이어마다 진행 중인 음량 트윈. 같은 volume_db를 두 트윈이 다투면 튄다.
+var _tweens: Dictionary = {}
+
+## 테마 플레이어 둘을 번갈아 쓴다 — 하나가 사라지는 동안 다른 하나가 들어온다.
+var _theme_players: Array[AudioStreamPlayer] = []
+var _theme_index: int = 0
+var _theme_id: StringName = &""
 
 
 func _ready() -> void:
@@ -72,6 +90,8 @@ func _ready() -> void:
 
 	_ambience = _make_loop_player(&"ambience")
 	_chase = _make_loop_player(&"chase")
+	for i in 2:
+		_theme_players.append(_make_loop_player(&""))
 
 
 ## 루프 재생용 플레이어. 루프 지점은 .import가 아니라 여기서 정한다 —
@@ -83,6 +103,13 @@ func _make_loop_player(id: StringName) -> AudioStreamPlayer:
 	player.volume_db = MUSIC_SILENT_DB
 	add_child(player)
 
+	# 테마 플레이어는 곡을 재생할 때 정하므로 빈 id로 만든다.
+	if id != &"":
+		player.stream = _loop_stream(id)
+	return player
+
+
+func _loop_stream(id: StringName) -> AudioStream:
 	var stream := _stream_for(id)
 	if stream is AudioStreamWAV:
 		var wav := stream as AudioStreamWAV
@@ -90,8 +117,7 @@ func _make_loop_player(id: StringName) -> AudioStreamPlayer:
 		wav.loop_begin = 0
 		# 샘플 수. 포맷(비트수·채널)에 기대지 않으려고 길이×샘플레이트로 센다.
 		wav.loop_end = int(wav.get_length() * wav.mix_rate)
-	player.stream = stream
-	return player
+	return stream
 
 
 ## 효과음 재생. 없는 id를 넘기면 조용히 무시한다 — 소리 하나 빠졌다고
@@ -126,6 +152,9 @@ func _free_voice() -> AudioStreamPlayer:
 
 ## 본편 진입 시 호출한다(floor_manager). 타이틀·엔딩에서는 울리지 않는다.
 func start_music() -> void:
+	# 프롤로그 테마가 남아 있으면 걷는다. 인트로가 스스로 끄지만, 건너뛰기나
+	# 게임오버 재시도처럼 그 경로를 안 지나는 진입도 있다.
+	stop_theme()
 	if _music_on:
 		return
 	_music_on = true
@@ -187,23 +216,64 @@ func _process(delta: float) -> void:
 	_fade(_ambience, AMBIENCE_DUCK_DB if should_chase else AMBIENCE_DB)
 
 
+# ── 타이틀·프롤로그 테마 (#606) ──────────────────────────────────
+
+## 테마를 튼다. 다른 테마가 울리고 있으면 크로스페이드한다. 같은 곡을 다시
+## 부르면 아무것도 안 한다 — 처음부터 다시 나면 끊긴 것처럼 들린다.
+func play_theme(id: StringName) -> void:
+	if id == _theme_id:
+		return
+	var stream := _loop_stream(id)
+	if stream == null:
+		return
+
+	_release_theme(_theme_players[_theme_index])
+	_theme_index = (_theme_index + 1) % _theme_players.size()
+	_theme_id = id
+
+	var player := _theme_players[_theme_index]
+	# 이 플레이어가 직전 크로스페이드에서 아직 사라지는 중일 수 있다. 그 정지
+	# 트윈을 걷어내지 않으면 방금 튼 곡을 멈춰 버린다.
+	_kill_fade(player)
+	player.stop()
+	player.stream = stream
+	player.volume_db = MUSIC_SILENT_DB
+	player.play()
+	_fade(player, THEME_DB.get(String(id), -12.0), THEME_FADE)
+
+
+func stop_theme() -> void:
+	if _theme_id == &"":
+		return
+	_theme_id = &""
+	_release_theme(_theme_players[_theme_index])
+
+
+func _release_theme(player: AudioStreamPlayer) -> void:
+	if not player.playing:
+		return
+	var tween := _fade(player, MUSIC_SILENT_DB, THEME_FADE)
+	tween.tween_callback(player.stop)
+
+
 ## 진행 중이던 페이드는 버리고 새로 건다. 두 트윈이 같은 volume_db를 두고
 ## 다투면 음량이 튄다.
-func _fade(player: AudioStreamPlayer, target_db: float) -> Tween:
+func _fade(player: AudioStreamPlayer, target_db: float,
+		seconds: float = MUSIC_FADE) -> Tween:
 	if player == null:
 		return null
 
-	var previous: Tween = _ambience_tween if player == _ambience else _chase_tween
+	_kill_fade(player)
+	var tween := create_tween()
+	tween.tween_property(player, "volume_db", target_db, seconds)
+	_tweens[player] = tween
+	return tween
+
+
+func _kill_fade(player: AudioStreamPlayer) -> void:
+	var previous: Tween = _tweens.get(player, null)
 	if previous != null and previous.is_valid():
 		previous.kill()
-
-	var tween := create_tween()
-	tween.tween_property(player, "volume_db", target_db, MUSIC_FADE)
-	if player == _ambience:
-		_ambience_tween = tween
-	else:
-		_chase_tween = tween
-	return tween
 
 
 ## 파일은 처음 쓸 때 한 번만 읽고 캐시한다. 실패해도 캐시에 null을 넣어
