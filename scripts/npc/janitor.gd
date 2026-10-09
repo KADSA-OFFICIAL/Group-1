@@ -130,6 +130,9 @@ const SPRITE_OFFSET_Y := -24.0   # 발끝을 충돌 캡슐 바닥(y=15)에 맞�
 # 못 듣는 상황에서도 단서가 남게 한다.
 const STEP_INTERVAL_PATROL := 0.52   # 느릿느릿(기획서 5장)
 const STEP_INTERVAL_CHASE := 0.30
+## 걸음 간격을 이 비율 안에서 흔든다(#611). 사람 걸음은 박자가 조금씩 어긋난다 —
+## 정확히 같은 간격이면 소리를 아무리 바꿔도 기계가 걷는다.
+const STEP_TIMING_JITTER := 0.06
 const STEPS_PER_JINGLE := 4          # 몇 걸음마다 열쇠꾸러미가 찰랑이는가
 const MOVING_SPEED_EPSILON := 10.0   # 이보다 느리면 멈춘 것으로 본다
 
@@ -861,7 +864,11 @@ func _update_footsteps(delta: float, chasing: bool) -> void:
 	if step_timer > 0.0:
 		return
 
-	step_timer = STEP_INTERVAL_CHASE if chasing else STEP_INTERVAL_PATROL
+	var interval := STEP_INTERVAL_CHASE if chasing else STEP_INTERVAL_PATROL
+	step_timer = interval * randf_range(1.0 - STEP_TIMING_JITTER, 1.0 + STEP_TIMING_JITTER)
+	# 걸음마다 다른 변형·음높이(#611). 같은 파일을 되풀이하면 "뽁뽁뽁뽁"이다.
+	step_sound.stream = Sfx.variant(&"janitor_step")
+	step_sound.pitch_scale = Sfx.variant_pitch()
 	step_sound.play()
 
 	step_count += 1

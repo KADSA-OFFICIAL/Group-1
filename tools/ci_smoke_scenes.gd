@@ -55,6 +55,7 @@ func _run() -> void:
 		await _check_floor(fl)
 	# 테마는 본편 씬보다 먼저 본다 — main.tscn을 띄우면 start_music이 테마를 걷는다.
 	await _check_themes()
+	_check_variants()
 	await _check_intro()
 	await _check_subtitle_queue()
 	await _check_artroom_intro()
@@ -204,6 +205,34 @@ func _check_themes() -> void:
 		_ok("본편 진입 시 테마 정지")
 	sfx.call("stop_music")
 	await _wait(0.1)
+
+
+## 소리 변형(#611) — 수위 발소리가 같은 파일을 연달아 쓰지 않고 넷을 고루 쓰는가.
+func _check_variants() -> void:
+	var sfx: Node = root.get_node_or_null("Sfx")
+	if sfx == null:
+		_fault("변형: Sfx autoload가 없다")
+		return
+	var seen := {}
+	var previous: AudioStream = null
+	for i in 40:
+		var stream: AudioStream = sfx.call("variant", &"janitor_step")
+		if stream == null:
+			_fault("변형: janitor_step 변형을 못 읽었다")
+			return
+		if stream == previous:
+			_fault("변형: 같은 발소리가 연달아 나왔다(%s)" % stream.resource_path)
+			return
+		previous = stream
+		seen[stream.resource_path] = true
+	if seen.size() != 4:
+		_fault("변형: 발소리 변형 4개 중 %d개만 나왔다" % seen.size())
+		return
+	var plain: AudioStream = sfx.call("variant", &"pickup")
+	if plain == null or not plain.resource_path.ends_with("pickup.wav"):
+		_fault("변형: 변형이 없는 소리(pickup)가 그대로 안 나온다")
+		return
+	_ok("발소리 변형")
 
 
 ## 지금 테마가 id이고 그 곡을 실제로 틀고 있는가. 틀고 있는 플레이어를 돌려준다.
