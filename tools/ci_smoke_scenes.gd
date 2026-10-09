@@ -584,6 +584,48 @@ func _check_artroom_intro() -> void:
 		else:
 			_ok("컷신 걷기 뒤 대기 포즈·조작 복귀")
 
+	# ── 창문 컷신이 대사 끝에 맞춰 넘어가는지(#618) ───────────────
+	# 예전에는 줄당 2.6초를 **고정으로** 기다려, 자막이 빨라진 뒤(#514·#563·#569)
+	# 마지막 줄이 사라지고도 6초를 빈 화면으로 기다렸다. 반대로 짧으면 대사를
+	# 자르고 페이드한다. 자막 대기열이 빈 순간과 층 전환이 시작된 순간을 잰다.
+	var hud: Node = get_first_node_in_group("hud")
+	if win == null or hud == null or player == null:
+		_fault("창문 컷신: 창문(%s)·HUD(%s)·플레이어(%s)를 못 찾았다" % [win, hud, player])
+	else:
+		# 앞 단계의 자막(국어책 등)이 다 빠진 뒤에 시작해야 창문 대사만 잰다.
+		await _until(func() -> bool: return not bool(hud.get("_draining")), 20.0)
+		win.call("interact", player)
+		var t0 := Time.get_ticks_msec()
+		var drained_at := -1
+		var travel_at := -1
+		var draining_at_travel := false
+		# 대사는 카메라 이동·창틀까지 걷기가 끝난 뒤에 나온다 — 그 전의 "빈 대기열"을
+		# 끝으로 세면 안 되므로 한 번 배출이 시작된 뒤부터 본다.
+		var saw_draining := false
+		while Time.get_ticks_msec() - t0 < 40000:
+			await process_frame
+			var now := Time.get_ticks_msec()
+			var draining := bool(hud.get("_draining"))
+			if draining:
+				saw_draining = true
+			elif saw_draining and drained_at < 0:
+				drained_at = now
+			if bool(main.get("changing_floor")):
+				travel_at = now
+				draining_at_travel = bool(hud.get("_draining"))
+				break
+		if travel_at < 0:
+			_fault("창문 컷신: 40초가 지나도 층 전환이 시작되지 않는다")
+		elif draining_at_travel or drained_at < 0:
+			_fault("창문 컷신: 대사가 다 나오기 전에 층을 넘긴다 (%.1f초)"
+				% ((travel_at - t0) / 1000.0))
+		elif travel_at - drained_at > 1000:
+			_fault("창문 컷신: 대사가 끝나고 %.1f초를 빈 화면으로 기다린다"
+				% ((travel_at - drained_at) / 1000.0))
+		else:
+			_ok("창문 컷신: 대사 끝 %.2f초 뒤 전환 (전체 %.1f초)"
+				% [(travel_at - drained_at) / 1000.0, (travel_at - t0) / 1000.0])
+
 	main.free()
 	await process_frame
 

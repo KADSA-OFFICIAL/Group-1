@@ -40,9 +40,6 @@ extends Area2D
 @export var cutscene_zoom: float = 1.9
 ## 이설이 창틀 앞까지 걸어가는 데 걸리는 시간(초).
 @export var cutscene_step_seconds: float = 0.9
-## 대사 한 줄에 주는 시간. HUD 대기열(#454)이 줄 사이를 알아서 벌리므로
-## 여기서는 **전체가 끝날 때까지** 기다릴 시간만 잡는다.
-@export var cutscene_line_seconds: float = 2.6
 ## 창밖으로 사라지는 데 걸리는 시간(초).
 @export var cutscene_vanish_seconds: float = 0.8
 ## 걷기 그림을 굴릴 속도(px/초, #594). **시간으로 굴리는 이유**: 창틀까지는 한
@@ -154,9 +151,12 @@ func _play_cutscene(game_state) -> void:
 		await create_tween().tween_property(body, "modulate:a", 0.0,
 			cutscene_vanish_seconds).finished
 
-	# 대사가 다 흐를 때까지 기다린 뒤 넘긴다.
-	await get_tree().create_timer(
-		cutscene_line_seconds * float(cutscene_lines.size())).timeout
+	# 대사가 다 흐를 때까지 기다린 뒤 넘긴다. **고정 시간으로 잡지 않는다**(#471, #618) —
+	# 줄당 2.6초로 잡았더니 자막이 빨라진 뒤(#514·#563·#569) 마지막 줄이 사라지고도
+	# 6초를 빈 화면으로 기다렸다. 짧게 잡으면 반대로 대사를 자르고 페이드한다.
+	var hud := get_tree().get_first_node_in_group("hud")
+	if hud != null and hud.has_method("await_speech_drained"):
+		await hud.call("await_speech_drained")
 
 	# 카메라와 그림을 되돌려 둔다 — 다음 층에 그대로 들고 간다.
 	if cam != null:
