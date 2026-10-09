@@ -30,6 +30,16 @@ const VOLUMES := {
 	"ui_click": -14.0,
 }
 
+## 같은 소리의 변형(#611). 하나를 고정 간격으로 되풀이하면 메트로놈처럼
+## 들린다 — 수위 발소리가 "뽁뽁뽁뽁"이던 이유의 절반이다. play()와 variant()가
+## 이 중 하나를 고르되 바로 앞에 쓴 것은 피한다. 파일은 gen_sfx.py가 굽는다.
+const VARIANTS := {
+	"janitor_step": ["janitor_step", "janitor_step_2", "janitor_step_3", "janitor_step_4"],
+}
+## 변형이 있는 소리는 재생할 때마다 음높이도 이 비율 안에서 흔든다.
+## ±5%였을 때 걸음마다 음높이가 들쭉날쭉해 가볍게 들렸다 — 무게는 일정해야 한다.
+const VARIANT_PITCH_JITTER := 0.025
+
 ## 동시 발음 수. 이보다 많이 겹치면 가장 오래된 것을 끊는다. 조사·획득이
 ## 연달아 눌릴 때 플레이어를 매번 새로 만들지 않으려고 미리 잡아 둔다.
 const VOICES := 8
@@ -62,6 +72,7 @@ const THEME_FADE := 1.6
 var _streams: Dictionary = {}
 var _players: Array[AudioStreamPlayer] = []
 var _next_voice: int = 0
+var _last_variant: Dictionary = {}
 
 var _ambience: AudioStreamPlayer = null
 var _chase: AudioStreamPlayer = null
@@ -123,14 +134,36 @@ func _loop_stream(id: StringName) -> AudioStream:
 ## 효과음 재생. 없는 id를 넘기면 조용히 무시한다 — 소리 하나 빠졌다고
 ## 게임이 죽으면 안 된다.
 func play(id: StringName) -> void:
-	var stream := _stream_for(id)
+	var stream := variant(id)
 	if stream == null:
 		return
 
 	var player := _free_voice()
 	player.stream = stream
 	player.volume_db = VOLUMES.get(String(id), -10.0)
+	# 보이스를 돌려 쓰므로 변형이 없는 소리는 음높이를 되돌려 놓아야 한다.
+	player.pitch_scale = variant_pitch() if VARIANTS.has(String(id)) else 1.0
 	player.play()
+
+
+## id의 변형 중 하나. 변형이 없으면 그 소리 자체다. 위치가 있는 소리(수위의
+## StepSound)도 이걸 거쳐 같은 변형을 쓴다.
+func variant(id: StringName) -> AudioStream:
+	var names: Array = VARIANTS.get(String(id), [])
+	if names.is_empty():
+		return _stream_for(id)
+	if names.size() == 1:
+		return _stream_for(StringName(names[0]))
+	var last: int = _last_variant.get(id, -1)
+	var pick := randi() % names.size()
+	if pick == last:
+		pick = (pick + 1 + randi() % (names.size() - 1)) % names.size()
+	_last_variant[id] = pick
+	return _stream_for(StringName(names[pick]))
+
+
+func variant_pitch() -> float:
+	return randf_range(1.0 - VARIANT_PITCH_JITTER, 1.0 + VARIANT_PITCH_JITTER)
 
 
 ## 놀고 있는 보이스를 먼저 쓴다. 재생 중인 플레이어에 stream을 갈아 끼우면
