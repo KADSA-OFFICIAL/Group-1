@@ -37,7 +37,8 @@ const VARIANTS := {
 	"janitor_step": ["janitor_step", "janitor_step_2", "janitor_step_3", "janitor_step_4"],
 }
 ## 변형이 있는 소리는 재생할 때마다 음높이도 이 비율 안에서 흔든다.
-const VARIANT_PITCH_JITTER := 0.05
+## ±5%였을 때 걸음마다 음높이가 들쭉날쭉해 가볍게 들렸다 — 무게는 일정해야 한다.
+const VARIANT_PITCH_JITTER := 0.025
 
 ## 동시 발음 수. 이보다 많이 겹치면 가장 오래된 것을 끊는다. 조사·획득이
 ## 연달아 눌릴 때 플레이어를 매번 새로 만들지 않으려고 미리 잡아 둔다.

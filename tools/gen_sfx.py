@@ -202,54 +202,67 @@ def offset(samples: list[float], seconds: float) -> list[float]:
 
 def footstep(seed: int, heel: float, toe_delay: float, click_hz: float,
              toe_weight: float) -> list[float]:
-    """구두 한 걸음 — 뒤꿈치 착지 → 앞꿈치 스침 + 복도 반사음.
+    """구두 한 걸음 — 뒤꿈치 착지 → 앞꿈치 내려앉음 + 복도 반사음.
 
-    느리게 걷는 어른은 뒤꿈치가 먼저 딱 닿고 60~90ms 뒤 앞꿈치가 내려앉는다.
-    두 타격이 한 덩어리로 붙어 있으면 공이 튀는 소리(뽁)로 들리고, 갈라져 있어야
-    발로 읽힌다. 뒤꿈치는 고역 딸깍 + 바닥 울림 + 몸무게(저역), 앞꿈치는 그보다
-    약하고 무디다. 마지막으로 빈 복도의 짧은 반사를 얹는다 — 마른 소리만 있으면
-    방음실 바닥을 두드리는 것처럼 들린다.
+    수위는 몸이 무거운 중년 남자가 밤에 느릿느릿 도는 것이다. 무게는 **소리의
+    대역과 길이**가 정한다:
+
+    - 굽 딸깍은 낮고(1.1~1.5kHz) 작게. 2.5~3kHz로 또렷하게 냈더니 구두굽이
+      또각거리는 가벼운 걸음이 됐다(사용자: "너무 경박해").
+    - 바닥 둔탁함(160Hz)과 몸무게(90Hz)를 길게. 둔탁함은 노트북 스피커가 내는
+      대역 안에 둔다 — 90Hz만 키우면 작은 스피커에서는 사라지고 딸깍만 남는다.
+    - 뒤꿈치 → 앞꿈치를 90~110ms로 벌린다. 발을 굴리는 시간이 길수록 무겁다.
+      붙어 있으면 공이 튀는 소리(뽁)다.
+    - 복도 반사는 어둡고(1.4kHz 저역 통과) 조금 길게. 빈 건물이 소리를 먹는다.
+
+    음정 있는 발진기는 쓰지 않는다(#611 — 예전 "뽁"의 원인).
     """
     noise = Noise(seed=seed)
     dry = mix(
-        # 뒤꿈치: 딱딱한 굽이 닿는 딸깍
-        gain(hit(noise, 0.05, 0.0008, 0.007, "band", click_hz, 1.3), 0.55 * heel),
-        # 뒤꿈치: 바닥이 받는 둔탁함
-        gain(hit(noise, 0.09, 0.0015, 0.020, "band", 210.0, 1.8), 1.30 * heel),
-        # 몸무게 — 가장 낮은 대역
-        gain(hit(noise, 0.12, 0.004, 0.030, "low", 120.0, 0.7), 0.90 * heel),
-        # 앞꿈치: 밑창이 내려앉는 소리. 굽보다 약하고 무디다.
-        offset(gain(hit(noise, 0.10, 0.006, 0.028, "band", 950.0, 0.9),
-                    0.42 * toe_weight), toe_delay),
-        offset(gain(hit(noise, 0.08, 0.004, 0.022, "band", 300.0, 1.4),
-                    0.55 * toe_weight), toe_delay),
-        # 밑창이 바닥 먼지를 긁는 스침 — 두 타격 사이를 잇는다.
-        gain(hit(noise, toe_delay + 0.06, 0.03, 0.035, "high", 3800.0, 0.7), 0.10),
+        # 뒤꿈치: 굽이 닿는 소리. 무디게, 작게.
+        gain(hit(noise, 0.05, 0.0015, 0.008, "band", click_hz, 1.0), 0.22 * heel),
+        # 뒤꿈치: 바닥이 받는 둔탁함 — 이 소리의 몸통.
+        gain(hit(noise, 0.16, 0.003, 0.040, "band", 160.0, 1.1), 1.70 * heel),
+        # 몸무게 — 가장 낮은 대역, 가장 길게.
+        gain(hit(noise, 0.20, 0.006, 0.055, "low", 90.0, 0.7), 1.30 * heel),
+        # 앞꿈치: 밑창이 내려앉는 소리. 뒤꿈치보다 약하고 더 무디다.
+        offset(gain(hit(noise, 0.10, 0.008, 0.030, "band", 520.0, 0.9),
+                    0.22 * toe_weight), toe_delay),
+        offset(gain(hit(noise, 0.14, 0.006, 0.035, "band", 150.0, 1.1),
+                    0.80 * toe_weight), toe_delay),
+        # 밑창이 바닥을 스치는 소리 — 두 타격 사이를 잇는다. 아주 작게.
+        gain(hit(noise, toe_delay + 0.06, 0.04, 0.040, "high", 2400.0, 0.7), 0.04),
     )
 
     # 복도 반사. 간격을 고르게 두면 금속성 울림(콤 필터)이 되므로 서로소에 가깝게
     # 흩는다. 반사는 벽이 고역을 먹으므로 저역 통과를 건다.
-    reflections = [0.0] * (len(dry) + int(RATE * 0.16))
-    for delay, amount in ((0.019, 0.30), (0.033, 0.22), (0.052, 0.16),
-                          (0.077, 0.11), (0.101, 0.07), (0.139, 0.04)):
+    reflections = [0.0] * (len(dry) + int(RATE * 0.22))
+    for delay, amount in ((0.023, 0.32), (0.041, 0.25), (0.067, 0.19),
+                          (0.097, 0.14), (0.131, 0.09), (0.173, 0.05),
+                          (0.211, 0.03)):
         start = int(RATE * delay)
         for i, value in enumerate(dry):
             reflections[start + i] += value * amount
-    # 예전 발소리(피크 0.58)와 크기를 맞춘다. StepSound의 volume_db(-4)와 거리
-    # 감쇠는 그 크기를 기준으로 맞춰 둔 값이다.
-    return gain(mix(dry, biquad(reflections, "low", 2400.0, 0.7)), FOOTSTEP_LEVEL)
+    # 피크를 직접 맞춘다. 저역 노이즈는 시드마다 세기가 크게 흔들려서(같은
+    # 이득으로 0.45~0.88) 변형끼리 한 걸음만 쿵 튀었다. 왼발/오른발 차이는
+    # heel로만 낸다. 기준은 예전 발소리(피크 0.58) 언저리 — StepSound의
+    # volume_db(-4)와 거리 감쇠가 그 크기에 맞춰져 있다.
+    out = mix(dry, biquad(reflections, "low", 1400.0, 0.7))
+    peak = max(abs(value) for value in out)
+    return gain(out, FOOTSTEP_PEAK * heel / peak)
 
 
-FOOTSTEP_LEVEL = 1.9
+FOOTSTEP_PEAK = 0.62
 
 # 발소리 변형(#611). 같은 파일을 0.52초마다 되풀이하면 메트로놈이다 —
-# 왼발(1·3)은 무겁고 앞꿈치가 늦게, 오른발(2·4)은 조금 가볍고 밝게 둔다.
-# 재생 쪽(sound_manager.STEP_VARIANTS)이 번갈아 고르고 음높이도 흔든다.
+# 왼발(1·3)은 무겁고 앞꿈치가 늦게, 오른발(2·4)은 조금 가볍게 둔다. 차이는
+# 작게 — 크게 벌리면 절뚝이는 걸음이 된다.
+# 재생 쪽(sound_manager.VARIANTS)이 번갈아 고르고 음높이도 흔든다.
 JANITOR_STEPS = {
-    "janitor_step":   dict(seed=61101, heel=1.00, toe_delay=0.074, click_hz=2700.0, toe_weight=1.00),
-    "janitor_step_2": dict(seed=61102, heel=0.90, toe_delay=0.063, click_hz=3100.0, toe_weight=0.85),
-    "janitor_step_3": dict(seed=61103, heel=1.00, toe_delay=0.081, click_hz=2500.0, toe_weight=0.95),
-    "janitor_step_4": dict(seed=61104, heel=0.86, toe_delay=0.068, click_hz=2900.0, toe_weight=0.80),
+    "janitor_step":   dict(seed=61101, heel=1.00, toe_delay=0.104, click_hz=1250.0, toe_weight=1.00),
+    "janitor_step_2": dict(seed=61102, heel=0.93, toe_delay=0.094, click_hz=1450.0, toe_weight=0.90),
+    "janitor_step_3": dict(seed=61103, heel=1.00, toe_delay=0.110, click_hz=1150.0, toe_weight=0.95),
+    "janitor_step_4": dict(seed=61104, heel=0.91, toe_delay=0.098, click_hz=1350.0, toe_weight=0.88),
 }
 
 
