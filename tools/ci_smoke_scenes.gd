@@ -22,6 +22,7 @@ extends SceneTree
 const DOOR_FLOORS := [1, 2, 3, 4]
 const MAIN := "res://scenes/main/main.tscn"
 const INTRO := "res://scenes/ui/intro.tscn"
+const MENU := "res://scenes/ui/main_menu.tscn"
 const INK := "res://scenes/items/ink_projectile.tscn"
 ## 문을 열고 닫는 데 주는 시간. `sliding_door.gd`의 `open_time`보다 넉넉해야 한다.
 const DOOR_SETTLE := 0.6
@@ -52,6 +53,8 @@ func _run() -> void:
 	await process_frame
 	for fl in DOOR_FLOORS:
 		await _check_floor(fl)
+	# 테마는 본편 씬보다 먼저 본다 — main.tscn을 띄우면 start_music이 테마를 걷는다.
+	await _check_themes()
 	await _check_intro()
 	await _check_subtitle_queue()
 	await _check_artroom_intro()
@@ -162,6 +165,62 @@ func _polygon_of(body: Node) -> CollisionPolygon2D:
 		if c is CollisionPolygon2D:
 			return c as CollisionPolygon2D
 	return null
+
+
+## 타이틀·프롤로그 테마(#606) — 화면마다 제 곡이 울리고, 바뀔 때 앞 곡이
+## 사라지고, 본편(start_music)이 테마를 걷어 가는가.
+func _check_themes() -> void:
+	var sfx: Node = root.get_node_or_null("Sfx")
+	if sfx == null:
+		_fault("테마: Sfx autoload가 없다")
+		return
+	var fade: float = sfx.get_script().get_script_constant_map().get("THEME_FADE", 1.6)
+
+	var menu: Node = (load(MENU) as PackedScene).instantiate()
+	root.add_child(menu)
+	await process_frame
+	var title_player: AudioStreamPlayer = _expect_theme(sfx, &"title", "타이틀")
+	menu.free()
+
+	var intro: Node = (load(INTRO) as PackedScene).instantiate()
+	root.add_child(intro)
+	await process_frame
+	var prologue_player: AudioStreamPlayer = _expect_theme(sfx, &"prologue", "프롤로그")
+	if title_player != null and title_player == prologue_player:
+		_fault("테마: 타이틀과 프롤로그가 같은 플레이어다(크로스페이드가 아니라 갈아 끼움)")
+	await _wait(fade + 0.3)
+	if title_player != null and title_player.playing:
+		_fault("테마: 프롤로그로 넘어간 뒤에도 타이틀 곡이 멈추지 않았다")
+	else:
+		_ok("테마 크로스페이드 후 앞 곡 정지")
+	intro.free()
+
+	# 본편 진입 — 건너뛰기처럼 인트로가 stop_theme을 안 부른 경로도 덮는가.
+	sfx.call("start_music")
+	await _wait(fade + 0.3)
+	if prologue_player != null and prologue_player.playing:
+		_fault("테마: start_music 뒤에도 프롤로그 곡이 울린다")
+	else:
+		_ok("본편 진입 시 테마 정지")
+	sfx.call("stop_music")
+	await _wait(0.1)
+
+
+## 지금 테마가 id이고 그 곡을 실제로 틀고 있는가. 틀고 있는 플레이어를 돌려준다.
+func _expect_theme(sfx: Node, id: StringName, label: String) -> AudioStreamPlayer:
+	if StringName(sfx.get("_theme_id")) != id:
+		_fault("테마: %s 화면인데 현재 테마가 '%s'다" % [label, sfx.get("_theme_id")])
+		return null
+	var players: Array = sfx.get("_theme_players")
+	var player := players[int(sfx.get("_theme_index"))] as AudioStreamPlayer
+	if player.stream == null or not player.stream.resource_path.ends_with("%s.wav" % id):
+		_fault("테마: %s 플레이어에 %s.wav가 안 물려 있다" % [label, id])
+		return null
+	if not player.playing:
+		_fault("테마: %s 곡이 재생 중이 아니다" % label)
+		return null
+	_ok("테마 %s" % label)
+	return player
 
 
 ## 프롤로그 — 건너뛰기 버튼이 살아 있는가(#231).
