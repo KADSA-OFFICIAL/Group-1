@@ -153,8 +153,38 @@ func _check_floor(fl: int) -> void:
 			_fault("floor%d %s: 닫았는데 충돌이 꺼져 있다" % [fl, sample.name])
 		_ok("floor%d %s 여닫기" % [fl, sample.name])
 
+		# 수위가 지나가면 문은 열리되 **전역 효과음은 안 난다**(#609).
+		# Sfx는 위치가 없어 층 반대편에서 지나가도 바로 옆처럼 들렸다.
+		await _wait(0.6)   # 위 여닫이 소리가 끝나길 기다린다
+		var before := _sfx_voices_playing()
+		var fake := CharacterBody2D.new()
+		fake.add_to_group("janitor")
+		node.add_child(fake)
+		sample.call("_on_body_entered", fake)
+		await process_frame
+		if _sfx_voices_playing() > before:
+			_fault("floor%d %s: 수위가 문에 들어오자 전역 효과음이 울렸다(#609)"
+				% [fl, sample.name])
+		await _wait(DOOR_SETTLE)
+		if not panel0.position.is_equal_approx(want):
+			_fault("floor%d %s: 수위가 들어왔는데 문이 안 열렸다" % [fl, sample.name])
+		sample.call("_on_body_exited", fake)
+		fake.free()
+		_ok("floor%d %s 수위 통과 무음" % [fl, sample.name])
+
 	node.free()
 	await process_frame
+
+
+func _sfx_voices_playing() -> int:
+	var sfx: Node = root.get_node_or_null("Sfx")
+	if sfx == null:
+		return 0
+	var count := 0
+	for p in sfx.get("_players"):
+		if (p as AudioStreamPlayer).playing:
+			count += 1
+	return count
 
 
 func _polygon_of(body: Node) -> CollisionPolygon2D:
