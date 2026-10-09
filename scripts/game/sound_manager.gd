@@ -69,6 +69,15 @@ const THEME_DB := {
 ## 페이드인(0.5초)이 이어지는 동안 바뀌도록 그보다 조금 길게 잡았다.
 const THEME_FADE := 1.6
 
+# ── 종료 (#615) ──────────────────────────────────────────────────
+## 창을 닫을 때 소리를 끄고 이만큼 기다린 뒤 끝낸다. 재생 중인 채로 끝내면
+## 오디오 서버가 재생 상태를 정리하기 전에 엔진이 내려가 AudioStreamWAV·
+## AudioStreamPlaybackWAV가 `ObjectDB instances leaked at exit`로 남았다(루프
+## 음악은 늘 재생 중이라 매번). stop()만으로는 안 된다 — 정리는 오디오 스레드가
+## 다음 믹스에서 하므로 그 한 번을 기다려야 한다(실측: 바로 끝내면 5/5회 누수,
+## 0.1초 기다리면 0/5회).
+const QUIT_AUDIO_DRAIN := 0.1
+
 var _streams: Dictionary = {}
 var _players: Array[AudioStreamPlayer] = []
 var _next_voice: int = 0
@@ -92,6 +101,8 @@ var _theme_id: StringName = &""
 func _ready() -> void:
 	# autoload는 씬 트리 전환의 영향을 받지 않지만, 일시정지에도 멈추지 않게 둔다.
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	# 창 닫기를 엔진이 바로 받지 않고 여기서 소리를 정리한 뒤 끝낸다(#615).
+	get_tree().auto_accept_quit = false
 
 	for i in VOICES:
 		var player := AudioStreamPlayer.new()
@@ -247,6 +258,29 @@ func _process(delta: float) -> void:
 	_chase_active = should_chase
 	_fade(_chase, CHASE_DB if should_chase else MUSIC_SILENT_DB)
 	_fade(_ambience, AMBIENCE_DUCK_DB if should_chase else AMBIENCE_DB)
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_WM_CLOSE_REQUEST:
+		quit_cleanly()
+
+
+## 소리를 전부 끄고 오디오 서버가 정리할 틈을 준 뒤 끝낸다(#615).
+## 게임을 끄는 길은 이것 하나로 둔다 — get_tree().quit()을 직접 부르면 누수가 돌아온다.
+##
+## **여기 것만 끄면 모자란다.** 수위의 발소리·열쇠·문 소리는 janitor.tscn의
+## AudioStreamPlayer2D라 Sfx 밖에 있다 — 그것만 남아도 한 쌍이 샌다(실측).
+## 그래서 트리 전체에서 찾는다.
+func quit_cleanly() -> void:
+	# owned=false — 여기 플레이어들은 런타임에 만들어 owner가 없다.
+	var root := get_tree().root
+	for player in root.find_children("*", "AudioStreamPlayer", true, false):
+		_kill_fade(player)
+		(player as AudioStreamPlayer).stop()
+	for player in root.find_children("*", "AudioStreamPlayer2D", true, false):
+		(player as AudioStreamPlayer2D).stop()
+	await get_tree().create_timer(QUIT_AUDIO_DRAIN).timeout
+	get_tree().quit()
 
 
 # ── 타이틀·프롤로그 테마 (#606) ──────────────────────────────────
