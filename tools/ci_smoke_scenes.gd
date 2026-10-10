@@ -377,6 +377,9 @@ func _check_intro() -> void:
 		# 포커스를 받으면 스페이스·엔터가 대사 넘기기 대신 버튼을 누른다.
 		if skip.focus_mode != Control.FOCUS_NONE:
 			_fault("intro: SkipButton의 focus_mode가 FOCUS_NONE이 아니다")
+		# 배포 빌드에서도 보여야 한다(#639) — 예전에는 OS.is_debug_build()로 숨겼다.
+		if not skip.visible:
+			_fault("intro: SkipButton이 숨어 있다")
 		_ok("intro SkipButton")
 	node.free()
 	await process_frame
@@ -946,11 +949,24 @@ func _check_ending_result() -> void:
 		for line: Array in sc["lines"]:
 			if String(line[1]).begins_with("알아낸 것"):
 				_fault("엔딩 결과: 점수 줄이 아직 컷신 자막에 붙어 있다(결과 화면과 중복)")
-	ending.call("_finish")
+	# 건너뛰기(#639) — 버튼이 살아 있고(포커스는 안 받음), Esc로 결과 화면에 간다.
+	# 끝까지 본 경우도 같은 `_finish()`를 지나므로 이것으로 둘 다 본다.
+	var eskip := ending.get_node_or_null("SkipButton") as Button
+	if eskip == null:
+		_fault("엔딩: SkipButton이 없다")
+	else:
+		if eskip.pressed.get_connections().is_empty():
+			_fault("엔딩: SkipButton의 pressed가 아무 데도 연결돼 있지 않다")
+		if eskip.focus_mode != Control.FOCUS_NONE:
+			_fault("엔딩: SkipButton의 focus_mode가 FOCUS_NONE이 아니다")
+		if not eskip.visible:
+			_fault("엔딩: SkipButton이 숨어 있다")
+		_ok("엔딩 SkipButton")
+	_press_cancel()
 	if not await _until(func() -> bool:
 			return current_scene != null \
 				and current_scene.scene_file_path == "res://scenes/ui/ending_result.tscn", 4.0):
-		_fault("엔딩 결과: 컷신이 끝났는데 결과 화면으로 안 넘어간다")
+		_fault("엔딩 결과: Esc로 건너뛰었는데 결과 화면으로 안 넘어간다")
 		await _drop_scenes(ending)
 		return
 	var result: Node = current_scene

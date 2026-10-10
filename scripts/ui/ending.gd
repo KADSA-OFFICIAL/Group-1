@@ -190,6 +190,7 @@ const SCENE_FADE_IN_SECONDS := 1.4
 @onready var scene_caption: Label = $SceneCaption
 @onready var dialogue: SubtitleDialogue = $Dialogue
 @onready var fade_rect: ColorRect = $FadeRect
+@onready var skip_button: Button = $SkipButton
 
 ## 이번 판에 재생할 장면 묶음. _ready에서 메타를 보고 고른다.
 var scenes: Array = BASIC_SCENES
@@ -211,7 +212,9 @@ func _ready() -> void:
 	_take_score()
 
 	fade_rect.color.a = 1.0
-	dialogue.apply_font(scene_caption)
+	# 장소 문구 글꼴은 씬에서 연성으로 준다(#639).
+	# 건너뛰기(#639) — 프롤로그와 같은 규약: 포커스를 안 받고 키보드는 Esc.
+	skip_button.pressed.connect(_on_skip_pressed)
 	_apply_scene()
 
 	var tween := create_tween()
@@ -220,6 +223,10 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel"):
+		_on_skip_pressed()
+		get_viewport().set_input_as_handled()
+		return
 	if transitioning or finished:
 		return
 	if not (event.is_action_pressed("interact") or event.is_action_pressed("ui_accept")):
@@ -299,6 +306,16 @@ func _next_scene() -> void:
 	tween.tween_callback(func() -> void:
 		transitioning = false
 		_next_line())
+
+
+## 남은 장면을 건너뛰고 결과 화면으로 간다(#639). 엔딩 종류·점수는 `_finish()`가
+## 그대로 넘기므로 끝까지 본 것과 결과 화면이 같다.
+func _on_skip_pressed() -> void:
+	if finished:
+		return
+	Sfx.play(&"ui_click")
+	skip_button.disabled = true
+	_finish()
 
 
 func _finish() -> void:
