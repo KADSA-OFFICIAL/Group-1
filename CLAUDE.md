@@ -12,7 +12,7 @@
 
 ### 씬 흐름
 
-main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scripts/ui/intro.gd`의 SCRIPT_NODES) → main(본편, **4층 미술실에서 시작** → 3층 → 1층 현관 → **운동장(0층)**) → ending → main_menu
+main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scripts/ui/intro.gd`의 SCRIPT_NODES) → main(본편, **4층 미술실에서 시작** → 3층 → 1층 현관 → **운동장(0층)**) → ending → ending_result(#636) → main_menu
 **미술실 장면은 자막이 아니라 조작 구간이다**(#405). 예전에는 `art_room`→`cabinet`→`next_room` 세 장면이 자막으로 흘러가 수위가 문 밖에서 말하는 것도, 캐비넷에 숨는 것도, 단서를 찾는 것도 **읽기만** 했다. 지금은 전부 플레이어가 직접 한다. **캐비넷 문틈의 송하람 학생증은 #407에서 걷어냈다** — 도입부의 훅은 준비실의 소지품 봉투와 날짜 벽이다.
 **프롤로그 장면 배경은 `SCRIPT_NODES`의 선택적 `background` 키다**(#430) — `assets/backgrounds/`의 그림을 `preload`로 물리고, `_apply_scene()`이 `SceneBackground`(TextureRect)에 끼운다. 키가 없는 장면은 검은 화면 그대로다 — **지금은 두 장면 다 그림이 있다**(`street`·`back_gate`, #433).
   - **배경이 있으면 장면 캡션(`SceneCaption`)을 감춘다.** 그림이 이미 장소를 말하는데 그 위에 "— 학교 뒷문 —"을 얹으면 같은 말을 두 번 하는 것이고 글자가 그림을 가린다. 캡션은 그림이 없는 장면의 장소 표시다.
@@ -334,7 +334,10 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
   - **쉬는 시간**(히든) — 실종 학생 **셋**을 전부 찾고(`found_imnayeon`·`found_jominhyuk`·`found_kangyujin`) 시우의 이야기를 전부 본 경우(`read_siwoo_counseling`·`read_siwoo_painting`·`read_janitor_notebook`). **히든이 신고보다 우선**한다 — 전부 아는 플레이어에게 신고 여부를 다시 묻는 것은 의미가 없다. 다섯이었다가 #407(송하람)·#413(백승호)에서 힌트를 지우며 셋이 됐다 — **힌트를 지우면 조건도 같이 줄여야 한다.** 안 그러면 얻을 수 없는 플래그가 조건에 남아 히든 엔딩이 영구히 닫힌다.
   - 판정은 `game_state.gd`의 `ending_kind(reported)`가 한다(플래그 옆이라 검사·수정이 쉽다). 상수 `ENDING_BASIC`/`ENDING_REPORT`/`ENDING_HIDDEN`과 `MISSING_FLAGS`/`SIWOO_FLAGS`/`COVERUP_FLAGS`가 조건을 쥔다.
   - **결과는 `SceneTree` 메타로 넘긴다**(`ending_kind`·`clue_score`). `GameState`는 씬 노드라 `change_scene_to_file()` 뒤에 사라진다 — 넘길 값이 문자열 하나뿐이라 오토로드를 새로 만들지 않았다. `ending.gd`가 읽고 **바로 지운다**(타이틀로 돌아간 뒤 남으면 다음 판이 오염된다). 메타가 없으면(에디터에서 `ending.tscn`만 실행) 기본 엔딩으로 떨어진다.
-  - 엔딩 끝에 "알아낸 것 N / 18"을 한 줄 붙인다(#407 송하람 -1, #413 백승호 -1, #411 도입부 플래그 +2). 엔딩이 셋뿐이라 그 사이가 안 보이기 때문이다. **`const`가 담은 Array는 참조**라 원본에 append하면 같은 프로세스에서 두 번째 클리어 때 줄이 쌓인다 — `duplicate(true)`로 복사한다.
+  - **컷신이 끝나면 결과 화면 "생존했다"로 간다**(#636, `scenes/ui/ending_result.tscn`). 게임 오버 화면과 같은 틀이다 — 동해독도 미색 제목 + 핏자국(1.5배), 붉은 엔딩 이름, "알아낸 것 N / 18"(#407 송하람 -1, #413 백승호 -1, #411 도입부 플래그 +2), 메뉴 스타일 버튼 "처음부터 다시하기"(체크포인트 삭제)·"타이틀로".
+    - 엔딩 종류·점수는 `ending.gd`가 전환 직전에 `EndingResultScreen.pending_kind`/`pending_score`(static)에 싣고, 결과 화면이 읽은 뒤 **바로 비운다**(`GameOverScreen.pending_reason`과 같은 방식). 점수가 없으면(에디터 단독 실행) 점수 줄을 숨긴다.
+    - "알아낸 것" 줄은 예전에 컷신 마지막 자막으로 붙였는데 결과 화면으로 **옮겼다** — 두 번 나오면 중복이다. 엔딩이 셋뿐이라 그 사이가 안 보여서 두는 줄이다.
+    - **`const`가 담은 Array는 참조**다 — 컷신 장면을 고칠 일이 있으면(`_apply_route`) 원본에 쓰지 말고 `duplicate(true)`로 복사한다. 안 그러면 같은 프로세스에서 두 번째 클리어 때 바뀐 것이 쌓인다.
   - 시우 그림 **재조사** 기믹은 되살리지 않았다(2026-07-28에 걷어낸 것). 기획서의 "시우 그림 재조사" 조건은 그림 플래그 보유로 대신한다.
 - **자막 읽는 시간은 `notice_seconds`(2.4) / `queued_notice_seconds`(1.0)다**(#514에서 3.0/1.4에서 줄였다). 한 줄의 표시 시간은 **타이핑 시간 + 이 값**이고 타이핑은 글자당 0.05초다 — 41자 한 줄이면 타이핑 2.05초가 전체의 3분의 2다. 여러 줄이 연달아 오면 뒤 줄이 한참 뒤에 떠서 이미 지나간 일을 말했다(사용자 보고). 네 줄 기준 17.1 → **15.1초**(실측). **더 줄이려면 타이핑 속도(`TYPING_SECONDS_PER_CHAR`)를 봐야 한다** — 그쪽은 읽는 방식 자체를 바꾸므로 값 하나로 끝나지 않는다.
 - **자막에는 대기열이 있다**(#454, `hud.gd::_show_subtitle`). 없던 시절에는 연달아 오는 대사가 서로를 **덮었다** — 이설이 머리를 보고 말하는 도중 수위 혼잣말이 끼어들자 그 줄이 통째로 사라졌다. 지금은 온 순서대로 한 줄씩 보여 준다. 뒤에 줄이 더 있으면 읽는 시간을 `queued_notice_seconds`(1.4초)로 줄인다 — 이어 말하는데 매 줄 `notice_seconds`(3초)씩 쉬면 대화가 아니라 안내문이 된다.
