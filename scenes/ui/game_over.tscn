@@ -1,7 +1,10 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/game_over.gd" id="1_game_over_script"]
-[ext_resource type="FontFile" path="res://assets/fonts/GriunXHangeul_DAHL-Rg.ttf" id="2_title_font"]
+[ext_resource type="FontFile" path="res://assets/fonts/EastSeaDokdo-Regular.ttf" id="2_title_font"]
+[ext_resource type="Theme" path="res://assets/ui/menu_button_theme.tres" id="3_button_theme"]
+[ext_resource type="Script" path="res://scripts/ui/menu_button.gd" id="4_menu_button"]
+[ext_resource type="Texture2D" path="res://assets/ui/blood_splatter.png" id="5_blood"]
 
 [node name="GameOver" type="Control"]
 layout_mode = 3
@@ -29,9 +32,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -320.0
-offset_top = -180.0
+offset_top = -250.0
 offset_right = 320.0
-offset_bottom = 180.0
+offset_bottom = 250.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 28
@@ -39,16 +42,33 @@ alignment = 1
 
 [node name="Title" type="Label" parent="Layout"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.61, 0.08, 0.08, 1)
+; 미색(#633) — 뒤에 핏자국이 깔리는데 붉은 글자면 피에 묻혀 안 읽힌다(일시정지 제목과 같은 색).
+theme_override_colors/font_color = Color(0.93, 0.9, 0.84, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
 theme_override_constants/outline_size = 10
 theme_override_constants/shadow_offset_x = 3
 theme_override_constants/shadow_offset_y = 5
 theme_override_fonts/font = ExtResource("2_title_font")
-theme_override_font_sizes/font_size = 96
+theme_override_font_sizes/font_size = 136
 text = "붙잡혔다"
 horizontal_alignment = 1
+
+[node name="BloodSplatter" type="TextureRect" parent="Layout/Title"]
+; 제목 뒤 핏자국(#633) — 일시정지 메뉴(#627)와 같은 그림을 1.5배(한 도트 3px)로
+; 키워 깐다. 제목이 그쪽보다 커서 그대로면 자국이 작아 보인다. 정수배가 아니면
+; 도트 크기가 들쭉날쭉해지므로 2px x 1.5 = 3px로 맞췄다.
+; show_behind_parent로 제목 글자 **뒤에** 그린다.
+show_behind_parent = true
+texture_filter = 1
+layout_mode = 0
+offset_left = 55.0
+offset_top = -158.0
+offset_right = 595.0
+offset_bottom = 154.0
+mouse_filter = 2
+texture = ExtResource("5_blood")
+expand_mode = 1
 
 [node name="MessageLabel" type="Label" parent="Layout"]
 layout_mode = 2
@@ -67,27 +87,36 @@ horizontal_alignment = 1
 ; 체크포인트 안내가 길어질 수 있다(#576) — 접히지 않으면 화면 밖으로 나간다.
 autowrap_mode = 2
 
-[node name="Buttons" type="HBoxContainer" parent="Layout"]
+[node name="Buttons" type="VBoxContainer" parent="Layout"]
+; 메뉴 버튼 스타일(#633) — 일시정지 메뉴와 같은 테마·스크립트. 고른 버튼 양옆으로
+; 선이 뻗어(글자 폭 + 약 170px) 가로로 두면 옆 버튼과 겹치므로 세로로 쌓는다.
 layout_mode = 2
-theme_override_constants/separation = 24
+theme = ExtResource("3_button_theme")
+theme_override_constants/separation = 14
 alignment = 1
 
 [node name="RetryButton" type="Button" parent="Layout/Buttons"]
-custom_minimum_size = Vector2(220, 56)
+custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 27
+script = ExtResource("4_menu_button")
 text = "다시 시작"
 
 [node name="RestartButton" type="Button" parent="Layout/Buttons"]
-custom_minimum_size = Vector2(220, 56)
+custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 27
+script = ExtResource("4_menu_button")
 text = "처음부터 다시하기"
 
 [node name="TitleButton" type="Button" parent="Layout/Buttons"]
-custom_minimum_size = Vector2(220, 56)
+custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 27
+script = ExtResource("4_menu_button")
 text = "타이틀로"
 
 [node name="Fade" type="ColorRect" parent="."]
