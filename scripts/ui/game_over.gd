@@ -41,6 +41,10 @@ func _ready() -> void:
 	retry_button.pressed.connect(_on_retry_pressed)
 	restart_button.pressed.connect(_on_restart_pressed)
 	title_button.pressed.connect(_on_title_pressed)
+	# 마우스를 올린 버튼이 포커스를 가져간다(#633) — 메뉴 버튼 테마는 포커스를 밝히고
+	# 양옆에 선을 긋는데, 안 그러면 키보드로 고른 것과 마우스 아래 것이 둘 다 밝다.
+	for b in [retry_button, restart_button, title_button]:
+		b.mouse_entered.connect(b.grab_focus)
 
 	if GameStateScript.has_checkpoint():
 		var cp := GameStateScript.get_checkpoint()
