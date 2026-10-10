@@ -72,16 +72,16 @@ var scene_tween: Tween = null
 func _ready() -> void:
 	fade_rect.color.a = 1.0
 	choice_panel.visible = false
-	dialogue.apply_font(scene_caption)
+	# 장소 문구 글꼴은 씬에서 연성으로 준다(#639) — 예전에는 자막과 같은 Noto Sans KR이었다.
 	_apply_scene()
 	# 타이틀 테마에서 크로스페이드(#606). 두 장면 내내 한 곡이다 — 장면마다
 	# 바꾸면 페이드 0.5초 사이에 음악이 끊겨 장면 전환보다 그게 더 들린다.
 	Sfx.play_theme(&"prologue")
 
-	# 테스트용 건너뛰기(#231) — 릴리스로 내보낸 빌드에서는 숨긴다.
+	# 건너뛰기(#231). 처음에는 테스트용이라 릴리스 빌드에서 숨겼는데 #639에서 늘 보이게
+	# 했다 — 두 번째 플레이부터 프롤로그를 다시 볼 이유가 없다.
 	# focus_mode는 씬에서 FOCUS_NONE이다. 포커스를 받으면 대사를 넘기려고
-	# 누른 Enter/Space가 버튼을 눌러 프롤로그가 통째로 날아간다.
-	skip_button.visible = OS.is_debug_build()
+	# 누른 Enter/Space가 버튼을 눌러 프롤로그가 통째로 날아간다. 그래서 키보드는 Esc다.
 	skip_button.pressed.connect(_on_skip_pressed)
 
 	scene_tween = create_tween()
@@ -90,6 +90,11 @@ func _ready() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	# Esc는 건너뛰기(#639) — 버튼이 포커스를 안 받으므로 키보드로 누를 길이 이것뿐이다.
+	if event.is_action_pressed("ui_cancel"):
+		_on_skip_pressed()
+		get_viewport().set_input_as_handled()
+		return
 	if transitioning or finished or choosing:
 		return
 	if not (event.is_action_pressed("interact") or event.is_action_pressed("ui_accept")):

@@ -1,7 +1,17 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/intro.gd" id="1_intro_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/subtitle_dialogue.tscn" id="2_subtitle"]
+[ext_resource type="Theme" path="res://assets/ui/menu_button_theme.tres" id="3_button_theme"]
+[ext_resource type="FontFile" path="res://assets/fonts/YeonSung-Regular.ttf" id="4_caption_font"]
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSansKR-VF.ttf" id="5_skip_font"]
+
+[sub_resource type="FontVariation" id="FontVariation_skip"]
+; Noto Sans KR 가변 글꼴의 기본 굵기는 가늘어서 프롤로그 배경 위에서 안 읽힌다(#639).
+base_font = ExtResource("5_skip_font")
+variation_opentype = {
+2003265652: 500
+}
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_choice"]
 bg_color = Color(0.07, 0.07, 0.09, 1)
@@ -53,8 +63,9 @@ offset_top = 48.0
 offset_right = 300.0
 offset_bottom = 84.0
 grow_horizontal = 2
-theme_override_colors/font_color = Color(0.42, 0.42, 0.48, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.5, 0.5, 0.56, 1)
+theme_override_fonts/font = ExtResource("4_caption_font")
+theme_override_font_sizes/font_size = 27
 text = ""
 horizontal_alignment = 1
 
@@ -96,19 +107,26 @@ text = ""
 horizontal_alignment = 1
 
 [node name="SkipButton" type="Button" parent="."]
+; 컷신 건너뛰기(#231, #639). 배포 빌드에서도 보인다. 메뉴 버튼 테마(연성, 흐린 회색 →
+; 마우스를 올리면 밝아짐)를 쓰되 글꼴만 Noto Sans KR로 따로 둔다(조작 안내라 연출 글꼴과 구분, 사용자 결정).
+; 그리고 **포커스를 받지 않는다** — 받으면 대사를 넘기려고
+; 누른 Enter/Space가 버튼을 눌러 컷신이 통째로 날아간다. 키보드는 Esc로 건너뛴다.
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -206.0
+offset_left = -330.0
 offset_top = 20.0
 offset_right = -24.0
-offset_bottom = 60.0
+offset_bottom = 64.0
 grow_horizontal = 0
 focus_mode = 0
-modulate = Color(1, 1, 1, 0.72)
-theme_override_font_sizes/font_size = 18
-text = "프롤로그 건너뛰기"
+theme = ExtResource("3_button_theme")
+theme_override_colors/font_color = Color(0.7, 0.7, 0.75, 1)
+theme_override_fonts/font = SubResource("FontVariation_skip")
+theme_override_font_sizes/font_size = 19
+text = "프롤로그 건너뛰기 · Esc"
+alignment = 2
 
 [node name="FadeRect" type="ColorRect" parent="."]
 layout_mode = 1
