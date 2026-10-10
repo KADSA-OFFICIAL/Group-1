@@ -1,0 +1,118 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/ending_result.gd" id="1_result_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/EastSeaDokdo-Regular.ttf" id="2_title_font"]
+[ext_resource type="Theme" path="res://assets/ui/menu_button_theme.tres" id="3_button_theme"]
+[ext_resource type="Script" path="res://scripts/ui/menu_button.gd" id="4_menu_button"]
+[ext_resource type="Texture2D" path="res://assets/ui/blood_splatter.png" id="5_blood"]
+
+[node name="EndingResult" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_result_script")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.02, 0.02, 1)
+
+[node name="Layout" type="VBoxContainer" parent="."]
+; 게임 오버 화면(game_over.tscn)과 같은 틀·크기다(#636).
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -250.0
+offset_right = 320.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 28
+alignment = 1
+
+[node name="Title" type="Label" parent="Layout"]
+layout_mode = 2
+; 미색 — 뒤에 핏자국이 깔리는데 붉은 글자면 피에 묻혀 안 읽힌다(#633과 같은 이유).
+theme_override_colors/font_color = Color(0.93, 0.9, 0.84, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.7)
+theme_override_constants/outline_size = 10
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 5
+theme_override_fonts/font = ExtResource("2_title_font")
+theme_override_font_sizes/font_size = 136
+text = "생존했다"
+horizontal_alignment = 1
+
+[node name="BloodSplatter" type="TextureRect" parent="Layout/Title"]
+; 게임 오버 제목과 같은 핏자국 1.5배(한 도트 3px). show_behind_parent로 글자 뒤에.
+show_behind_parent = true
+texture_filter = 1
+layout_mode = 0
+offset_left = 55.0
+offset_top = -158.0
+offset_right = 595.0
+offset_bottom = 154.0
+mouse_filter = 2
+texture = ExtResource("5_blood")
+expand_mode = 1
+
+[node name="EndingLabel" type="Label" parent="Layout"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.72, 0.1, 0.09, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("2_title_font")
+theme_override_font_sizes/font_size = 52
+text = "엔딩 — 방과 후"
+horizontal_alignment = 1
+
+[node name="ScoreLabel" type="Label" parent="Layout"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.55, 0.6, 1)
+theme_override_font_sizes/font_size = 18
+text = "알아낸 것 0 / 18"
+horizontal_alignment = 1
+
+[node name="Buttons" type="VBoxContainer" parent="Layout"]
+layout_mode = 2
+theme = ExtResource("3_button_theme")
+theme_override_constants/separation = 14
+alignment = 1
+
+[node name="RestartButton" type="Button" parent="Layout/Buttons"]
+custom_minimum_size = Vector2(280, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 27
+text = "처음부터 다시하기"
+script = ExtResource("4_menu_button")
+
+[node name="TitleButton" type="Button" parent="Layout/Buttons"]
+custom_minimum_size = Vector2(280, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 27
+text = "타이틀로"
+script = ExtResource("4_menu_button")
+
+[node name="Fade" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)

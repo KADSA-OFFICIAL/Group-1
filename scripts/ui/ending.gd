@@ -11,7 +11,8 @@ extends Control
 ## 2026-07-28에 "방과 후" 1종으로 줄였던 것을 사용자 우선순위(2026-08-22, #297)에
 ## 따라 되돌렸다.
 
-@export_file("*.tscn") var title_scene_path: String = "res://scenes/ui/main_menu.tscn"
+## 컷신이 끝나면 결과 화면("생존했다", #636)으로 간다 — 예전에는 곧장 타이틀이었다.
+@export_file("*.tscn") var result_scene_path: String = "res://scenes/ui/ending_result.tscn"
 
 # 장면: caption과 lines([화자, 대사] 또는 [화자, 대사, 감정]). 화자가 빈 문자열이면 지문·독백으로
 # 표시된다. 순서대로 재생하고 마지막에 타이틀로 돌아간다.
@@ -192,6 +193,9 @@ const SCENE_FADE_IN_SECONDS := 1.4
 
 ## 이번 판에 재생할 장면 묶음. _ready에서 메타를 보고 고른다.
 var scenes: Array = BASIC_SCENES
+## 결과 화면에 넘길 엔딩 종류와 [알아낸 수, 전체 수](#636).
+var kind: StringName = DEFAULT_KIND
+var score: Array = []
 var scene_index: int = 0
 var line_index: int = -1
 var transitioning: bool = false
@@ -199,13 +203,12 @@ var finished: bool = false
 
 
 func _ready() -> void:
-	var kind: StringName = DEFAULT_KIND
 	if get_tree().has_meta("ending_kind"):
 		kind = StringName(get_tree().get_meta("ending_kind"))
 		get_tree().remove_meta("ending_kind")   # 타이틀로 돌아간 뒤 남지 않게
 	scenes = ENDINGS.get(kind, BASIC_SCENES)
 	_apply_route(kind)
-	_append_score()
+	_take_score()
 
 	fade_rect.color.a = 1.0
 	dialogue.apply_font(scene_caption)
@@ -248,25 +251,17 @@ func _apply_route(kind: StringName) -> void:
 	scenes = copy
 
 
-## 마지막에 "알아낸 것 N / M"을 한 줄 붙인다(#353).
+## "알아낸 것 N / M"을 받아 둔다(#353) — 결과 화면(#636)이 보여 준다.
 ##
 ## 엔딩이 셋뿐이라 그 사이가 안 보인다 — 열 개를 본 플레이어와 두 개를 본
 ## 플레이어가 같은 "방과 후"를 받으면 단서를 읽은 값이 어디에도 안 남는다.
-##
-## **원본 상수를 건드리지 않는다.** `const`가 담은 Array는 참조라 그냥 append하면
-## 다음 판까지 줄이 쌓인다(같은 프로세스에서 두 번 클리어하면 두 줄이 된다).
-func _append_score() -> void:
+## 예전에는 컷신 마지막 자막 줄로 붙였는데, 결과 화면이 생기면서 그리로 옮겼다
+## (두 군데 나오면 중복이다).
+func _take_score() -> void:
 	if not get_tree().has_meta("clue_score"):
 		return
-	var score: Array = get_tree().get_meta("clue_score")
+	score = get_tree().get_meta("clue_score")
 	get_tree().remove_meta("clue_score")
-	if score.size() < 2:
-		return
-	var copy: Array = scenes.duplicate(true)
-	var last: Dictionary = copy[copy.size() - 1]
-	last["lines"] = (last["lines"] as Array).duplicate()
-	(last["lines"] as Array).append(["", "알아낸 것 %d / %d" % [score[0], score[1]]])
-	scenes = copy
 
 
 func _apply_scene() -> void:
@@ -314,4 +309,6 @@ func _finish() -> void:
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 1.0, SCENE_FADE_SECONDS)
 	tween.tween_callback(func() -> void:
-		get_tree().change_scene_to_file(title_scene_path))
+		EndingResultScreen.pending_kind = kind
+		EndingResultScreen.pending_score = score
+		get_tree().change_scene_to_file(result_scene_path))

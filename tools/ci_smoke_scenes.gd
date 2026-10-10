@@ -63,6 +63,7 @@ func _run() -> void:
 	await _check_ink_throw()
 	# 마지막에 둔다 — 씬을 실제로 갈아 끼워(change_scene_to_file) 본다.
 	await _check_pause_menu()
+	await _check_ending_result()
 
 	print("")
 	if _fail.is_empty():
@@ -925,3 +926,51 @@ func _drop_scenes(manual: Node) -> void:
 	if is_instance_valid(manual):
 		manual.free()
 	await process_frame
+
+
+## 엔딩 결과 화면(#636) — 컷신이 끝나면 "생존했다"로 넘어가 엔딩 이름·점수를 싣는가,
+## 점수 줄이 컷신 자막에서 빠졌는가, "타이틀로"가 타이틀로 가는가.
+##
+## 엔딩 종류·점수는 static으로 넘어가므로(`EndingResultScreen.pending_*`) 정적
+## 검사로는 배선이 끊겨도 모른다 — 실제 `_finish()`를 지나 씬을 갈아 끼워 본다.
+func _check_ending_result() -> void:
+	if current_scene != null:
+		current_scene.free()
+		await process_frame
+	set_meta("ending_kind", &"adults_work")
+	set_meta("clue_score", [7, 18])
+	var ending: Node = (load("res://scenes/ui/ending.tscn") as PackedScene).instantiate()
+	root.add_child(ending)
+	await process_frame
+	for sc: Dictionary in ending.get("scenes"):
+		for line: Array in sc["lines"]:
+			if String(line[1]).begins_with("알아낸 것"):
+				_fault("엔딩 결과: 점수 줄이 아직 컷신 자막에 붙어 있다(결과 화면과 중복)")
+	ending.call("_finish")
+	if not await _until(func() -> bool:
+			return current_scene != null \
+				and current_scene.scene_file_path == "res://scenes/ui/ending_result.tscn", 4.0):
+		_fault("엔딩 결과: 컷신이 끝났는데 결과 화면으로 안 넘어간다")
+		await _drop_scenes(ending)
+		return
+	var result: Node = current_scene
+	var name_text := String((result.get_node("Layout/EndingLabel") as Label).text)
+	var score_label := result.get_node("Layout/ScoreLabel") as Label
+	if not name_text.contains("어른들의 일"):
+		_fault("엔딩 결과: 엔딩 이름이 틀리다 (%s)" % name_text)
+	elif not score_label.visible or score_label.text != "알아낸 것 7 / 18":
+		_fault("엔딩 결과: 점수 줄이 틀리다 (visible=%s, %s)" % [score_label.visible, score_label.text])
+	else:
+		_ok("엔딩 결과 화면 이름·점수")
+	var rs: GDScript = load("res://scripts/ui/ending_result.gd")
+	if StringName(rs.get("pending_kind")) != &"" or not (rs.get("pending_score") as Array).is_empty():
+		_fault("엔딩 결과: 읽은 뒤 pending 값을 안 비웠다(다음 판이 지난 판 점수를 보인다)")
+
+	await _wait(1.2)   # 페이드 인이 끝나야 버튼이 포커스를 받는다
+	(result.get_node("Layout/Buttons/TitleButton") as Button).pressed.emit()
+	if not await _until(func() -> bool:
+			return current_scene != null and current_scene.scene_file_path == MENU, 4.0):
+		_fault("엔딩 결과: 타이틀로 — 타이틀 씬으로 안 넘어간다")
+	else:
+		_ok("엔딩 결과 타이틀로")
+	await _drop_scenes(ending)
