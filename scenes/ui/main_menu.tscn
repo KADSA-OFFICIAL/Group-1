@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu_script"]
 [ext_resource type="FontFile" path="res://assets/fonts/BlackAndWhitePicture-Regular.ttf" id="2_title_font"]
+[ext_resource type="Theme" path="res://assets/ui/menu_button_theme.tres" id="3_button_theme"]
+[ext_resource type="Script" path="res://scripts/ui/menu_button.gd" id="4_menu_button"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -54,8 +56,10 @@ horizontal_alignment = 1
 custom_minimum_size = Vector2(260, 56)
 layout_mode = 2
 size_flags_horizontal = 4
+theme = ExtResource("3_button_theme")
 theme_override_font_sizes/font_size = 24
 text = "게임 시작"
+script = ExtResource("4_menu_button")
 
 [node name="Fade" type="ColorRect" parent="."]
 layout_mode = 1

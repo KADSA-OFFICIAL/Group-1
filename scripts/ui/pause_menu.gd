@@ -38,6 +38,10 @@ func _ready() -> void:
 	_resume_button.pressed.connect(close)
 	_restart_button.pressed.connect(_on_restart_pressed)
 	_title_button.pressed.connect(_on_title_pressed)
+	# 마우스를 올린 버튼이 포커스를 가져간다 — 테마(menu_button_theme)가 포커스를
+	# 붉게 칠하므로, 안 그러면 키보드로 고른 것과 마우스 아래 것이 둘 다 붉다.
+	for b in _buttons():
+		b.mouse_entered.connect(b.grab_focus)
 
 
 func _unhandled_input(event: InputEvent) -> void:
