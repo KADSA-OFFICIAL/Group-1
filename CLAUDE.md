@@ -267,7 +267,8 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
   - **현관 선택지가 이미 멈춰 둔 트리와 게임 오버 연출 중에는 열지 않는다** — 열었다 닫으면 선택지의 멈춤까지 풀린다.
   - **멈춰도 흐르는 것이 둘 있다**: `create_timer()`의 기본값(`process_always = true`)과 `await get_tree().process_frame` 루프. 그래서 `art_room_intro._wait`·`hud._hold_line`은 `create_timer(t, false)`, `_walk_to`·`floor_link._walk_player`는 `can_process()`로 거른다. **본편에 대기를 새로 쓸 때도 같은 규칙을 지킬 것** — 안 그러면 메뉴를 보는 사이 연출이 건너뛰어지고 자막이 사라진다.
   - 씬을 바꾸기 전에 `paused = false`(choice_prompt와 같은 이유)와 `Sfx.stop_music()`(본편 음악은 autoload라 씬을 넘는다).
-  - **버튼은 상자 없이 글자만**이다 — 테마 `assets/ui/menu_button_theme.tres`(스타일박스 전부 비움, 굵은 Noto Sans KR, 평소 흐린 회색 / 고르면 미색)와 `scripts/ui/menu_button.gd`(고른 버튼 양옆 붉은 선 + 마름모)를 타이틀의 "게임 시작"과 같이 쓴다. 어두운 상자·붉은 띠+번짐·칠판/쪽지/손전등 시안은 사용자가 전부 거절했다.
+  - **버튼은 상자 없이 글자만**이다 — 테마 `assets/ui/menu_button_theme.tres`(스타일박스 전부 비움, 연성(Yeon Sung, #627), 평소 흐린 회색 / 고르면 미색)와 `scripts/ui/menu_button.gd`(고른 버튼 양옆 붉은 선 + 마름모)를 타이틀의 "게임 시작"과 같이 쓴다. 어두운 상자·붉은 띠+번짐·칠판/쪽지/손전등 시안은 사용자가 전부 거절했다.
+  - **제목은 동해독도(East Sea Dokdo) 104px이고 뒤에 핏자국이 깔린다**(#627). 핏자국은 `tools/gen_blood_splatter.py`가 굽는 도트 그림 `assets/ui/blood_splatter.png`(한 도트 2px, 팔레트 네 색)이고, `Title`의 자식 TextureRect에 `show_behind_parent`를 켜서 글자 **뒤에** 그린다(자식은 원래 부모 위에 그려진다). 왼쪽 아래에서 오른쪽 위로 뿌려진 방향성 있는 자국이라 출발점이 제목 왼쪽 아래에 온다. 버튼 쪽에는 피를 넣지 않는다(사용자가 빼라고 했다). 폰트 두 개는 google/fonts(OFL)에서 받았고 라이선스는 `assets/fonts/*-OFL.txt`.
 - 층별 자동 체크포인트 시스템(#564): 각 층(3층, 2층, 1층, 운동장) 진입 시 `floor_manager`가 `game_state`의 static 저장소에 현재 층수, 도착 좌표, 인벤토리 아이템 및 수집 단서 플래그 목록을 자동 기록한다. 게임 오버(`GameOverScreen`) 시 마지막 체크포인트 층에서 수집 상태를 보존한 채 즉시 재개할 수 있는 `[ N층에서 재시도 ]` 버튼과 `[ 처음부터 다시하기 (4층) ]` 버튼이 제공된다. 타이틀(`MainMenu`)에서 게임 시작 시에는 기존 체크포인트가 초기화되어 깨끗한 4층 프롤로그부터 시작된다.
   - **체크포인트는 층에 들어선 순간을 찍는다** — 그래서 **그 층에서 모은 것은 재시도하면 사라진다**(실측: 2층에서 계단 열쇠를 얻고 재시도하면 빈손). 화면이 "소지품 및 단서 유지"라고 적어 두어 거짓말이 되어 있었고 #576에서 문구를 고쳤다 — 동작은 그대로다(죽음이 아프게 남는 것은 #412의 의도와 맞는다). 계속 갱신하게 바꾸면 같은 층에서 가진 것 그대로 부활해 **죽음이 거의 무료가 된다** — 난이도 결정이라 별건이다.
   - **운동장(0층)에도 기록된다.** 거기는 수위가 없어(`_janitor_active`가 0층 제외) 붙잡힐 일이 없으므로 쓰이지 않는 기록이다 — 실害는 없지만 마지막 1층 체크포인트를 덮어쓴다.
@@ -440,6 +441,8 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
 - 잉크통·깨진 비커 스프라이트나 그 원본을 고쳤으면 `python3 tools/gen_item_sprites.py` 후
   `python3 tools/gen_floors.py`까지 다시 돌립니다(생성기가 배경 제거·안쪽 뚫림·빈
   스프라이트·색 뭉개짐을 스스로 검사합니다).
+- 일시정지 메뉴 핏자국을 고쳤으면 `python3 tools/gen_blood_splatter.py`(면적·팔레트를 스스로 검사하고, 결정론적이라
+  모양을 안 바꿨으면 diff가 나오지 않습니다). 새 PNG면 Godot `--import`도 돌립니다.
 - 효과음을 고쳤으면 `python3 tools/gen_sfx.py`, 앰비언트·BGM은 `python3 tools/gen_music.py`로
   재생성합니다(길이·피크·DC 오프셋·루프 이음매를 스스로 검사하고, 결정론적이라
   톤을 안 바꿨으면 diff가 나오지 않습니다).
