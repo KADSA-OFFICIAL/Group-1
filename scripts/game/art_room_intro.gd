@@ -397,6 +397,9 @@ func _walk_to(jan: Node2D, target: Vector2, speed: float = WALK_SPEED) -> void:
 	_step_clock = 0.0
 	while tween.is_running():
 		await get_tree().process_frame
+		# `process_frame`은 트리가 멈춰도 온다(#624) — 트윈은 서 있는데 발소리만 난다.
+		if not can_process():
+			continue
 		_step_clock += get_process_delta_time()
 		if _step_clock >= STEP_SOUND_EVERY:
 			_step_clock = 0.0
@@ -470,8 +473,10 @@ func _say(gs, speaker: String, text: String, emotion: String = "") -> void:
 		gs.call("request_speech", speaker, text, emotion)
 
 
+## `process_always = false` — 일시정지 메뉴(#624)가 트리를 멈추면 같이 선다.
+## 기본값(true)이면 메뉴를 보는 동안 장면이 혼자 흘러간다.
 func _wait(seconds: float) -> void:
-	await get_tree().create_timer(seconds).timeout
+	await get_tree().create_timer(seconds, false).timeout
 
 
 ## 자막 대기열이 빌 때까지 기다린다 — 장면이 대사를 앞지르지 않게(#471).
