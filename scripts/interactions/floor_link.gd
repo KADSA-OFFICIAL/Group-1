@@ -193,6 +193,9 @@ func _walk_player(player: Node2D, to: Vector2, seconds: float,
 	var elapsed := 0.0
 	while elapsed < seconds:
 		await get_tree().process_frame
+		# `process_frame`은 트리가 멈춰도 온다(#624) — 일시정지 중에 걸어가면 안 된다.
+		if not can_process():
+			continue
 		elapsed = minf(elapsed + get_process_delta_time(), seconds)
 		var u := elapsed / seconds
 		# sine ease-in-out — 트윈이 쓰던 곡선과 같다.

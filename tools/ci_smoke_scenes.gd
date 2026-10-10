@@ -61,6 +61,8 @@ func _run() -> void:
 	await _check_subtitle_queue()
 	await _check_artroom_intro()
 	await _check_ink_throw()
+	# 마지막에 둔다 — 씬을 실제로 갈아 끼워(change_scene_to_file) 본다.
+	await _check_pause_menu()
 
 	print("")
 	if _fail.is_empty():
@@ -781,3 +783,145 @@ func _throw_ink(main: Node, player: Node2D, janitor: Node2D,
 		can.free()
 	janitor.set("blind_timer", 0.0)
 	return hit
+
+
+## 일시정지 메뉴(#624) — Esc로 열고 닫히는가, 멈춤 중에 연출이 흘러가지 않는가,
+## 다시하기·메인 화면으로가 멈춤을 풀고 씬을 바꾸는가.
+##
+## **멈춤 중에도 흐르는 것이 있다** — `create_timer()`의 기본값(`process_always`
+## = true)과 `process_frame` 루프. 장면 대기(`art_room_intro._wait`)와 자막 머무는
+## 시간(`hud._hold_line`)이 그걸 써서 메뉴를 보는 사이 연출이 건너뛰어졌다.
+func _check_pause_menu() -> void:
+	# 앞 검사가 씬을 갈아 끼웠다면(게임 오버 등) 그게 남아 아래 "씬이 바뀌었나"
+	# 판정을 처음부터 참으로 만든다.
+	if current_scene != null:
+		current_scene.free()
+		await process_frame
+	var main: Node = (load(MAIN) as PackedScene).instantiate()
+	root.add_child(main)
+	for i in 8:
+		await process_frame
+	await _wait(0.4)
+
+	var menu: Node = main.get_node_or_null("PauseMenu")
+	var hud: Node = main.get_node_or_null("HUD")
+	var gs: Node = main.get_node_or_null("GameState")
+	var fm: Node = main
+	var intro = main.get_node_or_null("Background/ArtRoomIntro")
+	if menu == null or hud == null or gs == null or intro == null:
+		_fault("일시정지: PauseMenu/HUD/GameState/ArtRoomIntro를 못 찾았다")
+		main.free()
+		await process_frame
+		return
+
+	# ── 열 수 없는 때 ─────────────────────────────────────────────
+	# 현관 선택지가 이미 멈춰 둔 상태 — 열었다 닫으면 선택지의 멈춤을 풀어 버린다.
+	paused = true
+	_press_cancel()
+	if bool(menu.get("is_open")):
+		_fault("일시정지: 이미 멈춘 트리(현관 선택지)에서 메뉴가 열렸다")
+	paused = false
+	fm.set("game_over_active", true)
+	_press_cancel()
+	if bool(menu.get("is_open")):
+		_fault("일시정지: 게임 오버 연출 중에 메뉴가 열렸다")
+	if paused:
+		_fault("일시정지: 열리지 않았는데 트리가 멈췄다")
+	fm.set("game_over_active", false)
+	_ok("일시정지 열 수 없는 때")
+
+	# ── 열고 닫기, 멈춤 중 연출 ───────────────────────────────────
+	gs.call("request_notice", "일시정지 검사 줄")
+	if not await _until(func() -> bool:
+			return not (hud.get("_current") as Array).is_empty(), 2.0):
+		_fault("일시정지: 검사용 자막이 안 떴다")
+	var line_before: Array = (hud.get("_current") as Array).duplicate()
+
+	_press_cancel()
+	var box: Control = menu.get_node("Root")
+	if not paused or not bool(menu.get("is_open")) or not box.visible:
+		_fault("일시정지: Esc로 메뉴가 안 열린다 (paused=%s, open=%s, visible=%s)"
+			% [paused, menu.get("is_open"), box.visible])
+	else:
+		_ok("일시정지 Esc로 열림")
+
+	var done := [false]
+	var waiter := func() -> void:
+		await intro._wait(0.3)
+		done[0] = true
+	waiter.call()
+	# 자막 한 줄이 머무는 시간(타이핑 + notice_seconds 2.4)을 넉넉히 넘긴다.
+	# 이 스크립트의 `_wait`는 process_always 기본값이라 멈춤 중에도 흐른다.
+	await _wait(4.0)
+	if done[0]:
+		_fault("일시정지: 멈춤 중에 장면 대기(art_room_intro._wait)가 끝났다")
+	if (hud.get("_current") as Array) != line_before:
+		_fault("일시정지: 멈춤 중에 자막이 넘어갔다 (%s → %s)"
+			% [line_before, hud.get("_current")])
+	if not done[0] and (hud.get("_current") as Array) == line_before:
+		_ok("일시정지 중 연출 정지")
+
+	_press_cancel()
+	if paused or bool(menu.get("is_open")) or box.visible:
+		_fault("일시정지: Esc로 메뉴가 안 닫힌다")
+	elif not await _until(func() -> bool: return done[0], 2.0):
+		_fault("일시정지: 닫았는데 장면 대기가 다시 안 흐른다")
+	else:
+		_ok("일시정지 Esc로 닫힘")
+
+	# ── 메인 화면으로 ──────────────────────────────────────────────
+	_press_cancel()
+	(menu.get_node("Root/Box/Buttons/TitleButton") as Button).pressed.emit()
+	if not await _until(func() -> bool:
+			return current_scene != null and current_scene.scene_file_path == MENU, 4.0):
+		_fault("일시정지: 메인 화면으로 — 타이틀 씬으로 안 넘어간다")
+	else:
+		if paused:
+			_fault("일시정지: 메인 화면으로 넘어갔는데 트리가 멈춰 있다")
+		if bool(root.get_node("Sfx").get("_music_on")):
+			_fault("일시정지: 메인 화면으로 넘어갔는데 본편 음악이 켜져 있다")
+		_ok("일시정지 메인 화면으로")
+	await _drop_scenes(main)
+
+	# ── 처음부터 다시하기 ──────────────────────────────────────────
+	main = (load(MAIN) as PackedScene).instantiate()
+	root.add_child(main)
+	for i in 8:
+		await process_frame
+	menu = main.get_node("PauseMenu")
+	var gs_script: GDScript = load("res://scripts/game/game_state.gd")
+	var none: Array[String] = []
+	gs_script.call("save_checkpoint", 2, Vector2(579, 692), none, none)
+	_press_cancel()
+	(menu.get_node("Root/Box/Buttons/RestartButton") as Button).pressed.emit()
+	if not await _until(func() -> bool:
+			return current_scene != null and current_scene.scene_file_path == MAIN, 4.0):
+		_fault("일시정지: 처음부터 다시하기 — 본편 씬을 다시 안 연다")
+	else:
+		if paused:
+			_fault("일시정지: 다시 시작했는데 트리가 멈춰 있다")
+		if bool(gs_script.call("has_checkpoint")):
+			_fault("일시정지: 처음부터 다시 시작했는데 체크포인트가 남아 있다")
+		if int(current_scene.get("current_floor")) != 4:
+			_fault("일시정지: 다시 시작했는데 4층이 아니다 (%s)" % current_scene.get("current_floor"))
+		_ok("일시정지 처음부터 다시하기")
+	await _drop_scenes(main)
+	root.get_node("Sfx").call("stop_music")
+
+
+## 일시정지 메뉴가 받는 Esc. 버튼 포커스와 상관없이 `_unhandled_input`까지 간다.
+func _press_cancel() -> void:
+	var ev := InputEventAction.new()
+	ev.action = &"ui_cancel"
+	ev.pressed = true
+	root.push_input(ev)
+
+
+## `change_scene_to_file`이 붙인 현재 씬과, 손으로 붙였던 씬을 함께 내린다.
+func _drop_scenes(manual: Node) -> void:
+	paused = false
+	if current_scene != null and current_scene != manual:
+		current_scene.free()
+	if is_instance_valid(manual):
+		manual.free()
+	await process_frame
