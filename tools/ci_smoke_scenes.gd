@@ -63,6 +63,7 @@ func _run() -> void:
 	await _check_ink_throw()
 	# 마지막에 둔다 — 씬을 실제로 갈아 끼워(change_scene_to_file) 본다.
 	await _check_pause_menu()
+	await _check_ending_backgrounds()
 	await _check_ending_result()
 
 	print("")
@@ -929,6 +930,68 @@ func _drop_scenes(manual: Node) -> void:
 	if is_instance_valid(manual):
 		manual.free()
 	await process_frame
+
+
+## 엔딩 컷신 배경(#642) — 장면의 `background`가 실제로 `SceneBackground`에 끼워지고, 그림이
+## 있는 장면에서는 장소 캡션이 숨는가, 그림이 없는 장면은 검은 화면 + 캡션 그대로인가.
+##
+## `_apply_scene()`은 `_ready`와 장면 전환 때만 불리므로 `ci_load_scenes`(트리에 안 붙임)로는
+## 안 본다. 운동장 출입구 루트는 **현관이 아니므로 그림이 없어야** 한다(`_apply_route`가
+## 첫 장면을 갈아 끼운다) — 현관 그림이 철문 장면 위에 뜨면 앞뒤가 안 맞는다.
+func _check_ending_backgrounds() -> void:
+	var ending_script: GDScript = load("res://scripts/ui/ending.gd")
+	var consts: Dictionary = ending_script.get_script_constant_map()
+	for key: String in ["BG_ENTRANCE", "BG_GATE"]:
+		var tex := consts.get(key) as Texture2D
+		if tex == null:
+			_fault("엔딩 배경: %s를 못 읽었다" % key)
+		elif tex.get_width() != 1600 or tex.get_height() != 900:
+			_fault("엔딩 배경: %s가 뷰포트(1600x900)와 크기가 다르다 (%dx%d)"
+				% [key, tex.get_width(), tex.get_height()])
+	var kinds := {
+		&"after_school": "BASIC_SCENES",
+		&"adults_work": "REPORT_SCENES",
+		&"break_time": "HIDDEN_SCENES",
+	}
+	for kind: StringName in kinds:
+		for route: StringName in [&"", &"yard_exit"]:
+			set_meta("ending_kind", kind)
+			if route != &"":
+				set_meta("exit_route", route)
+			var ending: Node = (load("res://scenes/ui/ending.tscn") as PackedScene).instantiate()
+			root.add_child(ending)
+			await process_frame
+			var label := "%s%s" % [kind, " (운동장 출입구)" if route != &"" else ""]
+			var bg := ending.get_node_or_null("SceneBackground") as TextureRect
+			var cap := ending.get_node_or_null("SceneCaption") as Label
+			if bg == null or cap == null:
+				_fault("엔딩 배경 %s: SceneBackground/SceneCaption이 없다" % label)
+				ending.free()
+				continue
+			var scenes: Array = ending.get("scenes")
+			var drawn := 0
+			for i in scenes.size():
+				ending.set("scene_index", i)
+				ending.call("_apply_scene")
+				var want := scenes[i].get("background", null) as Texture2D
+				if bg.texture != want:
+					_fault("엔딩 배경 %s %d번 장면: 그림이 장면의 background와 다르다" % [label, i + 1])
+				elif cap.visible != (want == null):
+					_fault("엔딩 배경 %s %d번 장면: 캡션 표시가 그림 유무와 어긋난다(그림=%s, 캡션=%s)"
+						% [label, i + 1, want != null, cap.visible])
+				elif want != null:
+					drawn += 1
+			if route == &"" and drawn == 0:
+				_fault("엔딩 배경 %s: 그림이 붙은 장면이 하나도 없다" % label)
+			if route != &"" and scenes[0].get("background", null) != null:
+				_fault("엔딩 배경 %s: 운동장 출입구 첫 장면에 현관 그림이 붙었다" % label)
+			_ok("엔딩 배경 %s" % label)
+			ending.free()
+			await process_frame
+			if has_meta("ending_kind"):
+				remove_meta("ending_kind")
+			if has_meta("exit_route"):
+				remove_meta("exit_route")
 
 
 ## 엔딩 결과 화면(#636) — 컷신이 끝나면 "생존했다"로 넘어가 엔딩 이름·점수를 싣는가,

@@ -14,14 +14,21 @@ extends Control
 ## 컷신이 끝나면 결과 화면("생존했다", #636)으로 간다 — 예전에는 곧장 타이틀이었다.
 @export_file("*.tscn") var result_scene_path: String = "res://scenes/ui/ending_result.tscn"
 
+const BG_ENTRANCE := preload("res://assets/backgrounds/ending_entrance.png")
+const BG_GATE := preload("res://assets/backgrounds/ending_gate.png")
+
 # 장면: caption과 lines([화자, 대사] 또는 [화자, 대사, 감정]). 화자가 빈 문자열이면 지문·독백으로
 # 표시된다. 순서대로 재생하고 마지막에 타이틀로 돌아간다.
+# background(선택, #642): 그 장면 동안 화면을 채우는 그림 — 프롤로그(intro.gd, #430)와 같은 규약이다.
+# **이 키가 있으면 caption은 화면에 뜨지 않는다**(그림이 장소를 말하므로 글자는 같은 말을 두 번
+# 하는 것이다). 키가 없는 장면(집·경찰서·복도·교실)은 지금처럼 검은 화면 + 캡션이다.
 #
 # 기본 "방과 후" — 단서를 거의 안 봤거나, 보고도 그냥 나왔을 때.
 # 이설은 아무에게도 말하지 못한다. 시우가 그랬던 것처럼.
 const BASIC_SCENES: Array = [
 	{
 		"caption": "— 학교 현관 —",
+		"background": BG_ENTRANCE,
 		"lines": [
 			["", "현관문이 열렸다. 밤공기가 차갑게 목덜미를 스쳤다."],
 			["", "이설은 뒤를 돌아보지 않고 운동장을 가로질렀다."],
@@ -40,6 +47,7 @@ const BASIC_SCENES: Array = [
 	},
 	{
 		"caption": "— 등굣길, 정문 —",
+		"background": BG_GATE,
 		"lines": [
 			["", "정문 앞에서 수위 아저씨가 낙엽을 쓸고 있었다."],
 			["수위", "어, 잘 가."],
@@ -56,6 +64,7 @@ const BASIC_SCENES: Array = [
 const REPORT_SCENES: Array = [
 	{
 		"caption": "— 학교 현관 —",
+		"background": BG_ENTRANCE,
 		"lines": [
 			["", "현관문이 열렸다. 밤공기가 차갑게 목덜미를 스쳤다."],
 			["", "이설은 운동장 한가운데서 걸음을 멈췄다."],
@@ -77,6 +86,7 @@ const REPORT_SCENES: Array = [
 	},
 	{
 		"caption": "— 사흘 뒤, 교문 앞 —",
+		"background": BG_GATE,
 		"lines": [
 			["", "교문에 카메라가 늘어섰다. 학교 이름이 자막으로 지나갔다."],
 			["TV 아나운서", "불암고등학교 실종 사건과 관련해 학교 측의 은폐 정황이—"],
@@ -95,6 +105,7 @@ const REPORT_SCENES: Array = [
 const HIDDEN_SCENES: Array = [
 	{
 		"caption": "— 학교 현관 —",
+		"background": BG_ENTRANCE,
 		"lines": [
 			["", "현관문 손잡이를 잡은 채로, 이설은 뒤를 돌아봤다."],
 			["", "복도 끝에 불빛 하나가 서 있었다. 손전등. 움직이지 않았다."],
@@ -138,6 +149,7 @@ const HIDDEN_SCENES: Array = [
 # 운동장 출입구로 나온 경우의 첫 장면(#393). **판정은 바뀌지 않는다** — 엔딩은
 # 그대로 3종이고, 현관을 묘사하는 첫 장면만 그 루트에서 갈아 끼운다.
 # 현관으로 나오지 않았는데 "현관문이 열렸다"로 시작하면 방금 한 선택이 지워진다.
+# **그림도 붙이지 않는다**(#642) — 현관 그림을 쓰면 철문으로 나온 장면 위에 현관이 뜬다.
 const YARD_ROUTE := &"yard_exit"
 const YARD_OPENINGS: Dictionary = {
 	&"after_school": {
@@ -187,6 +199,7 @@ const DEFAULT_KIND := &"after_school"
 const SCENE_FADE_SECONDS := 0.6
 const SCENE_FADE_IN_SECONDS := 1.4
 
+@onready var scene_background: TextureRect = $SceneBackground
 @onready var scene_caption: Label = $SceneCaption
 @onready var dialogue: SubtitleDialogue = $Dialogue
 @onready var fade_rect: ColorRect = $FadeRect
@@ -271,8 +284,16 @@ func _take_score() -> void:
 	get_tree().remove_meta("clue_score")
 
 
+## 장면이 바뀔 때 캡션·배경·자막을 한꺼번에 갈아 끼운다(#642).
+## `_next_scene()`이 FadeRect를 1.0까지 올린 **뒤에** 부르므로 교체 순간은 화면에 보이지
+## 않는다 — 그 순서를 바꾸면 배경이 눈앞에서 튀어 바뀐다.
 func _apply_scene() -> void:
-	scene_caption.text = scenes[scene_index]["caption"]
+	var scene: Dictionary = scenes[scene_index]
+	var background: Texture2D = scene.get("background", null)
+	scene_background.texture = background
+	scene_caption.text = scene["caption"]
+	# 배경이 있으면 캡션을 감춘다 — 그림이 이미 장소를 말하고 있다(프롤로그와 같다).
+	scene_caption.visible = background == null
 	dialogue.clear()
 
 
