@@ -17,6 +17,7 @@ extends Control
 const BG_ENTRANCE := preload("res://assets/backgrounds/ending_entrance.png")
 const BG_GATE := preload("res://assets/backgrounds/ending_gate.png")
 const BG_HOME := preload("res://assets/backgrounds/ending_home.png")
+const BG_POLICE := preload("res://assets/backgrounds/ending_police.png")
 
 # 장면: caption과 lines([화자, 대사] 또는 [화자, 대사, 감정]). 화자가 빈 문자열이면 지문·독백으로
 # 표시된다. 순서대로 재생하고 마지막에 타이틀로 돌아간다.
@@ -77,6 +78,7 @@ const REPORT_SCENES: Array = [
 	},
 	{
 		"caption": "— 경찰서, 새벽 —",
+		"background": BG_POLICE,
 		"lines": [
 			["", "형광등이 지나치게 밝았다."],
 			["경찰", "학생, 이거 전부 학교 안에서 찍은 거 맞아요?"],
