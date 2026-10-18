@@ -18,6 +18,7 @@ const BG_ENTRANCE := preload("res://assets/backgrounds/ending_entrance.png")
 const BG_GATE := preload("res://assets/backgrounds/ending_gate.png")
 const BG_HOME := preload("res://assets/backgrounds/ending_home.png")
 const BG_POLICE := preload("res://assets/backgrounds/ending_police.png")
+const BG_HALLWAY := preload("res://assets/backgrounds/ending_hallway.png")
 
 # 장면: caption과 lines([화자, 대사] 또는 [화자, 대사, 감정]). 화자가 빈 문자열이면 지문·독백으로
 # 표시된다. 순서대로 재생하고 마지막에 타이틀로 돌아간다.
@@ -125,6 +126,7 @@ const HIDDEN_SCENES: Array = [
 	},
 	{
 		"caption": "— 복도 —",
+		"background": BG_HALLWAY,
 		"lines": [
 			["", "손전등이 바닥으로 내려갔다. 빛이 타일 위에 동그랗게 고였다."],
 			["수위", "…시우가 그 말을 나한테는 안 했어."],
