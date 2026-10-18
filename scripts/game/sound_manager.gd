@@ -26,6 +26,8 @@ const VOLUMES := {
 	"ink_splash": -8.0,
 	"spotted": -7.0,
 	"caught": -6.0,
+	# 점프스케어(#662) — 일부러 가장 크다. caught보다 3dB 위.
+	"jumpscare": -3.0,
 	"escape": -8.0,
 	"ui_click": -14.0,
 	# 이설 발소리(#621) — 초당 두 번 계속 나므로 가장 작다. 수위 발소리(위치를

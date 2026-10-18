@@ -259,6 +259,51 @@ def hallway(dry: list[float], low_pass: float, amount: float = 1.0) -> list[floa
     return biquad(reflections, "low", low_pass, 0.7)
 
 
+def screech(duration: float, hz: float, rise: float, vibrato_hz: float,
+            vibrato_depth: float, attack: float, release: float) -> list[float]:
+    """떨리며 치솟는 톱니파 — 점프스케어 비명의 한 성부(#662).
+
+    tone()은 음정이 한 방향으로만 미끄러져 사이렌처럼 들린다. 비명은 음정이
+    빠르게 떨려야 사람 목소리·현악기 긁는 소리처럼 거칠어진다. 떨림 깊이는
+    음정 비율이라 성부마다 같은 '흔들림'이 난다.
+    """
+    total = int(RATE * duration)
+    out: list[float] = []
+    phase = 0.0
+    for i in range(total):
+        ratio = i / max(total - 1, 1)
+        base = hz * rise ** ratio
+        wobble = 1.0 + vibrato_depth * math.sin(math.tau * vibrato_hz * i / RATE)
+        phase += base * wobble / RATE
+        out.append(saw(phase) * envelope(i, total, attack, release, 1.6))
+    return out
+
+
+def jumpscare() -> list[float]:
+    """점프스케어(#662) — 쾅 하는 타격 + 불협 비명.
+
+    공용 noise를 쓰지 않고 고정 시드를 따로 쓴다(발소리 #611과 같은 이유) —
+    다른 소리를 더할 때 이 소리가, 이 소리를 더할 때 다른 소리가 바뀌지 않게.
+
+    caught(무겁게 가라앉는 스팅어)와 반대로 **위로 터진다**. 성부 셋은 반음·
+    증4도로 일부러 부딪히게 두고(1100 · 1165 · 1555Hz), 떨림 속도도 서로 달라
+    맥놀이가 겹친다. 첫 0.12초의 저역 타격이 '덮친다'를 맡는다 — 비명만 있으면
+    높은 소리가 갑자기 날 뿐이고 무언가 부딪혀 오는 느낌이 없다.
+    """
+    noise = Noise(seed=66201)
+    return mix(
+        # 쾅 — 저역 몸통 + 고역 파열
+        gain(hit(noise, 0.30, 0.001, 0.070, "low", 110.0, 0.9), 2.4),
+        gain(hit(noise, 0.18, 0.001, 0.035, "high", 2200.0, 0.7), 0.9),
+        # 비명 — 불협 세 성부
+        gain(screech(1.05, 1100.0, 1.12, 13.0, 0.035, 0.008, 0.55), 0.20),
+        gain(screech(1.05, 1165.0, 1.10, 17.0, 0.045, 0.008, 0.55), 0.17),
+        gain(screech(0.95, 1555.0, 1.06, 11.0, 0.030, 0.010, 0.60), 0.12),
+        # 긁는 소리 — 비명 뒤에 깔리는 노이즈
+        gain(hit(noise, 1.00, 0.004, 0.300, "band", 3000.0, 1.4), 0.55),
+    )
+
+
 def sneaker_step(seed: int, heel: float, toe_delay: float, body_hz: float,
                  toe_weight: float) -> list[float]:
     """이설의 운동화 한 걸음(#621). 수위(footstep)와 **귀로 갈려야** 한다.
@@ -425,6 +470,9 @@ def build_all() -> dict[str, list[float]]:
     # UI 클릭
     sounds["ui_click"] = gain(
         tone(0.06, 1050, 700, square, attack=0.01, release=0.7, duty=0.3), 0.3)
+
+    # 점프스케어(#662) — 고정 시드라 공용 noise를 건드리지 않는다.
+    sounds["jumpscare"] = jumpscare()
 
     return sounds
 
