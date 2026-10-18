@@ -259,48 +259,91 @@ def hallway(dry: list[float], low_pass: float, amount: float = 1.0) -> list[floa
     return biquad(reflections, "low", low_pass, 0.7)
 
 
-def screech(duration: float, hz: float, rise: float, vibrato_hz: float,
-            vibrato_depth: float, attack: float, release: float) -> list[float]:
-    """떨리며 치솟는 톱니파 — 점프스케어 비명의 한 성부(#662).
+def saturate(samples: list[float], amount: float) -> list[float]:
+    """tanh 포화 — 파형 꼭대기를 눌러 소리를 찢어지게 만든다(#662).
+    1.0에서 1.0이 나오도록 정규화한다."""
+    norm = math.tanh(amount)
+    return [math.tanh(value * amount) / norm for value in samples]
 
-    tone()은 음정이 한 방향으로만 미끄러져 사이렌처럼 들린다. 비명은 음정이
-    빠르게 떨려야 사람 목소리·현악기 긁는 소리처럼 거칠어진다. 떨림 깊이는
-    음정 비율이라 성부마다 같은 '흔들림'이 난다.
+
+def scream(duration: float, seed: int, base: float, peak: float, end: float,
+           formants: tuple[tuple[float, float, float], ...], sub: float) -> list[float]:
+    """사람 비명 한 성부(#662) — 떨리는 톱니파 + 숨소리를 모음 포먼트에 통과시킨다.
+
+    음정은 0.06초 만에 base에서 peak로 치솟고 끝에서 end로 꺾인다. 떨림은 규칙적인
+    비브라토(7.5Hz)와 불규칙한 흔들림(랜덤 워크)을 겹친다 — 비브라토만 있으면
+    사이렌, 흔들림이 있어야 목이 갈라진다. `sub`는 한 옥타브 아래 톱니파로
+    **목 긁힘**을 낸다(목소리가 갈라질 때 생기는 부배음).
+
+    음정과 포먼트를 **남자 쪽으로** 잡았다(사용자 청음) — 처음 후보는 560→980Hz,
+    포먼트 850/1250/2900이라 여자 비명이었다. 300→520Hz, 700/1100/2450.
     """
+    noise = Noise(seed=seed)
     total = int(RATE * duration)
-    out: list[float] = []
+    attack = max(int(RATE * 0.012), 1)
+    release = max(int(total * 0.45), 1)
+    source: list[float] = []
+    phase = 0.0
+    wander = 0.0
+    for i in range(total):
+        t = i / RATE
+        if t < 0.06:
+            hz = base * (peak / base) ** (t / 0.06)
+        else:
+            ratio = (t - 0.06) / max(duration - 0.06, 1e-6)
+            hz = peak * (end / peak) ** (ratio ** 2.2)
+        wander += noise.next() * 0.02 - wander * 0.05
+        hz *= 1.0 + 0.03 * math.sin(math.tau * 7.5 * t) + wander
+        phase += hz / RATE
+        source.append(saw(phase) * 0.8 + saw(phase * 0.5) * sub + noise.next() * 0.35)
+    voiced = mix(*[gain(biquad(source, "band", f, q), amp) for f, q, amp in formants])
+    shaped = []
+    for i, value in enumerate(voiced):
+        env = i / attack if i < attack else 1.0
+        if total - i < release:
+            env = ((total - i) / release) ** 1.6
+        shaped.append(value * env * 3.0)
+    return saturate(shaped, 2.5)
+
+
+def slam(seed: int) -> list[float]:
+    """덮치는 쾅(#662) — 78→34Hz로 떨어지는 서브 사인 + 저역·고역 노이즈 타격."""
+    noise = Noise(seed=seed)
+    total = int(RATE * 0.55)
+    sub: list[float] = []
     phase = 0.0
     for i in range(total):
-        ratio = i / max(total - 1, 1)
-        base = hz * rise ** ratio
-        wobble = 1.0 + vibrato_depth * math.sin(math.tau * vibrato_hz * i / RATE)
-        phase += base * wobble / RATE
-        out.append(saw(phase) * envelope(i, total, attack, release, 1.6))
-    return out
+        t = i / RATE
+        phase += 78.0 * (34.0 / 78.0) ** min(t / 0.45, 1.0) / RATE
+        sub.append(math.sin(math.tau * phase) * math.exp(-t / 0.18))
+    return saturate(mix(
+        sub,
+        gain(hit(noise, 0.25, 0.001, 0.05, "low", 140.0, 0.8), 2.0),
+        gain(hit(noise, 0.10, 0.0005, 0.02, "high", 2500.0, 0.7), 0.6),
+    ), 2.0)
+
+
+# 남자 비명 포먼트("아") — (중심 Hz, Q, 세기). 두 성부가 조금 다른 목이다.
+MALE_FORMANTS = ((700.0, 5.0, 1.0), (1100.0, 6.0, 0.75), (2450.0, 8.0, 0.4))
+MALE_FORMANTS_2 = ((760.0, 5.0, 1.0), (1180.0, 6.0, 0.7), (2600.0, 8.0, 0.45))
 
 
 def jumpscare() -> list[float]:
-    """점프스케어(#662) — 쾅 하는 타격 + 불협 비명.
+    """점프스케어(#662) — 쾅 + 남자 비명 두 겹 + 긁는 노이즈.
+
+    첫 버전은 8비트 톱니파 세 성부의 불협화음이었는데 "더 무섭게"(사용자) — 기계음이라
+    사람이 덮친다는 느낌이 없었다. 비명·현악 찌르기·둘 다를 들어 보고 비명을
+    골랐고, 키를 낮춰 남자 비명으로 맞췄다. 성부 둘은 음정·포먼트·시드가 조금씩
+    달라 한 사람이 아니라 갈라진 목처럼 겹친다.
 
     공용 noise를 쓰지 않고 고정 시드를 따로 쓴다(발소리 #611과 같은 이유) —
     다른 소리를 더할 때 이 소리가, 이 소리를 더할 때 다른 소리가 바뀌지 않게.
-
-    caught(무겁게 가라앉는 스팅어)와 반대로 **위로 터진다**. 성부 셋은 반음·
-    증4도로 일부러 부딪히게 두고(1100 · 1165 · 1555Hz), 떨림 속도도 서로 달라
-    맥놀이가 겹친다. 첫 0.12초의 저역 타격이 '덮친다'를 맡는다 — 비명만 있으면
-    높은 소리가 갑자기 날 뿐이고 무언가 부딪혀 오는 느낌이 없다.
     """
-    noise = Noise(seed=66201)
     return mix(
-        # 쾅 — 저역 몸통 + 고역 파열
-        gain(hit(noise, 0.30, 0.001, 0.070, "low", 110.0, 0.9), 2.4),
-        gain(hit(noise, 0.18, 0.001, 0.035, "high", 2200.0, 0.7), 0.9),
-        # 비명 — 불협 세 성부
-        gain(screech(1.05, 1100.0, 1.12, 13.0, 0.035, 0.008, 0.55), 0.20),
-        gain(screech(1.05, 1165.0, 1.10, 17.0, 0.045, 0.008, 0.55), 0.17),
-        gain(screech(0.95, 1555.0, 1.06, 11.0, 0.030, 0.010, 0.60), 0.12),
-        # 긁는 소리 — 비명 뒤에 깔리는 노이즈
-        gain(hit(noise, 1.00, 0.004, 0.300, "band", 3000.0, 1.4), 0.55),
+        gain(slam(70101), 0.9),
+        gain(scream(1.15, 70102, 300.0, 520.0, 340.0, MALE_FORMANTS, 0.18), 0.75),
+        gain(scream(1.10, 70103, 320.0, 560.0, 370.0, MALE_FORMANTS_2, 0.12), 0.45),
+        gain(hit(Noise(seed=70104), 1.0, 0.003, 0.35, "band", 3400.0, 1.2), 0.25),
     )
 
 
