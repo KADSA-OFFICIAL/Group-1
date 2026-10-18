@@ -61,6 +61,7 @@ func _run() -> void:
 	await _check_subtitle_queue()
 	await _check_artroom_intro()
 	await _check_ink_throw()
+	await _check_jumpscare()
 	# 마지막에 둔다 — 씬을 실제로 갈아 끼워(change_scene_to_file) 본다.
 	await _check_pause_menu()
 	await _check_ending_backgrounds()
@@ -920,6 +921,70 @@ func _press_cancel() -> void:
 	ev.action = &"ui_cancel"
 	ev.pressed = true
 	root.push_input(ev)
+
+
+## 점프스케어(#662) — 붙잡히면 대사 뒤에 얼굴 오버레이가 뜨고, 비명이 울리고,
+## 얼굴이 화면을 넘칠 만큼 커졌다가, 검은 바탕만 남긴 채 게임 오버 씬으로 넘어가는가.
+##
+## 오버레이는 `_on_game_over()`의 await 사슬 끝에 붙어 있어 정적 검사로는 배선이
+## 끊겨도(노드 이름이 틀려 null이면 옛 페이드 경로로 빠진다) 모른다.
+func _check_jumpscare() -> void:
+	if current_scene != null:
+		current_scene.free()
+		await process_frame
+	var main: Node = (load(MAIN) as PackedScene).instantiate()
+	root.add_child(main)
+	for i in 8:
+		await process_frame
+	await _wait(0.4)
+
+	var js: Node = main.get_node_or_null("Jumpscare")
+	var gs: Node = main.get_node_or_null("GameState")
+	if js == null or gs == null:
+		_fault("점프스케어: Jumpscare/GameState를 못 찾았다")
+		await _drop_scenes(main)
+		return
+	if main.get("jumpscare") != js:
+		_fault("점프스케어: floor_manager.jumpscare가 Jumpscare 노드를 안 가리킨다")
+	var js_root := js.get_node("Root") as Control
+	var face := js.get_node("Root/Face") as TextureRect
+	if js_root.visible:
+		_fault("점프스케어: 붙잡히기 전부터 오버레이가 보인다")
+
+	var finished_black := [false]
+	js.connect("finished", func() -> void:
+		finished_black[0] = js_root.visible and not face.visible)
+
+	gs.call("trigger_game_over", "caught")
+	if not await _until(func() -> bool: return js_root.visible, 4.0):
+		_fault("점프스케어: 붙잡혔는데 오버레이가 안 뜬다")
+		await _drop_scenes(main)
+		return
+	var screamed := false
+	var sfx: Node = root.get_node_or_null("Sfx")
+	if sfx != null:
+		for pl in sfx.get("_players"):
+			var ap := pl as AudioStreamPlayer
+			if ap.playing and ap.stream != null and ap.stream.resource_path.ends_with("jumpscare.wav"):
+				screamed = true
+	if not screamed:
+		_fault("점프스케어: 오버레이가 떴는데 jumpscare 효과음이 안 난다")
+	await _wait(0.3)
+	if not face.visible or face.scale.x < 1.0:
+		_fault("점프스케어: 0.3초 뒤에도 얼굴이 화면을 덮지 않았다 (visible=%s, scale=%.2f)"
+			% [face.visible, face.scale.x])
+	else:
+		_ok("점프스케어 얼굴 덮침")
+
+	if not await _until(func() -> bool:
+			return current_scene != null \
+				and current_scene.scene_file_path == "res://scenes/ui/game_over.tscn", 4.0):
+		_fault("점프스케어: 연출 뒤 게임 오버 화면으로 안 넘어간다")
+	elif not finished_black[0]:
+		_fault("점프스케어: 끝날 때 검은 바탕이 안 남았다(게임 화면이 한 번 비친다)")
+	else:
+		_ok("점프스케어 → 게임 오버")
+	await _drop_scenes(main)
 
 
 ## `change_scene_to_file`이 붙인 현재 씬과, 손으로 붙였던 씬을 함께 내린다.

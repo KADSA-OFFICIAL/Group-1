@@ -259,6 +259,94 @@ def hallway(dry: list[float], low_pass: float, amount: float = 1.0) -> list[floa
     return biquad(reflections, "low", low_pass, 0.7)
 
 
+def saturate(samples: list[float], amount: float) -> list[float]:
+    """tanh 포화 — 파형 꼭대기를 눌러 소리를 찢어지게 만든다(#662).
+    1.0에서 1.0이 나오도록 정규화한다."""
+    norm = math.tanh(amount)
+    return [math.tanh(value * amount) / norm for value in samples]
+
+
+def scream(duration: float, seed: int, base: float, peak: float, end: float,
+           formants: tuple[tuple[float, float, float], ...], sub: float) -> list[float]:
+    """사람 비명 한 성부(#662) — 떨리는 톱니파 + 숨소리를 모음 포먼트에 통과시킨다.
+
+    음정은 0.06초 만에 base에서 peak로 치솟고 끝에서 end로 꺾인다. 떨림은 규칙적인
+    비브라토(7.5Hz)와 불규칙한 흔들림(랜덤 워크)을 겹친다 — 비브라토만 있으면
+    사이렌, 흔들림이 있어야 목이 갈라진다. `sub`는 한 옥타브 아래 톱니파로
+    **목 긁힘**을 낸다(목소리가 갈라질 때 생기는 부배음).
+
+    음정과 포먼트를 **남자 쪽으로** 잡았다(사용자 청음) — 처음 후보는 560→980Hz,
+    포먼트 850/1250/2900이라 여자 비명이었다. 300→520Hz, 700/1100/2450.
+    """
+    noise = Noise(seed=seed)
+    total = int(RATE * duration)
+    attack = max(int(RATE * 0.012), 1)
+    release = max(int(total * 0.45), 1)
+    source: list[float] = []
+    phase = 0.0
+    wander = 0.0
+    for i in range(total):
+        t = i / RATE
+        if t < 0.06:
+            hz = base * (peak / base) ** (t / 0.06)
+        else:
+            ratio = (t - 0.06) / max(duration - 0.06, 1e-6)
+            hz = peak * (end / peak) ** (ratio ** 2.2)
+        wander += noise.next() * 0.02 - wander * 0.05
+        hz *= 1.0 + 0.03 * math.sin(math.tau * 7.5 * t) + wander
+        phase += hz / RATE
+        source.append(saw(phase) * 0.8 + saw(phase * 0.5) * sub + noise.next() * 0.35)
+    voiced = mix(*[gain(biquad(source, "band", f, q), amp) for f, q, amp in formants])
+    shaped = []
+    for i, value in enumerate(voiced):
+        env = i / attack if i < attack else 1.0
+        if total - i < release:
+            env = ((total - i) / release) ** 1.6
+        shaped.append(value * env * 3.0)
+    return saturate(shaped, 2.5)
+
+
+def slam(seed: int) -> list[float]:
+    """덮치는 쾅(#662) — 78→34Hz로 떨어지는 서브 사인 + 저역·고역 노이즈 타격."""
+    noise = Noise(seed=seed)
+    total = int(RATE * 0.55)
+    sub: list[float] = []
+    phase = 0.0
+    for i in range(total):
+        t = i / RATE
+        phase += 78.0 * (34.0 / 78.0) ** min(t / 0.45, 1.0) / RATE
+        sub.append(math.sin(math.tau * phase) * math.exp(-t / 0.18))
+    return saturate(mix(
+        sub,
+        gain(hit(noise, 0.25, 0.001, 0.05, "low", 140.0, 0.8), 2.0),
+        gain(hit(noise, 0.10, 0.0005, 0.02, "high", 2500.0, 0.7), 0.6),
+    ), 2.0)
+
+
+# 남자 비명 포먼트("아") — (중심 Hz, Q, 세기). 두 성부가 조금 다른 목이다.
+MALE_FORMANTS = ((700.0, 5.0, 1.0), (1100.0, 6.0, 0.75), (2450.0, 8.0, 0.4))
+MALE_FORMANTS_2 = ((760.0, 5.0, 1.0), (1180.0, 6.0, 0.7), (2600.0, 8.0, 0.45))
+
+
+def jumpscare() -> list[float]:
+    """점프스케어(#662) — 쾅 + 남자 비명 두 겹 + 긁는 노이즈.
+
+    첫 버전은 8비트 톱니파 세 성부의 불협화음이었는데 "더 무섭게"(사용자) — 기계음이라
+    사람이 덮친다는 느낌이 없었다. 비명·현악 찌르기·둘 다를 들어 보고 비명을
+    골랐고, 키를 낮춰 남자 비명으로 맞췄다. 성부 둘은 음정·포먼트·시드가 조금씩
+    달라 한 사람이 아니라 갈라진 목처럼 겹친다.
+
+    공용 noise를 쓰지 않고 고정 시드를 따로 쓴다(발소리 #611과 같은 이유) —
+    다른 소리를 더할 때 이 소리가, 이 소리를 더할 때 다른 소리가 바뀌지 않게.
+    """
+    return mix(
+        gain(slam(70101), 0.9),
+        gain(scream(1.15, 70102, 300.0, 520.0, 340.0, MALE_FORMANTS, 0.18), 0.75),
+        gain(scream(1.10, 70103, 320.0, 560.0, 370.0, MALE_FORMANTS_2, 0.12), 0.45),
+        gain(hit(Noise(seed=70104), 1.0, 0.003, 0.35, "band", 3400.0, 1.2), 0.25),
+    )
+
+
 def sneaker_step(seed: int, heel: float, toe_delay: float, body_hz: float,
                  toe_weight: float) -> list[float]:
     """이설의 운동화 한 걸음(#621). 수위(footstep)와 **귀로 갈려야** 한다.
@@ -425,6 +513,9 @@ def build_all() -> dict[str, list[float]]:
     # UI 클릭
     sounds["ui_click"] = gain(
         tone(0.06, 1050, 700, square, attack=0.01, release=0.7, duty=0.3), 0.3)
+
+    # 점프스케어(#662) — 고정 시드라 공용 noise를 건드리지 않는다.
+    sounds["jumpscare"] = jumpscare()
 
     return sounds
 
