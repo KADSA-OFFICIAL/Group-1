@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/background/school_floor_4.tscn" id="1_floor"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -9,6 +9,7 @@
 [ext_resource type="Texture2D" path="res://scenes/main/wall_fade_mask.tres" id="7_fade_mask"]
 [ext_resource type="Script" path="res://scripts/game/wall_fade_mask.gd" id="8_fade_mask"]
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="9_pause_menu"]
+[ext_resource type="PackedScene" path="res://scenes/ui/jumpscare.tscn" id="10_jumpscare"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("3_floor_manager")
@@ -68,3 +69,5 @@ mouse_filter = 2
 color = Color(0, 0, 0, 1)
 
 [node name="PauseMenu" parent="." instance=ExtResource("9_pause_menu")]
+
+[node name="Jumpscare" parent="." instance=ExtResource("10_jumpscare")]

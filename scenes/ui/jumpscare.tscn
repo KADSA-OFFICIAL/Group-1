@@ -1,0 +1,53 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/jumpscare.gd" id="1_jumpscare"]
+[ext_resource type="Texture2D" path="res://assets/sprites/janitor_face.png" id="2_face"]
+
+[node name="Jumpscare" type="CanvasLayer"]
+; HUD·UI(FadeRect) 3, 일시정지 메뉴 4 — 자막까지 덮어야 한다(#662).
+layer = 5
+script = ExtResource("1_jumpscare")
+
+[node name="Root" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Backdrop" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 1)
+
+[node name="Face" type="TextureRect" parent="Root"]
+; 60x50 도트 그림을 화면 높이까지 키운다. Nearest — 보간하면 도트가 뭉개진다.
+texture_filter = 1
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_face")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Flash" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.85, 0.02, 0.02, 0)

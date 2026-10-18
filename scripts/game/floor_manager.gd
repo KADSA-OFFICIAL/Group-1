@@ -123,6 +123,7 @@ var changing_floor: bool = false
 @onready var hud: CanvasLayer = $HUD
 @onready var darkness: CanvasModulate = $Darkness
 @onready var fade_mask: Sprite2D = $WallFade/Mask
+@onready var jumpscare: CanvasLayer = $Jumpscare
 
 const FADE_IN_SECONDS := 1.5
 const FLOOR_FADE_OUT_SECONDS := 0.25
@@ -132,8 +133,12 @@ const START_HINT := "4층 미술실. 국어책만 챙겨서 나가면 된다."
 # 붙잡힌 순간을 잠깐 보여준 뒤 실패 화면으로 넘어간다(수위가 마주보는 연출).
 const GAME_OVER_SCENE := "res://scenes/ui/game_over.tscn"
 const GAME_OVER_FADE_SECONDS := 1.2
-## 붙잡힘 대사가 다 찍힌 뒤 페이드를 시작하기까지 두는 시간(#199).
-const GAME_OVER_LINE_HOLD := 0.5
+## 붙잡힘 대사가 다 찍힌 뒤 점프스케어까지 두는 시간(#199, #662). 0.7초였을 때
+## 체포음부터 얼굴까지 0.97초(타이핑 0.27 + 이 값)라 김이 빠졌다(사용자 F5) —
+## 대사가 다 찍히자마자 덮친다. 실측 0.42초.
+const GAME_OVER_LINE_HOLD := 0.15
+## 점프스케어가 끝난 뒤 검은 화면으로 머무는 시간. 비명 꼬리가 사라질 틈이다.
+const JUMPSCARE_BLACK_HOLD := 0.35
 
 var game_over_active: bool = false
 
@@ -213,6 +218,15 @@ func _on_game_over(reason: String) -> void:
 	if hud.has_method("await_subtitle"):
 		await hud.await_subtitle()
 	await get_tree().create_timer(GAME_OVER_LINE_HOLD).timeout
+
+	# 점프스케어(#662) — 얼굴이 덮친 뒤 검은 바탕만 남기고 끝난다. 페이드 없이
+	# 곧바로 넘긴다: 게임 오버 화면이 검은 데서 페이드 인하므로 컷으로 이어진다.
+	if jumpscare != null:
+		await jumpscare.play()
+		fade_rect.color.a = 1.0
+		await get_tree().create_timer(JUMPSCARE_BLACK_HOLD).timeout
+		get_tree().change_scene_to_file(GAME_OVER_SCENE)
+		return
 
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 1.0, GAME_OVER_FADE_SECONDS)
