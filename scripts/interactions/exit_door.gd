@@ -16,13 +16,8 @@ const CHOICE_SCENE: PackedScene = preload("res://scenes/ui/choice_prompt.tscn")
 ## 0 이상이면 엔딩 대신 그 층으로 간다(#356). 1층 현관은 0(운동장)을 준다.
 ## 판정은 그대로 여기서 하고 메타에 실어 두므로, 정문에서 꺼내 쓰면 결과가 같다.
 @export var next_floor: int = -1
-## 도착 지점(#393). Vector2.INF면 그 층의 기본 등장 지점으로 간다 — 현관은 그대로
-## 두고, 운동장 출입구만 서쪽 옆문 자리를 따로 준다.
+## 도착 지점. Vector2.INF면 그 층의 기본 등장 지점으로 간다(현관이 그렇다).
 @export var arrive_at: Vector2 = Vector2.INF
-## 어느 문으로 나왔는지(#393). 엔딩 첫 장면이 이 값으로 갈린다.
-## **비어 있으면 메타를 건드리지 않는다** — 현관에서 실어 둔 값을 정문(FrontGate)이
-## 덮어쓰면 어느 루트였는지가 지워진다.
-@export var exit_route: String = ""
 
 ## 어른 쪽 은폐를 본 플레이어에게만 묻는다. 아무것도 못 봤으면 신고할 거리가 없다.
 const CHOICE_PROMPT := "이대로 나가면 아무도 모른다."
@@ -67,8 +62,6 @@ func _leave(game_state, reported: bool) -> void:
 		kind = game_state.call("ending_kind", reported)
 		get_tree().set_meta("clue_score", game_state.call("clue_score"))
 	get_tree().set_meta("ending_kind", kind)
-	if not exit_route.is_empty():
-		get_tree().set_meta("exit_route", exit_route)
 
 	# autoload라 씬이 바뀌어도 소리는 끊기지 않는다.
 	Sfx.stop_music()
