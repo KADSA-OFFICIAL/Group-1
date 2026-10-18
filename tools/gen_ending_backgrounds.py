@@ -6,6 +6,7 @@
 
     assets/backgrounds/ending_entrance.png   학교 현관(밤)
     assets/backgrounds/ending_gate.png       정문(새벽)
+    assets/backgrounds/ending_home.png       집 식탁(아침, #647)
 
 `gen_key_sprite.py`와 같은 규약이다 — **표준 라이브러리만 쓰고 결정론적**이고
 정수 연산만 쓴다. 원본은 `source/`의 `.gdignore` 아래라 Godot이 임포트하지 않는다.
@@ -48,6 +49,7 @@ COLORS = 40
 JOBS = [
     ("ending_entrance_design.png", "ending_entrance.png"),
     ("ending_gate_design.png", "ending_gate.png"),
+    ("ending_home_design.png", "ending_home.png"),
 ]
 
 
