@@ -940,7 +940,7 @@ func _drop_scenes(manual: Node) -> void:
 func _check_ending_backgrounds() -> void:
 	var ending_script: GDScript = load("res://scripts/ui/ending.gd")
 	var consts: Dictionary = ending_script.get_script_constant_map()
-	for key: String in ["BG_ENTRANCE", "BG_GATE", "BG_HOME", "BG_POLICE"]:
+	for key: String in ["BG_ENTRANCE", "BG_GATE", "BG_HOME", "BG_POLICE", "BG_HALLWAY"]:
 		var tex := consts.get(key) as Texture2D
 		if tex == null:
 			_fault("엔딩 배경: %s를 못 읽었다" % key)
