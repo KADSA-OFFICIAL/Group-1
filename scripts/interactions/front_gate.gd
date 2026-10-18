@@ -2,8 +2,8 @@
 
 ## 운동장 정문(#513, #520) — 플레이어가 접촉하면 E키 없이 자동으로 엔딩 씬으로 전환한다.
 ##
-## 현관(exit_door.gd)이 운동장으로 보내기 **전에** 엔딩 판정(ending_kind)과
-## exit_route를 이미 SceneTree 메타에 실어 둔다. 이 스크립트는 그 메타를
+## 현관(exit_door.gd)이 운동장으로 보내기 **전에** 엔딩 판정(ending_kind)을
+## 이미 SceneTree 메타에 실어 둔다. 이 스크립트는 그 메타를
 ## 건드리지 않고 — 씬 전환만 담당한다.
 
 @export_file("*.tscn") var ending_scene_path: String = "res://scenes/ui/ending.tscn"

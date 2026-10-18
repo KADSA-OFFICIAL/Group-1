@@ -1604,8 +1604,7 @@ PROP_SPECS = {
 }
 
 # 도달 불가로 남겨야 하는 방에는 집기를 두지 않는다(verify_floor_reach가 확인).
-# 집기를 넣지 않는 방. 운동장 출입구는 #393에서 탈출 루트가 되면서 빠졌다 —
-# 들어갈 수 없는 방이라 비워 뒀던 것이지, 비어야 할 이유가 있던 게 아니다.
+# 집기를 넣지 않는 방. 지금은 없다.
 PROP_SKIP = set()
 
 
@@ -1617,8 +1616,7 @@ def prop_kind(key, label):
         return "toilet"
     if key.startswith("Storage") or key in ("PEStorage", "ArtStorage", "MusicPrep"):
         return "storage"
-    # 운동장 출입구도 현관과 같은 성격의 방이다(#393) — 신발장·우산꽂이.
-    if key in ("Entrance", "YardExit"):
+    if key == "Entrance":
         return "entrance"
     if key == "JanitorRoom":
         return "janitor"
