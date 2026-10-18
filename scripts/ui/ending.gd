@@ -16,6 +16,7 @@ extends Control
 
 const BG_ENTRANCE := preload("res://assets/backgrounds/ending_entrance.png")
 const BG_GATE := preload("res://assets/backgrounds/ending_gate.png")
+const BG_HOME := preload("res://assets/backgrounds/ending_home.png")
 
 # 장면: caption과 lines([화자, 대사] 또는 [화자, 대사, 감정]). 화자가 빈 문자열이면 지문·독백으로
 # 표시된다. 순서대로 재생하고 마지막에 타이틀로 돌아간다.
@@ -37,6 +38,7 @@ const BASIC_SCENES: Array = [
 	},
 	{
 		"caption": "— 다음 날 아침, 집 —",
+		"background": BG_HOME,
 		"lines": [
 			["", "TV가 켜져 있다."],
 			["TV 아나운서", "불암고등학교에서 여섯 번째 학생의 실종 신고가 접수되었습니다—"],
