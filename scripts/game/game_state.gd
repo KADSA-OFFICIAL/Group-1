@@ -189,10 +189,15 @@ const SIWOO_FLAGS := [
 const COVERUP_FLAGS := [
 	"read_principal_letter", "read_janitor_notebook", "read_crisis_manual"]
 
-## 층별 진엔딩(총 6개) 필수 단서 플래그(#540)
+## 층별 진엔딩(총 6개) 필수 단서 플래그(#540) — HUD 층별 진행도가 읽는다.
+## **단서가 실제로 놓인 층**에 적는다(#665). 상담기록부는 #411에서 3층으로 내려갔는데
+## 여기만 4층에 남아 있어서, 4층을 떠난 플레이어에게 HUD가 `4층:1/2`로 **다시 갈 수
+## 없는 층**의 단서를 놓쳤다고 알렸다. 조민혁은 3층 비커와 2층 머리(#459) 둘 다에서
+## 얻지만 3층 몫으로 센다 — 3층은 계단으로 되돌아갈 수 있어 거짓 경고가 안 되고,
+## 2층 머리로 얻어도 3층 칸이 채워진다. `verify_progression`이 씬과 대조한다.
 const TRUE_ENDING_BY_FLOOR := {
-	4: ["read_siwoo_painting", "read_siwoo_counseling"],
-	3: ["found_imnayeon", "found_jominhyuk"],
+	4: ["read_siwoo_painting"],
+	3: ["read_siwoo_counseling", "found_imnayeon", "found_jominhyuk"],
 	2: ["found_kangyujin"],
 	1: ["read_janitor_notebook"],
 }
@@ -226,7 +231,7 @@ func saw_coverup() -> bool:
 
 ## 진엔딩 진행 상황 반환(#540): { "found": N, "total": 6, "by_floor": { 4: [found, total], 3: [found, total], 2: [found, total], 1: [found, total] } }
 func get_true_ending_stats() -> Dictionary:
-	var res := { "found": 0, "total": 6, "by_floor": {} }
+	var res := { "found": 0, "total": 0, "by_floor": {} }
 	for fl in [4, 3, 2, 1]:
 		var clues: Array = TRUE_ENDING_BY_FLOOR.get(fl, [])
 		var got := 0
@@ -234,13 +239,14 @@ func get_true_ending_stats() -> Dictionary:
 			if c in flags:
 				got += 1
 		res.found += got
+		res.total += clues.size()
 		res.by_floor[fl] = [got, clues.size()]
 	return res
 
 
 ## 엔딩 2 진행 상황 반환(#540): { "found": N, "total": 3, "by_floor": { 2: [found, total], 1: [found, total] } }
 func get_report_ending_stats() -> Dictionary:
-	var res := { "found": 0, "total": 3, "by_floor": {} }
+	var res := { "found": 0, "total": 0, "by_floor": {} }
 	for fl in [2, 1]:
 		var clues: Array = REPORT_ENDING_BY_FLOOR.get(fl, [])
 		var got := 0
@@ -248,6 +254,7 @@ func get_report_ending_stats() -> Dictionary:
 			if c in flags:
 				got += 1
 		res.found += got
+		res.total += clues.size()
 		res.by_floor[fl] = [got, clues.size()]
 	return res
 
