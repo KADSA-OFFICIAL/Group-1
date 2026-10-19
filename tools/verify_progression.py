@@ -35,7 +35,7 @@ area_re = re.compile(r'\[node name="(\w+)" type="Area2D" parent="\."\]\n'
 
 def scan(fl):
     text = (ROOT / f"scenes/background/school_floor_{fl}.tscn").read_text()
-    items, locks, exits, links = [], [], [], []
+    items, locks, exits, links, flags = [], [], [], [], []
     for m in area_re.finditer(text):
         name, body = m.group(1), m.group(2)
         pos = re.search(r"position = Vector2\(([-\d.]+), ([-\d.]+)\)", body)
@@ -45,6 +45,9 @@ def scan(fl):
         got = re.search(r'\n(?:item_id|grants_item_id) = "([^"]+)"', body)
         if got:
             items.append((name, got.group(1), p))
+        flag = re.search(r'\ngrants_flag = "([^"]+)"', body)
+        if flag:
+            flags.append((name, flag.group(1), p))
         # **계단 자물쇠만** 센다. `required_item_id`만 보면 층 통로(창문, #406)와
         # 현관까지 자물쇠로 세어, 하강 수단이 사라져도 '자물쇠는 있으니 괜찮다'로
         # 통과한다 — 실제로 창문을 지웠는데 검사가 안 걸렸다.
@@ -64,11 +67,65 @@ def scan(fl):
             links.append((name, int(tf.group(1)) if tf else -1,
                           req.group(1) if req else "", p,
                           (float(arr.group(1)), float(arr.group(2))) if arr else None))
-    return items, locks, exits, links
+    return items, locks, exits, links, flags
+
+
+GAME_STATE = ROOT / "scripts/game/game_state.gd"
+
+
+def gd_list(text, name):
+    """`const NAME := [ "a", "b" ]`의 문자열들."""
+    m = re.search(rf"^const {name} := \[(.*?)\]", text, re.M | re.S)
+    return re.findall(r'"([^"]+)"', m.group(1)) if m else None
+
+
+def gd_floor_table(text, name):
+    """`const NAME := { 4: [...], 3: [...] }` → {층: [플래그]}."""
+    m = re.search(rf"^const {name} := \{{(.*?)^\}}", text, re.M | re.S)
+    if not m:
+        return None
+    return {int(fl): re.findall(r'"([^"]+)"', body)
+            for fl, body in re.findall(r"^\s*(\d+): \[([^\]]*)\]", m.group(1), re.M)}
+
+
+def check_ending_tally(flags_at):
+    """HUD의 층별 엔딩 진행도(`*_ENDING_BY_FLOOR`)가 씬과 맞는가(#665).
+
+    상담기록부를 #411에서 3층으로 옮겼는데 표만 4층에 남아, HUD가 다시 갈 수
+    없는 4층의 단서를 놓쳤다고 알렸다. 표가 손으로 적는 것이라 씬을 옮길 때마다
+    어긋날 수 있다 — ① 각 플래그가 **그 층에서 걸어서 닿는** `grants_flag`로
+    있는지, ② 표의 합이 판정 상수(`MISSING`+`SIWOO` / `COVERUP`)와 같은지 본다.
+    ②가 없으면 판정에는 있는데 HUD에 안 뜨는(또는 그 반대) 단서를 못 잡는다.
+    """
+    text = GAME_STATE.read_text()
+    bad = 0
+    for table, judge in (("TRUE_ENDING_BY_FLOOR", ("MISSING_FLAGS", "SIWOO_FLAGS")),
+                         ("REPORT_ENDING_BY_FLOOR", ("COVERUP_FLAGS",))):
+        tally = gd_floor_table(text, table)
+        want = [gd_list(text, j) for j in judge]
+        if tally is None or None in want:
+            print(f"  ✗ game_state.gd에서 {table} / {judge}를 읽지 못했다"); bad += 1
+            continue
+        listed = [f for fl in tally for f in tally[fl]]
+        if sorted(listed) != sorted(set(listed)):
+            print(f"  ✗ {table}에 같은 플래그가 두 층에 적혀 있다: {listed}"); bad += 1
+        if set(listed) != {f for w in want for f in w}:
+            print(f"  ✗ {table} 합 {sorted(set(listed))} ≠ "
+                  f"{'+'.join(judge)} {sorted({f for w in want for f in w})}"); bad += 1
+        for fl, fs in sorted(tally.items(), reverse=True):
+            for f in fs:
+                if f not in flags_at.get(fl, set()):
+                    where = [k for k, v in sorted(flags_at.items(), reverse=True) if f in v]
+                    print(f"  ✗ {table}: {f}를 {fl}층 몫으로 세지만 {fl}층에서 얻을 수 없다"
+                          f" (실제: {', '.join(f'{k}층' for k in where) or '없음'})"); bad += 1
+    if not bad:
+        print("  층별 엔딩 진행도(HUD) ↔ 씬 단서 위치 일치")
+    return bad
 
 
 def main():
     inv, log, bad = set(), [], 0
+    flags_at = {}  # 층 -> 그 층에서 걸어서 닿는 grants_flag
     arrive = START_POS
 
     for fl in range(START_FLOOR, END_FLOOR - 1, -1):
@@ -91,7 +148,8 @@ def main():
                         return True
             return False
 
-        items, locks, exits, links = scan(fl)
+        items, locks, exits, links, flags = scan(fl)
+        flags_at[fl] = {f for _n, f, p in flags if reach(p)}
         picked = []
         for name, item, p in items:
             if reach(p):
@@ -139,6 +197,8 @@ def main():
                 print(f"  ✗ {fl}층 계단 자물쇠에 도달할 수 없다"); bad += 1
                 break
         arrive = ARRIVE[fl - 1]
+
+    bad += check_ending_tally(flags_at)
 
     print("\n".join("  " + l for l in log))
     print(f"\n진행 가능 — {START_FLOOR}층 시작에서 1층 현관 탈출까지 완주"

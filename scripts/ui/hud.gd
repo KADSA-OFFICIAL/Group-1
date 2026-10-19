@@ -110,8 +110,8 @@ func _update_endings_ui() -> void:
 	# 1. 진엔딩 (쉬는 시간, 총 6개)
 	if is_instance_valid(true_ending_label) and game_state.has_method("get_true_ending_stats"):
 		var te: Dictionary = game_state.call("get_true_ending_stats")
-		var f4: Array = te.by_floor.get(4, [0, 2])
-		var f3: Array = te.by_floor.get(3, [0, 2])
+		var f4: Array = te.by_floor.get(4, [0, 1])
+		var f3: Array = te.by_floor.get(3, [0, 3])
 		var f2: Array = te.by_floor.get(2, [0, 1])
 		var f1: Array = te.by_floor.get(1, [0, 1])
 		if te.found >= te.total:
