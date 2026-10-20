@@ -266,44 +266,119 @@ def saturate(samples: list[float], amount: float) -> list[float]:
     return [math.tanh(value * amount) / norm for value in samples]
 
 
-def scream(duration: float, seed: int, base: float, peak: float, end: float,
-           formants: tuple[tuple[float, float, float], ...], sub: float) -> list[float]:
-    """사람 비명 한 성부(#662) — 떨리는 톱니파 + 숨소리를 모음 포먼트에 통과시킨다.
+def gauss3(noise: Noise) -> float:
+    """균등 난수 셋의 합 — 종 모양에 가까운 흔들림(#668). 지터·시머·음정 표류에 쓴다."""
+    return (noise.next() + noise.next() + noise.next()) / 1.7
 
-    음정은 0.06초 만에 base에서 peak로 치솟고 끝에서 end로 꺾인다. 떨림은 규칙적인
-    비브라토(7.5Hz)와 불규칙한 흔들림(랜덤 워크)을 겹친다 — 비브라토만 있으면
-    사이렌, 흔들림이 있어야 목이 갈라진다. `sub`는 한 옥타브 아래 톱니파로
-    **목 긁힘**을 낸다(목소리가 갈라질 때 생기는 부배음).
 
-    음정과 포먼트를 **남자 쪽으로** 잡았다(사용자 청음) — 처음 후보는 560→980Hz,
-    포먼트 850/1250/2900이라 여자 비명이었다. 300→520Hz, 700/1100/2450.
+def breakpoint(points: list[tuple[float, float]], t: float) -> float:
+    """[(시각, 값), ...]을 선형으로 잇는다 — 음정·포먼트·세기가 시간에 따라 움직인다."""
+    if t <= points[0][0]:
+        return points[0][1]
+    for (t0, v0), (t1, v1) in zip(points, points[1:]):
+        if t <= t1:
+            return v0 + (v1 - v0) * (t - t0) / (t1 - t0)
+    return points[-1][1]
+
+
+def glottal(duration: float, seed: int, f0_pts: list[tuple[float, float]],
+            chaos_pts: list[tuple[float, float]], jitter: float, shimmer: float,
+            open_q: float, breath_pts: list[tuple[float, float]]) -> list[float]:
+    """성대 펄스열 + 주기 동기 숨(#668). 비명의 음원이다.
+
+    한 주기씩 로젠버그 펄스(열림 70% / 닫힘 30%)를 찍고, 주기마다 길이(지터)·세기
+    (시머)를 흔든다. 톱니파(#662의 첫 비명)는 주기가 완벽히 같아 카주처럼 들렸다.
+    거기에 **로지스틱 맵(r=3.9)** 수열로 길이·세기를 혼돈으로 흔든다 — 실제 비명에서
+    성대는 규칙적으로 떨지 않고 혼돈(deterministic chaos)으로 떤다.
+
+    숨은 성대가 열린 동안 더 세게 샌다(주기 동기 기식음). 출력은 입술 방사(1차 미분)를
+    거친 값이라 고역이 살아 있다.
     """
     noise = Noise(seed=seed)
     total = int(RATE * duration)
-    attack = max(int(RATE * 0.012), 1)
-    release = max(int(total * 0.45), 1)
-    source: list[float] = []
-    phase = 0.0
-    wander = 0.0
-    for i in range(total):
-        t = i / RATE
-        if t < 0.06:
-            hz = base * (peak / base) ** (t / 0.06)
-        else:
-            ratio = (t - 0.06) / max(duration - 0.06, 1e-6)
-            hz = peak * (end / peak) ** (ratio ** 2.2)
-        wander += noise.next() * 0.02 - wander * 0.05
-        hz *= 1.0 + 0.03 * math.sin(math.tau * 7.5 * t) + wander
-        phase += hz / RATE
-        source.append(saw(phase) * 0.8 + saw(phase * 0.5) * sub + noise.next() * 0.35)
-    voiced = mix(*[gain(biquad(source, "band", f, q), amp) for f, q, amp in formants])
-    shaped = []
-    for i, value in enumerate(voiced):
-        env = i / attack if i < attack else 1.0
-        if total - i < release:
-            env = ((total - i) / release) ** 1.6
-        shaped.append(value * env * 3.0)
-    return saturate(shaped, 2.5)
+    voice = [0.0] * total
+    breath = [0.0] * total
+    n = 0
+    x = 0.37
+    drift = 0.0
+    while n < total:
+        t = n / RATE
+        drift += gauss3(noise) * 0.006 - drift * 0.1
+        f0 = breakpoint(f0_pts, t) * (1.0 + drift)
+        chaos = breakpoint(chaos_pts, t)
+        x = 3.9 * x * (1.0 - x)
+        c = (x - 0.5) * 2.0
+        period = (1.0 / f0) * (1.0 + jitter * gauss3(noise) + chaos * 0.45 * c)
+        amp = max(0.05, 1.0 + shimmer * gauss3(noise) + chaos * 0.8 * c)
+        length = max(int(period * RATE), 6)
+        tp = max(int(length * open_q * 0.7), 1)
+        tn = max(int(length * open_q * 0.3), 1)
+        level = breakpoint(breath_pts, t)
+        for k in range(length):
+            if n + k >= total:
+                break
+            if k < tp:
+                flow = 0.5 * (1.0 - math.cos(math.pi * k / tp))
+            elif k < tp + tn:
+                flow = math.cos(0.5 * math.pi * (k - tp) / tn)
+            else:
+                flow = 0.0
+            voice[n + k] = flow * amp
+            breath[n + k] = noise.next() * (0.3 + 0.7 * flow) * level
+        n += length
+    radiated = [0.0] * total
+    prev = 0.0
+    for i, v in enumerate(voice):
+        radiated[i] = (v - prev) * 6.0
+        prev = v
+    breath = biquad(breath, "high", 700.0, 0.7)
+    return [r + b for r, b in zip(radiated, breath)]
+
+
+def _resonate(samples: list[float], points: list[tuple[float, float]], bw: float) -> list[float]:
+    """Klatt 공명기 하나 — 중심 주파수가 시간에 따라 움직인다. DC 이득 1."""
+    y1 = y2 = 0.0
+    c = -math.exp(-2 * math.pi * bw / RATE)
+    out = []
+    for i, x in enumerate(samples):
+        f = breakpoint(points, i / RATE)
+        b = 2 * math.exp(-math.pi * bw / RATE) * math.cos(2 * math.pi * f / RATE)
+        y = (1 - b - c) * x + b * y1 + c * y2
+        y2, y1 = y1, y
+        out.append(y)
+    return out
+
+
+def formant_cascade(samples: list[float], tracks, bandwidths) -> list[float]:
+    """직렬 포먼트(F1~F5) — 성대음에 쓴다. 직렬이라 포먼트끼리의 세기 비가 저절로 맞는다."""
+    out = samples
+    for points, bw in zip(tracks, bandwidths):
+        out = _resonate(out, points, bw)
+    return out
+
+
+def formant_parallel(samples: list[float], tracks, bandwidths, gains) -> list[float]:
+    """병렬 포먼트 — 숨(넓은 대역 노이즈)을 모음 모양으로 깎는 데 쓴다."""
+    return mix(*[gain(_resonate(samples, points, bw), g)
+                 for points, bw, g in zip(tracks, bandwidths, gains)])
+
+
+def peak_envelope(samples: list[float], attack: float, release_frac: float,
+                  curve: float = 1.8) -> list[float]:
+    """올림·내림 엔벨로프를 씌우고 피크를 1로 맞춘다 — 층을 섞기 전에 세기를 고르게."""
+    total = len(samples)
+    a = int(attack * RATE)
+    r = int(total * release_frac)
+    out = []
+    for i, value in enumerate(samples):
+        env = 1.0
+        if i < a:
+            env = (i / a) ** 0.6
+        if total - i < r:
+            env *= ((total - i) / r) ** curve
+        out.append(value * env)
+    peak = max(abs(v) for v in out) or 1.0
+    return [v / peak for v in out]
 
 
 def slam(seed: int) -> list[float]:
@@ -323,27 +398,62 @@ def slam(seed: int) -> list[float]:
     ), 2.0)
 
 
-# 남자 비명 포먼트("아") — (중심 Hz, Q, 세기). 두 성부가 조금 다른 목이다.
-MALE_FORMANTS = ((700.0, 5.0, 1.0), (1100.0, 6.0, 0.75), (2450.0, 8.0, 0.4))
-MALE_FORMANTS_2 = ((760.0, 5.0, 1.0), (1180.0, 6.0, 0.7), (2600.0, 8.0, 0.45))
+# 쉰 절규의 "아" 포먼트(#668) — 입이 더 벌어지며 F1·F2가 오르고 끝에서 다문다.
+SCREAM_SECONDS = 1.15
+SCREAM_FORMANTS = (
+    [(0.0, 780), (0.3, 900), (1.15, 760)],
+    [(0.0, 1250), (0.3, 1350), (1.15, 1200)],
+    [(0.0, 2550), (1.15, 2600)],
+    [(0.0, 3400), (1.15, 3400)],
+    [(0.0, 4200), (1.15, 4200)],
+)
+
+
+def hoarse_scream(seed: int, voiced_gain: float, air_gain: float, breath: float,
+                  chaos_scale: float, jitter: float, voiced_bw, presence: float,
+                  f0_pts) -> list[float]:
+    """쉰 절규(#668) — 성대음(직렬 포먼트) + 숨(병렬 포먼트 노이즈) + 존재감 부스트 + 복도.
+
+    처음 고른 S2는 숨이 성대음보다 커서 음정이 묻혔다(주기성 0.38). "더 분명하게"
+    (사용자)에 따라 성대음 1.0 / 숨 0.35, 혼돈 절반, 포먼트 대역폭을 좁혀 모음을
+    또렷하게 하고 3kHz를 올려 비명을 앞으로 뺐다(주기성 0.70~0.82).
+    """
+    v = glottal(SCREAM_SECONDS, seed,
+                f0_pts=list(f0_pts),
+                chaos_pts=[(0.0, 0.3 * chaos_scale), (0.2, 0.2 * chaos_scale),
+                           (1.15, 0.35 * chaos_scale)],
+                jitter=jitter, shimmer=0.2 * chaos_scale + 0.05, open_q=0.5,
+                breath_pts=[(0.0, 1.6 * breath), (1.15, 2.0 * breath)])
+    voiced = formant_cascade(v, SCREAM_FORMANTS, voiced_bw)
+    air_noise = Noise(seed=seed + 1)
+    air = [air_noise.next() for _ in range(int(RATE * SCREAM_SECONDS))]
+    air = formant_parallel(air, SCREAM_FORMANTS, (200, 260, 320, 400, 500),
+                           (1.0, 0.8, 0.6, 0.4, 0.3))
+    s = mix(gain(peak_envelope(voiced, 0.02, 0.35), voiced_gain),
+            gain(peak_envelope(air, 0.01, 0.4), air_gain))
+    if presence > 0:
+        s = mix(s, gain(biquad(s, "band", 3000.0, 1.0), presence))
+    s = saturate(peak_envelope(s, 0.012, 0.3), 1.8)
+    return mix(s, hallway(s, 3800.0, 0.8))
 
 
 def jumpscare() -> list[float]:
-    """점프스케어(#662) — 쾅 + 남자 비명 두 겹 + 긁는 노이즈.
+    """점프스케어(#662, #668) — 쾅 + 쉰 남자 절규.
 
-    첫 버전은 8비트 톱니파 세 성부의 불협화음이었는데 "더 무섭게"(사용자) — 기계음이라
-    사람이 덮친다는 느낌이 없었다. 비명·현악 찌르기·둘 다를 들어 보고 비명을
-    골랐고, 키를 낮춰 남자 비명으로 맞췄다. 성부 둘은 음정·포먼트·시드가 조금씩
-    달라 한 사람이 아니라 갈라진 목처럼 겹친다.
+    거쳐 온 것(전부 사용자 청음):
+      1. 8비트 톱니파 불협화음 — "더 무섭게": 기계음이라 사람이 덮치는 느낌이 없었다.
+      2. 톱니파 + 병렬 포먼트 남자 비명 두 겹(#662) — "더 현실적으로".
+      3. 성대 펄스 + 지터·시머 + 직렬 포먼트(깨끗한 / 갈라지는 / 높은) — "구리다".
+         500Hz에서 배음이 듬성듬성해 포먼트가 카주처럼 찍혔고 주기가 너무 고왔다.
+      4. 포효(낮은 고함) / **쉰 절규**(숨이 주) / 혼돈 비명 — 쉰 절규가 골라졌다.
+      5. 쉰 절규를 또렷하게 한 셋 중 **음정을 510Hz까지 치켜올린 것**(T3).
 
-    공용 noise를 쓰지 않고 고정 시드를 따로 쓴다(발소리 #611과 같은 이유) —
-    다른 소리를 더할 때 이 소리가, 이 소리를 더할 때 다른 소리가 바뀌지 않게.
+    고정 시드라 다른 소리를 더하거나 빼도 이 소리가 바뀌지 않는다.
     """
     return mix(
-        gain(slam(70101), 0.9),
-        gain(scream(1.15, 70102, 300.0, 520.0, 340.0, MALE_FORMANTS, 0.18), 0.75),
-        gain(scream(1.10, 70103, 320.0, 560.0, 370.0, MALE_FORMANTS_2, 0.12), 0.45),
-        gain(hit(Noise(seed=70104), 1.0, 0.003, 0.35, "band", 3400.0, 1.2), 0.25),
+        gain(slam(70101), 0.8),
+        hoarse_scream(69201, 1.0, 0.35, 0.4, 0.5, 0.025, (90, 110, 170, 260, 340), 0.7,
+                      f0_pts=((0.0, 300), (0.06, 480), (0.15, 510), (0.65, 500), (1.15, 360))),
     )
 
 
