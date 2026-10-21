@@ -368,6 +368,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
 - **자막 타이핑에는 배속이 둘 있다**(#563, `subtitle_dialogue.gd`). 평소 `TYPING_SPEED`(1.5배), 뒤에 대기 중인 줄이 있으면 `TYPING_SPEED_QUEUED`(2배) — HUD가 대기열이 비었는지를 `show_line(..., queued)`로 넘긴다. 글자당 시간(`TYPING_SECONDS_PER_CHAR` 0.05)을 직접 줄이지 않은 이유는 감정 배율(`_typing_scale`)이 그 위에 곱해지기 때문이다: 배속을 따로 두면 "기본 속도"와 "지금 얼마나 서두르는가"가 분리된다.
   - **두 단계로 나눈 이유**: 혼자 뜨는 대사(조사 문구 한 줄)까지 2배로 하면 읽기 전에 지나간다. 밀려 있을 때만 서두르면 기다리는 시간만 줄고 한 줄짜리는 그대로다. 실측(51자 다섯 줄 연속): 줄당 3.66 → **2.33초**, 다섯 줄 16.0 → **11.1초**.
   - 컷신(`intro.gd`·`ending.gd`)은 `queued`를 넘기지 않으므로 평소 배속(1.5배)이다.
+- **게임 문구에 이모지를 쓰지 않는다**(#671). 게임 폰트(NotoSansKR·연성·동해독도)에 이모지 글리프가 없어서, 한 글자만 있어도 **OS 이모지 폰트를 통째로 불러온다** — macOS `Apple Color Emoji.ttc` 183MB. 체크포인트 알림의 📌 하나로 본편 정적 메모리가 128 → 312MB가 됐고, 처음 뜰 때 프레임이 한 번 끊겼다(48~77ms). 한 번 올라온 폰트는 게임을 끌 때까지 남는다. ▲▼·→ 같은 기호도 폰트에 있는지 먼저 볼 것.
 - 대사 감정은 `subtitle_dialogue.gd::EMOTIONS`에 있는 키만 듣는다 — 없는 키는 **조용히** 기본값으로 떨어진다. `"suspicion"`(느리게)과 `"fear"`(빠르게, 붉은 이름) 둘뿐이다. #409가 `"fear"`를 썼는데 표에 없어 아무 효과가 없던 것을 #454에서 채웠다.
 - 현관 선택지는 `scenes/ui/choice_prompt.tscn`(`scripts/ui/choice_prompt.gd`) — 본편에서 플레이어가 **말로 고르는 유일한 자리**다. 대화 자막(`subtitle_dialogue.tscn`)은 한 줄씩 흘려보내는 장치라 커서를 올렸다 내렸다 할 수 없어 따로 만들었다.
   - **게임을 멈춘다**(`get_tree().paused`). 안 그러면 고르는 동안 수위가 걸어와 붙잡는다. 패널만 `PROCESS_MODE_ALWAYS`라 멈춘 중에도 입력을 받고, Tween에는 `TWEEN_PAUSE_PROCESS`를 준다.
@@ -387,7 +388,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
 - .tscn 수정 시 `load_steps` = ext_resource 수 + sub_resource 수 + 1 유지.
 - **게임을 끄는 길은 `Sfx.quit_cleanly()` 하나다**(#615). `Sfx`가 `auto_accept_quit`를 끄고 창 닫기 요청을 받아 소리를 전부 멈춘 뒤 **0.1초 기다렸다** 끝낸다. 루프 음악이 재생 중인 채로 끝내면 오디오 스레드가 재생 상태를 정리하기 전에 엔진이 내려가 `AudioStreamWAV`·`AudioStreamPlaybackWAV`가 남는다 — `stop()` 직후에 끝내도 남는다(실측 5/5회). `get_tree().quit()`을 직접 부르면 누수가 돌아온다.
   - **트리 전체의 플레이어를 끈다**(`find_children`). 수위의 발소리·열쇠·문 소리는 `janitor.tscn`의 `AudioStreamPlayer2D`라 `Sfx` 밖에 있고, 그것만 남아도 한 쌍이 샌다(실측).
-  - **자막·컷신 도중에 닫으면 `GDScriptFunctionState` 1~2개가 여전히 남는다.** 멈춘 코루틴이 종료 시점에 남는 GDScript 엔진 동작이다 — `create_timer` 대신 노드 `Timer`(static 함수·인스턴스 메서드 둘 다), 매 프레임 `process_frame` 루프, 종료 전 씬 내리기를 다 해 봤는데 1~2개는 그대로였다 — 원래 `create_timer`일 때는 코루틴 1개 + `SceneTreeTimer` 1개가 남는다. 종료 때만 생기고 플레이 중에 쌓이지 않으며 OS가 회수한다. 없애려면 종료 시점에 멈춘 코루틴이 하나도 없어야 하는데, 그건 컷신·자막 구조를 다 바꾸는 일이라 하지 않았다.
+  - **자막·컷신 도중에 닫으면 `GDScriptFunctionState` 1~2개가 여전히 남는다.** 멈춘 코루틴이 종료 시점에 남는 GDScript 엔진 동작이다 — `create_timer` 대신 노드 `Timer`(static 함수·인스턴스 메서드 둘 다), 매 프레임 `process_frame` 루프, 종료 전 씬 내리기를 다 해 봤는데 1~2개는 그대로였다 — 원래 `create_timer`일 때는 코루틴 1개 + `SceneTreeTimer` 1개가 남는다. OS가 회수한다. **플레이 중에도 조금씩 쌓인다**(#671에서 실측) — 대기 중인 코루틴이 있는 채로 main 씬이 해제될 때마다(게임 오버 재시도·처음부터 다시하기·타이틀로) 1~2개씩 남는다. 노드가 `await` 도중 해제되면 대기 대상(타이머·`process_frame`·중첩 코루틴)과 무관하게 코루틴 하나가 남는 엔진 동작이고, 개당 1KB 미만이라 죽을 때마다 쌓여도 실해는 없다. 없애려면 종료 시점에 멈춘 코루틴이 하나도 없어야 하는데, 그건 컷신·자막 구조를 다 바꾸는 일이라 하지 않았다.
 - project.godot에 사용자의 미커밋 변경이 있을 수 있음 — 내 커밋에 섞지 말 것(필요 시 stash로 분리).
 - .gd 스크립트를 새로 만들면 사용자 에디터가 .uid 파일을 생성함 — 발견 시 해당 이슈 브랜치에 커밋.
 
@@ -477,6 +478,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
 - 배치를 **눈으로** 보려면 `python3 tools/preview_scene.py <씬이름>`으로 SVG+PNG를 뽑습니다(#361). Godot을 띄우지 않고 폴리곤을 선언 순서대로 칠하고 광원을 얹습니다. **게임 화면과 같지 않습니다** — 도트 텍스처·어둠·손전등·시야 마스크가 빠져 있어 "이렇게 보인다"가 아니라 "이렇게 놓였다"를 보는 도구입니다. 운동장 소품 겹침(#361)을 이걸로 발견했습니다.
 - **`verify_progression`은 하강 수단을 계단에 한정하지 않습니다**(#406). 층마다 ① 계단 자물쇠 또는 ② 층 통로(`floor_link.gd`)를 찾고, 그것에 **걸어서 닿는지**와 요구 아이템을 얻을 수 있는지를 봅니다. 예전에는 자물쇠만 봐서, 4층 계단이 사라지자 확인할 것이 없어져 **아무것도 검사하지 않고 통과**했습니다. 도달 판정은 칸 자체가 아니라 **둘레 `REACH_CELLS`(2)칸**을 봅니다 — 단서는 집기 위·벽에 붙는 것이 정상이라 그 칸은 격자에서 막혀 있고, 실제로는 옆에 서서 E를 누릅니다.
 - 기하·좌표를 바꿨으면 해당 이슈에 맞는 임시 검증 스크립트로 대조합니다.
+- **프레임 시간은 벽시계로 잽니다**(#671). 헤드리스 임시 스크립트에서 `Performance.TIME_PROCESS`를 매 프레임 읽으면 **갱신 사이에 같은 값이 수백 프레임 이어서** 나온다 — 층 교체 프레임 하나(120ms)가 145프레임 내리 찍혀 "도착 후 계속 끊긴다"로 잘못 읽었다. `Time.get_ticks_usec()`의 프레임 간 차이를 쓸 것. 메모리는 `Performance.MEMORY_STATIC`, 누수는 `OBJECT_COUNT`·`OBJECT_NODE_COUNT`·`OBJECT_ORPHAN_NODE_COUNT` 추이와 `--verbose` 종료 시 `Leaked instance` 목록으로 본다.
 - 플레이어 입력, UI, 충돌, 게임 흐름 확인은 사용자의 수동 F5에 의존합니다.
 - 푸시하면 GitHub Actions(`.github/workflows/ci.yml`)가 정적 검사와 함께
   Godot 4.6 헤드리스 임포트·전체 씬 로드를 실행합니다. 결과는 `gh pr checks <번호>`로 확인합니다.
