@@ -1022,6 +1022,8 @@ func _check_ending_backgrounds() -> void:
 		var ending: Node = (load("res://scenes/ui/ending.tscn") as PackedScene).instantiate()
 		root.add_child(ending)
 		await process_frame
+		# 엔딩마다 제 곡(#676).
+		_expect_theme(root.get_node("Sfx"), StringName("ending_%s" % kind), "엔딩 %s" % kind)
 		var bg := ending.get_node_or_null("SceneBackground") as TextureRect
 		var cap := ending.get_node_or_null("SceneCaption") as Label
 		if bg == null or cap == null:
@@ -1048,6 +1050,7 @@ func _check_ending_backgrounds() -> void:
 		await process_frame
 		if has_meta("ending_kind"):
 			remove_meta("ending_kind")
+	root.get_node("Sfx").call("stop_theme")
 
 
 ## 엔딩 결과 화면(#636) — 컷신이 끝나면 "생존했다"로 넘어가 엔딩 이름·점수를 싣는가,
@@ -1064,6 +1067,8 @@ func _check_ending_result() -> void:
 	var ending: Node = (load("res://scenes/ui/ending.tscn") as PackedScene).instantiate()
 	root.add_child(ending)
 	await process_frame
+	var sfx: Node = root.get_node("Sfx")
+	var ending_player: AudioStreamPlayer = _expect_theme(sfx, &"ending_adults_work", "엔딩 어른들의 일")
 	for sc: Dictionary in ending.get("scenes"):
 		for line: Array in sc["lines"]:
 			if String(line[1]).begins_with("알아낸 것"):
@@ -1097,6 +1102,17 @@ func _check_ending_result() -> void:
 		_fault("엔딩 결과: 점수 줄이 틀리다 (visible=%s, %s)" % [score_label.visible, score_label.text])
 	else:
 		_ok("엔딩 결과 화면 이름·점수")
+	# 엔딩 곡이 결과 화면으로 끊기지 않고 이어지는가(#676) — 다시 틀면 처음부터 난다.
+	# 다시 틀면 다른 플레이어로 크로스페이드하므로(앞 곡은 사라지는 중에도 playing이다)
+	# 같은 플레이어가 지금 테마인지를 본다.
+	if ending_player != null:
+		var now_player: AudioStreamPlayer = (sfx.get("_theme_players") as Array)[int(sfx.get("_theme_index"))]
+		if StringName(sfx.get("_theme_id")) != &"ending_adults_work" or not ending_player.playing:
+			_fault("엔딩 결과: 컷신 곡이 결과 화면에서 이어지지 않는다 (테마 '%s')" % sfx.get("_theme_id"))
+		elif now_player != ending_player or ending_player.get_playback_position() < 0.3:
+			_fault("엔딩 결과: 결과 화면에서 엔딩 곡이 처음부터 다시 났다")
+		else:
+			_ok("엔딩 곡이 결과 화면까지 이어짐")
 	var rs: GDScript = load("res://scripts/ui/ending_result.gd")
 	if StringName(rs.get("pending_kind")) != &"" or not (rs.get("pending_score") as Array).is_empty():
 		_fault("엔딩 결과: 읽은 뒤 pending 값을 안 비웠다(다음 판이 지난 판 점수를 보인다)")
@@ -1108,4 +1124,13 @@ func _check_ending_result() -> void:
 		_fault("엔딩 결과: 타이틀로 — 타이틀 씬으로 안 넘어간다")
 	else:
 		_ok("엔딩 결과 타이틀로")
+		await process_frame
+		_expect_theme(sfx, &"title", "엔딩 뒤 타이틀")
+		var fade: float = sfx.get_script().get_script_constant_map().get("THEME_FADE", 1.6)
+		await _wait(fade + 0.3)
+		if ending_player != null and ending_player.playing:
+			_fault("엔딩 결과: 타이틀로 간 뒤에도 엔딩 곡이 멈추지 않았다")
+		else:
+			_ok("타이틀로 간 뒤 엔딩 곡 정지")
+	sfx.call("stop_theme")
 	await _drop_scenes(ending)
