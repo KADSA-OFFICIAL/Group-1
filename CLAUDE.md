@@ -388,6 +388,10 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
 - **게임을 끄는 길은 `Sfx.quit_cleanly()` 하나다**(#615). `Sfx`가 `auto_accept_quit`를 끄고 창 닫기 요청을 받아 소리를 전부 멈춘 뒤 **0.1초 기다렸다** 끝낸다. 루프 음악이 재생 중인 채로 끝내면 오디오 스레드가 재생 상태를 정리하기 전에 엔진이 내려가 `AudioStreamWAV`·`AudioStreamPlaybackWAV`가 남는다 — `stop()` 직후에 끝내도 남는다(실측 5/5회). `get_tree().quit()`을 직접 부르면 누수가 돌아온다.
   - **트리 전체의 플레이어를 끈다**(`find_children`). 수위의 발소리·열쇠·문 소리는 `janitor.tscn`의 `AudioStreamPlayer2D`라 `Sfx` 밖에 있고, 그것만 남아도 한 쌍이 샌다(실측).
   - **자막·컷신 도중에 닫으면 `GDScriptFunctionState` 1~2개가 여전히 남는다.** 멈춘 코루틴이 종료 시점에 남는 GDScript 엔진 동작이다 — `create_timer` 대신 노드 `Timer`(static 함수·인스턴스 메서드 둘 다), 매 프레임 `process_frame` 루프, 종료 전 씬 내리기를 다 해 봤는데 1~2개는 그대로였다 — 원래 `create_timer`일 때는 코루틴 1개 + `SceneTreeTimer` 1개가 남는다. 종료 때만 생기고 플레이 중에 쌓이지 않으며 OS가 회수한다. 없애려면 종료 시점에 멈춘 코루틴이 하나도 없어야 하는데, 그건 컷신·자막 구조를 다 바꾸는 일이라 하지 않았다.
+- **Mac(#679)**: 내보내기 프리셋이 둘이다 — `Windows Desktop`(x86_64 단일 `.exe`)과 `macOS`(**universal** = Apple Silicon + Intel, ad-hoc 서명, `build/AfterSchool.zip`). `godot --headless --path . --export-release "macOS" build/AfterSchool.zip`. 공증이 없어 받은 사람은 처음 열 때 Gatekeeper 경고를 본다(우클릭 → 열기).
+  - **arm64·universal은 `textures/vram_compression/import_etc2_astc=true`가 있어야 구워진다**(없으면 설정 오류로 거부). 텍스처가 전부 무손실(`compress/mode=0`)이라 켜도 재임포트·용량 변화가 없다 — VRAM 압축 텍스처를 들이면 그때 ASTC 사본이 생긴다.
+  - **창 크기는 `WindowFit` autoload(`scripts/game/window_fit.gd`)가 시작할 때 한 번 맞춘다.** macOS에서 Godot은 데스크톱 전체를 `screen_get_max_scale()`배 픽셀로 잡는다 — 배율 2인 화면(Retina·Sidecar)이 **하나라도** 붙어 있으면 배율 1 모니터에서도 1600x900px 창이 **800x450pt**로 떴다(실측). 그래서 화면별 `screen_get_scale()`이 아니라 최대 배율을 곱하고, 사용 영역의 85%를 넘으면 16:9로 줄여 가운데 둔다. Windows는 최대 배율이 1이라 아무 일도 없다. 논리 화면(`get_visible_rect`)은 1600x900 그대로다.
+  - 실측(Apple M5, Metal, Forward+): 1600x900에서 2.1~2.7ms, 3010x1692로 키워도 최악 10.6ms. 층 전환 `_swap_floor` 100~124ms(페이드에 가려진다). **창이 포커스를 잃으면 1초 멈춤 + 모니터 주사율 고정**이 보이는데 macOS가 가려진 창을 조절하는 것이라 게임 문제가 아니다 — 프레임을 잴 때는 창을 앞에 둘 것.
 - project.godot에 사용자의 미커밋 변경이 있을 수 있음 — 내 커밋에 섞지 말 것(필요 시 stash로 분리).
 - .gd 스크립트를 새로 만들면 사용자 에디터가 .uid 파일을 생성함 — 발견 시 해당 이슈 브랜치에 커밋.
 
