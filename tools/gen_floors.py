@@ -68,14 +68,17 @@ DOOR_LEAF_T = 10                          # 문짝 두께(벽 16 안쪽에 낀�
 #
 # 34는 **플레이어 스프라이트에서 나온 값이다.** 스프라이트는 74x76에 offset y −24라
 # 충돌 캡슐(반경 8·높이 26, −13~+13) 위로 **49px** 뻗는다(머리끝 −62). 위로 걸어
-# 벽에 붙으면 캡슐 위끝이 벽 띠의 남쪽 면에 닿으므로, 벽이 보이는 높이가 49px보다
-# 낮으면 **머리가 벽을 넘어 뒷방으로 들어간다** — 20일 때 16+20=36으로 13px가 넘쳤다.
-# 34면 16+34=50 ≥ 49다.
+# 벽에 붙었을 때 캡슐 위끝이 **앞면 아랫변**에 닿아야 벽이 보이는 높이(16+34=50)가
+# 머리(49)를 덮는다 — 20일 때 16+20=36으로 13px가 넘쳤다.
+#
+# **#544는 앞면이 시각 전용이라 그 가정이 틀렸다.** 캡슐이 앞면을 지나 16px 벽 띠의
+# 남쪽 면까지 올라가서 머리가 벽 윗변보다 33px 위(창밖·뒷방)로 나갔고, 창가 조사
+# 존(앞면 아래)에서도 벗어나 창가에 붙으면 `[E]`가 안 떴다. 그래서 앞면에 **충돌만**
+# 준다(`WB_`, `WallBases`) — 광원 차단체는 없다(앞면은 빛을 막는 면이 아니다).
 #
 # 다른 해결책은 전에 정한 것을 뒤집는다: 벽을 플레이어 위에 그리면 #250(몸이 잘려
-# 보인다)을 되돌리고, 충돌을 상반신까지 키우면 46px 통로(`OFFICE_WALK`)를 못
-# 지나가 맵 전역의 여유를 다시 잡아야 한다. **앞면은 #268부터 시각 전용이라**
-# 충돌·광원 차단체·도달 격자·수위 A* 격자는 이 값과 무관하다.
+# 보인다)을 되돌리고, 캡슐을 상반신까지 키우면 46px 통로(`OFFICE_WALK`)를 못
+# 지나간다. 앞면 충돌은 가로 벽 남쪽에만 붙으므로 그 통로들과 무관하다.
 #
 # 같은 상수가 **방 안 벽면 띠**로도 쓰인다 — 창문·커튼·게시판이 `(wt, wt+WALL_FACE)`에
 # 걸리고 복도 사물함이 `base = cy0 + WALL_FACE`에 선다. 앞면 위에 얹히는 것들이라
@@ -665,9 +668,10 @@ class Scene:
         하나만 그리면 두께만 있고 높이가 없어 건축 도면처럼 보인다. 아래쪽에
         면을 덧그리면 벽이 서 있는 것으로 읽힌다.
 
-        앞면은 **시각 전용**이다 — 충돌·광원 차단체는 그대로 16px 띠에 있어서
-        통행과 시야 판정이 바뀌지 않는다. 세로 벽에는 그리지 않는다(탑다운에서
-        앞면이 보이는 것은 시선과 마주 보는 가로 벽뿐이다).
+        앞면에는 **충돌만** 붙는다(`WB_`, `WallBases`) — 없으면 캡슐이 앞면을 지나
+        벽 띠까지 올라가 머리가 벽 윗변 위로 나간다(`WALL_FACE` 주석). 광원
+        차단체는 16px 띠에만 있어서 시야 판정은 그대로다. 세로 벽에는 그리지
+        않는다(탑다운에서 앞면이 보이는 것은 시선과 마주 보는 가로 벽뿐이다).
         """
         self.solid(f"WC_{key}", body, polygon)
         self.poly2d(f"WV_{key}", "Structures", C_WALL, polygon)
@@ -685,6 +689,10 @@ class Scene:
                         rect(x0, y1, x1, y1 + WALL_FACE - 4))
             self.poly2d(f"WS_{key}", "Structures", C_WALL_SHADOW,
                         rect(x0, y1 + WALL_FACE - 4, x1, y1 + WALL_FACE))
+            # 앞면 충돌. `RoomWalls`가 아니라 따로 둔 몸이라 상호작용 표시의
+            # 시야 광선(interact_marks.gd의 RAY_PASS)이 뚫고 지나간다.
+            self.node(f'[node name="WB_{key}" type="CollisionPolygon2D" parent="WallBases"]\n'
+                      f'polygon = {rect(x0, y1, x1, y1 + WALL_FACE)}\n')
 
     def prop(self, key, polygon, color):
         """방 안 집기: 충돌 PC_ + 시각 PV_ 한 쌍.
@@ -3255,6 +3263,7 @@ def build_common(fl, spec):
             + 'reveal_distance = 420.0\n'
             + 'full_distance = 300.0\n')
     sc.node('[node name="RoomWalls" type="StaticBody2D" parent="."]\n')
+    sc.node('[node name="WallBases" type="StaticBody2D" parent="."]\n')
     sc.node('[node name="PropBodies" type="StaticBody2D" parent="."]\n')
     sc.node('[node name="StairWalls" type="StaticBody2D" parent="."]\n')
 
@@ -3371,6 +3380,7 @@ def build_floor1():
             + 'reveal_distance = 420.0\n'
             + 'full_distance = 300.0\n')
     sc.node('[node name="RoomWalls" type="StaticBody2D" parent="."]\n')
+    sc.node('[node name="WallBases" type="StaticBody2D" parent="."]\n')
     sc.node('[node name="PropBodies" type="StaticBody2D" parent="."]\n')
     sc.node('[node name="StairWalls" type="StaticBody2D" parent="."]\n')
 
@@ -3743,6 +3753,7 @@ def build_yard():
             + 'script = ExtResource("8_marks")' + NL
             + "reveal_distance = 420.0" + NL + "full_distance = 300.0" + NL)
     sc.node('[node name="RoomWalls" type="StaticBody2D" parent="."]' + NL)
+    sc.node('[node name="WallBases" type="StaticBody2D" parent="."]' + NL)
     sc.node('[node name="PropBodies" type="StaticBody2D" parent="."]' + NL)
 
     # ── 바닥 ────────────────────────────────────────────────
@@ -3967,6 +3978,7 @@ def build_intro():
             + 'script = ExtResource("8_marks")' + NL
             + "reveal_distance = 420.0" + NL + "full_distance = 300.0" + NL)
     sc.node('[node name="RoomWalls" type="StaticBody2D" parent="."]' + NL)
+    sc.node('[node name="WallBases" type="StaticBody2D" parent="."]' + NL)
     sc.node('[node name="PropBodies" type="StaticBody2D" parent="."]' + NL)
 
     # ── 방 둘 ────────────────────────────────────────────────
