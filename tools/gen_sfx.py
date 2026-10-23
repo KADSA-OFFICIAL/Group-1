@@ -200,45 +200,37 @@ def offset(samples: list[float], seconds: float) -> list[float]:
     return chain(silence(seconds), samples)
 
 
-def footstep(seed: int, heel: float, toe_delay: float, click_hz: float,
-             toe_weight: float) -> list[float]:
-    """구두 한 걸음 — 뒤꿈치 착지 → 앞꿈치 내려앉음 + 복도 반사음.
+def lower_pitch(samples: list[float], ratio: float) -> list[float]:
+    """재생 속도를 `ratio`배로 늦춰 음높이를 내린다(테이프식 — 길이도 1/ratio배).
 
-    수위는 몸이 무거운 중년 남자가 밤에 느릿느릿 도는 것이다. 무게는 **소리의
-    대역과 길이**가 정한다:
-
-    - 굽 딸깍은 낮고(1.1~1.5kHz) 작게. 2.5~3kHz로 또렷하게 냈더니 구두굽이
-      또각거리는 가벼운 걸음이 됐다(사용자: "너무 경박해").
-    - 바닥 둔탁함(160Hz)과 몸무게(90Hz)를 길게. 둔탁함은 노트북 스피커가 내는
-      대역 안에 둔다 — 90Hz만 키우면 작은 스피커에서는 사라지고 딸깍만 남는다.
-    - 뒤꿈치 → 앞꿈치를 90~110ms로 벌린다. 발을 굴리는 시간이 길수록 무겁다.
-      붙어 있으면 공이 튀는 소리(뽁)다.
-    - 복도 반사는 어둡고(1.4kHz 저역 통과) 조금 길게. 빈 건물이 소리를 먹는다.
-
-    음정 있는 발진기는 쓰지 않는다(#611 — 예전 "뽁"의 원인).
+    입력이 이미 저역 통과된 발소리라 선형 보간으로 충분하다.
     """
-    noise = Noise(seed=seed)
-    dry = mix(
-        # 뒤꿈치: 굽이 닿는 소리. 무디게, 작게.
-        gain(hit(noise, 0.05, 0.0015, 0.008, "band", click_hz, 1.0), 0.22 * heel),
-        # 뒤꿈치: 바닥이 받는 둔탁함 — 이 소리의 몸통.
-        gain(hit(noise, 0.16, 0.003, 0.040, "band", 160.0, 1.1), 1.70 * heel),
-        # 몸무게 — 가장 낮은 대역, 가장 길게.
-        gain(hit(noise, 0.20, 0.006, 0.055, "low", 90.0, 0.7), 1.30 * heel),
-        # 앞꿈치: 밑창이 내려앉는 소리. 뒤꿈치보다 약하고 더 무디다.
-        offset(gain(hit(noise, 0.10, 0.008, 0.030, "band", 520.0, 0.9),
-                    0.22 * toe_weight), toe_delay),
-        offset(gain(hit(noise, 0.14, 0.006, 0.035, "band", 150.0, 1.1),
-                    0.80 * toe_weight), toe_delay),
-        # 밑창이 바닥을 스치는 소리 — 두 타격 사이를 잇는다. 아주 작게.
-        gain(hit(noise, toe_delay + 0.06, 0.04, 0.040, "high", 2400.0, 0.7), 0.04),
-    )
+    length = int(len(samples) / ratio)
+    out: list[float] = []
+    for i in range(length):
+        position = i * ratio
+        index = int(position)
+        frac = position - index
+        nxt = samples[index + 1] if index + 1 < len(samples) else 0.0
+        out.append(samples[index] * (1.0 - frac) + nxt * frac)
+    return out
 
-    # 피크를 직접 맞춘다. 저역 노이즈는 시드마다 세기가 크게 흔들려서(같은
-    # 이득으로 0.45~0.88) 변형끼리 한 걸음만 쿵 튀었다. 왼발/오른발 차이는
-    # heel로만 낸다. 기준은 예전 발소리(피크 0.58) 언저리 — StepSound의
-    # volume_db(-4)와 거리 감쇠가 그 크기에 맞춰져 있다.
-    out = mix(dry, hallway(dry, 1400.0))
+
+def footstep(seed: int, heel: float, toe_delay: float, body_hz: float,
+             toe_weight: float) -> list[float]:
+    """수위 발소리 — 이설의 운동화 걸음(`sneaker_step`)을 `JANITOR_PITCH`로 내린 것.
+
+    합성한 구두 세 갈래(좁은 대역 노이즈·공진기·넓은 대역 딱)가 전부 사용자에게
+    "구리다/찢어진다"였고, 이설 발소리는 괜찮게 들렸다. 그래서 그 소리를 뼈대로
+    음높이만 내린다(사용자: "주인공 발소리를 기반으로 피치를 살짝 낮춰봐").
+
+    **이설과 같은 뼈대라 갈라 듣는 근거는 음높이·간격·크기뿐이다.** 수위 발소리는
+    위치를 알려 주는 단서(#9)라 이설 것과 헷갈리면 안 된다 — 그래서 시드가 다르고
+    (`61101~`), 음높이가 낮고, 걸음 간격이 느리고(0.52초 대 이설 0.5초 박자 위에
+    ±6% 지터), 더 크다(`FOOTSTEP_PEAK` 0.62 대 0.55, 재생 -4dB 대 -15dB).
+    """
+    dry = sneaker_step(seed, heel, toe_delay, body_hz, toe_weight)
+    out = lower_pitch(dry, JANITOR_PITCH)
     peak = max(abs(value) for value in out)
     return gain(out, FOOTSTEP_PEAK * heel / peak)
 
@@ -512,11 +504,14 @@ FOOTSTEP_PEAK = 0.62
 # 왼발(1·3)은 무겁고 앞꿈치가 늦게, 오른발(2·4)은 조금 가볍게 둔다. 차이는
 # 작게 — 크게 벌리면 절뚝이는 걸음이 된다.
 # 재생 쪽(sound_manager.VARIANTS)이 번갈아 고르고 음높이도 흔든다.
+# 이설 발소리를 이 비율로 늦춰 재생한다(0.80 = 약 -3.9반음). 1이면 이설과 같다.
+JANITOR_PITCH = 0.80
+
 JANITOR_STEPS = {
-    "janitor_step":   dict(seed=61101, heel=1.00, toe_delay=0.104, click_hz=1250.0, toe_weight=1.00),
-    "janitor_step_2": dict(seed=61102, heel=0.93, toe_delay=0.094, click_hz=1450.0, toe_weight=0.90),
-    "janitor_step_3": dict(seed=61103, heel=1.00, toe_delay=0.110, click_hz=1150.0, toe_weight=0.95),
-    "janitor_step_4": dict(seed=61104, heel=0.91, toe_delay=0.098, click_hz=1350.0, toe_weight=0.88),
+    "janitor_step":   dict(seed=61101, heel=1.00, toe_delay=0.052, body_hz=340.0, toe_weight=1.00),
+    "janitor_step_2": dict(seed=61102, heel=0.93, toe_delay=0.046, body_hz=380.0, toe_weight=0.92),
+    "janitor_step_3": dict(seed=61103, heel=1.00, toe_delay=0.056, body_hz=310.0, toe_weight=0.96),
+    "janitor_step_4": dict(seed=61104, heel=0.91, toe_delay=0.049, body_hz=360.0, toe_weight=0.90),
 }
 
 
