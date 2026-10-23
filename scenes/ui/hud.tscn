@@ -275,25 +275,9 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("4_waypoint")
 
-[node name="Marker" type="Control" parent="Root/Waypoint"]
+[node name="Text" type="Label" parent="Root/Waypoint"]
 layout_mode = 0
 mouse_filter = 2
-
-[node name="Row" type="HBoxContainer" parent="Root/Waypoint/Marker"]
-layout_mode = 0
-theme_override_constants/separation = 6
-
-[node name="Arrow" type="Label" parent="Root/Waypoint/Marker/Row"]
-layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.78, 0.32, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/outline_size = 6
-theme_override_font_sizes/font_size = 28
-text = "◆"
-vertical_alignment = 1
-
-[node name="Text" type="Label" parent="Root/Waypoint/Marker/Row"]
-layout_mode = 2
 theme_override_colors/font_color = Color(1, 0.88, 0.66, 1)
 theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
 theme_override_constants/outline_size = 6
