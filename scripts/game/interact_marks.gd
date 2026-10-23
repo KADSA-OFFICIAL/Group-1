@@ -33,7 +33,9 @@ const PREFIX := "Mark_"
 const LOS_EXEMPT := "Mark_Hide"
 ## 시야 광선이 뚫고 지나갈 몸. 표시는 **집기 위에** 붙는 것이 정상이라(`Exam_*`)
 ## 집기에 막히면 하나도 안 켜진다. 플레이어 자신도 뺀다(광선이 몸 안에서 시작한다).
-const RAY_PASS := ["PropBodies"]
+## 가로 벽 앞면 충돌(`WallBases`)도 뚫는다 — 창가 조사·벽면 단서가 그 띠에 붙고,
+## 벽 너머를 가리는 일은 16px 벽 띠(`RoomWalls`)가 이미 한다.
+const RAY_PASS := ["PropBodies", "WallBases"]
 
 var _player: Node2D = null
 var _timer: float = 0.0

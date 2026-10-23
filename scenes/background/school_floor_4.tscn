@@ -136,6 +136,8 @@ full_distance = 300.0
 
 [node name="RoomWalls" type="StaticBody2D" parent="."]
 
+[node name="WallBases" type="StaticBody2D" parent="."]
+
 [node name="PropBodies" type="StaticBody2D" parent="."]
 
 [node name="ArtRoom" type="Polygon2D" parent="Rooms"]
@@ -195,6 +197,9 @@ polygon = PackedVector2Array(20, 36, 1780, 36, 1780, 66, 20, 66)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(20, 66, 1780, 66, 1780, 70, 20, 70)
 
+[node name="WB_IntroTop" type="CollisionPolygon2D" parent="WallBases"]
+polygon = PackedVector2Array(20, 36, 1780, 36, 1780, 70, 20, 70)
+
 [node name="WC_IntroLeft" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(20, 20, 36, 20, 36, 880, 20, 880)
 
@@ -240,6 +245,9 @@ polygon = PackedVector2Array(20, 880, 515, 880, 515, 910, 20, 910)
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(20, 910, 515, 910, 515, 914, 20, 914)
 
+[node name="WB_IntroBotL" type="CollisionPolygon2D" parent="WallBases"]
+polygon = PackedVector2Array(20, 880, 515, 880, 515, 914, 20, 914)
+
 [node name="WC_IntroBotR" type="CollisionPolygon2D" parent="RoomWalls"]
 polygon = PackedVector2Array(625, 864, 1780, 864, 1780, 880, 625, 880)
 
@@ -262,6 +270,9 @@ polygon = PackedVector2Array(625, 880, 1780, 880, 1780, 910, 625, 910)
 [node name="WS_IntroBotR" type="Polygon2D" parent="Structures"]
 color = Color(0.118, 0.124, 0.140, 1)
 polygon = PackedVector2Array(625, 910, 1780, 910, 1780, 914, 625, 914)
+
+[node name="WB_IntroBotR" type="CollisionPolygon2D" parent="WallBases"]
+polygon = PackedVector2Array(625, 880, 1780, 880, 1780, 914, 625, 914)
 
 [node name="ArtDoorPanel" type="StaticBody2D" parent="."]
 
