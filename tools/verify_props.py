@@ -157,6 +157,10 @@ def check(fl: int) -> None:
                 tops[name[3:]] = bbox(pts(poly_m.group(1)))
             else:
                 visuals[name[3:]] = poly_m.group(1).strip()
+        elif ntype == "CollisionPolygon2D" and parent == "WallBases":
+            # 가로 벽 앞면 충돌(`WB_`). 벽이 아니라 벽 **앞**이라 벽에 붙여 세운
+            # 집기·벽면 장식이 그 위에 서는 것이 정상이다. 통행은 도달성 검사가 본다.
+            continue
         elif ntype == "CollisionPolygon2D" and parent != "PropBodies" and poly_m:
             if "SDPanel" in parent:
                 panels[parent] = pts(poly_m.group(1))
