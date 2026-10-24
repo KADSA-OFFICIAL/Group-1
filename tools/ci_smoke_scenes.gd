@@ -62,6 +62,7 @@ func _run() -> void:
 	await _check_artroom_intro()
 	await _check_ink_throw()
 	await _check_jumpscare()
+	await _check_external_audio()
 	# 마지막에 둔다 — 씬을 실제로 갈아 끼워(change_scene_to_file) 본다.
 	await _check_pause_menu()
 	await _check_journal()
@@ -1062,6 +1063,52 @@ func _press_cancel() -> void:
 	ev.action = &"ui_cancel"
 	ev.pressed = true
 	root.push_input(ev)
+
+## 외부 음원(#713) — 바꾼 소리가 실제로 그 파일을 쓰고, 지속음은 루프가 걸리고,
+## 운동장에 나가면 바람이 깔렸다가 실내로 돌아오면 걷히는가.
+##
+## `EXTERNAL` 표의 경로가 틀리면 `_stream_for`는 경고만 내고 null을 캐시해
+## 소리가 **조용히** 사라진다 — 씬 로드 검사로는 안 보인다.
+func _check_external_audio() -> void:
+	var sfx: Node = root.get_node_or_null("Sfx")
+	if sfx == null:
+		_fault("외부 음원: Sfx autoload가 없다")
+		return
+	var table: Dictionary = sfx.get_script().get_script_constant_map().get("EXTERNAL", {})
+	if table.is_empty():
+		_fault("외부 음원: Sfx.EXTERNAL이 비어 있다")
+		return
+	for id in table:
+		var s: AudioStream = sfx.call("_stream_for", StringName(id))
+		if s == null or s.resource_path != table[id]:
+			_fault("외부 음원: %s가 %s를 안 쓴다" % [id, table[id]])
+	for id in ["ambience", "chase"]:
+		var p: AudioStreamPlayer = sfx.get("_" + id)
+		var wav := p.stream as AudioStreamWAV if p != null else null
+		if wav == null or wav.loop_mode != AudioStreamWAV.LOOP_FORWARD:
+			_fault("외부 음원: %s 루프가 안 걸렸다" % id)
+	_ok("외부 음원 경로·루프")
+
+	if current_scene != null:
+		current_scene.free()
+		await process_frame
+	var main: Node = (load(MAIN) as PackedScene).instantiate()
+	root.add_child(main)
+	for i in 8:
+		await process_frame
+	main.call("travel_to", 0)
+	await _until(func() -> bool: return not bool(main.get("changing_floor")), 6.0)
+	_expect_theme(sfx, &"yard_wind", "운동장 바람")
+	main.call("travel_to", 1)
+	await _until(func() -> bool: return not bool(main.get("changing_floor")), 6.0)
+	if StringName(sfx.get("_theme_id")) == &"yard_wind":
+		_fault("외부 음원: 실내로 돌아왔는데 바람 테마가 남아 있다")
+	else:
+		_ok("실내 복귀 시 바람 정지")
+	sfx.call("stop_theme")
+	sfx.call("stop_music")
+	await _drop_scenes(main)
+
 
 
 ## 점프스케어(#662) — 붙잡히면 대사 뒤에 얼굴 오버레이가 뜨고, 비명이 울리고,
