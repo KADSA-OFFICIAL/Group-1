@@ -39,7 +39,7 @@ const YARD_ARRIVE := Vector2(1700, 380)
 ## `player.tscn`에 박아 두면 운동장에서 빈 아래쪽이 보인다.
 const FLOOR_BOUNDS := {
 	0: Rect2(0, 0, 3400, 1700),
-	1: Rect2(0, 0, 2280, 1500),   # 현관 로비 층(#498, #554) — 가로 2280px로 콤팩트 축소
+	1: Rect2(0, 0, 2280, 1140),   # 현관 로비 층(#498) — 전면 개편으로 하단 띠 680→400(#708)
 	# 2층(#702) — 하단 띠가 비어 있어(방·계단실 B 없음) 남쪽 특별실동 아래에서 끝난다.
 	# `gen_floors.floor_height()`와 같아야 한다(`verify_floor_reach.check_camera`).
 	2: Rect2(0, 0, 2280, 1700),
@@ -82,10 +82,10 @@ const NO_STAIRWELL := {2: [1]}
 
 const STAIRS := {
 	0: [],   # 운동장 — 계단 없음(#356)
-	# 현관 로비 층(#498) — 하단 방 띠(800~1480) 왼쪽. `gen_floors.FLOOR1["stair"]`와
+	# 현관 로비 층(#498, #708) — 하단 방 띠(720~1120) 왼쪽 끝. `gen_floors.FLOOR1["stair"]`와
 	# 같은 자리여야 한다(`verify_stairs`가 대조). **위가 복도여야 한다** —
 	# `_arrive_on`이 사각형 위쪽에서 도착 지점을 잡는다.
-	1: [Rect2(220, 800, 440, 320)],
+	1: [Rect2(20, 720, 440, 400)],
 	2: [STAIR_A, STAIR_B],
 	3: [STAIR_A, STAIR_B],
 	4: [],   # 도입부 — 계단 없음. 창문으로 3층에 내려간다(#405)
@@ -284,7 +284,7 @@ func _physics_process(_delta: float) -> void:
 ## 층별 기본 등장 지점. `travel_to()`가 등장 지점 없이 불렸을 때 쓴다.
 const DEFAULT_ARRIVES := {
 	0: YARD_ARRIVE,
-	1: Vector2(381, 772),
+	1: Vector2(181, 692),
 	2: Vector2(579, 692),
 	3: Vector2(579, 692),
 	4: INTRO_ARRIVE,
