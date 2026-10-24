@@ -134,6 +134,7 @@ def check(fl: int) -> None:
 
     props: dict[str, tuple] = {}      # PC_ 이름 -> bbox
     visuals: dict[str, str] = {}      # PV_ 이름 -> polygon 원문
+    talls: dict[str, tuple] = {}      # PW_ 이름 -> bbox (키 큰 집기 그림, #721)
     decors: dict[str, tuple] = {}     # PD_ 이름 -> bbox (충돌 없는 장식)
     tops: dict[str, tuple] = {}       # PT_ 이름 -> bbox (집기 위 소품)
     panels: dict[str, list] = {}      # 미닫이 문짝 -> 폴리곤(사선이라 경계상자로 보면 안 된다)
@@ -150,6 +151,8 @@ def check(fl: int) -> None:
         if ntype == "CollisionPolygon2D" and parent == "PropBodies":
             props[name[3:]] = bbox(pts(poly_m.group(1)))
             prop_polys[name[3:]] = poly_m.group(1).strip()
+        elif ntype == "Polygon2D" and parent == "TallProps" and name.startswith("PW_"):
+            talls[name[3:]] = bbox(pts(poly_m.group(1)))
         elif ntype == "Polygon2D" and parent == "Props":
             if name.startswith("PD_"):
                 decors[name[3:]] = bbox(pts(poly_m.group(1)))
@@ -174,8 +177,23 @@ def check(fl: int) -> None:
                 clues.append((name, float(pos.group(1)), float(pos.group(2)),
                               script_of.get(sm.group(1), "?") if sm else "?"))
 
-    # 1. 충돌 PC_ ↔ 시각 PV_ 1:1, 폴리곤 동일
-    for key in sorted(set(props) | set(visuals)):
+    # 1. 충돌 PC_ ↔ 시각 PV_ 1:1, 폴리곤 동일.
+    #    **키 큰 집기**(#721)는 시각이 `PW_`(TallProps)이고 폴리곤이 다르다 — 그림은
+    #    벽 앞면 위로 겹치고 충돌은 바닥 부분만이다. 대신 가로 범위와 **아래 끝**이
+    #    같아야 하고(바닥에 닿는 자리가 곧 충돌), 그림이 충돌보다 위로 커야 한다.
+    for key in sorted(talls):
+        if key not in props:
+            errors.append(f"{tag}: PW_{key}에 대응하는 PC_{key}가 없다")
+            continue
+        if key in visuals:
+            errors.append(f"{tag}: {key}에 PV_와 PW_가 둘 다 있다")
+        vx0, vy0, vx1, vy1 = talls[key]
+        px0, py0, px1, py1 = props[key]
+        if (abs(vx0 - px0) > 0.5 or abs(vx1 - px1) > 0.5 or abs(vy1 - py1) > 0.5
+                or vy0 > py0):
+            errors.append(f"{tag}: PW_{key}와 PC_{key}가 어긋난다 — 가로 범위·아래 끝이 "
+                          f"같고 그림이 위로 커야 한다 (그림 {talls[key]} / 충돌 {props[key]})")
+    for key in sorted((set(props) - set(talls)) | set(visuals)):
         if key not in visuals:
             errors.append(f"{tag}: PC_{key}에 대응하는 PV_{key}가 없다")
         elif key not in props:
