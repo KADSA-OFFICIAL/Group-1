@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://scripts/npc/janitor.gd" id="1_janitor_script"]
 [ext_resource type="AudioStream" path="res://assets/audio/janitor_step.wav" id="2_step"]
 [ext_resource type="AudioStream" path="res://assets/audio/keys.wav" id="3_keys"]
-[ext_resource type="AudioStream" path="res://assets/audio/door_open.wav" id="4_door"]
+[ext_resource type="AudioStream" path="res://assets/audio/ext/door_creak.wav" id="4_door"]
 [ext_resource type="Texture2D" path="res://assets/sprites/janitor_sheet.png" id="5_sheet"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_janitor"]
@@ -38,6 +38,6 @@ attenuation = 1.2
 
 [node name="DoorSound" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource("4_door")
-volume_db = -6.0
+volume_db = -11.0
 max_distance = 1000.0
 attenuation = 1.4

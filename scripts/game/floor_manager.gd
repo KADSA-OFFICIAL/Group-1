@@ -404,6 +404,12 @@ func _janitor_active(target: int) -> bool:
 ## 씬 아래쪽 빈 공간이 보인다.
 func _apply_environment(target: int) -> void:
 	var outside := target == YARD_FLOOR
+	# 밖에 나오면 바람 소리(#713). 본편 음악은 현관 문(`exit_door.gd`)이 이미
+	# 껐다. 정문에서 엔딩 테마가 크로스페이드로 이어받는다.
+	if outside:
+		Sfx.play_theme(&"yard_wind")
+	else:
+		Sfx.stop_theme_if(&"yard_wind")
 	if darkness != null:
 		var base_dark: Color = YARD_DARKNESS if outside else INDOOR_DARKNESS
 		darkness.color = FLOOR_DARKNESS.get(target, base_dark)
