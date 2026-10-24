@@ -1,4 +1,4 @@
-[gd_scene load_steps=100 format=3]
+[gd_scene load_steps=110 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
@@ -29,6 +29,16 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_grain.png" id="tex_prop_grain"]
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_metal.png" id="tex_prop_metal"]
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/armchair_red.png" id="ext_armchair_red"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/bed_green.png" id="ext_bed_green"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/bookcase_tall.png" id="ext_bookcase_tall"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/desk_exec.png" id="ext_desk_exec"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/floor_lamp.png" id="ext_floor_lamp"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/globe.png" id="ext_globe"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/grandfather_clock.png" id="ext_grandfather_clock"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/rug_long.png" id="ext_rug_long"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/sofa_red.png" id="ext_sofa_red"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/vase_blue.png" id="ext_vase_blue"]
 [ext_resource type="Texture2D" path="res://assets/sprites/key.png" id="9_key"]
 [ext_resource type="Texture2D" path="res://assets/sprites/note.png" id="10_note"]
 
@@ -1431,10 +1441,10 @@ texture_scale = 1.8
 [node name="Furniture" type="Node2D" parent="."]
 
 [node name="DeskPrincipal" type="Polygon2D" parent="Furniture"]
-texture = ExtResource("tex_obj_desk")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.364, 0.2887, 0.2134, 1)
-polygon = PackedVector2Array(1870, 140, 2030, 140, 2030, 200, 1870, 200)
+texture = ExtResource("ext_desk_exec")
+uv = PackedVector2Array(0, 0, 56, 0, 56, 25, 0, 25)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(1894, 140, 2006, 140, 2006, 190, 1894, 190)
 
 [node name="DeskJanitorL" type="Polygon2D" parent="Furniture"]
 texture = ExtResource("tex_obj_desk")
@@ -1821,58 +1831,67 @@ color = Color(0.2513, 0.2051, 0.1538, 1)
 polygon = PackedVector2Array(20, 540, 2260, 540, 2260, 720, 20, 720)
 
 [node name="PC_NurseRoom_0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(169, 101, 217, 101, 217, 185, 169, 185)
+polygon = PackedVector2Array(148, 111, 188, 111, 188, 175, 148, 175)
 
 [node name="PV_NurseRoom_0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_bed")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3772, 0.3269, 0.3018, 1)
-polygon = PackedVector2Array(169, 101, 217, 101, 217, 185, 169, 185)
+texture = ExtResource("ext_bed_green")
+uv = PackedVector2Array(0, 0, 20, 0, 20, 32, 0, 32)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(148, 111, 188, 111, 188, 175, 148, 175)
 
 [node name="PC_NurseRoom_1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(251, 101, 299, 101, 299, 185, 251, 185)
+polygon = PackedVector2Array(222, 111, 262, 111, 262, 175, 222, 175)
 
 [node name="PV_NurseRoom_1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_bed")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3949, 0.3422, 0.3159, 1)
-polygon = PackedVector2Array(251, 101, 299, 101, 299, 185, 251, 185)
+texture = ExtResource("ext_bed_green")
+uv = PackedVector2Array(0, 0, 20, 0, 20, 32, 0, 32)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(222, 111, 262, 111, 262, 175, 222, 175)
 
 [node name="PC_NurseRoom_2" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(333, 101, 381, 101, 381, 185, 333, 185)
+polygon = PackedVector2Array(296, 111, 336, 111, 336, 175, 296, 175)
 
 [node name="PV_NurseRoom_2" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_bed")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3664, 0.3175, 0.2931, 1)
-polygon = PackedVector2Array(333, 101, 381, 101, 381, 185, 333, 185)
+texture = ExtResource("ext_bed_green")
+uv = PackedVector2Array(0, 0, 20, 0, 20, 32, 0, 32)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(296, 111, 336, 111, 336, 175, 296, 175)
 
 [node name="PC_NurseRoom_3" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(415, 101, 463, 101, 463, 185, 415, 185)
+polygon = PackedVector2Array(370, 111, 410, 111, 410, 175, 370, 175)
 
 [node name="PV_NurseRoom_3" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_bed")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3841, 0.3328, 0.3073, 1)
-polygon = PackedVector2Array(415, 101, 463, 101, 463, 185, 415, 185)
+texture = ExtResource("ext_bed_green")
+uv = PackedVector2Array(0, 0, 20, 0, 20, 32, 0, 32)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(370, 111, 410, 111, 410, 175, 370, 175)
 
 [node name="PC_NurseRoom_4" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(168.5, 375, 216.5, 375, 216.5, 459, 168.5, 459)
+polygon = PackedVector2Array(444, 111, 484, 111, 484, 175, 444, 175)
 
 [node name="PV_NurseRoom_4" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_bed")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3989, 0.3457, 0.3191, 1)
-polygon = PackedVector2Array(168.5, 375, 216.5, 375, 216.5, 459, 168.5, 459)
+texture = ExtResource("ext_bed_green")
+uv = PackedVector2Array(0, 0, 20, 0, 20, 32, 0, 32)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(444, 111, 484, 111, 484, 175, 444, 175)
 
 [node name="PC_NurseRoom_5" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(419.5, 375, 467.5, 375, 467.5, 459, 419.5, 459)
+polygon = PackedVector2Array(172.5, 385, 212.5, 385, 212.5, 449, 172.5, 449)
 
 [node name="PV_NurseRoom_5" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_bed")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3704, 0.321, 0.2963, 1)
-polygon = PackedVector2Array(419.5, 375, 467.5, 375, 467.5, 459, 419.5, 459)
+texture = ExtResource("ext_bed_green")
+uv = PackedVector2Array(0, 0, 20, 0, 20, 32, 0, 32)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(172.5, 385, 212.5, 385, 212.5, 449, 172.5, 449)
+
+[node name="PC_NurseRoom_6" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(423.5, 385, 463.5, 385, 463.5, 449, 423.5, 449)
+
+[node name="PV_NurseRoom_6" type="Polygon2D" parent="Props"]
+texture = ExtResource("ext_bed_green")
+uv = PackedVector2Array(0, 0, 20, 0, 20, 32, 0, 32)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(423.5, 385, 463.5, 385, 463.5, 449, 423.5, 449)
 
 [node name="PD_NurseRoom_sign" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_glass")
@@ -2011,22 +2030,22 @@ shape = SubResource("RectangleShape2D_room_PrincipalRoom")
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(1758, 36, 1830, 36, 1830, 70, 1758, 70)
+polygon = PackedVector2Array(1852, 36, 1924, 36, 1924, 70, 1852, 70)
 
 [node name="WD_PrincipalRoom_curtainL0" type="Polygon2D" parent="Structures"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(1750, 36, 1758, 36, 1758, 70, 1750, 70)
+polygon = PackedVector2Array(1844, 36, 1852, 36, 1852, 70, 1844, 70)
 
 [node name="WD_PrincipalRoom_curtainR0" type="Polygon2D" parent="Structures"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(1830, 36, 1838, 36, 1838, 70, 1830, 70)
+polygon = PackedVector2Array(1924, 36, 1932, 36, 1932, 70, 1924, 70)
 
 [node name="WinLight_PrincipalRoom_0" type="PointLight2D" parent="Lights/Room_PrincipalRoom"]
-position = Vector2(1794.0, 94.0)
+position = Vector2(1888.0, 94.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
 shadow_enabled = true
@@ -2039,50 +2058,22 @@ texture_scale = 0.72
 z_index = 1
 texture = ExtResource("tex_prop_glass")
 color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(1914, 36, 1986, 36, 1986, 70, 1914, 70)
+polygon = PackedVector2Array(1976, 36, 2048, 36, 2048, 70, 1976, 70)
 
 [node name="WD_PrincipalRoom_curtainL1" type="Polygon2D" parent="Structures"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(1906, 36, 1914, 36, 1914, 70, 1906, 70)
+polygon = PackedVector2Array(1968, 36, 1976, 36, 1976, 70, 1968, 70)
 
 [node name="WD_PrincipalRoom_curtainR1" type="Polygon2D" parent="Structures"]
 z_index = 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(1986, 36, 1994, 36, 1994, 70, 1986, 70)
+polygon = PackedVector2Array(2048, 36, 2056, 36, 2056, 70, 2048, 70)
 
 [node name="WinLight_PrincipalRoom_1" type="PointLight2D" parent="Lights/Room_PrincipalRoom"]
-position = Vector2(1950.0, 94.0)
-color = Color(0.54, 0.65, 0.95, 1)
-energy = 1.25
-shadow_enabled = true
-shadow_filter = 1
-shadow_filter_smooth = 4.0
-texture = SubResource("GradientTexture2D_moon")
-texture_scale = 0.72
-
-[node name="WD_PrincipalRoom_win2" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_glass")
-color = Color(0.2179, 0.2949, 0.4615, 1)
-polygon = PackedVector2Array(2070, 36, 2142, 36, 2142, 70, 2070, 70)
-
-[node name="WD_PrincipalRoom_curtainL2" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_cloth")
-color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2062, 36, 2070, 36, 2070, 70, 2062, 70)
-
-[node name="WD_PrincipalRoom_curtainR2" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_cloth")
-color = Color(0.4615, 0.4231, 0.3974, 1)
-polygon = PackedVector2Array(2142, 36, 2150, 36, 2150, 70, 2142, 70)
-
-[node name="WinLight_PrincipalRoom_2" type="PointLight2D" parent="Lights/Room_PrincipalRoom"]
-position = Vector2(2106.0, 94.0)
+position = Vector2(2012.0, 94.0)
 color = Color(0.54, 0.65, 0.95, 1)
 energy = 1.25
 shadow_enabled = true
@@ -2108,64 +2099,83 @@ z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
-[node name="PC_PrincipalRoom_sofaA" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1700, 240, 1810, 240, 1810, 270, 1700, 270)
+[node name="PC_PrincipalRoom_bookcase_tall0" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1664, 72, 1724, 72, 1724, 176, 1664, 176)
 
-[node name="PV_PrincipalRoom_sofaA" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_bed")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3406, 0.2919, 0.3162, 1)
-polygon = PackedVector2Array(1700, 240, 1810, 240, 1810, 270, 1700, 270)
+[node name="PV_PrincipalRoom_bookcase_tall0" type="Polygon2D" parent="Props"]
+texture = ExtResource("ext_bookcase_tall")
+uv = PackedVector2Array(0, 0, 30, 0, 30, 52, 0, 52)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(1664, 72, 1724, 72, 1724, 176, 1664, 176)
 
-[node name="PC_PrincipalRoom_table" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1715, 286, 1795, 286, 1795, 326, 1715, 326)
+[node name="PC_PrincipalRoom_bookcase_tall1" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1728, 72, 1788, 72, 1788, 176, 1728, 176)
 
-[node name="PV_PrincipalRoom_table" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_desk")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3665, 0.2907, 0.2148, 1)
-polygon = PackedVector2Array(1715, 286, 1795, 286, 1795, 326, 1715, 326)
+[node name="PV_PrincipalRoom_bookcase_tall1" type="Polygon2D" parent="Props"]
+texture = ExtResource("ext_bookcase_tall")
+uv = PackedVector2Array(0, 0, 30, 0, 30, 52, 0, 52)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(1728, 72, 1788, 72, 1788, 176, 1728, 176)
 
-[node name="PC_PrincipalRoom_sofaB" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1700, 342, 1810, 342, 1810, 372, 1700, 372)
+[node name="PC_PrincipalRoom_grandfather_clock2" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(2210, 72, 2236, 72, 2236, 152, 2210, 152)
 
-[node name="PV_PrincipalRoom_sofaB" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_bed")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3773, 0.3234, 0.3503, 1)
-polygon = PackedVector2Array(1700, 342, 1810, 342, 1810, 372, 1700, 372)
+[node name="PV_PrincipalRoom_grandfather_clock2" type="Polygon2D" parent="Props"]
+texture = ExtResource("ext_grandfather_clock")
+uv = PackedVector2Array(0, 0, 13, 0, 13, 40, 0, 40)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(2210, 72, 2236, 72, 2236, 152, 2210, 152)
 
-[node name="PC_PrincipalRoom_trophy" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1662, 90, 1690, 90, 1690, 240, 1662, 240)
+[node name="PC_PrincipalRoom_floor_lamp3" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1664, 290, 1692, 290, 1692, 354, 1664, 354)
 
-[node name="PV_PrincipalRoom_trophy" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_cabinet")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.296, 0.2713, 0.2343, 1)
-polygon = PackedVector2Array(1662, 90, 1690, 90, 1690, 240, 1662, 240)
+[node name="PV_PrincipalRoom_floor_lamp3" type="Polygon2D" parent="Props"]
+texture = ExtResource("ext_floor_lamp")
+uv = PackedVector2Array(0, 0, 14, 0, 14, 32, 0, 32)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(1664, 290, 1692, 290, 1692, 354, 1664, 354)
 
-[node name="PC_PrincipalRoom_books" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2210, 90, 2238, 90, 2238, 280, 2210, 280)
+[node name="PC_PrincipalRoom_sofa_red4" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1700, 300, 1756, 300, 1756, 342, 1700, 342)
 
-[node name="PV_PrincipalRoom_books" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_shelf")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.301, 0.2617, 0.2093, 1)
-polygon = PackedVector2Array(2210, 90, 2238, 90, 2238, 280, 2210, 280)
+[node name="PV_PrincipalRoom_sofa_red4" type="Polygon2D" parent="Props"]
+texture = ExtResource("ext_sofa_red")
+uv = PackedVector2Array(0, 0, 28, 0, 28, 21, 0, 21)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(1700, 300, 1756, 300, 1756, 342, 1700, 342)
 
-[node name="PC_PrincipalRoom_plantL" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1662, 490, 1688, 490, 1688, 516, 1662, 516)
+[node name="PC_PrincipalRoom_armchair_red5" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1762, 300, 1806, 300, 1806, 342, 1762, 342)
 
-[node name="PV_PrincipalRoom_plantL" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_plant")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.213, 0.3461, 0.2397, 1)
-polygon = PackedVector2Array(1662, 490, 1688, 490, 1688, 516, 1662, 516)
+[node name="PV_PrincipalRoom_armchair_red5" type="Polygon2D" parent="Props"]
+texture = ExtResource("ext_armchair_red")
+uv = PackedVector2Array(0, 0, 22, 0, 22, 21, 0, 21)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(1762, 300, 1806, 300, 1806, 342, 1762, 342)
 
-[node name="PD_PrincipalRoom_flag" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_prop_cloth")
-color = Color(0.7949, 0.7692, 0.7308, 1)
-polygon = PackedVector2Array(2238, 300, 2244, 300, 2244, 360, 2238, 360)
+[node name="PC_PrincipalRoom_globe6" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(2210, 180, 2236, 180, 2236, 216, 2210, 216)
+
+[node name="PV_PrincipalRoom_globe6" type="Polygon2D" parent="Props"]
+texture = ExtResource("ext_globe")
+uv = PackedVector2Array(0, 0, 13, 0, 13, 18, 0, 18)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(2210, 180, 2236, 180, 2236, 216, 2210, 216)
+
+[node name="PC_PrincipalRoom_vase_blue7" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1664, 474, 1696, 474, 1696, 516, 1664, 516)
+
+[node name="PV_PrincipalRoom_vase_blue7" type="Polygon2D" parent="Props"]
+texture = ExtResource("ext_vase_blue")
+uv = PackedVector2Array(0, 0, 16, 0, 16, 21, 0, 21)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(1664, 474, 1696, 474, 1696, 516, 1664, 516)
+
+[node name="FM_PrincipalRoom_rug" type="Polygon2D" parent="RoomMarks"]
+texture = ExtResource("ext_rug_long")
+uv = PackedVector2Array(0, 0, 96, 0, 96, 30, 0, 30)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(1680, 332, 1872, 332, 1872, 392, 1680, 392)
 
 [node name="PC_MensRoom1_bin" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(478, 1078, 500, 1078, 500, 1102, 478, 1102)
@@ -3973,39 +3983,6 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.3642, 0.3886, 0.4493, 1)
 polygon = PackedVector2Array(1563.5, 574, 1621.5, 574, 1621.5, 606, 1563.5, 606)
 
-[node name="PT_NurseRoom_1_fold0" type="Polygon2D" parent="Props"]
-color = Color(0.35, 0.38, 0.42, 1)
-polygon = PackedVector2Array(254, 107, 286.6, 107, 286.6, 125.5, 254, 125.5)
-
-[node name="PT_NurseRoom_2_fold0" type="Polygon2D" parent="Props"]
-color = Color(0.35, 0.38, 0.42, 1)
-polygon = PackedVector2Array(340.7, 104, 373.3, 104, 373.3, 122.5, 340.7, 122.5)
-
-[node name="PT_PrincipalRoom_sofaA_cushion0" type="Polygon2D" parent="Props"]
-color = Color(0.35, 0.38, 0.42, 1)
-polygon = PackedVector2Array(1774, 246, 1807, 246, 1807, 259.2, 1774, 259.2)
-
-[node name="PT_PrincipalRoom_sofaA_cushion1" type="Polygon2D" parent="Props"]
-color = Color(0.35, 0.38, 0.42, 1)
-polygon = PackedVector2Array(1738.5, 246, 1771.5, 246, 1771.5, 259.2, 1738.5, 259.2)
-
-[node name="PT_PrincipalRoom_table_book0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_prop_grain")
-color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(1760, 289, 1792, 289, 1792, 302.6, 1760, 302.6)
-
-[node name="PT_PrincipalRoom_table_cup1" type="Polygon2D" parent="Props"]
-color = Color(0.66, 0.65, 0.60, 1)
-polygon = PackedVector2Array(1718, 289, 1730, 289, 1730, 297, 1718, 297)
-
-[node name="PT_PrincipalRoom_sofaB_cushion0" type="Polygon2D" parent="Props"]
-color = Color(0.35, 0.38, 0.42, 1)
-polygon = PackedVector2Array(1738.5, 345, 1771.5, 345, 1771.5, 358.2, 1738.5, 358.2)
-
-[node name="PT_PrincipalRoom_books_kit0" type="Polygon2D" parent="Props"]
-color = Color(0.44, 0.32, 0.22, 1)
-polygon = PackedVector2Array(2213, 96, 2221.4, 96, 2221.4, 141.6, 2213, 141.6)
-
 [node name="PT_MensRoom1_sink0_soap0" type="Polygon2D" parent="Props"]
 color = Color(0.66, 0.65, 0.60, 1)
 polygon = PackedVector2Array(487, 799.5, 493, 799.5, 493, 804, 487, 804)
@@ -4243,74 +4220,20 @@ z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
-[node name="Exam_NurseRoom_2" type="Area2D" parent="."]
-position = Vector2(357, 143)
+[node name="Exam_NurseRoom_chem" type="Area2D" parent="."]
+position = Vector2(52, 68)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
 interact_priority = 3
-message = "베개가 눌린 자국이 선명하다."
-prompt_text = "침상 살펴보기"
-
-[node name="Zone" type="CollisionShape2D" parent="Exam_NurseRoom_2"]
-shape = SubResource("RectangleShape2D_exam_zone")
-
-[node name="Mark_Exam_NurseRoom_2" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(357, 143)
-z_index = 5
-color = Color(0.60, 0.68, 0.78, 1)
-polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
-
-[node name="Exam_NurseRoom_3" type="Area2D" parent="."]
-position = Vector2(439, 143)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("3_interactable")
-interact_priority = 3
-message = "이불이 개켜져 있다. 누군가 최근까지 쓴 자리다."
-prompt_text = "침상 살펴보기"
-
-[node name="Zone" type="CollisionShape2D" parent="Exam_NurseRoom_3"]
-shape = SubResource("RectangleShape2D_exam_zone")
-
-[node name="Mark_Exam_NurseRoom_3" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(439, 143)
-z_index = 5
-color = Color(0.60, 0.68, 0.78, 1)
-polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
-
-[node name="Exam_PrincipalRoom_trophy" type="Area2D" parent="."]
-position = Vector2(1676, 165)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("3_interactable")
-interact_priority = 3
-message = "캐비닛 문이 어긋나 닫히지 않는다."
+message = "안쪽에서 종이 냄새가 난다."
 prompt_text = "캐비닛 살펴보기"
 
-[node name="Zone" type="CollisionShape2D" parent="Exam_PrincipalRoom_trophy"]
+[node name="Zone" type="CollisionShape2D" parent="Exam_NurseRoom_chem"]
 shape = SubResource("RectangleShape2D_exam_zone")
 
-[node name="Mark_Exam_PrincipalRoom_trophy" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(1676, 165)
-z_index = 5
-color = Color(0.60, 0.68, 0.78, 1)
-polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
-
-[node name="Exam_PrincipalRoom_books" type="Area2D" parent="."]
-position = Vector2(2224, 185)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("3_interactable")
-interact_priority = 3
-message = "먼지가 고르게 앉았다. 한참 아무도 안 건드렸다."
-prompt_text = "선반 살펴보기"
-
-[node name="Zone" type="CollisionShape2D" parent="Exam_PrincipalRoom_books"]
-shape = SubResource("RectangleShape2D_exam_zone")
-
-[node name="Mark_Exam_PrincipalRoom_books" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(2224, 185)
+[node name="Mark_Exam_NurseRoom_chem" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(52, 68)
 z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
