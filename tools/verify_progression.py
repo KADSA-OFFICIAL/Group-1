@@ -134,6 +134,45 @@ def check_placement_rooms():
     return bad
 
 
+JOURNAL = ROOT / "scripts/game/journal.gd"
+
+
+def check_journal_flags():
+    """**수첩(#705)이 쓰는 플래그가 실제로 어딘가에서 서는가.**
+
+    수첩은 플래그가 서면 칸을 채우고, 정리 줄은 `needs`가 **전부** 서야 풀린다.
+    플래그 이름에 오타가 나면 그 칸은 영영 `????`이고 정리도 안 풀리는데, 화면은
+    그냥 "아직 못 찾았다"로 보여 아무도 모른다. 출처로 인정하는 것은 셋이다:
+    층 씬의 `grants_flag`·`pickup_id`(줍는 것도 플래그를 세운다), 스크립트의
+    `set_flag("…")`(도입부 자백의 `heard_confession`이 그렇다).
+    """
+    if not JOURNAL.exists():
+        print("  ✗ scripts/game/journal.gd가 없다")
+        return 1
+    text = JOURNAL.read_text(encoding="utf-8")
+    used = set(re.findall(r'\["(\w+)",\s*\n?\s*"', text))
+    for needs in re.findall(r"\[\[([^\]]*)\],", text):
+        used |= set(re.findall(r'"(\w+)"', needs))
+
+    sources = set()
+    for p in sorted((ROOT / "scenes/background").glob("school_floor_*.tscn")):
+        t = p.read_text(encoding="utf-8")
+        sources |= set(re.findall(r'^(?:grants_flag|pickup_id) = "(\w+)"', t, re.M))
+    for p in sorted((ROOT / "scripts").rglob("*.gd")):
+        t = p.read_text(encoding="utf-8")
+        sources |= set(re.findall(r'set_flag",\s*"(\w+)"', t))
+        sources |= set(re.findall(r'set_flag\(\s*"(\w+)"', t))
+
+    bad = 0
+    for f in sorted(used - sources):
+        print(f"  ✗ 수첩이 쓰는 플래그 '{f}'를 세우는 곳이 없다 — 그 칸은 영영 안 풀린다")
+        bad += 1
+    if not used:
+        print("  ✗ 수첩에서 플래그를 하나도 못 읽었다(형식이 바뀌었나?)")
+        bad += 1
+    return bad
+
+
 GAME_STATE = ROOT / "scripts/game/game_state.gd"
 
 
@@ -264,6 +303,7 @@ def main():
 
     bad += check_ending_tally(flags_at)
     bad += check_placement_rooms()
+    bad += check_journal_flags()
 
     print("\n".join("  " + l for l in log))
     print(f"\n진행 가능 — {START_FLOOR}층 시작에서 1층 현관 탈출까지 완주"

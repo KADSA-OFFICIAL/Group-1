@@ -64,6 +64,7 @@ func _run() -> void:
 	await _check_jumpscare()
 	# 마지막에 둔다 — 씬을 실제로 갈아 끼워(change_scene_to_file) 본다.
 	await _check_pause_menu()
+	await _check_journal()
 	await _check_ending_backgrounds()
 	await _check_ending_result()
 
@@ -943,6 +944,116 @@ func _check_pause_menu() -> void:
 		_ok("일시정지 처음부터 다시하기")
 	await _drop_scenes(main)
 	root.get_node("Sfx").call("stop_music")
+
+
+## 수첩(#705)이 받는 J.
+func _press_journal() -> void:
+	var ev := InputEventAction.new()
+	ev.action = &"journal"
+	ev.pressed = true
+	root.push_input(ev)
+
+
+## 수첩(#705) — J로 열고 게임을 멈추는가, 플래그가 칸을 채우고 정리 줄을 푸는가,
+## 새 내용을 알리는가, J·Esc로 닫고 멈춤을 푸는가, 열 수 없는 때는 안 열리는가.
+##
+## 화면과 입력 배선(`project.godot`의 `journal`, 일시정지 메뉴와 Esc를 나눠 받는 것)은
+## 정적 검사로 못 본다.
+func _check_journal() -> void:
+	if current_scene != null:
+		current_scene.free()
+		await process_frame
+	var main: Node = (load(MAIN) as PackedScene).instantiate()
+	root.add_child(main)
+	for i in 8:
+		await process_frame
+	await _wait(0.4)
+
+	var jp: Node = main.get_node_or_null("JournalPanel")
+	var gs: Node = main.get_node_or_null("GameState")
+	if jp == null or gs == null:
+		_fault("수첩: JournalPanel/GameState를 못 찾았다")
+		await _drop_scenes(main)
+		return
+	if not InputMap.has_action(&"journal"):
+		_fault("수첩: 입력 `journal`이 project.godot에 없다")
+		await _drop_scenes(main)
+		return
+	var box: Control = jp.get_node("Root")
+	var text: RichTextLabel = jp.get_node("Root/Paper/Margin/Rows/Scroll/Text")
+	var toast: Label = jp.get_node("Toast")
+
+	# ── 열 수 없는 때(일시정지 메뉴와 같은 규칙) ───────────────────
+	paused = true
+	_press_journal()
+	if bool(jp.get("is_open")):
+		_fault("수첩: 이미 멈춘 트리(현관 선택지)에서 열렸다")
+	paused = false
+	main.set("game_over_active", true)
+	_press_journal()
+	if bool(jp.get("is_open")) or paused:
+		_fault("수첩: 게임 오버 연출 중에 열렸다")
+	main.set("game_over_active", false)
+
+	# ── 새 내용 알림 — 단서 하나를 조사한 것처럼 플래그를 세운다 ─────
+	toast.modulate.a = 0.0
+	gs.call("set_flag", "read_siwoo_painting")
+	await process_frame
+	if toast.modulate.a < 0.5:
+		_fault("수첩: 새 칸이 풀렸는데 '수첩에 적었다' 알림이 안 뜬다")
+	else:
+		_ok("수첩 새 내용 알림")
+
+	# ── 열기 — 멈추고, 풀린 칸은 메모, 못 찾은 칸은 ???? ──────────
+	_press_journal()
+	await process_frame
+	if not bool(jp.get("is_open")) or not box.visible or not paused:
+		_fault("수첩: J로 안 열린다 (open=%s, visible=%s, paused=%s)"
+			% [jp.get("is_open"), box.visible, paused])
+		await _drop_scenes(main)
+		return
+	var shown := text.get_parsed_text()
+	if not shown.contains("도와줘"):
+		_fault("수첩: 조사한 단서(시우 그림)의 메모가 안 적혔다")
+	elif not shown.contains("????"):
+		_fault("수첩: 못 찾은 칸이 ????로 안 남는다")
+	else:
+		_ok("수첩 J로 열림·멈춤·칸 표시")
+
+	# ── 정리 줄 — `needs`가 전부 서야 풀린다 ─────────────────────
+	var link := "학교가 하지 않은 '심판'"
+	if shown.contains(link):
+		_fault("수첩: 조건이 안 찼는데 정리 줄이 보인다")
+	gs.call("set_flag", "heard_confession")
+	await process_frame
+	if text.get_parsed_text().contains(link):
+		_fault("수첩: 조건의 일부(자백)만으로 정리 줄이 풀렸다")
+	gs.call("set_flag", "read_siwoo_counseling")
+	await process_frame
+	if not text.get_parsed_text().contains(link):
+		_fault("수첩: 조건(자백 + 상담기록부)이 다 찼는데 정리 줄이 안 풀린다 — 열린 채로 갱신되나?")
+	else:
+		_ok("수첩 정리 줄 해제")
+
+	# ── 닫기 — J와 Esc 둘 다. Esc는 일시정지 메뉴가 먼저 먹으면 안 된다 ──
+	_press_journal()
+	await process_frame
+	if bool(jp.get("is_open")) or box.visible or paused:
+		_fault("수첩: J로 안 닫히거나 멈춤이 안 풀린다 (open=%s, paused=%s)"
+			% [jp.get("is_open"), paused])
+	_press_journal()
+	await process_frame
+	_press_cancel()
+	await process_frame
+	var pm: Node = main.get_node_or_null("PauseMenu")
+	if bool(jp.get("is_open")) or paused:
+		_fault("수첩: Esc로 안 닫힌다 (open=%s, paused=%s)" % [jp.get("is_open"), paused])
+	elif pm != null and bool(pm.get("is_open")):
+		_fault("수첩: Esc로 닫으려는데 일시정지 메뉴가 열렸다 — 멈춘 트리에서 열리면 안 된다")
+	else:
+		_ok("수첩 J·Esc로 닫힘")
+
+	await _drop_scenes(main)
 
 
 ## 일시정지 메뉴가 받는 Esc. 버튼 포커스와 상관없이 `_unhandled_input`까지 간다.
