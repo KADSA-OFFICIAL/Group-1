@@ -50,6 +50,9 @@ HAUNTED = {
     "hs_office_desk_down": ("Inside_B.png", 387, 374, 430, 431),
     # 교무실 섬 아래 자리: 책상 위·의자 아래(칸막이를 향해 위를 본다).
     "hs_office_desk_up": ("Inside_B.png", 339, 396, 382, 445),
+    # 철제 사물함(#721) — 정면 3/4, 윗면 회색 판 + 문. 키 큰 집기라 윗부분은 벽 앞면에 겹친다.
+    "hs_locker": ("Inside_B.png", 480, 96, 527, 198),
+    "hs_locker_open": ("Inside_B.png", 528, 96, 575, 198),
 }
 
 
