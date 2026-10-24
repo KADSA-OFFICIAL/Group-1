@@ -51,6 +51,18 @@ extends Area2D
 ## 넘어가는 것이 아니라 그 자리에서 지워지는 것으로 보인다.
 @export var cutscene_vanish_rise: float = 26.0
 
+## ── 도착한 뒤의 대사(#700) ──────────────────────────────────────────
+## 새 층에 내려서서 **페이드가 다 걷힌 뒤** 나온다. 화자는 줄마다 다르다(빈 문자열은
+## 지문). 원문(`docs/story.md` 3-5)의 마지막 — 위층에서 수위가 돌아와 빈 방을
+## 확인하는 소리 — 가 여기 온다. 간발의 차였다는 확인이 없으면 위험이 실제였는지
+## 알 수 없다.
+##
+## **이 노드가 직접 내보낼 수 없다.** 층을 넘기면 이 씬이 통째로 해제되므로
+## 기다리던 코루틴도 같이 죽는다. 넘기기 직전에 `floor_manager`에 맡긴다.
+@export var arrival_speakers: PackedStringArray = PackedStringArray()
+@export var arrival_lines: PackedStringArray = PackedStringArray()
+@export var arrival_emotions: PackedStringArray = PackedStringArray()
+
 ## 되돌릴 수 없는 하강이 시작됐다. **컷신(#468)이 붙은 뒤로는 씬이 곧바로
 ## 해제되지 않는다** — `interact()`가 `travel_to()` 전에 컷신을 끝까지 기다리므로
 ## 그동안 이 층의 `_process`가 계속 돈다. 층에서 도는 유예·연출은 이 신호를 받아
@@ -93,6 +105,15 @@ func interact(_player: Node) -> void:
 
 	if game_state != null and not message.is_empty():
 		game_state.call("request_notice", message)
+	# 도착 대사는 층 관리자에 맡긴다(#700) — 이 씬은 곧 해제된다.
+	if not arrival_lines.is_empty() and manager.has_method("queue_arrival_speech"):
+		var lines: Array = []
+		for i in arrival_lines.size():
+			lines.append([
+				arrival_speakers[i] if i < arrival_speakers.size() else "",
+				arrival_lines[i],
+				arrival_emotions[i] if i < arrival_emotions.size() else ""])
+		manager.call("queue_arrival_speech", lines)
 	Sfx.play(&"stairs")
 	manager.call("travel_to", target_floor, arrive_at)
 

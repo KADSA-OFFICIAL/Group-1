@@ -141,6 +141,13 @@ const GAME_OVER_LINE_HOLD := 0.15
 const JUMPSCARE_BLACK_HOLD := 0.35
 
 var game_over_active: bool = false
+## 다음 층에 내려서서 **페이드가 다 걷힌 뒤** 낼 대사(#700). `[화자, 문장, 감정]`의
+## 배열이다. 층 통로(`floor_link.gd`)가 넘기기 직전에 맡긴다 — 그 노드는 층 씬과
+## 함께 해제되므로 도착 뒤에 스스로 말할 수 없다.
+##
+## **페이드 중에 내보내면 안 보인다.** `HUD`와 `UI`가 둘 다 CanvasLayer 3인데
+## `UI`(`FadeRect`)가 뒤에 선언돼 위로 오므로, 까만 화면 아래에 자막이 깔린다.
+var _arrival_speech: Array = []
 
 
 ## 현관 문(#356)이 층 전환을 부르려면 이름이 아니라 그룹으로 찾아야 한다 —
@@ -307,7 +314,29 @@ func _change_floor(target: int, arrive: Vector2) -> void:
 	tween.tween_callback(_swap_floor.bind(target, arrive))
 	tween.tween_property(fade_rect, "color:a", 0.0, FLOOR_FADE_IN_SECONDS)
 	tween.tween_callback(func() -> void:
-		changing_floor = false)
+		changing_floor = false
+		_flush_arrival_speech())
+
+
+## 다음 층 도착 뒤 대사를 맡긴다(#700). 층 전환을 부르기 **전에** 불러야 한다.
+func queue_arrival_speech(lines: Array) -> void:
+	_arrival_speech = lines.duplicate(true)
+
+
+## 페이드가 다 걷힌 뒤에 맡겨 둔 대사를 낸다. 순서·간격은 HUD 대기열(#454)이 맡는다.
+func _flush_arrival_speech() -> void:
+	if _arrival_speech.is_empty():
+		return
+	var lines := _arrival_speech
+	_arrival_speech = []
+	var game_state = get_tree().get_first_node_in_group("game_state")
+	if game_state == null:
+		return
+	for line: Array in lines:
+		if String(line[0]).is_empty():
+			game_state.call("request_notice", line[1])
+		else:
+			game_state.call("request_speech", line[0], line[1], line[2])
 
 
 func _swap_floor(target: int, arrive: Vector2, record_cp: bool = true) -> void:
