@@ -37,6 +37,10 @@ DARKLIGHT = {
     "vase_blue": "VaseBlue.png",
     "bed_green": "bedGreen.png",              # 보건실 침대
     "rug_long": "rugLong.png",
+    # 단서(#723)
+    "painting_dark": "painting1.png",         # 시우 그림 — 밤 풍경 액자
+    "book_closed": "book.png",                # 인사 기록(서류철)
+    "books_pile": "booksPile1.png",           # 대응 매뉴얼
 }
 
 # 게임 안 이름 → (시트, x0, y0, x1, y1) — 끝 좌표 포함.
@@ -53,6 +57,20 @@ HAUNTED = {
     # 철제 사물함(#721) — 정면 3/4, 윗면 회색 판 + 문. 키 큰 집기라 윗부분은 벽 앞면에 겹친다.
     "hs_locker": ("Inside_B.png", 480, 96, 527, 198),
     "hs_locker_open": ("Inside_B.png", 528, 96, 575, 198),
+    # 단서(#723) — 작은 소품들. 게임에서는 2배로 놓는다(`gen_floors.CLUE_ART_SCALE`).
+    "hs_calendar": ("Inside_B.png", 394, 102, 421, 135),       # 날짜 벽
+    "hs_id_card": ("Inside_B.png", 311, 125, 333, 137),        # 학생증
+    "hs_bag_spilled": ("Inside_B.png", 294, 211, 333, 236),    # 소지품 봉투
+    "hs_book_purple": ("Inside_B.png", 347, 210, 359, 226),    # 국어책
+    "hs_books_green": ("Inside_B.png", 405, 206, 419, 227),    # 상담기록부
+    "hs_book_open": ("Inside_B.png", 445, 210, 471, 227),      # 졸업앨범
+    "hs_notebook": ("Inside_B.png", 391, 207, 403, 226),       # 수위 공책
+    "hs_papers_pile": ("Inside_B.png", 341, 147, 381, 179),    # 사안 파일
+    "hs_papers_two": ("Inside_B.png", 396, 157, 416, 175),     # 교장 편지(편지지 두 장)
+    "hs_note_small": ("Inside_B.png", 362, 102, 374, 114),     # 태호 쪽지
+    "hs_paper_crumpled": ("Inside_B.png", 348, 120, 374, 135), # 강유진 쪽지
+    "hs_memo_grey": ("Inside_B.png", 317, 147, 328, 160),      # 신고 전단(인쇄물)
+    "hs_frame_map": ("Inside_B.png", 438, 151, 474, 178),      # 사진 벽
 }
 
 

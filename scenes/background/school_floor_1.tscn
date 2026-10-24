@@ -1,4 +1,4 @@
-[gd_scene load_steps=113 format=3]
+[gd_scene load_steps=116 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
@@ -35,15 +35,18 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/floor_lamp.png" id="ext_floor_lamp"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/globe.png" id="ext_globe"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/grandfather_clock.png" id="ext_grandfather_clock"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_frame_map.png" id="ext_hs_frame_map"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_id_card.png" id="ext_hs_id_card"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_locker.png" id="ext_hs_locker"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_locker_open.png" id="ext_hs_locker_open"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_notebook.png" id="ext_hs_notebook"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_office_desk_down.png" id="ext_hs_office_desk_down"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_office_desk_up.png" id="ext_hs_office_desk_up"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_papers_two.png" id="ext_hs_papers_two"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/rug_long.png" id="ext_rug_long"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/sofa_red.png" id="ext_sofa_red"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/vase_blue.png" id="ext_vase_blue"]
 [ext_resource type="Texture2D" path="res://assets/sprites/key.png" id="9_key"]
-[ext_resource type="Texture2D" path="res://assets/sprites/note.png" id="10_note"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(2280, 40)
@@ -1482,8 +1485,8 @@ grants_flag = "read_principal_letter"
 [node name="PrincipalLetterVisual" type="Sprite2D" parent="PrincipalLetter"]
 z_index = 1
 texture_filter = 1
-texture = ExtResource("10_note")
-
+texture = ExtResource("ext_hs_papers_two")
+scale = Vector2(2, 2)
 
 [node name="PrincipalLetterZone" type="CollisionShape2D" parent="PrincipalLetter"]
 shape = SubResource("RectangleShape2D_key_zone")
@@ -1505,11 +1508,11 @@ prompt_text = "사진벽 보기"
 grants_flag = "saw_photo_wall"
 
 
-[node name="PhotoWallVisual" type="Polygon2D" parent="PhotoWall"]
+[node name="PhotoWallVisual" type="Sprite2D" parent="PhotoWall"]
 z_index = 1
-color = Color(0.3, 0.25, 0.2, 1)
-polygon = PackedVector2Array(-16, -10, 16, -10, 16, 10, -16, 10)
-
+texture_filter = 1
+texture = ExtResource("ext_hs_frame_map")
+scale = Vector2(2, 2)
 
 [node name="PhotoWallZone" type="CollisionShape2D" parent="PhotoWall"]
 shape = SubResource("RectangleShape2D_key_zone")
@@ -1534,8 +1537,8 @@ grants_flag = "saw_student_cards"
 [node name="StudentCardsVisual" type="Sprite2D" parent="StudentCards"]
 z_index = 1
 texture_filter = 1
-texture = ExtResource("10_note")
-
+texture = ExtResource("ext_hs_id_card")
+scale = Vector2(2, 2)
 
 [node name="StudentCardsZone" type="CollisionShape2D" parent="StudentCards"]
 shape = SubResource("RectangleShape2D_key_zone")
@@ -1560,8 +1563,8 @@ grants_flag = "read_janitor_notebook"
 [node name="JanitorNotebookVisual" type="Sprite2D" parent="JanitorNotebook"]
 z_index = 1
 texture_filter = 1
-texture = ExtResource("10_note")
-
+texture = ExtResource("ext_hs_notebook")
+scale = Vector2(2, 2)
 
 [node name="JanitorNotebookZone" type="CollisionShape2D" parent="JanitorNotebook"]
 shape = SubResource("RectangleShape2D_key_zone")

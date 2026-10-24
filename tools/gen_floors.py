@@ -1572,6 +1572,47 @@ def add_hiding(sc, floor):
         sc.mark(name, cx, cy, C_MARK_HIDE)
 
 
+# 단서 그림(#723) — 단서 이름 → 외부 그림. `story_objects.json`의 `<이름>Visual`
+# 노드를 이 그림의 Sprite2D로 갈아 끼운다(본문·플래그는 그대로). 예전에는 종이류
+# 단서 11개가 전부 같은 공책 그림(`note.png`)이라 그림으로는 무슨 단서인지 안
+# 갈렸고, 국어책·시우 그림·소지품 봉투·날짜 벽·사진 벽은 단색 도형이었다.
+# 여기 없는 단서(열쇠·잉크통·비커·머리·열쇠 보관함·끌린 자국)는 그대로다.
+CLUE_ART = {
+    "KoreanBook": "hs_book_purple",
+    "SiwooPainting": "painting_dark",
+    "Belongings": "hs_bag_spilled",
+    "DateWall": "hs_calendar",
+    "NayeonClue": "hs_papers_pile",
+    "CounselRecord": "hs_books_green",
+    "JanitorWarning": "book_closed",
+    "ReportFlyer": "hs_memo_grey",
+    "TaehoNote": "hs_note_small",
+    "YujinClue": "hs_paper_crumpled",
+    "CrisisManual": "books_pile",
+    "HistoryClue": "hs_book_open",
+    "PrincipalLetter": "hs_papers_two",
+    "PhotoWall": "hs_frame_map",
+    "StudentCards": "hs_id_card",
+    "JanitorNotebook": "hs_notebook",
+}
+# 단서는 **2배**로 놓는다 — 찾을 것이라 눈에 띄어야 한다. 1배면 책(13x17)이
+# 책상 그림 위의 점 하나라, "3층 열쇠가 안 보인다"(#698)가 단서마다 되풀이된다.
+# Darklight 그림은 원래 2배라 그대로 맞는다.
+CLUE_ART_SCALE = 2
+
+
+def _clue_visual(name):
+    """단서 시각 노드 — 외부 그림 Sprite2D. 부모(단서 Area2D) 자리 한가운데에 선다."""
+    art = CLUE_ART[name]
+    if art not in EXT_SIZES:
+        raise SystemExit(f"단서 그림 {art}.png가 없다 — tools/import_ext_sprites.py를 돌렸는가")
+    return (f'[node name="{name}Visual" type="Sprite2D" parent="{name}"]\n'
+            "z_index = 1\n"
+            "texture_filter = 1\n"
+            f'texture = ExtResource("ext_{art}")\n'
+            f"scale = Vector2({CLUE_ART_SCALE}, {CLUE_ART_SCALE})\n")
+
+
 def add_story(sc, floor):
     """추출해 둔 단서 노드를 방 안에 배치. 본문은 그대로, position만 새 좌표."""
     data = json.loads((pathlib.Path(__file__).parent / "story_objects.json").read_text())
@@ -1602,6 +1643,8 @@ def add_story(sc, floor):
                 body = to_pickup(body)
             sc.node(body if body.endswith("\n") else body + "\n")
             for kid in nodes[name]["kids"]:
+                if name in CLUE_ART and kid.startswith(f'[node name="{name}Visual"'):
+                    kid = _clue_visual(name)
                 sc.node(kid if kid.endswith("\n") else kid + "\n")
 
 
