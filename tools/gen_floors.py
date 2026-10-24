@@ -23,7 +23,7 @@ NL = chr(10)   # 노드 블록을 줄 단위로 조립할 때 쓴다
 
 T = 16          # 벽 두께
 DOOR = 110      # 문 틈 폭
-W, H = 3400, 2500   # 캔버스
+W, H = 2280, 2500   # 캔버스 — 폭은 오른쪽 교실을 걷어내며 3400에서 줄였다(1층 F1W와 같다)
 
 C_FLOOR = "Color(0.14, 0.14, 0.16, 1)"
 C_ROOM = "Color(0.1, 0.11, 0.12, 1)"
@@ -441,9 +441,15 @@ STAIR_B = (1450, 2120, 1890, 2440)   # 중앙 하단 계단실 (2~5층 동일)
 # 열린 막다른 골목을 만들어, 실내인데 바깥처럼 보이고 수위 스폰 후보에도 들었다.
 NORTH_GAP = 0
 
+# 교실 폭은 예전 9칸 기준 값에 **고정**한다. 오른쪽 교실을 걷어내 칸 수가 줄어도
+# 남은 반의 x가 그대로여야 PLACEMENT·POS_OVERRIDE(2학년부 보관함 등)가 안 어긋난다.
+NORTH_COLS = 9
+NORTH_FULL_W = 3400
+
+
 def north_x(i, count):
-    span = W - 2 * EDGE
-    pitch = (span + NORTH_GAP) / count
+    span = NORTH_FULL_W - 2 * EDGE
+    pitch = (span + NORTH_GAP) / NORTH_COLS
     x0 = EDGE + i * pitch
     return x0, x0 + pitch - NORTH_GAP
 
@@ -458,19 +464,15 @@ RIGHT_X0 = 1920
 # 라벨이 None이면 막힌 공간(문 없음·라벨 없음)
 LAYOUT = {
     3: {
-        "north": ["1반", "2반", "3반", "생활지도부", "2학년부", "4반", "5반", "6반", "7반"],
+        "north": ["1반", "2반", "3반", "생활지도부", "2학년부", "4반"],
         "south_left": [("Class6", "6반", 20, 720), ("CareerDept", "진로진학부", 750, 1640)],
-        "south_right": [("ScienceLab1", "과학실1", 1920, 2400),
-                        ("Storage2", "창고", 2430, 2790),
-                        ("ScienceLab2", "과학실2", 2820, 3380)],
+        "south_right": [("ScienceLab1", "과학실1", 1920, 2260)],
         "bottom_left": [("CareerRoom", "진로실", 20, 1200)],
     },
     2: {
-        "north": ["1반", "2반", "3반", "1학년부", "4반", "5반", "6반", "7반", "8반"],
+        "north": ["1반", "2반", "3반", "1학년부", "4반", "5반"],
         "south_left": [("PEStorage", "체육창고", 20, 720), ("PEDept", "체육건강부", 750, 1640)],
-        "south_right": [("EduRoom", "교육실", 1920, 2400),
-                        ("Storage2", "창고", 2430, 2790),
-                        ("ComputerRoom", "컴퓨터실", 2820, 3380)],
+        "south_right": [("EduRoom", "교육실", 1920, 2260)],
         "bottom_left": [],
     },
 }
@@ -480,13 +482,9 @@ MID_LEFT = [("MensRoomL", "남자 화장실", 800, 1060),
             ("WomensRoomL", "여자 화장실", 1090, 1350),
             ("BlockedL", None, 1380, 1640)]
 # 중간 띠 공통(우, 사선): 창고 + 막힌 공간 + 남/여 화장실
-MID_RIGHT = [("StorageR", "창고", 1920, 2280),
-             ("BlockedR", None, 2310, 2790),
-             ("MensRoomR", "남자 화장실", 2820, 3060),
-             ("WomensRoomR", "여자 화장실", 3090, 3380)]
+MID_RIGHT = [("StorageR", "창고", 1920, 2260)]
 # 하단 띠 공통: 남/여 화장실
-BOTTOM_RIGHT = [("MensRoomB", "남자 화장실", 2270, 2530),
-                ("WomensRoomB", "여자 화장실", 2560, 2820)]
+BOTTOM_RIGHT = []
 
 def close_gaps(seq, limit=200, i0=2, i1=3):
     """같은 띠에서 이웃한 방 사이의 틈을 없앤다 — 경계를 틈 한가운데로 옮긴다.
@@ -1108,7 +1106,7 @@ PLACEMENT = {
         # 바뀌었다 — 눈구멍에 열쇠가 박힌 머리(`assets/sprites/eye_key.png`).
         ("StorageR", ["HistoryClue", "HeadKey"]),  # 창고 +780px — 졸업앨범 + 열쇠
         # 끌린 자국은 열쇠와 무관한 스토리 단서라 화장실에 남는다.
-        ("MensRoomB", ["ShowerMarks"]),           # 화장실 ← 샤워실
+        ("MensRoomL", ["ShowerMarks"]),           # 화장실 ← 샤워실 (하단 화장실은 오른쪽 축소로 없어졌다)
         ],
     1: [("StaffRoom", ["PrincipalLetter"]),                       # 교무실 ← 교장실
         ("JanitorRoom", ["PhotoWall", "StudentCards", "JanitorNotebook", "JanitorSafe"]),
@@ -1308,10 +1306,8 @@ EXTRA_HIDING = {
          "준비실 적재함 뒤. 비닐봉투 냄새가 코를 찌른다.")],
     3: [("HideClass2", "North2", "locker", "사물함에 숨기",
          "2반 뒤 사물함. 문틈으로 복도가 가늘게 보인다."),
-        ("HideClass5", "North7", "clean", "청소함에 숨기",
-         "5반 청소함. 대걸레 자루가 어깨를 누른다."),
-        ("HideBroadcastRoom", "Storage2", "files", "적재함에 숨기",
-         "창고 적재함 뒤. 상자 틈으로 문이 보인다."),
+        ("HideClass4", "North6", "clean", "청소함에 숨기",
+         "4반 청소함. 대걸레 자루가 어깨를 누른다."),
         ("HideScienceLab1", "ScienceLab1", "chem", "약품장에 숨기",
          "약품장 아래 칸. 시큼한 냄새에 숨이 막힌다."),
         ("HideCareerRoom", "CareerRoom", "files", "서류함에 숨기",
@@ -1320,28 +1316,24 @@ EXTRA_HIDING = {
          "창가 커튼 뒤. 유리에 닿은 등이 서늘하다."),
         ("HideStorageR", "StorageR", "files", "적재함에 숨기",
          "쌓인 상자 사이. 무릎을 끌어안고 앉았다."),
-        ("HideMensRoomB", "MensRoomB", "stall", "칸에 숨기",
+        ("HideMensRoomL", "MensRoomL", "stall", "칸에 숨기",
          "맨 끝 칸. 발을 변기 위로 올렸다."),
-        ("HideScienceLab2", "ScienceLab2", "desk", "실험대 밑에 숨기",
-         "실험대 밑. 가스 배관에 등이 닿는다.")],
+        ("HideWomensRoomL", "WomensRoomL", "stall", "칸에 숨기",
+         "가운데 칸. 문틈으로 세면대가 보인다.")],
     2: [("HideClass1", "North1", "locker", "사물함에 숨기",
          "1반 뒤 사물함. 안쪽에서 문을 붙잡았다."),
-        ("HideClass6", "North7", "clean", "청소함에 숨기",
-         "6반 청소함. 세제 냄새가 코를 찌른다."),
-        ("HideShower", "MensRoomB", "stall", "칸에 숨기",
+        ("HideClass4", "North5", "clean", "청소함에 숨기",
+         "4반 청소함. 세제 냄새가 코를 찌른다."),
+        ("HideMensRoomL", "MensRoomL", "stall", "칸에 숨기",
          "샤워칸 안. 타일에 등을 붙이자 서늘하다."),
         ("HideEduRoom", "EduRoom", "locker", "사물함에 숨기",
          "교육실 사물함. 문틈으로 복도가 가늘게 보인다."),
-        ("HideStorage2b", "Storage2", "gear", "장비함에 숨기",
-         "창고 장비함. 공 사이에 몸을 밀어 넣었다."),
-        ("HideNorth7", "North7", "curtain", "커튼 뒤에 숨기",
+        ("HideNorth6", "North6", "curtain", "커튼 뒤에 숨기",
          "커튼과 창 사이. 숨을 죽이자 유리가 김으로 흐려진다."),
         ("HidePEStorage", "PEStorage", "gear", "매트 뒤에 숨기",
          "세워 둔 매트 뒤. 곰팡내가 코를 막는다."),
-        ("HideWomensRoomR", "WomensRoomR", "stall", "칸에 숨기",
-         "가운데 칸. 문틈으로 세면대가 보인다."),
-        ("HideComputerRoom", "ComputerRoom", "desk", "책상 밑에 숨기",
-         "컴퓨터 책상 밑. 케이블 뭉치에 발이 걸린다.")],
+        ("HideWomensRoomL", "WomensRoomL", "stall", "칸에 숨기",
+         "가운데 칸. 문틈으로 세면대가 보인다.")],
     1: [("HideClass1_1", "Class1", "locker", "사물함에 숨기",
          "교실1 뒤 사물함. 문이 반쯤 어긋나 닫힌다."),
         ("HideClass1Curtain", "Class1", "curtain", "커튼 뒤에 숨기",
@@ -3297,15 +3289,20 @@ def build_common(fl, spec):
     # 공백 구역(건물 밖) 봉인 — 중앙다리 폭만 열어 둔다.
     # 위 경계: 왼쪽은 수평, 오른쪽은 중간 띠와 같은 기울기.
     sc.wall("VoidTopL", rect(0, MID_Y1, BRIDGE_X0, MID_Y1 + T))
-    sc.wall("VoidTopR", rect(BRIDGE_X1, MID_Y1, W, MID_Y1 + T))
+    sc.wall("VoidTopR", rect(BRIDGE_X1, MID_Y1, W - EDGE, MID_Y1 + T))
     # 아래 경계: 남쪽 복도와 맞닿는 수평선
     sc.wall("VoidBotL", rect(0, VOID_Y1 - T, BRIDGE_X0, VOID_Y1))
-    sc.wall("VoidBotR", rect(BRIDGE_X1, VOID_Y1 - T, W, VOID_Y1))
+    sc.wall("VoidBotR", rect(BRIDGE_X1, VOID_Y1 - T, W - EDGE, VOID_Y1))
 
     # 공백 구역 내부를 메워 통행 후보에서 뺀다(수위 스폰 방지)
     fill_void(sc, "VoidFillL", 0, BRIDGE_X0 - T, lambda x: MID_Y1 + T, VOID_Y1 - T)
-    fill_void(sc, "VoidFillR", BRIDGE_X1 + T, W,
+    fill_void(sc, "VoidFillR", BRIDGE_X1 + T, W - EDGE,
               lambda x: MID_Y1 + T, VOID_Y1 - T)
+
+    # 복도 오른쪽 끝 마개 — 오른쪽 교실을 걷어내고 폭을 줄이면서 복도가 마루만
+    # 깔린 채 열려 끝났다. 방 동쪽 벽(W-EDGE-T ~ W-EDGE)과 같은 선에 벽을 세운다.
+    for cy0, cy1 in ((NORTH_Y1, MID_Y0), (VOID_Y1, SOUTH_Y0), (SOUTH_Y1, BOT_Y0)):
+        sc.wall(f"CorridorEnd_{int(cy0)}", rect(W - EDGE - T, cy0, W - EDGE, cy1))
 
     # 중앙다리 — 좌·우 벽
     sc.wall("BridgeL", rect(BRIDGE_X0 - T, BRIDGE_Y0, BRIDGE_X0, BRIDGE_Y1))

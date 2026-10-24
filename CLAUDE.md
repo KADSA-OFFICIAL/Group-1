@@ -30,7 +30,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
 ### 구조 요약
 
 - `scenes/main/main.tscn` = 조립 씬: Darkness(CanvasModulate 어둠), Background(층 씬 인스턴스), Player, GameState, HUD, UI(FloorLabel·FadeRect). 루트 스크립트 `scripts/game/floor_manager.gd`가 층 전환·시작 힌트·페이드 담당.
-- 층 씬 `scenes/background/school_floor_1~3.tscn`: **3400×2500, 손도면 기반(#159)**. 씬을 손으로 고치지 말고 **`tools/gen_floors.py`의 LAYOUT 테이블을 고친 뒤 재생성**한다(3개 층 + 도입부 + 운동장을 만든다).
+- 층 씬 `scenes/background/school_floor_1~3.tscn`: 2·3층은 **2280×2500**(손도면 기반 #159, 처음엔 3400×2500이었으나 **오른쪽 교실을 걷어내 폭을 줄였다**). 걷어낸 것: 북쪽 교실 9→6칸, 남쪽 우측 특별실(3층 창고·과학실2 / 2층 창고·컴퓨터실), 중간 띠 우측 막힌 공간·화장실, 하단 우측 화장실. 북쪽 교실 폭은 9칸 기준 값(`NORTH_FULL_W`/`NORTH_COLS`)에 고정이라 남은 반의 x는 그대로다. 카메라 한계는 `player.tscn`·`floor_manager.DEFAULT_BOUNDS`가 2280×2500이다. 은신처는 3층 8곳·2층 7곳이고, 2층 끌린 자국(`ShowerMarks`)은 `MensRoomL`로 옮겼다. 씬을 손으로 고치지 말고 **`tools/gen_floors.py`의 LAYOUT 테이블을 고친 뒤 재생성**한다(3개 층 + 도입부 + 운동장을 만든다).
 - **도입부 `scenes/background/school_floor_4.tscn`(#405)**: 미술실 + 미술 준비실 두 방뿐인 **1800×1000** 씬. `build_intro()`가 만든다.
   - 스토리가 여기서 시작한다. 창문으로 3층에 직행하므로 예전 4층의 방 14개는 도달 불가가 됐고, 미술실 한 칸을 위해 3275노드를 로드하던 것을 **174노드**로 줄였다.
   - **복도를 만들지 않는다.** 수위는 미술실에 들어오지 않는다 — 문 밖에서 말하고 잠그고 간다. 클로즈업 연출도 문과 문틈 불빛만 보여 주면 된다.
