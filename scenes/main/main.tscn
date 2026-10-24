@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/background/school_floor_4.tscn" id="1_floor"]
 [ext_resource type="PackedScene" path="res://scenes/player/player.tscn" id="2_player"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://scripts/game/wall_fade_mask.gd" id="8_fade_mask"]
 [ext_resource type="PackedScene" path="res://scenes/ui/pause_menu.tscn" id="9_pause_menu"]
 [ext_resource type="PackedScene" path="res://scenes/ui/jumpscare.tscn" id="10_jumpscare"]
+[ext_resource type="PackedScene" path="res://scenes/ui/journal_panel.tscn" id="11_journal"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("3_floor_manager")
@@ -69,5 +70,9 @@ mouse_filter = 2
 color = Color(0, 0, 0, 1)
 
 [node name="PauseMenu" parent="." instance=ExtResource("9_pause_menu")]
+
+[node name="JournalPanel" parent="." instance=ExtResource("11_journal")]
+; 수첩(#705). 일시정지 메뉴와 순서는 상관없다 — 서로 멈춘 트리에서는 안 열리고
+; 이벤트도 안 먹는다(`journal_panel.gd` 머리 주석).
 
 [node name="Jumpscare" parent="." instance=ExtResource("10_jumpscare")]
