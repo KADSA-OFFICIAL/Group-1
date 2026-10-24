@@ -1,4 +1,4 @@
-[gd_scene load_steps=145 format=3]
+[gd_scene load_steps=148 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
@@ -8,10 +8,8 @@
 [ext_resource type="Script" path="res://scripts/game/room_lights.gd" id="7_roomlights"]
 [ext_resource type="Script" path="res://scripts/game/interact_marks.gd" id="8_marks"]
 [ext_resource type="Script" path="res://scripts/interactions/proximity_reveal.gd" id="17_proximity"]
-[ext_resource type="Texture2D" path="res://assets/tiles/floor_board.png" id="tex_floor_board"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_cement.png" id="tex_floor_cement"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_matte.png" id="tex_floor_matte"]
-[ext_resource type="Texture2D" path="res://assets/tiles/floor_wood.png" id="tex_floor_wood"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_bed.png" id="tex_obj_bed"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_bin.png" id="tex_obj_bin"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_cabinet.png" id="tex_obj_cabinet"]
@@ -30,6 +28,11 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/books_pile.png" id="ext_books_pile"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_book_open.png" id="ext_hs_book_open"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_floor_herringbone.png" id="ext_hs_floor_herringbone"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_floor_planks.png" id="ext_hs_floor_planks"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_floor_stone.png" id="ext_hs_floor_stone"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_floor_teal.png" id="ext_hs_floor_teal"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_floor_tile_white.png" id="ext_hs_floor_tile_white"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_locker.png" id="ext_hs_locker"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_locker_open.png" id="ext_hs_locker_open"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_office_desk_down.png" id="ext_hs_office_desk_down"]
@@ -414,8 +417,8 @@ full_distance = 300.0
 [node name="StairWalls" type="StaticBody2D" parent="."]
 
 [node name="North1" type="Polygon2D" parent="Rooms"]
-texture = ExtResource("tex_floor_wood")
-color = Color(0.1949, 0.159, 0.1179, 1)
+texture = ExtResource("ext_hs_floor_planks")
+color = Color(0.55, 0.53, 0.52, 1)
 polygon = PackedVector2Array(20, 20, 393.3, 20, 393.3, 540, 20, 540)
 
 [node name="L_North1" type="Label" parent="WallGlow/Labels"]
@@ -539,8 +542,8 @@ color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(377.3, 20, 393.3, 20, 393.3, 540, 377.3, 540)
 
 [node name="North2" type="Polygon2D" parent="Rooms"]
-texture = ExtResource("tex_floor_wood")
-color = Color(0.1949, 0.159, 0.1179, 1)
+texture = ExtResource("ext_hs_floor_planks")
+color = Color(0.55, 0.53, 0.52, 1)
 polygon = PackedVector2Array(393.3, 20, 766.7, 20, 766.7, 540, 393.3, 540)
 
 [node name="L_North2" type="Label" parent="WallGlow/Labels"]
@@ -664,8 +667,8 @@ color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(750.7, 20, 766.7, 20, 766.7, 540, 750.7, 540)
 
 [node name="North3" type="Polygon2D" parent="Rooms"]
-texture = ExtResource("tex_floor_wood")
-color = Color(0.1949, 0.159, 0.1179, 1)
+texture = ExtResource("ext_hs_floor_planks")
+color = Color(0.55, 0.53, 0.52, 1)
 polygon = PackedVector2Array(766.7, 20, 1140, 20, 1140, 540, 766.7, 540)
 
 [node name="L_North3" type="Label" parent="WallGlow/Labels"]
@@ -789,8 +792,8 @@ color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1124, 20, 1140, 20, 1140, 540, 1124, 540)
 
 [node name="North4" type="Polygon2D" parent="Rooms"]
-texture = ExtResource("tex_floor_wood")
-color = Color(0.1795, 0.1513, 0.1205, 1)
+texture = ExtResource("ext_hs_floor_herringbone")
+color = Color(0.55, 0.53, 0.52, 1)
 polygon = PackedVector2Array(1140, 20, 1513.3, 20, 1513.3, 540, 1140, 540)
 
 [node name="L_North4" type="Label" parent="WallGlow/Labels"]
@@ -914,8 +917,8 @@ color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1497.3, 20, 1513.3, 20, 1513.3, 540, 1497.3, 540)
 
 [node name="North5" type="Polygon2D" parent="Rooms"]
-texture = ExtResource("tex_floor_wood")
-color = Color(0.1949, 0.159, 0.1179, 1)
+texture = ExtResource("ext_hs_floor_planks")
+color = Color(0.55, 0.53, 0.52, 1)
 polygon = PackedVector2Array(1513.3, 20, 1886.7, 20, 1886.7, 540, 1513.3, 540)
 
 [node name="L_North5" type="Label" parent="WallGlow/Labels"]
@@ -1039,8 +1042,8 @@ color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1870.7, 20, 1886.7, 20, 1886.7, 540, 1870.7, 540)
 
 [node name="North6" type="Polygon2D" parent="Rooms"]
-texture = ExtResource("tex_floor_wood")
-color = Color(0.1949, 0.159, 0.1179, 1)
+texture = ExtResource("ext_hs_floor_planks")
+color = Color(0.55, 0.53, 0.52, 1)
 polygon = PackedVector2Array(1886.7, 20, 2260, 20, 2260, 540, 1886.7, 540)
 
 [node name="L_North6" type="Label" parent="WallGlow/Labels"]
@@ -1164,8 +1167,8 @@ color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2244, 20, 2260, 20, 2260, 540, 2244, 540)
 
 [node name="MensRoomL" type="Polygon2D" parent="Rooms"]
-texture = ExtResource("tex_floor_matte")
-color = Color(0.1641, 0.1821, 0.1897, 1)
+texture = ExtResource("ext_hs_floor_tile_white")
+color = Color(0.45, 0.46, 0.47, 1)
 polygon = PackedVector2Array(800, 720, 1075, 720, 1075, 1000, 800, 1000)
 
 [node name="L_MensRoomL" type="Label" parent="WallGlow/Labels"]
@@ -1289,8 +1292,8 @@ color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1059, 720, 1075, 720, 1075, 1000, 1059, 1000)
 
 [node name="WomensRoomL" type="Polygon2D" parent="Rooms"]
-texture = ExtResource("tex_floor_matte")
-color = Color(0.1641, 0.1821, 0.1897, 1)
+texture = ExtResource("ext_hs_floor_tile_white")
+color = Color(0.45, 0.46, 0.47, 1)
 polygon = PackedVector2Array(1075, 720, 1365, 720, 1365, 1000, 1075, 1000)
 
 [node name="L_WomensRoomL" type="Label" parent="WallGlow/Labels"]
@@ -1493,8 +1496,8 @@ color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(1624, 720, 1640, 720, 1640, 1000, 1624, 1000)
 
 [node name="StorageR" type="Polygon2D" parent="Rooms"]
-texture = ExtResource("tex_floor_cement")
-color = Color(0.1179, 0.1128, 0.1051, 1)
+texture = ExtResource("ext_hs_floor_stone")
+color = Color(0.48, 0.48, 0.49, 1)
 polygon = PackedVector2Array(1920, 720, 2260, 720, 2260, 1000, 1920, 1000)
 
 [node name="L_StorageR" type="Label" parent="WallGlow/Labels"]
@@ -1806,8 +1809,8 @@ color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2244, 1000, 2260, 1000, 2260, 1180, 2244, 1180)
 
 [node name="PEStorage" type="Polygon2D" parent="Rooms"]
-texture = ExtResource("tex_floor_cement")
-color = Color(0.1179, 0.1128, 0.1051, 1)
+texture = ExtResource("ext_hs_floor_stone")
+color = Color(0.48, 0.48, 0.49, 1)
 polygon = PackedVector2Array(20, 1180, 735, 1180, 735, 1600, 20, 1600)
 
 [node name="L_PEStorage" type="Label" parent="WallGlow/Labels"]
@@ -1931,8 +1934,8 @@ color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(719, 1180, 735, 1180, 735, 1600, 719, 1600)
 
 [node name="PEDept" type="Polygon2D" parent="Rooms"]
-texture = ExtResource("tex_floor_wood")
-color = Color(0.1795, 0.1513, 0.1205, 1)
+texture = ExtResource("ext_hs_floor_herringbone")
+color = Color(0.55, 0.53, 0.52, 1)
 polygon = PackedVector2Array(735, 1180, 1640, 1180, 1640, 1600, 735, 1600)
 
 [node name="L_PEDept" type="Label" parent="WallGlow/Labels"]
@@ -2495,13 +2498,13 @@ color = Color(0.42, 0.86, 0.82, 1)
 polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
 
 [node name="G_Corridor_540" type="Polygon2D" parent="Ground"]
-texture = ExtResource("tex_floor_board")
-color = Color(0.2513, 0.2051, 0.1538, 1)
+texture = ExtResource("ext_hs_floor_teal")
+color = Color(0.42, 0.44, 0.44, 1)
 polygon = PackedVector2Array(20, 540, 2260, 540, 2260, 720, 20, 720)
 
 [node name="G_Corridor_1000" type="Polygon2D" parent="Ground"]
-texture = ExtResource("tex_floor_board")
-color = Color(0.2513, 0.2051, 0.1538, 1)
+texture = ExtResource("ext_hs_floor_teal")
+color = Color(0.42, 0.44, 0.44, 1)
 polygon = PackedVector2Array(20, 1000, 2260, 1000, 2260, 1180, 20, 1180)
 
 [node name="WC_GapMid0" type="CollisionPolygon2D" parent="RoomWalls"]
@@ -2517,8 +2520,8 @@ polygon = PackedVector2Array(740, 720, 800, 720, 800, 1000, 740, 1000)
 occluder = SubResource("Occ_WC_GapMid1")
 
 [node name="G_MidLane2" type="Polygon2D" parent="Ground"]
-texture = ExtResource("tex_floor_board")
-color = Color(0.2513, 0.2051, 0.1538, 1)
+texture = ExtResource("ext_hs_floor_teal")
+color = Color(0.42, 0.44, 0.44, 1)
 polygon = PackedVector2Array(1640, 720, 1920, 720, 1920, 1000, 1640, 1000)
 
 [node name="WC_GapSouth0" type="CollisionPolygon2D" parent="RoomWalls"]

@@ -427,6 +427,32 @@ SPRITE = {
 }
 SPRITE_SIZE = 32    # gen_tiles.py의 OBJ와 반드시 같아야 한다
 
+# 바닥 → 외부 그림(#725, Haunted School `Inside_A2.png`). 방 종류별 바닥색(`ROOM_FLOOR`)과
+# 복도 마루(`C_CORRIDOR`)를 열쇠로 찾는다 — `TEX`보다 우선한다. 막힌 공간·맵 바탕은
+# 그대로(절차 무늬로 어둡게) 둔다. 그림은 월드 좌표로 1배 되풀이된다(96px 칸).
+EXT_FLOOR = {
+    ROOM_FLOOR["classroom"]: "hs_floor_planks",      # 엇갈린 마루 — 교실·미술실
+    ROOM_FLOOR["office"]: "hs_floor_herringbone",    # 헤링본 — 교무실·부서실
+    ROOM_FLOOR["principal"]: "hs_floor_herringbone",
+    ROOM_FLOOR["computer"]: "hs_floor_planks_v",
+    ROOM_FLOOR["janitor"]: "hs_floor_worn",          # 낡은 마루 — 수위실
+    ROOM_FLOOR["toilet"]: "hs_floor_tile_white",     # 흰 타일 — 화장실
+    ROOM_FLOOR["nurse"]: "hs_floor_tile_white",
+    ROOM_FLOOR["storage"]: "hs_floor_stone",         # 회색 석재 — 창고
+    ROOM_FLOOR["lab"]: "hs_floor_stone",
+    ROOM_FLOOR["entrance"]: "hs_floor_stone",
+    C_CORRIDOR: "hs_floor_teal",                     # 청록 리놀륨 — 복도
+}
+# 바닥 밝기. 원본은 낮 장면용으로 밝아서(마루 평균 휘도가 예전 절차 바닥의 약 3배)
+# 그대로면 손전등 아래가 대낮처럼 하얗게 뜬다. 공포 분위기에 맞게 누른다 — 값은
+# 실제 창 캡처를 보며 맞췄다. 청록 복도는 채도가 높아 더 누른다.
+EXT_FLOOR_TINT_DEFAULT = "Color(0.55, 0.53, 0.52, 1)"
+EXT_FLOOR_TINT = {
+    "hs_floor_teal": "Color(0.42, 0.44, 0.44, 1)",
+    "hs_floor_tile_white": "Color(0.45, 0.46, 0.47, 1)",
+    "hs_floor_stone": "Color(0.48, 0.48, 0.49, 1)",
+}
+
 
 def uv_for(polygon, tw=None, th=None):
     """폴리곤 경계상자를 오브젝트 그림 한 장에 대응시키는 UV.
@@ -747,6 +773,17 @@ class Scene:
     def poly2d(self, name, parent, color, polygon, z=None):
         z_line = f"z_index = {z}\n" if z is not None else ""
         tex_line = ""
+        # 외부 바닥(#725) — 재질처럼 UV를 비워 월드 격자로 되풀이한다(1배).
+        # 색은 팔레트가 아니라 `EXT_FLOOR_TINT`로 누른다(완성된 그림이다).
+        floor = EXT_FLOOR.get(color)
+        if floor is not None:
+            tex_line = f'texture = ExtResource("ext_{floor}")\n'
+            if parent in CANVAS_ITEM_ROOTS:
+                tex_line = TEX_FLAGS + tex_line
+            self.node(f'[node name="{name}" type="Polygon2D" parent="{parent}"]\n'
+                      f'{z_line}{tex_line}color = {EXT_FLOOR_TINT.get(floor, EXT_FLOOR_TINT_DEFAULT)}\n'
+                      f'polygon = {polygon}\n')
+            return
         # 오브젝트 그림이 재질보다 우선한다(#259). 물건 하나에 한 장을 맞춰 늘리려고
         # 로컬 UV를 넣는다 — 재질은 UV를 비워 월드 격자에 정렬시키는 것과 반대다.
         obj = SPRITE.get(color)

@@ -71,6 +71,16 @@ HAUNTED = {
     "hs_paper_crumpled": ("Inside_B.png", 348, 120, 374, 135), # 강유진 쪽지
     "hs_memo_grey": ("Inside_B.png", 317, 147, 328, 160),      # 신고 전단(인쇄물)
     "hs_frame_map": ("Inside_B.png", 438, 151, 474, 178),      # 사진 벽
+    # 바닥(#725) — `Inside_A2.png`. **이어붙여도 이음매가 안 보이는 칸만** 고른다
+    # (4x4로 이어붙여 눈으로 확인했다). 청록 리놀륨은 자동 타일 테두리가 있어
+    # 안쪽 64x64만 자른다. 카펫 두 장은 테두리 무늬가 칸마다 되풀이돼 안 쓴다.
+    "hs_floor_planks": ("Inside_A2.png", 0, 336, 95, 431),       # 엇갈린 마루 — 교실
+    "hs_floor_planks_v": ("Inside_A2.png", 0, 48, 95, 143),      # 세로 마루
+    "hs_floor_herringbone": ("Inside_A2.png", 192, 48, 287, 143),  # 헤링본 — 교무실
+    "hs_floor_worn": ("Inside_A2.png", 0, 480, 95, 575),         # 낡은 마루 — 수위실
+    "hs_floor_stone": ("Inside_A2.png", 192, 336, 287, 431),     # 회색 석재 — 창고·현관
+    "hs_floor_tile_white": ("Inside_A2.png", 96, 480, 191, 575),  # 흰 타일 — 화장실
+    "hs_floor_teal": ("Inside_A2.png", 304, 496, 367, 559),      # 청록 리놀륨 — 복도
 }
 
 
