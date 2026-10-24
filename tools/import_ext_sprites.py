@@ -81,6 +81,9 @@ HAUNTED = {
     "hs_floor_stone": ("Inside_A2.png", 192, 336, 287, 431),     # 회색 석재 — 창고·현관
     "hs_floor_tile_white": ("Inside_A2.png", 96, 480, 191, 575),  # 흰 타일 — 화장실
     "hs_floor_teal": ("Inside_A2.png", 304, 496, 367, 559),      # 청록 리놀륨 — 복도
+    # 벽 앞면(#727) — `Inside_A4.png` 크림색 벽의 **아랫부분 30줄**(크림 + 초록 징두리).
+    # 팩의 벽은 96px 높이라 우리 앞면(`WALL_FACE` 34 - 그림자 4)에 맞춰 잘라 쓴다.
+    "hs_wall_face": ("Inside_A4.png", 192, 195, 287, 224),
 }
 
 

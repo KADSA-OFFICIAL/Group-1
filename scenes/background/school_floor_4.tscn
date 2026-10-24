@@ -1,4 +1,4 @@
-[gd_scene load_steps=52 format=3]
+[gd_scene load_steps=53 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 [ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="5_hiding"]
@@ -29,6 +29,7 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_book_purple.png" id="ext_hs_book_purple"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_calendar.png" id="ext_hs_calendar"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_floor_planks.png" id="ext_hs_floor_planks"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_wall_face.png" id="ext_hs_wall_face"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/painting_dark.png" id="ext_painting_dark"]
 [ext_resource type="Texture2D" path="res://assets/sprites/janitor_sheet.png" id="18_janitor"]
 
@@ -194,7 +195,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(20, 20, 1780, 20, 1780, 23, 20, 23)
 
 [node name="WF_IntroTop" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(20, 0, 1780, 0, 1780, 30, 20, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(20, 36, 1780, 36, 1780, 66, 20, 66)
 
 [node name="WS_IntroTop" type="Polygon2D" parent="Structures"]
@@ -242,7 +245,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(20, 864, 515, 864, 515, 867, 20, 867)
 
 [node name="WF_IntroBotL" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(20, 0, 515, 0, 515, 30, 20, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(20, 880, 515, 880, 515, 910, 20, 910)
 
 [node name="WS_IntroBotL" type="Polygon2D" parent="Structures"]
@@ -268,7 +273,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(625, 864, 1780, 864, 1780, 867, 625, 867)
 
 [node name="WF_IntroBotR" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(625, 0, 1780, 0, 1780, 30, 625, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(625, 880, 1780, 880, 1780, 910, 625, 910)
 
 [node name="WS_IntroBotR" type="Polygon2D" parent="Structures"]

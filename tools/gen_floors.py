@@ -446,6 +446,9 @@ EXT_FLOOR = {
 # 바닥 밝기. 원본은 낮 장면용으로 밝아서(마루 평균 휘도가 예전 절차 바닥의 약 3배)
 # 그대로면 손전등 아래가 대낮처럼 하얗게 뜬다. 공포 분위기에 맞게 누른다 — 값은
 # 실제 창 캡처를 보며 맞췄다. 청록 복도는 채도가 높아 더 누른다.
+# 벽 앞면(#727) — 크림색 벽 + 초록 징두리. 바닥처럼 밝기를 누른다.
+WALL_FACE_ART = "hs_wall_face"
+WALL_FACE_TINT = "Color(0.5, 0.5, 0.52, 1)"
 EXT_FLOOR_TINT_DEFAULT = "Color(0.55, 0.53, 0.52, 1)"
 EXT_FLOOR_TINT = {
     "hs_floor_teal": "Color(0.42, 0.44, 0.44, 1)",
@@ -845,14 +848,30 @@ class Scene:
             # 면 하나만 두면 밝기가 같은 띠 두 개라 여전히 납작해 보인다(#271).
             self.poly2d(f"WH_{key}", "Structures", C_WALL_TOP,
                         rect(x0, y0, x1, y0 + 3))
-            self.poly2d(f"WF_{key}", "Structures", C_FACE,
-                        rect(x0, y1, x1, y1 + WALL_FACE - 4))
+            self.wall_face(f"WF_{key}", x0, x1, y1, y1 + WALL_FACE - 4)
             self.poly2d(f"WS_{key}", "Structures", C_WALL_SHADOW,
                         rect(x0, y1 + WALL_FACE - 4, x1, y1 + WALL_FACE))
             # 앞면 충돌. `RoomWalls`가 아니라 따로 둔 몸이라 상호작용 표시의
             # 시야 광선(interact_marks.gd의 RAY_PASS)이 뚫고 지나간다.
             self.node(f'[node name="WB_{key}" type="CollisionPolygon2D" parent="WallBases"]\n'
                       f'polygon = {rect(x0, y1, x1, y1 + WALL_FACE)}\n')
+
+    def wall_face(self, name, x0, x1, y0, y1):
+        """가로 벽 앞면(#727) — 외부 그림(크림색 벽 + 초록 징두리)을 붙인다.
+
+        바닥과 달리 UV를 **가로만 월드 좌표**로 두고 세로는 앞면 높이에 맞춘다
+        (`0 ~ 그림 높이`). 세로까지 월드 좌표면 벽마다 y가 달라 징두리가 위아래로
+        어긋나 잘려 들어간다. 그림이 없으면 예전 단색 앞면으로 돌아간다.
+        """
+        if WALL_FACE_ART not in EXT_SIZES:
+            self.poly2d(name, "Structures", C_FACE, rect(x0, y0, x1, y1))
+            return
+        _, th = EXT_SIZES[WALL_FACE_ART]
+        self.node(f'[node name="{name}" type="Polygon2D" parent="Structures"]\n'
+                  f'texture = ExtResource("ext_{WALL_FACE_ART}")\n'
+                  f"uv = {poly((x0, 0), (x1, 0), (x1, th), (x0, th))}\n"
+                  f"color = {WALL_FACE_TINT}\n"
+                  f"polygon = {rect(x0, y0, x1, y1)}\n")
 
     def prop(self, key, polygon, color):
         """방 안 집기: 충돌 PC_ + 시각 PV_ 한 쌍.
@@ -3338,7 +3357,10 @@ def add_corridor_props(sc, corridors, x1_of=None):
             # 서므로 가리지 않는다. WallGlow 안이라 벽 위에 그려지고 어둠을
             # 받지 않는다 — 벽과 같은 취급이다.
             gap0, gap1 = cx - DOOR / 2, cx + DOOR / 2
-            for seg0, seg1 in ((x0 + T, gap0), (gap1, x1 - T)):
+            # 외부 벽 앞면(#727)에는 징두리·밑선이 이미 그려져 있어 걸레받이를
+            # 덧대면 두 겹이 된다 — 그림이 있으면 건너뛴다.
+            wain_segs = () if WALL_FACE_ART in EXT_SIZES else ((x0 + T, gap0), (gap1, x1 - T))
+            for seg0, seg1 in wain_segs:
                 if seg1 - seg0 > 20:
                     sc.wall_decor(f"Wain_{key}_{int(cy0)}_{int(seg0)}",
                                   rect(seg0, wain[0], seg1, wain[1]), C_WAINSCOT)

@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3]
+[gd_scene load_steps=30 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 [ext_resource type="Script" path="res://scripts/interactions/front_gate.gd" id="4_front_gate"]
@@ -15,6 +15,7 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/yard_dirt.png" id="tex_yard_dirt"]
 [ext_resource type="Texture2D" path="res://assets/tiles/yard_paving.png" id="tex_yard_paving"]
 [ext_resource type="Texture2D" path="res://assets/tiles/yard_track.png" id="tex_yard_track"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_wall_face.png" id="ext_hs_wall_face"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
 size = Vector2(3400, 40)
@@ -348,7 +349,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(0, 284, 1560, 284, 1560, 287, 0, 287)
 
 [node name="WF_FacadeL" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(0, 0, 1560, 0, 1560, 30, 0, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(0, 300, 1560, 300, 1560, 330, 0, 330)
 
 [node name="WS_FacadeL" type="Polygon2D" parent="Structures"]
@@ -374,7 +377,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1840, 284, 3400, 284, 3400, 287, 1840, 287)
 
 [node name="WF_FacadeR" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1840, 0, 3400, 0, 3400, 30, 1840, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1840, 300, 3400, 300, 3400, 330, 1840, 330)
 
 [node name="WS_FacadeR" type="Polygon2D" parent="Structures"]
@@ -400,7 +405,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1560, 284, 1840, 284, 1840, 287, 1560, 287)
 
 [node name="WF_PorchSeal" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1560, 0, 1840, 0, 1840, 30, 1560, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1560, 300, 1840, 300, 1840, 330, 1560, 330)
 
 [node name="WS_PorchSeal" type="Polygon2D" parent="Structures"]
@@ -492,7 +499,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(0, 1600, 2260, 1600, 2260, 1603, 0, 1603)
 
 [node name="WF_FenceL" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(0, 0, 2260, 0, 2260, 30, 0, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(0, 1616, 2260, 1616, 2260, 1646, 0, 1646)
 
 [node name="WS_FenceL" type="Polygon2D" parent="Structures"]
@@ -518,7 +527,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(2540, 1600, 3400, 1600, 3400, 1603, 2540, 1603)
 
 [node name="WF_FenceR" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(2540, 0, 3400, 0, 3400, 30, 2540, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(2540, 1616, 3400, 1616, 3400, 1646, 2540, 1646)
 
 [node name="WS_FenceR" type="Polygon2D" parent="Structures"]
