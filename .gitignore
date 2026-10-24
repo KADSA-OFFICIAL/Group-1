@@ -24,3 +24,7 @@ mono_crash.*.json
 # Python 도구(tools/) 실행 시 생성
 __pycache__/
 *.pyc
+
+# preview_scene.py 산출물(#691) — 출력 경로를 안 주면 저장소 루트에 떨어진다
+*_preview.svg
+*_preview.png

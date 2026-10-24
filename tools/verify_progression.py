@@ -70,6 +70,70 @@ def scan(fl):
     return items, locks, exits, links, flags
 
 
+GEN_FLOORS = ROOT / "tools/gen_floors.py"
+
+
+def placement_table():
+    """`gen_floors.PLACEMENT`의 (층, 오브젝트) -> 방 키."""
+    text = GEN_FLOORS.read_text(encoding="utf-8")
+    m = re.search(r"^PLACEMENT = \{(.*?)^\}", text, re.M | re.S)
+    if m is None:
+        return None
+    want = {}
+    for fm in re.finditer(r"^    (\d+): \[(.*?)\],?\s*$", m.group(1), re.M | re.S):
+        fl = int(fm.group(1))
+        for room, objs in re.findall(r'\("(\w+)", \[([^\]]*)\]\)', fm.group(2)):
+            for obj in re.findall(r'"(\w+)"', objs):
+                want[(fl, obj)] = room
+    return want
+
+
+def check_placement_rooms():
+    """**단서가 `PLACEMENT`이 지정한 방 안에 실제로 떨어졌는가.**
+
+    `POS_OVERRIDE`는 손으로 적는 절대 좌표라 방이 옮겨 가면 그대로 남는다 —
+    #691에서 2·3층을 줄였을 때 **계단 열쇠 둘**(`SpareKeyHook`·`HeadKey`)이
+    옛 방 자리에 남아 엉뚱한 방에 떨어졌다. 그 상태로 **검사 7종이 전부
+    통과했다**: 도달성·집기 겹침·진행 사슬은 "걸어서 닿는가"만 보므로 열쇠가
+    옆방에 있어도 통과한다. 그런데 단서 문구는 방을 가리키므로(#444의 교훈)
+    화면과 말이 어긋나고, 방을 옮길 때마다 되풀이될 사고라 여기서 본다.
+    """
+    want = placement_table()
+    if want is None:
+        print("  ✗ gen_floors.PLACEMENT를 읽지 못했다")
+        return 1
+    bad = 0
+    for fl in sorted({f for f, _ in want}):
+        path = ROOT / f"scenes/background/school_floor_{fl}.tscn"
+        if not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8")
+        _walls, rooms, _size, _ = V.parse(path)
+        for (f, obj), room in sorted(want.items()):
+            if f != fl:
+                continue
+            pat = ('\\[node name="' + obj + '" type="Area2D"[^\\]]*\\]\n'
+                   r"((?:(?!\[node)[^\n]*\n)*)")
+            nm = re.search(pat, text)
+            if nm is None:
+                continue
+            pm = re.search(r"position = Vector2\(([-\d.]+), ([-\d.]+)\)", nm.group(1))
+            if pm is None:
+                continue
+            x, y = float(pm.group(1)), float(pm.group(2))
+            if room not in rooms:
+                print(f"  ✗ {fl}층 {obj}: PLACEMENT가 지정한 방 {room}이 씬에 없다")
+                bad += 1
+                continue
+            if not V.inside(rooms[room], x, y):
+                actual = next((k for k, poly in rooms.items() if V.inside(poly, x, y)),
+                              "어느 방도 아님")
+                print(f"  ✗ {fl}층 {obj} ({x:.0f},{y:.0f}): "
+                      f"지정 {room} -> 실제 {actual}  (POS_OVERRIDE를 새 방에 맞출 것)")
+                bad += 1
+    return bad
+
+
 GAME_STATE = ROOT / "scripts/game/game_state.gd"
 
 
@@ -199,6 +263,7 @@ def main():
         arrive = ARRIVE[fl - 1]
 
     bad += check_ending_tally(flags_at)
+    bad += check_placement_rooms()
 
     print("\n".join("  " + l for l in log))
     print(f"\n진행 가능 — {START_FLOOR}층 시작에서 1층 현관 탈출까지 완주"
