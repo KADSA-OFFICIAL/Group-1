@@ -1,4 +1,4 @@
-[gd_scene load_steps=148 format=3]
+[gd_scene load_steps=149 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
@@ -40,6 +40,7 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_paper_crumpled.png" id="ext_hs_paper_crumpled"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_student_desk.png" id="ext_hs_student_desk"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_teacher_desk.png" id="ext_hs_teacher_desk"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_wall_face.png" id="ext_hs_wall_face"]
 [ext_resource type="Texture2D" path="res://assets/sprites/eye_key.png" id="15_eyekey"]
 [ext_resource type="Texture2D" path="res://assets/sprites/head_top.png" id="16_headtop"]
 
@@ -449,7 +450,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(20, 20, 393.3, 20, 393.3, 23, 20, 23)
 
 [node name="WF_North1_top" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(20, 0, 393.3, 0, 393.3, 30, 20, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(20, 36, 393.3, 36, 393.3, 66, 20, 66)
 
 [node name="WS_North1_top" type="Polygon2D" parent="Structures"]
@@ -475,7 +478,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(20, 524, 151.7, 524, 151.7, 527, 20, 527)
 
 [node name="WF_North1_botL" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(20, 0, 151.7, 0, 151.7, 30, 20, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(20, 540, 151.7, 540, 151.7, 570, 20, 570)
 
 [node name="WS_North1_botL" type="Polygon2D" parent="Structures"]
@@ -501,7 +506,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(261.7, 524, 393.3, 524, 393.3, 527, 261.7, 527)
 
 [node name="WF_North1_botR" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(261.7, 0, 393.3, 0, 393.3, 30, 261.7, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(261.7, 540, 393.3, 540, 393.3, 570, 261.7, 570)
 
 [node name="WS_North1_botR" type="Polygon2D" parent="Structures"]
@@ -574,7 +581,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(393.3, 20, 766.7, 20, 766.7, 23, 393.3, 23)
 
 [node name="WF_North2_top" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(393.3, 0, 766.7, 0, 766.7, 30, 393.3, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(393.3, 36, 766.7, 36, 766.7, 66, 393.3, 66)
 
 [node name="WS_North2_top" type="Polygon2D" parent="Structures"]
@@ -600,7 +609,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(393.3, 524, 525, 524, 525, 527, 393.3, 527)
 
 [node name="WF_North2_botL" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(393.3, 0, 525, 0, 525, 30, 393.3, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(393.3, 540, 525, 540, 525, 570, 393.3, 570)
 
 [node name="WS_North2_botL" type="Polygon2D" parent="Structures"]
@@ -626,7 +637,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(635, 524, 766.7, 524, 766.7, 527, 635, 527)
 
 [node name="WF_North2_botR" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(635, 0, 766.7, 0, 766.7, 30, 635, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(635, 540, 766.7, 540, 766.7, 570, 635, 570)
 
 [node name="WS_North2_botR" type="Polygon2D" parent="Structures"]
@@ -699,7 +712,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(766.7, 20, 1140, 20, 1140, 23, 766.7, 23)
 
 [node name="WF_North3_top" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(766.7, 0, 1140, 0, 1140, 30, 766.7, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(766.7, 36, 1140, 36, 1140, 66, 766.7, 66)
 
 [node name="WS_North3_top" type="Polygon2D" parent="Structures"]
@@ -725,7 +740,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(766.7, 524, 898.3, 524, 898.3, 527, 766.7, 527)
 
 [node name="WF_North3_botL" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(766.7, 0, 898.3, 0, 898.3, 30, 766.7, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(766.7, 540, 898.3, 540, 898.3, 570, 766.7, 570)
 
 [node name="WS_North3_botL" type="Polygon2D" parent="Structures"]
@@ -751,7 +768,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1008.3, 524, 1140, 524, 1140, 527, 1008.3, 527)
 
 [node name="WF_North3_botR" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1008.3, 0, 1140, 0, 1140, 30, 1008.3, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1008.3, 540, 1140, 540, 1140, 570, 1008.3, 570)
 
 [node name="WS_North3_botR" type="Polygon2D" parent="Structures"]
@@ -824,7 +843,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1140, 20, 1513.3, 20, 1513.3, 23, 1140, 23)
 
 [node name="WF_North4_top" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1140, 0, 1513.3, 0, 1513.3, 30, 1140, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1140, 36, 1513.3, 36, 1513.3, 66, 1140, 66)
 
 [node name="WS_North4_top" type="Polygon2D" parent="Structures"]
@@ -850,7 +871,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1140, 524, 1271.7, 524, 1271.7, 527, 1140, 527)
 
 [node name="WF_North4_botL" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1140, 0, 1271.7, 0, 1271.7, 30, 1140, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1140, 540, 1271.7, 540, 1271.7, 570, 1140, 570)
 
 [node name="WS_North4_botL" type="Polygon2D" parent="Structures"]
@@ -876,7 +899,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1381.7, 524, 1513.3, 524, 1513.3, 527, 1381.7, 527)
 
 [node name="WF_North4_botR" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1381.7, 0, 1513.3, 0, 1513.3, 30, 1381.7, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1381.7, 540, 1513.3, 540, 1513.3, 570, 1381.7, 570)
 
 [node name="WS_North4_botR" type="Polygon2D" parent="Structures"]
@@ -949,7 +974,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1513.3, 20, 1886.7, 20, 1886.7, 23, 1513.3, 23)
 
 [node name="WF_North5_top" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1513.3, 0, 1886.7, 0, 1886.7, 30, 1513.3, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1513.3, 36, 1886.7, 36, 1886.7, 66, 1513.3, 66)
 
 [node name="WS_North5_top" type="Polygon2D" parent="Structures"]
@@ -975,7 +1002,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1513.3, 524, 1645, 524, 1645, 527, 1513.3, 527)
 
 [node name="WF_North5_botL" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1513.3, 0, 1645, 0, 1645, 30, 1513.3, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1513.3, 540, 1645, 540, 1645, 570, 1513.3, 570)
 
 [node name="WS_North5_botL" type="Polygon2D" parent="Structures"]
@@ -1001,7 +1030,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1755, 524, 1886.7, 524, 1886.7, 527, 1755, 527)
 
 [node name="WF_North5_botR" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1755, 0, 1886.7, 0, 1886.7, 30, 1755, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1755, 540, 1886.7, 540, 1886.7, 570, 1755, 570)
 
 [node name="WS_North5_botR" type="Polygon2D" parent="Structures"]
@@ -1074,7 +1105,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1886.7, 20, 2260, 20, 2260, 23, 1886.7, 23)
 
 [node name="WF_North6_top" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1886.7, 0, 2260, 0, 2260, 30, 1886.7, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1886.7, 36, 2260, 36, 2260, 66, 1886.7, 66)
 
 [node name="WS_North6_top" type="Polygon2D" parent="Structures"]
@@ -1100,7 +1133,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1886.7, 524, 2018.3, 524, 2018.3, 527, 1886.7, 527)
 
 [node name="WF_North6_botL" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1886.7, 0, 2018.3, 0, 2018.3, 30, 1886.7, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1886.7, 540, 2018.3, 540, 2018.3, 570, 1886.7, 570)
 
 [node name="WS_North6_botL" type="Polygon2D" parent="Structures"]
@@ -1126,7 +1161,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(2128.3, 524, 2260, 524, 2260, 527, 2128.3, 527)
 
 [node name="WF_North6_botR" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(2128.3, 0, 2260, 0, 2260, 30, 2128.3, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(2128.3, 540, 2260, 540, 2260, 570, 2128.3, 570)
 
 [node name="WS_North6_botR" type="Polygon2D" parent="Structures"]
@@ -1199,7 +1236,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(800, 720, 882.5, 720, 882.5, 723, 800, 723)
 
 [node name="WF_MensRoomL_topL" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(800, 0, 882.5, 0, 882.5, 30, 800, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(800, 736, 882.5, 736, 882.5, 766, 800, 766)
 
 [node name="WS_MensRoomL_topL" type="Polygon2D" parent="Structures"]
@@ -1225,7 +1264,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(992.5, 720, 1075, 720, 1075, 723, 992.5, 723)
 
 [node name="WF_MensRoomL_topR" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(992.5, 0, 1075, 0, 1075, 30, 992.5, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(992.5, 736, 1075, 736, 1075, 766, 992.5, 766)
 
 [node name="WS_MensRoomL_topR" type="Polygon2D" parent="Structures"]
@@ -1259,7 +1300,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(800, 984, 1075, 984, 1075, 987, 800, 987)
 
 [node name="WF_MensRoomL_bot" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(800, 0, 1075, 0, 1075, 30, 800, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(800, 1000, 1075, 1000, 1075, 1030, 800, 1030)
 
 [node name="WS_MensRoomL_bot" type="Polygon2D" parent="Structures"]
@@ -1324,7 +1367,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1075, 720, 1165, 720, 1165, 723, 1075, 723)
 
 [node name="WF_WomensRoomL_topL" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1075, 0, 1165, 0, 1165, 30, 1075, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1075, 736, 1165, 736, 1165, 766, 1075, 766)
 
 [node name="WS_WomensRoomL_topL" type="Polygon2D" parent="Structures"]
@@ -1350,7 +1395,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1275, 720, 1365, 720, 1365, 723, 1275, 723)
 
 [node name="WF_WomensRoomL_topR" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1275, 0, 1365, 0, 1365, 30, 1275, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1275, 736, 1365, 736, 1365, 766, 1275, 766)
 
 [node name="WS_WomensRoomL_topR" type="Polygon2D" parent="Structures"]
@@ -1384,7 +1431,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1075, 984, 1365, 984, 1365, 987, 1075, 987)
 
 [node name="WF_WomensRoomL_bot" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1075, 0, 1365, 0, 1365, 30, 1075, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1075, 1000, 1365, 1000, 1365, 1030, 1075, 1030)
 
 [node name="WS_WomensRoomL_bot" type="Polygon2D" parent="Structures"]
@@ -1437,7 +1486,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1365, 720, 1640, 720, 1640, 723, 1365, 723)
 
 [node name="WF_BlockedL_top" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1365, 0, 1640, 0, 1640, 30, 1365, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1365, 736, 1640, 736, 1640, 766, 1365, 766)
 
 [node name="WS_BlockedL_top" type="Polygon2D" parent="Structures"]
@@ -1463,7 +1514,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1365, 984, 1640, 984, 1640, 987, 1365, 987)
 
 [node name="WF_BlockedL_bot" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1365, 0, 1640, 0, 1640, 30, 1365, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1365, 1000, 1640, 1000, 1640, 1030, 1365, 1030)
 
 [node name="WS_BlockedL_bot" type="Polygon2D" parent="Structures"]
@@ -1528,7 +1581,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1920, 720, 2035, 720, 2035, 723, 1920, 723)
 
 [node name="WF_StorageR_topL" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1920, 0, 2035, 0, 2035, 30, 1920, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1920, 736, 2035, 736, 2035, 766, 1920, 766)
 
 [node name="WS_StorageR_topL" type="Polygon2D" parent="Structures"]
@@ -1554,7 +1609,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(2145, 720, 2260, 720, 2260, 723, 2145, 723)
 
 [node name="WF_StorageR_topR" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(2145, 0, 2260, 0, 2260, 30, 2145, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(2145, 736, 2260, 736, 2260, 766, 2145, 766)
 
 [node name="WS_StorageR_topR" type="Polygon2D" parent="Structures"]
@@ -1588,7 +1645,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1920, 984, 2260, 984, 2260, 987, 1920, 987)
 
 [node name="WF_StorageR_bot" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1920, 0, 2260, 0, 2260, 30, 1920, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1920, 1000, 2260, 1000, 2260, 1030, 1920, 1030)
 
 [node name="WS_StorageR_bot" type="Polygon2D" parent="Structures"]
@@ -1841,7 +1900,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(20, 1180, 322.5, 1180, 322.5, 1183, 20, 1183)
 
 [node name="WF_PEStorage_topL" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(20, 0, 322.5, 0, 322.5, 30, 20, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(20, 1196, 322.5, 1196, 322.5, 1226, 20, 1226)
 
 [node name="WS_PEStorage_topL" type="Polygon2D" parent="Structures"]
@@ -1867,7 +1928,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(432.5, 1180, 735, 1180, 735, 1183, 432.5, 1183)
 
 [node name="WF_PEStorage_topR" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(432.5, 0, 735, 0, 735, 30, 432.5, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(432.5, 1196, 735, 1196, 735, 1226, 432.5, 1226)
 
 [node name="WS_PEStorage_topR" type="Polygon2D" parent="Structures"]
@@ -1901,7 +1964,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(20, 1584, 735, 1584, 735, 1587, 20, 1587)
 
 [node name="WF_PEStorage_bot" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(20, 0, 735, 0, 735, 30, 20, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(20, 1600, 735, 1600, 735, 1630, 20, 1630)
 
 [node name="WS_PEStorage_bot" type="Polygon2D" parent="Structures"]
@@ -1966,7 +2031,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(735, 1180, 1132.5, 1180, 1132.5, 1183, 735, 1183)
 
 [node name="WF_PEDept_topL" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(735, 0, 1132.5, 0, 1132.5, 30, 735, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(735, 1196, 1132.5, 1196, 1132.5, 1226, 735, 1226)
 
 [node name="WS_PEDept_topL" type="Polygon2D" parent="Structures"]
@@ -1992,7 +2059,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1242.5, 1180, 1640, 1180, 1640, 1183, 1242.5, 1183)
 
 [node name="WF_PEDept_topR" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1242.5, 0, 1640, 0, 1640, 30, 1242.5, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1242.5, 1196, 1640, 1196, 1640, 1226, 1242.5, 1226)
 
 [node name="WS_PEDept_topR" type="Polygon2D" parent="Structures"]
@@ -2026,7 +2095,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(735, 1584, 1640, 1584, 1640, 1587, 735, 1587)
 
 [node name="WF_PEDept_bot" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(735, 0, 1640, 0, 1640, 30, 735, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(735, 1600, 1640, 1600, 1640, 1630, 735, 1630)
 
 [node name="WS_PEDept_bot" type="Polygon2D" parent="Structures"]
@@ -2091,7 +2162,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1920, 1180, 2035, 1180, 2035, 1183, 1920, 1183)
 
 [node name="WF_EduRoom_topL" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1920, 0, 2035, 0, 2035, 30, 1920, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1920, 1196, 2035, 1196, 2035, 1226, 1920, 1226)
 
 [node name="WS_EduRoom_topL" type="Polygon2D" parent="Structures"]
@@ -2117,7 +2190,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(2145, 1180, 2260, 1180, 2260, 1183, 2145, 1183)
 
 [node name="WF_EduRoom_topR" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(2145, 0, 2260, 0, 2260, 30, 2145, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(2145, 1196, 2260, 1196, 2260, 1226, 2145, 1226)
 
 [node name="WS_EduRoom_topR" type="Polygon2D" parent="Structures"]
@@ -2151,7 +2226,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(1920, 1584, 2260, 1584, 2260, 1587, 1920, 1587)
 
 [node name="WF_EduRoom_bot" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(1920, 0, 2260, 0, 2260, 30, 1920, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(1920, 1600, 2260, 1600, 2260, 1630, 1920, 1630)
 
 [node name="WS_EduRoom_bot" type="Polygon2D" parent="Structures"]
@@ -5686,18 +5763,6 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2, 0.3249, 0.225, 1)
 polygon = PackedVector2Array(1938, 1556, 1964, 1556, 1964, 1582, 1938, 1582)
 
-[node name="WD_Wain_North1_540_36" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(36, 569, 151.7, 569, 151.7, 574, 36, 574)
-
-[node name="WD_Wain_North1_540_261" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(261.7, 569, 377.3, 569, 377.3, 574, 261.7, 574)
-
 [node name="PD_Mat_North1_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
@@ -5720,18 +5785,6 @@ texture = ExtResource("ext_hs_locker_open")
 uv = PackedVector2Array(0, 0, 48, 0, 48, 103, 0, 103)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(318.5, 540, 366.5, 540, 366.5, 643, 318.5, 643)
-
-[node name="WD_Wain_North2_540_409" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(409.3, 569, 525, 569, 525, 574, 409.3, 574)
-
-[node name="WD_Wain_North2_540_635" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(635, 569, 750.7, 569, 750.7, 574, 635, 574)
 
 [node name="PD_Mat_North2_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
@@ -5756,18 +5809,6 @@ uv = PackedVector2Array(0, 0, 48, 0, 48, 103, 0, 103)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(691.8, 540, 739.8, 540, 739.8, 643, 691.8, 643)
 
-[node name="WD_Wain_North3_540_782" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(782.7, 569, 898.3, 569, 898.3, 574, 782.7, 574)
-
-[node name="WD_Wain_North3_540_1008" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1008.3, 569, 1124, 569, 1124, 574, 1008.3, 574)
-
 [node name="PD_Mat_North3_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
@@ -5786,18 +5827,6 @@ texture = ExtResource("ext_hs_locker")
 uv = PackedVector2Array(0, 0, 48, 0, 48, 103, 0, 103)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(793.5, 540, 841.5, 540, 841.5, 643, 793.5, 643)
-
-[node name="WD_Wain_North4_540_1156" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1156, 569, 1271.7, 569, 1271.7, 574, 1156, 574)
-
-[node name="WD_Wain_North4_540_1381" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1381.7, 569, 1497.3, 569, 1497.3, 574, 1381.7, 574)
 
 [node name="PD_Mat_North4_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
@@ -5820,18 +5849,6 @@ texture = ExtResource("ext_hs_locker")
 uv = PackedVector2Array(0, 0, 48, 0, 48, 103, 0, 103)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1438.5, 540, 1486.5, 540, 1486.5, 643, 1438.5, 643)
-
-[node name="WD_Wain_North5_540_1529" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1529.3, 569, 1645, 569, 1645, 574, 1529.3, 574)
-
-[node name="WD_Wain_North5_540_1755" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1755, 569, 1870.7, 569, 1870.7, 574, 1755, 574)
 
 [node name="PD_Mat_North5_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
@@ -5856,18 +5873,6 @@ uv = PackedVector2Array(0, 0, 48, 0, 48, 103, 0, 103)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1811.8, 540, 1859.8, 540, 1859.8, 643, 1811.8, 643)
 
-[node name="WD_Wain_North6_540_1902" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1902.7, 569, 2018.3, 569, 2018.3, 574, 1902.7, 574)
-
-[node name="WD_Wain_North6_540_2128" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(2128.3, 569, 2244, 569, 2244, 574, 2128.3, 574)
-
 [node name="PD_Mat_North6_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
@@ -5887,34 +5892,10 @@ uv = PackedVector2Array(0, 0, 48, 0, 48, 103, 0, 103)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1913.5, 540, 1961.5, 540, 1961.5, 643, 1913.5, 643)
 
-[node name="WD_Wain_MensRoomL_540_816" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(816, 720, 882.5, 720, 882.5, 725, 816, 725)
-
-[node name="WD_Wain_MensRoomL_540_992" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(992.5, 720, 1059, 720, 1059, 725, 992.5, 725)
-
 [node name="PD_Mat_MensRoomL_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
 polygon = PackedVector2Array(862.5, 696, 1012.5, 696, 1012.5, 718, 862.5, 718)
-
-[node name="WD_Wain_WomensRoomL_540_1091" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1091, 720, 1165, 720, 1165, 725, 1091, 725)
-
-[node name="WD_Wain_WomensRoomL_540_1275" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1275, 720, 1349, 720, 1349, 725, 1275, 725)
 
 [node name="PD_Mat_WomensRoomL_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
@@ -5931,18 +5912,6 @@ texture = ExtResource("tex_prop_metal")
 color = Color(0.5641, 0.2179, 0.1923, 1)
 polygon = PackedVector2Array(1325, 698, 1339, 698, 1339, 720, 1325, 720)
 
-[node name="WD_Wain_StorageR_540_1936" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1936, 720, 2035, 720, 2035, 725, 1936, 725)
-
-[node name="WD_Wain_StorageR_540_2145" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(2145, 720, 2244, 720, 2244, 725, 2145, 725)
-
 [node name="PD_Mat_StorageR_540" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
@@ -5958,34 +5927,10 @@ texture = ExtResource("tex_prop_cloth")
 color = Color(0.4359, 0.3718, 0.2692, 1)
 polygon = PackedVector2Array(1940, 710, 1985, 710, 1985, 720, 1940, 720)
 
-[node name="WD_Wain_MensRoomL_1000_816" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(816, 1029, 882.5, 1029, 882.5, 1034, 816, 1034)
-
-[node name="WD_Wain_MensRoomL_1000_992" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(992.5, 1029, 1059, 1029, 1059, 1034, 992.5, 1034)
-
 [node name="PD_Mat_MensRoomL_1000" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.2436, 0.2179, 0.1923, 1)
 polygon = PackedVector2Array(862.5, 1038, 1012.5, 1038, 1012.5, 1060, 862.5, 1060)
-
-[node name="WD_Wain_WomensRoomL_1000_1091" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1091, 1029, 1165, 1029, 1165, 1034, 1091, 1034)
-
-[node name="WD_Wain_WomensRoomL_1000_1275" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1275, 1029, 1349, 1029, 1349, 1034, 1275, 1034)
 
 [node name="PD_Mat_WomensRoomL_1000" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
@@ -6001,18 +5946,6 @@ polygon = PackedVector2Array(1095, 1034, 1109, 1034, 1109, 1056, 1095, 1056)
 texture = ExtResource("tex_prop_metal")
 color = Color(0.5641, 0.2179, 0.1923, 1)
 polygon = PackedVector2Array(1325, 1034, 1339, 1034, 1339, 1056, 1325, 1056)
-
-[node name="WD_Wain_StorageR_1000_1936" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1936, 1029, 2035, 1029, 2035, 1034, 1936, 1034)
-
-[node name="WD_Wain_StorageR_1000_2145" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(2145, 1029, 2244, 1029, 2244, 1034, 2145, 1034)
 
 [node name="PD_Mat_StorageR_1000" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
@@ -6036,18 +5969,6 @@ texture = ExtResource("ext_hs_locker")
 uv = PackedVector2Array(0, 0, 48, 0, 48, 103, 0, 103)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(2193.5, 1000, 2241.5, 1000, 2241.5, 1103, 2193.5, 1103)
-
-[node name="WD_Wain_PEStorage_1000_36" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(36, 1180, 322.5, 1180, 322.5, 1185, 36, 1185)
-
-[node name="WD_Wain_PEStorage_1000_432" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(432.5, 1180, 719, 1180, 719, 1185, 432.5, 1185)
 
 [node name="PD_Mat_PEStorage_1000" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
@@ -6081,18 +6002,6 @@ polygon = PackedVector2Array(482.5, 1158, 496.5, 1158, 496.5, 1180, 482.5, 1180)
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4359, 0.3718, 0.2692, 1)
 polygon = PackedVector2Array(551.8, 1170, 671.8, 1170, 671.8, 1180, 551.8, 1180)
-
-[node name="WD_Wain_PEDept_1000_751" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(751, 1180, 1132.5, 1180, 1132.5, 1185, 751, 1185)
-
-[node name="WD_Wain_PEDept_1000_1242" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1242.5, 1180, 1624, 1180, 1624, 1185, 1242.5, 1185)
 
 [node name="WD_Pil_PEDept_1000_0" type="Polygon2D" parent="Structures"]
 z_index = 1
@@ -6130,18 +6039,6 @@ polygon = PackedVector2Array(1292.5, 1158, 1306.5, 1158, 1306.5, 1180, 1292.5, 1
 texture = ExtResource("tex_prop_cloth")
 color = Color(0.4359, 0.3718, 0.2692, 1)
 polygon = PackedVector2Array(1409.2, 1170, 1529.2, 1170, 1529.2, 1180, 1409.2, 1180)
-
-[node name="WD_Wain_EduRoom_1000_1936" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(1936, 1180, 2035, 1180, 2035, 1185, 1936, 1185)
-
-[node name="WD_Wain_EduRoom_1000_2145" type="Polygon2D" parent="Structures"]
-z_index = 1
-texture = ExtResource("tex_prop_grain")
-color = Color(0.4359, 0.3718, 0.2821, 1)
-polygon = PackedVector2Array(2145, 1180, 2244, 1180, 2244, 1185, 2145, 1185)
 
 [node name="PD_Mat_EduRoom_1000" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_cloth")
