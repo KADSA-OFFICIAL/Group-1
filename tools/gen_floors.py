@@ -339,6 +339,8 @@ C_X_SDESK = "Color(0.421, 0.331, 0.211, 1)"     # 학생 자리(책상+의자)
 C_X_TDESK = "Color(0.261, 0.181, 0.121, 1)"     # 교탁(책상+의자)
 C_X_ODESK_DOWN = "Color(0.262, 0.182, 0.122, 1)"  # 교무실 섬 위 자리
 C_X_ODESK_UP = "Color(0.263, 0.183, 0.123, 1)"    # 교무실 섬 아래 자리
+C_X_LOCKER = "Color(0.441, 0.451, 0.471, 1)"      # 복도 철제 사물함(#721)
+C_X_LOCKER_OPEN = "Color(0.442, 0.452, 0.472, 1)"  # 문이 열린 것
 
 
 def _png_size(path):
@@ -384,6 +386,8 @@ SPRITE = {
     C_X_TDESK: "ext:hs_teacher_desk",
     C_X_ODESK_DOWN: "ext:hs_office_desk_down",
     C_X_ODESK_UP: "ext:hs_office_desk_up",
+    C_X_LOCKER: "ext:hs_locker",
+    C_X_LOCKER_OPEN: "ext:hs_locker_open",
     C_DESK: "obj_desk",
     C_CHAIR: "obj_chair",
     C_LOCKER: "obj_locker",
@@ -422,6 +426,35 @@ SPRITE = {
     C_PODIUM: "obj_podium",
 }
 SPRITE_SIZE = 32    # gen_tiles.py의 OBJ와 반드시 같아야 한다
+
+# 바닥 → 외부 그림(#725, Haunted School `Inside_A2.png`). 방 종류별 바닥색(`ROOM_FLOOR`)과
+# 복도 마루(`C_CORRIDOR`)를 열쇠로 찾는다 — `TEX`보다 우선한다. 막힌 공간·맵 바탕은
+# 그대로(절차 무늬로 어둡게) 둔다. 그림은 월드 좌표로 1배 되풀이된다(96px 칸).
+EXT_FLOOR = {
+    ROOM_FLOOR["classroom"]: "hs_floor_planks",      # 엇갈린 마루 — 교실·미술실
+    ROOM_FLOOR["office"]: "hs_floor_herringbone",    # 헤링본 — 교무실·부서실
+    ROOM_FLOOR["principal"]: "hs_floor_herringbone",
+    ROOM_FLOOR["computer"]: "hs_floor_planks_v",
+    ROOM_FLOOR["janitor"]: "hs_floor_worn",          # 낡은 마루 — 수위실
+    ROOM_FLOOR["toilet"]: "hs_floor_tile_white",     # 흰 타일 — 화장실
+    ROOM_FLOOR["nurse"]: "hs_floor_tile_white",
+    ROOM_FLOOR["storage"]: "hs_floor_stone",         # 회색 석재 — 창고
+    ROOM_FLOOR["lab"]: "hs_floor_stone",
+    ROOM_FLOOR["entrance"]: "hs_floor_stone",
+    C_CORRIDOR: "hs_floor_teal",                     # 청록 리놀륨 — 복도
+}
+# 바닥 밝기. 원본은 낮 장면용으로 밝아서(마루 평균 휘도가 예전 절차 바닥의 약 3배)
+# 그대로면 손전등 아래가 대낮처럼 하얗게 뜬다. 공포 분위기에 맞게 누른다 — 값은
+# 실제 창 캡처를 보며 맞췄다. 청록 복도는 채도가 높아 더 누른다.
+# 벽 앞면(#727) — 크림색 벽 + 초록 징두리. 바닥처럼 밝기를 누른다.
+WALL_FACE_ART = "hs_wall_face"
+WALL_FACE_TINT = "Color(0.5, 0.5, 0.52, 1)"
+EXT_FLOOR_TINT_DEFAULT = "Color(0.55, 0.53, 0.52, 1)"
+EXT_FLOOR_TINT = {
+    "hs_floor_teal": "Color(0.42, 0.44, 0.44, 1)",
+    "hs_floor_tile_white": "Color(0.45, 0.46, 0.47, 1)",
+    "hs_floor_stone": "Color(0.48, 0.48, 0.49, 1)",
+}
 
 
 def uv_for(polygon, tw=None, th=None):
@@ -743,6 +776,17 @@ class Scene:
     def poly2d(self, name, parent, color, polygon, z=None):
         z_line = f"z_index = {z}\n" if z is not None else ""
         tex_line = ""
+        # 외부 바닥(#725) — 재질처럼 UV를 비워 월드 격자로 되풀이한다(1배).
+        # 색은 팔레트가 아니라 `EXT_FLOOR_TINT`로 누른다(완성된 그림이다).
+        floor = EXT_FLOOR.get(color)
+        if floor is not None:
+            tex_line = f'texture = ExtResource("ext_{floor}")\n'
+            if parent in CANVAS_ITEM_ROOTS:
+                tex_line = TEX_FLAGS + tex_line
+            self.node(f'[node name="{name}" type="Polygon2D" parent="{parent}"]\n'
+                      f'{z_line}{tex_line}color = {EXT_FLOOR_TINT.get(floor, EXT_FLOOR_TINT_DEFAULT)}\n'
+                      f'polygon = {polygon}\n')
+            return
         # 오브젝트 그림이 재질보다 우선한다(#259). 물건 하나에 한 장을 맞춰 늘리려고
         # 로컬 UV를 넣는다 — 재질은 UV를 비워 월드 격자에 정렬시키는 것과 반대다.
         obj = SPRITE.get(color)
@@ -804,14 +848,30 @@ class Scene:
             # 면 하나만 두면 밝기가 같은 띠 두 개라 여전히 납작해 보인다(#271).
             self.poly2d(f"WH_{key}", "Structures", C_WALL_TOP,
                         rect(x0, y0, x1, y0 + 3))
-            self.poly2d(f"WF_{key}", "Structures", C_FACE,
-                        rect(x0, y1, x1, y1 + WALL_FACE - 4))
+            self.wall_face(f"WF_{key}", x0, x1, y1, y1 + WALL_FACE - 4)
             self.poly2d(f"WS_{key}", "Structures", C_WALL_SHADOW,
                         rect(x0, y1 + WALL_FACE - 4, x1, y1 + WALL_FACE))
             # 앞면 충돌. `RoomWalls`가 아니라 따로 둔 몸이라 상호작용 표시의
             # 시야 광선(interact_marks.gd의 RAY_PASS)이 뚫고 지나간다.
             self.node(f'[node name="WB_{key}" type="CollisionPolygon2D" parent="WallBases"]\n'
                       f'polygon = {rect(x0, y1, x1, y1 + WALL_FACE)}\n')
+
+    def wall_face(self, name, x0, x1, y0, y1):
+        """가로 벽 앞면(#727) — 외부 그림(크림색 벽 + 초록 징두리)을 붙인다.
+
+        바닥과 달리 UV를 **가로만 월드 좌표**로 두고 세로는 앞면 높이에 맞춘다
+        (`0 ~ 그림 높이`). 세로까지 월드 좌표면 벽마다 y가 달라 징두리가 위아래로
+        어긋나 잘려 들어간다. 그림이 없으면 예전 단색 앞면으로 돌아간다.
+        """
+        if WALL_FACE_ART not in EXT_SIZES:
+            self.poly2d(name, "Structures", C_FACE, rect(x0, y0, x1, y1))
+            return
+        _, th = EXT_SIZES[WALL_FACE_ART]
+        self.node(f'[node name="{name}" type="Polygon2D" parent="Structures"]\n'
+                  f'texture = ExtResource("ext_{WALL_FACE_ART}")\n'
+                  f"uv = {poly((x0, 0), (x1, 0), (x1, th), (x0, th))}\n"
+                  f"color = {WALL_FACE_TINT}\n"
+                  f"polygon = {rect(x0, y0, x1, y1)}\n")
 
     def prop(self, key, polygon, color):
         """방 안 집기: 충돌 PC_ + 시각 PV_ 한 쌍.
@@ -824,6 +884,20 @@ class Scene:
                   f'polygon = {polygon}\n')
         self.poly2d(f"PV_{key}", "Props", color, polygon)
         self.prop_rects.append((key, _poly_box(polygon), color))
+
+    def tall_prop(self, key, visual, foot, color):
+        """키 큰 집기(#721): 그림 `PW_`(벽 앞면 위로 겹친다) + 바닥 부분 충돌 `PC_`.
+
+        3/4 시점 그림의 사물함·책장은 키가 커서 그림 전체를 충돌로 잡으면 복도가
+        막힌다. RPG Maker처럼 **윗부분은 벽 앞면 위에 겹쳐 그리고** 바닥에 닿는
+        부분만 막는다. 그림은 벽(`Structures`)보다 **뒤에** 선언된 `TallProps`에
+        넣어야 앞면 위에 그려진다. `verify_props`는 PW_↔PC_ 짝을 가로 범위와 아래
+        끝으로 맞춰 본다(폴리곤이 같을 필요는 없다).
+        """
+        self.node(f'[node name="PC_{key}" type="CollisionPolygon2D" parent="PropBodies"]\n'
+                  f'polygon = {rect(*foot)}\n')
+        self.poly2d(f"PW_{key}", "TallProps", color, rect(*visual))
+        self.prop_rects.append((key, tuple(foot), color))
 
     def window_light(self, key, x, y, room):
         """창으로 드는 달빛 — 진짜 광원(#274).
@@ -1554,6 +1628,47 @@ def add_hiding(sc, floor):
         sc.mark(name, cx, cy, C_MARK_HIDE)
 
 
+# 단서 그림(#723) — 단서 이름 → 외부 그림. `story_objects.json`의 `<이름>Visual`
+# 노드를 이 그림의 Sprite2D로 갈아 끼운다(본문·플래그는 그대로). 예전에는 종이류
+# 단서 11개가 전부 같은 공책 그림(`note.png`)이라 그림으로는 무슨 단서인지 안
+# 갈렸고, 국어책·시우 그림·소지품 봉투·날짜 벽·사진 벽은 단색 도형이었다.
+# 여기 없는 단서(열쇠·잉크통·비커·머리·열쇠 보관함·끌린 자국)는 그대로다.
+CLUE_ART = {
+    "KoreanBook": "hs_book_purple",
+    "SiwooPainting": "painting_dark",
+    "Belongings": "hs_bag_spilled",
+    "DateWall": "hs_calendar",
+    "NayeonClue": "hs_papers_pile",
+    "CounselRecord": "hs_books_green",
+    "JanitorWarning": "book_closed",
+    "ReportFlyer": "hs_memo_grey",
+    "TaehoNote": "hs_note_small",
+    "YujinClue": "hs_paper_crumpled",
+    "CrisisManual": "books_pile",
+    "HistoryClue": "hs_book_open",
+    "PrincipalLetter": "hs_papers_two",
+    "PhotoWall": "hs_frame_map",
+    "StudentCards": "hs_id_card",
+    "JanitorNotebook": "hs_notebook",
+}
+# 단서는 **2배**로 놓는다 — 찾을 것이라 눈에 띄어야 한다. 1배면 책(13x17)이
+# 책상 그림 위의 점 하나라, "3층 열쇠가 안 보인다"(#698)가 단서마다 되풀이된다.
+# Darklight 그림은 원래 2배라 그대로 맞는다.
+CLUE_ART_SCALE = 2
+
+
+def _clue_visual(name):
+    """단서 시각 노드 — 외부 그림 Sprite2D. 부모(단서 Area2D) 자리 한가운데에 선다."""
+    art = CLUE_ART[name]
+    if art not in EXT_SIZES:
+        raise SystemExit(f"단서 그림 {art}.png가 없다 — tools/import_ext_sprites.py를 돌렸는가")
+    return (f'[node name="{name}Visual" type="Sprite2D" parent="{name}"]\n'
+            "z_index = 1\n"
+            "texture_filter = 1\n"
+            f'texture = ExtResource("ext_{art}")\n'
+            f"scale = Vector2({CLUE_ART_SCALE}, {CLUE_ART_SCALE})\n")
+
+
 def add_story(sc, floor):
     """추출해 둔 단서 노드를 방 안에 배치. 본문은 그대로, position만 새 좌표."""
     data = json.loads((pathlib.Path(__file__).parent / "story_objects.json").read_text())
@@ -1584,6 +1699,8 @@ def add_story(sc, floor):
                 body = to_pickup(body)
             sc.node(body if body.endswith("\n") else body + "\n")
             for kid in nodes[name]["kids"]:
+                if name in CLUE_ART and kid.startswith(f'[node name="{name}Visual"'):
+                    kid = _clue_visual(name)
                 sc.node(kid if kid.endswith("\n") else kid + "\n")
 
 
@@ -3213,11 +3330,14 @@ def add_corridor_props(sc, corridors, x1_of=None):
             # 벽면이 복도의 위쪽인지 아래쪽인지에 따라 장식을 붙이는 방향이
             # 뒤집힌다. 두께가 서로 다르므로(게시판 10, 소화기 22) 각각 벽면에
             # 맞춰 앵커를 잡아야 벽을 파고들지 않는다.
-            if abs(botf(x1) - cy0) < 1:          # 방이 복도 위쪽에 접한다
+            top_wall = abs(botf(x1) - cy0) < 1
+            if top_wall:                         # 방이 복도 위쪽에 접한다
                 # 이 방의 아래 벽은 앞면이 복도로 WALL_FACE만큼 내려온다(#268).
                 # 사물함·비품을 그만큼 비켜 놓지 않으면 앞면에 가린다.
                 base = cy0 + WALL_FACE
-                ly0, ly1 = base, base + CORR_LOCKER_D
+                # 철제 사물함(#721)은 그림 위 끝이 앞면 위 끝(cy0)이고 바닥 부분
+                # (앞면 아래 ~ 그림 아래 끝)만 막는다 — `Scene.tall_prop`.
+                ly0, ly1 = base, cy0 + ext_size("hs_locker")[1]
                 wain = (base - WAINSCOT, base)   # 걸레받이는 앞면 **아래 끝**에
                 pil = (cy0, base)                # 기둥은 앞면 전체를 덮는다
 
@@ -3237,7 +3357,10 @@ def add_corridor_props(sc, corridors, x1_of=None):
             # 서므로 가리지 않는다. WallGlow 안이라 벽 위에 그려지고 어둠을
             # 받지 않는다 — 벽과 같은 취급이다.
             gap0, gap1 = cx - DOOR / 2, cx + DOOR / 2
-            for seg0, seg1 in ((x0 + T, gap0), (gap1, x1 - T)):
+            # 외부 벽 앞면(#727)에는 징두리·밑선이 이미 그려져 있어 걸레받이를
+            # 덧대면 두 겹이 된다 — 그림이 있으면 건너뛴다.
+            wain_segs = () if WALL_FACE_ART in EXT_SIZES else ((x0 + T, gap0), (gap1, x1 - T))
+            for seg0, seg1 in wain_segs:
                 if seg1 - seg0 > 20:
                     sc.wall_decor(f"Wain_{key}_{int(cy0)}_{int(seg0)}",
                                   rect(seg0, wain[0], seg1, wain[1]), C_WAINSCOT)
@@ -3279,10 +3402,18 @@ def add_corridor_props(sc, corridors, x1_of=None):
                     sc.prop(f"Corr_{key}_{int(cy0)}_water", rect(*cell), C_WATER)
                     sc.corridor_props.append(cell)
                     keepout.append((cell[0] - 8, ly0 - 1, cell[2] + 8, ly1 + 1))
-            placed = _row(x0 + T, x1 - T, ly0, ly1, CORR_LOCKER_W,
-                          CORR_LOCKER_GAP, keepout)
+            # **사물함은 위쪽 벽에만 선다**(#721). 아래쪽 벽은 3/4 시점에서 등이
+            # 보여야 맞는데 그림에 뒷모습이 없다 — RPG Maker도 아래 벽에는 가구를
+            # 안 붙인다. 그 벽면은 아래에서 게시판·소화기가 채운다.
+            placed = []
+            if top_wall:
+                lw = ext_size("hs_locker")[0]
+                placed = _row(x0 + T, x1 - T, ly0, ly1, lw, CORR_LOCKER_GAP, keepout)
             for i, r4 in enumerate(placed):
-                sc.prop(f"Corr_{key}_{int(cy0)}_{i}", rect(*r4), C_LOCKER)
+                # 일곱에 하나쯤 문이 열린 채다 — 이름 해시로 골라 재생성해도 같다.
+                name = f"Corr_{key}_{int(cy0)}_{i}"
+                color = C_X_LOCKER_OPEN if _name_hash(name) % 7 == 0 else C_X_LOCKER
+                sc.tall_prop(name, (r4[0], cy0, r4[2], r4[3]), r4, color)
                 sc.corridor_props.append(r4)
             # 사물함이 못 들어간 벽면(문 옆 자투리)에 소화기와 게시판을 건다
             taken = [(a, ly0, b, ly1) for a, _, b, _ in placed]
@@ -3525,6 +3656,8 @@ def build_common(fl, spec):
     # 두면 어둠도 손전등도 안 받아 시야 밖에서도 100% 밝기로 보였다.
     # Stairwells **뒤**라야 집기 위에 그려진다 — 선언 순서가 곧 레이어다.
     sc.node('[node name="Structures" type="Node2D" parent="."]\n')
+    # 키 큰 집기 그림(#721) — 벽 **뒤**에 선언해야 앞면 위에 그려진다.
+    sc.node('[node name="TallProps" type="Node2D" parent="."]\n')
     # 표시는 CanvasLayer에 있어 어둠·시야 마스크를 안 받는다 — 거리만 맞으면
     # 벽 뒤·닫힌 문 너머 단서까지 떴다(#343). 광선으로 시야를 확인한다.
     # **은신처 표시(`Mark_Hide*`)만 면제**다(스크립트의 `LOS_EXEMPT`).
@@ -3656,6 +3789,8 @@ def build_floor1():
     # 두면 어둠도 손전등도 안 받아 시야 밖에서도 100% 밝기로 보였다.
     # Stairwells **뒤**라야 집기 위에 그려진다 — 선언 순서가 곧 레이어다.
     sc.node('[node name="Structures" type="Node2D" parent="."]\n')
+    # 키 큰 집기 그림(#721) — 벽 **뒤**에 선언해야 앞면 위에 그려진다.
+    sc.node('[node name="TallProps" type="Node2D" parent="."]\n')
     # 표시는 CanvasLayer에 있어 어둠·시야 마스크를 안 받는다 — 거리만 맞으면
     # 벽 뒤·닫힌 문 너머 단서까지 떴다(#343). 광선으로 시야를 확인한다.
     # **은신처 표시(`Mark_Hide*`)만 면제**다(스크립트의 `LOS_EXEMPT`).

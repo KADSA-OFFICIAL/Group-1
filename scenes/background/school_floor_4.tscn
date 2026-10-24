@@ -1,4 +1,4 @@
-[gd_scene load_steps=48 format=3]
+[gd_scene load_steps=53 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 [ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="5_hiding"]
@@ -9,7 +9,6 @@
 [ext_resource type="Script" path="res://scripts/game/art_room_intro.gd" id="12_artintro"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_cement.png" id="tex_floor_cement"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_matte.png" id="tex_floor_matte"]
-[ext_resource type="Texture2D" path="res://assets/tiles/floor_wood.png" id="tex_floor_wood"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_bin.png" id="tex_obj_bin"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_bust.png" id="tex_obj_bust"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_canvas.png" id="tex_obj_canvas"]
@@ -26,6 +25,12 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_grain.png" id="tex_prop_grain"]
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_metal.png" id="tex_prop_metal"]
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_bag_spilled.png" id="ext_hs_bag_spilled"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_book_purple.png" id="ext_hs_book_purple"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_calendar.png" id="ext_hs_calendar"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_floor_planks.png" id="ext_hs_floor_planks"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_wall_face.png" id="ext_hs_wall_face"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/painting_dark.png" id="ext_painting_dark"]
 [ext_resource type="Texture2D" path="res://assets/sprites/janitor_sheet.png" id="18_janitor"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
@@ -141,8 +146,8 @@ full_distance = 300.0
 [node name="PropBodies" type="StaticBody2D" parent="."]
 
 [node name="ArtRoom" type="Polygon2D" parent="Rooms"]
-texture = ExtResource("tex_floor_wood")
-color = Color(0.1949, 0.159, 0.1179, 1)
+texture = ExtResource("ext_hs_floor_planks")
+color = Color(0.55, 0.53, 0.52, 1)
 polygon = PackedVector2Array(20, 20, 1136, 20, 1136, 880, 20, 880)
 
 [node name="L_ArtRoom" type="Label" parent="WallGlow/Labels"]
@@ -158,8 +163,8 @@ text = "미술실"
 horizontal_alignment = 1
 
 [node name="ArtPrep" type="Polygon2D" parent="Rooms"]
-texture = ExtResource("tex_floor_wood")
-color = Color(0.1949, 0.159, 0.1179, 1)
+texture = ExtResource("ext_hs_floor_planks")
+color = Color(0.55, 0.53, 0.52, 1)
 polygon = PackedVector2Array(1120, 20, 1780, 20, 1780, 880, 1120, 880)
 
 [node name="L_ArtPrep" type="Label" parent="WallGlow/Labels"]
@@ -190,7 +195,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(20, 20, 1780, 20, 1780, 23, 20, 23)
 
 [node name="WF_IntroTop" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(20, 0, 1780, 0, 1780, 30, 20, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(20, 36, 1780, 36, 1780, 66, 20, 66)
 
 [node name="WS_IntroTop" type="Polygon2D" parent="Structures"]
@@ -238,7 +245,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(20, 864, 515, 864, 515, 867, 20, 867)
 
 [node name="WF_IntroBotL" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(20, 0, 515, 0, 515, 30, 20, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(20, 880, 515, 880, 515, 910, 20, 910)
 
 [node name="WS_IntroBotL" type="Polygon2D" parent="Structures"]
@@ -264,7 +273,9 @@ color = Color(0.375, 0.392, 0.430, 1)
 polygon = PackedVector2Array(625, 864, 1780, 864, 1780, 867, 625, 867)
 
 [node name="WF_IntroBotR" type="Polygon2D" parent="Structures"]
-color = Color(0.205, 0.216, 0.242, 1)
+texture = ExtResource("ext_hs_wall_face")
+uv = PackedVector2Array(625, 0, 1780, 0, 1780, 30, 625, 30)
+color = Color(0.5, 0.5, 0.52, 1)
 polygon = PackedVector2Array(625, 880, 1780, 880, 1780, 910, 625, 910)
 
 [node name="WS_IntroBotR" type="Polygon2D" parent="Structures"]
@@ -1042,10 +1053,11 @@ prompt_text = "국어책 챙기기"
 grants_item_id = "korean_book"
 
 
-[node name="KoreanBookVisual" type="Polygon2D" parent="KoreanBook"]
+[node name="KoreanBookVisual" type="Sprite2D" parent="KoreanBook"]
 z_index = 1
-color = Color(0.72, 0.45, 0.30, 1)
-polygon = PackedVector2Array(-11, -14, 11, -14, 11, 14, -11, 14)
+texture_filter = 1
+texture = ExtResource("ext_hs_book_purple")
+scale = Vector2(2, 2)
 
 [node name="KoreanBookZone" type="CollisionShape2D" parent="KoreanBook"]
 shape = SubResource("RectangleShape2D_key_zone")
@@ -1066,11 +1078,11 @@ prompt_text = "그림 보기"
 grants_flag = "read_siwoo_painting"
 
 
-[node name="SiwooPaintingVisual" type="Polygon2D" parent="SiwooPainting"]
+[node name="SiwooPaintingVisual" type="Sprite2D" parent="SiwooPainting"]
 z_index = 1
-color = Color(0.35, 0.3, 0.45, 1)
-polygon = PackedVector2Array(-14, -12, 14, -12, 14, 12, -14, 12)
-
+texture_filter = 1
+texture = ExtResource("ext_painting_dark")
+scale = Vector2(2, 2)
 
 [node name="SiwooPaintingZone" type="CollisionShape2D" parent="SiwooPainting"]
 shape = SubResource("RectangleShape2D_key_zone")
@@ -1092,10 +1104,11 @@ prompt_text = "비닐봉투 살펴보기"
 grants_flag = "saw_belongings"
 
 
-[node name="BelongingsVisual" type="Polygon2D" parent="Belongings"]
+[node name="BelongingsVisual" type="Sprite2D" parent="Belongings"]
 z_index = 1
-color = Color(0.55, 0.62, 0.6, 1)
-polygon = PackedVector2Array(-13, -10, 13, -10, 13, 10, -13, 10)
+texture_filter = 1
+texture = ExtResource("ext_hs_bag_spilled")
+scale = Vector2(2, 2)
 
 [node name="BelongingsZone" type="CollisionShape2D" parent="Belongings"]
 shape = SubResource("RectangleShape2D_key_zone")
@@ -1116,10 +1129,11 @@ prompt_text = "벽에 적힌 날짜 읽기"
 grants_flag = "saw_dates"
 
 
-[node name="DateWallVisual" type="Polygon2D" parent="DateWall"]
+[node name="DateWallVisual" type="Sprite2D" parent="DateWall"]
 z_index = 1
-color = Color(0.55, 0.62, 0.6, 1)
-polygon = PackedVector2Array(-13, -10, 13, -10, 13, 10, -13, 10)
+texture_filter = 1
+texture = ExtResource("ext_hs_calendar")
+scale = Vector2(2, 2)
 
 [node name="DateWallZone" type="CollisionShape2D" parent="DateWall"]
 shape = SubResource("RectangleShape2D_key_zone")
