@@ -147,7 +147,7 @@ full_distance = 300.0
 
 [node name="ArtRoom" type="Polygon2D" parent="Rooms"]
 texture = ExtResource("ext_hs_floor_planks")
-color = Color(0.55, 0.53, 0.52, 1)
+color = Color(0.33, 0.31, 0.3, 1)
 polygon = PackedVector2Array(20, 20, 1136, 20, 1136, 880, 20, 880)
 
 [node name="L_ArtRoom" type="Label" parent="WallGlow/Labels"]
@@ -164,7 +164,7 @@ horizontal_alignment = 1
 
 [node name="ArtPrep" type="Polygon2D" parent="Rooms"]
 texture = ExtResource("ext_hs_floor_planks")
-color = Color(0.55, 0.53, 0.52, 1)
+color = Color(0.33, 0.31, 0.3, 1)
 polygon = PackedVector2Array(1120, 20, 1780, 20, 1780, 880, 1120, 880)
 
 [node name="L_ArtPrep" type="Label" parent="WallGlow/Labels"]
@@ -197,7 +197,7 @@ polygon = PackedVector2Array(20, 20, 1780, 20, 1780, 23, 20, 23)
 [node name="WF_IntroTop" type="Polygon2D" parent="Structures"]
 texture = ExtResource("ext_hs_wall_face")
 uv = PackedVector2Array(20, 0, 1780, 0, 1780, 30, 20, 30)
-color = Color(0.5, 0.5, 0.52, 1)
+color = Color(0.34, 0.34, 0.36, 1)
 polygon = PackedVector2Array(20, 36, 1780, 36, 1780, 66, 20, 66)
 
 [node name="WS_IntroTop" type="Polygon2D" parent="Structures"]
@@ -247,7 +247,7 @@ polygon = PackedVector2Array(20, 864, 515, 864, 515, 867, 20, 867)
 [node name="WF_IntroBotL" type="Polygon2D" parent="Structures"]
 texture = ExtResource("ext_hs_wall_face")
 uv = PackedVector2Array(20, 0, 515, 0, 515, 30, 20, 30)
-color = Color(0.5, 0.5, 0.52, 1)
+color = Color(0.34, 0.34, 0.36, 1)
 polygon = PackedVector2Array(20, 880, 515, 880, 515, 910, 20, 910)
 
 [node name="WS_IntroBotL" type="Polygon2D" parent="Structures"]
@@ -275,7 +275,7 @@ polygon = PackedVector2Array(625, 864, 1780, 864, 1780, 867, 625, 867)
 [node name="WF_IntroBotR" type="Polygon2D" parent="Structures"]
 texture = ExtResource("ext_hs_wall_face")
 uv = PackedVector2Array(625, 0, 1780, 0, 1780, 30, 625, 30)
-color = Color(0.5, 0.5, 0.52, 1)
+color = Color(0.34, 0.34, 0.36, 1)
 polygon = PackedVector2Array(625, 880, 1780, 880, 1780, 910, 625, 910)
 
 [node name="WS_IntroBotR" type="Polygon2D" parent="Structures"]

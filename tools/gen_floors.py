@@ -339,8 +339,6 @@ C_X_SDESK = "Color(0.421, 0.331, 0.211, 1)"     # 학생 자리(책상+의자)
 C_X_TDESK = "Color(0.261, 0.181, 0.121, 1)"     # 교탁(책상+의자)
 C_X_ODESK_DOWN = "Color(0.262, 0.182, 0.122, 1)"  # 교무실 섬 위 자리
 C_X_ODESK_UP = "Color(0.263, 0.183, 0.123, 1)"    # 교무실 섬 아래 자리
-C_X_LOCKER = "Color(0.441, 0.451, 0.471, 1)"      # 복도 철제 사물함(#721)
-C_X_LOCKER_OPEN = "Color(0.442, 0.452, 0.472, 1)"  # 문이 열린 것
 
 
 def _png_size(path):
@@ -386,8 +384,6 @@ SPRITE = {
     C_X_TDESK: "ext:hs_teacher_desk",
     C_X_ODESK_DOWN: "ext:hs_office_desk_down",
     C_X_ODESK_UP: "ext:hs_office_desk_up",
-    C_X_LOCKER: "ext:hs_locker",
-    C_X_LOCKER_OPEN: "ext:hs_locker_open",
     C_DESK: "obj_desk",
     C_CHAIR: "obj_chair",
     C_LOCKER: "obj_locker",
@@ -441,20 +437,23 @@ EXT_FLOOR = {
     ROOM_FLOOR["storage"]: "hs_floor_stone",         # 회색 석재 — 창고
     ROOM_FLOOR["lab"]: "hs_floor_stone",
     ROOM_FLOOR["entrance"]: "hs_floor_stone",
-    C_CORRIDOR: "hs_floor_teal",                     # 청록 리놀륨 — 복도
+    # 복도는 어두운 가로 판자 마루다. #725의 청록 리놀륨은 채도가 높아 혼자 튀어
+    # "복도가 너무 어색하다"(사용자, #730)로 바꿨다.
+    C_CORRIDOR: "hs_floor_planks_h",
 }
 # 바닥 밝기. 원본은 낮 장면용으로 밝아서(마루 평균 휘도가 예전 절차 바닥의 약 3배)
-# 그대로면 손전등 아래가 대낮처럼 하얗게 뜬다. 공포 분위기에 맞게 누른다 — 값은
-# 실제 창 캡처를 보며 맞췄다. 청록 복도는 채도가 높아 더 누른다.
-# 벽 앞면(#727) — 크림색 벽 + 초록 징두리. 바닥처럼 밝기를 누른다.
-WALL_FACE_ART = "hs_wall_face"
-WALL_FACE_TINT = "Color(0.5, 0.5, 0.52, 1)"
-EXT_FLOOR_TINT_DEFAULT = "Color(0.55, 0.53, 0.52, 1)"
+# 그대로면 손전등 아래가 대낮처럼 하얗게 뜬다. #725에서 0.45~0.55로 눌렀는데도
+# "바닥이 너무 밝다"(사용자, #730) — 예전 절차 바닥의 실효 밝기(약 0.15)에 맞춰
+# 0.3 안팎으로 더 눌렀다. 흰 타일·석재는 원본이 더 밝아 더 누른다.
+EXT_FLOOR_TINT_DEFAULT = "Color(0.33, 0.31, 0.3, 1)"
 EXT_FLOOR_TINT = {
-    "hs_floor_teal": "Color(0.42, 0.44, 0.44, 1)",
-    "hs_floor_tile_white": "Color(0.45, 0.46, 0.47, 1)",
-    "hs_floor_stone": "Color(0.48, 0.48, 0.49, 1)",
+    "hs_floor_tile_white": "Color(0.26, 0.27, 0.28, 1)",
+    "hs_floor_stone": "Color(0.28, 0.28, 0.29, 1)",
+    "hs_floor_planks_h": "Color(0.3, 0.28, 0.27, 1)",
 }
+# 벽 앞면(#727) — 크림색 벽 + 초록 징두리. 바닥과 함께 낮췄다(#730).
+WALL_FACE_ART = "hs_wall_face"
+WALL_FACE_TINT = "Color(0.34, 0.34, 0.36, 1)"
 
 
 def uv_for(polygon, tw=None, th=None):
@@ -3335,9 +3334,7 @@ def add_corridor_props(sc, corridors, x1_of=None):
                 # 이 방의 아래 벽은 앞면이 복도로 WALL_FACE만큼 내려온다(#268).
                 # 사물함·비품을 그만큼 비켜 놓지 않으면 앞면에 가린다.
                 base = cy0 + WALL_FACE
-                # 철제 사물함(#721)은 그림 위 끝이 앞면 위 끝(cy0)이고 바닥 부분
-                # (앞면 아래 ~ 그림 아래 끝)만 막는다 — `Scene.tall_prop`.
-                ly0, ly1 = base, cy0 + ext_size("hs_locker")[1]
+                ly0, ly1 = base, base + CORR_LOCKER_D
                 wain = (base - WAINSCOT, base)   # 걸레받이는 앞면 **아래 끝**에
                 pil = (cy0, base)                # 기둥은 앞면 전체를 덮는다
 
@@ -3402,18 +3399,14 @@ def add_corridor_props(sc, corridors, x1_of=None):
                     sc.prop(f"Corr_{key}_{int(cy0)}_water", rect(*cell), C_WATER)
                     sc.corridor_props.append(cell)
                     keepout.append((cell[0] - 8, ly0 - 1, cell[2] + 8, ly1 + 1))
-            # **사물함은 위쪽 벽에만 선다**(#721). 아래쪽 벽은 3/4 시점에서 등이
-            # 보여야 맞는데 그림에 뒷모습이 없다 — RPG Maker도 아래 벽에는 가구를
-            # 안 붙인다. 그 벽면은 아래에서 게시판·소화기가 채운다.
-            placed = []
-            if top_wall:
-                lw = ext_size("hs_locker")[0]
-                placed = _row(x0 + T, x1 - T, ly0, ly1, lw, CORR_LOCKER_GAP, keepout)
+            # 복도 사물함은 **절차 그림의 낮은 상자**다. #721에서 철제 사물함(키 큰
+            # 3/4 그림)으로 바꿨다가 "분위기에 안 맞는다"(사용자, #730)로 되돌렸다 —
+            # 깨끗한 미국식 철제 사물함이 낡은 밤 학교와 어긋났다. 키 큰 집기 방식
+            # (`Scene.tall_prop`·`verify_props`의 PW_ 검사)은 다른 물건에 쓸 수 있게 남겼다.
+            placed = _row(x0 + T, x1 - T, ly0, ly1, CORR_LOCKER_W,
+                          CORR_LOCKER_GAP, keepout)
             for i, r4 in enumerate(placed):
-                # 일곱에 하나쯤 문이 열린 채다 — 이름 해시로 골라 재생성해도 같다.
-                name = f"Corr_{key}_{int(cy0)}_{i}"
-                color = C_X_LOCKER_OPEN if _name_hash(name) % 7 == 0 else C_X_LOCKER
-                sc.tall_prop(name, (r4[0], cy0, r4[2], r4[3]), r4, color)
+                sc.prop(f"Corr_{key}_{int(cy0)}_{i}", rect(*r4), C_LOCKER)
                 sc.corridor_props.append(r4)
             # 사물함이 못 들어간 벽면(문 옆 자투리)에 소화기와 게시판을 건다
             taken = [(a, ly0, b, ly1) for a, _, b, _ in placed]
