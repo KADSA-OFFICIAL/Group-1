@@ -426,8 +426,12 @@ SPRITE_SIZE = 32    # gen_tiles.py의 OBJ와 반드시 같아야 한다
 # 바닥 → 외부 그림(#725, Haunted School `Inside_A2.png`). 방 종류별 바닥색(`ROOM_FLOOR`)과
 # 복도 마루(`C_CORRIDOR`)를 열쇠로 찾는다 — `TEX`보다 우선한다. 막힌 공간·맵 바탕은
 # 그대로(절차 무늬로 어둡게) 둔다. 그림은 월드 좌표로 1배 되풀이된다(96px 칸).
+#
+# **복도·교실·미술실은 절차 바닥이다**(#733). 외부 마루를 세 번 갈아 끼웠다 —
+# 청록 리놀륨(#725, "어색하다") → 어두운 가로 판자(#730, "마루도 별로") → 사용자가
+# 실제 게임 화면 네 조합(예전 바닥 / 석재+세로 마루 / 타일+헤링본 / 낡은 마루)을
+# 비교해 **예전 바닥**을 골랐다. 이 둘은 `TEX`의 `floor_board`·`floor_wood` 무늬다.
 EXT_FLOOR = {
-    ROOM_FLOOR["classroom"]: "hs_floor_planks",      # 엇갈린 마루 — 교실·미술실
     ROOM_FLOOR["office"]: "hs_floor_herringbone",    # 헤링본 — 교무실·부서실
     ROOM_FLOOR["principal"]: "hs_floor_herringbone",
     ROOM_FLOOR["computer"]: "hs_floor_planks_v",
@@ -437,9 +441,6 @@ EXT_FLOOR = {
     ROOM_FLOOR["storage"]: "hs_floor_stone",         # 회색 석재 — 창고
     ROOM_FLOOR["lab"]: "hs_floor_stone",
     ROOM_FLOOR["entrance"]: "hs_floor_stone",
-    # 복도는 어두운 가로 판자 마루다. #725의 청록 리놀륨은 채도가 높아 혼자 튀어
-    # "복도가 너무 어색하다"(사용자, #730)로 바꿨다.
-    C_CORRIDOR: "hs_floor_planks_h",
 }
 # 바닥 밝기. 원본은 낮 장면용으로 밝아서(마루 평균 휘도가 예전 절차 바닥의 약 3배)
 # 그대로면 손전등 아래가 대낮처럼 하얗게 뜬다. #725에서 0.45~0.55로 눌렀는데도
@@ -449,7 +450,6 @@ EXT_FLOOR_TINT_DEFAULT = "Color(0.33, 0.31, 0.3, 1)"
 EXT_FLOOR_TINT = {
     "hs_floor_tile_white": "Color(0.26, 0.27, 0.28, 1)",
     "hs_floor_stone": "Color(0.28, 0.28, 0.29, 1)",
-    "hs_floor_planks_h": "Color(0.3, 0.28, 0.27, 1)",
 }
 # 벽 앞면(#727) — 크림색 벽 + 초록 징두리. 바닥과 함께 낮췄다(#730).
 WALL_FACE_ART = "hs_wall_face"
