@@ -23,8 +23,10 @@ NL = chr(10)   # 노드 블록을 줄 단위로 조립할 때 쓴다
 
 T = 16          # 벽 두께
 DOOR = 110      # 문 틈 폭
-W, H = 2280, 2240   # 캔버스 — 폭은 오른쪽 교실을 걷어내며 3400에서(#692),
-                    # 높이는 방 없는 중앙다리 띠를 줄이며 2500에서 줄였다(#691)
+W, H = 2280, 2160   # 캔버스 — 폭은 오른쪽 교실을 걷어내며 3400에서(#692),
+                    # 높이는 중앙다리 띠를 줄이고(#691) 없애며(#710) 2500에서 줄였다.
+                    # **H는 하단 띠가 있는 층의 높이다** — 지금은 그런 층이 없다
+                    # (2층 #702, 3층 #710). 실제 높이는 `floor_height()`가 정한다.
 
 C_FLOOR = "Color(0.14, 0.14, 0.16, 1)"
 C_ROOM = "Color(0.1, 0.11, 0.12, 1)"
@@ -434,17 +436,26 @@ EDGE = 20
 NORTH_Y0, NORTH_Y1 = EDGE, 540       # 북쪽 교실동 — 위쪽 외벽에 밀착
 MID_Y0, MID_Y1 = 720, 1000           # 중간 띠(화장실·막힌공간)
 STAIR_A = (300, 720, 740, 1000)      # 좌측 계단실 — 중간 띠와 같은 높이(공백 봉인 벽과 겹치지 않게)
-BRIDGE_X0, BRIDGE_X1 = 1670, 1890    # 중앙다리(유일한 남북 통로)
+BRIDGE_X0, BRIDGE_X1 = 1670, 1890    # 중간 띠 오른쪽 남북 통로의 x(옛 중앙다리)
 # **중앙다리 띠는 140px이다**(#691에서 400에서 줄였다). 400일 때 이 띠에는 방이
 # 하나도 없고 걸을 수 있는 칸이 17.6%뿐이라, 캔버스 높이의 16%가 다리 하나를
 # 건너려고만 있었다(실측: 방 없는 구간 y 1000~1520, 520px). 남쪽 복도와 같은
 # 폭으로 줄이면 "건물 밖 공백"이라는 성격은 남고 빈 칸만 사라진다.
 # 아래 띠는 전부 260px 올라갔다.
-BRIDGE_Y0, BRIDGE_Y1 = 1000, 1140    # 위=중간 띠 아래, 아래=남쪽 복도
-VOID_Y1 = 1140                       # 공백 구역(건물 밖) 하단 = 남쪽 복도 시작
-SOUTH_Y0, SOUTH_Y1 = 1260, 1680      # 남쪽 특별실동(위 복도 1140~1260)
-BOT_Y0, BOT_Y1 = 1860, 2220          # 하단 띠 — 아래쪽 외벽에 밀착
-STAIR_B = (1450, 1860, 1890, 2180)   # 중앙 하단 계단실 (2~3층 동일)
+#
+# **#710에서 그 140px도 없앴다** — 폭 2280 중 다리 220px만 걸을 수 있고 나머지는
+# 봉인된 빈 칸이었다(층마다 약 0.29M px²). 중간 띠 바로 아래에서 남쪽 복도가
+# 시작하고, 남북 통로는 중간 띠 오른쪽 접근로(x 1640~1920)가 곧장 잇는다.
+# **남쪽 복도는 120 → 180px**(북쪽 복도와 같다). 위쪽이 공백 벽에서 방 벽으로
+# 바뀌어 복도 양쪽에 사물함이 붙고 위쪽 벽 앞면(`WALL_FACE`)까지 들어오자 120px
+# 복도가 막혀 과학실1·교육실이 도달 불가가 됐다(`verify_floor_reach`가 잡았다).
+# 그래서 아래 띠는 80px만 올라갔다. 높이가 0이면 공백 벽·다리 벽·메움을 안 낸다
+# (`has_void_band()`) — 되살리려면 값만 돌려놓으면 된다.
+BRIDGE_Y0, BRIDGE_Y1 = 1000, 1000    # 위=중간 띠 아래, 아래=남쪽 복도(높이 0 = 없음)
+VOID_Y1 = BRIDGE_Y1                  # 공백 구역(건물 밖) 하단 = 남쪽 복도 시작
+SOUTH_Y0, SOUTH_Y1 = 1180, 1600      # 남쪽 특별실동(위 복도 1000~1180)
+BOT_Y0, BOT_Y1 = 1780, 2140          # 하단 띠 — 지금은 이 띠를 쓰는 층이 없다
+STAIR_B = (1450, 1780, 1890, 2100)   # 중앙 하단 계단실 — 2층(#398)·3층(#710) 다 없다
 
 # 북쪽 교실: 칸 수에 맞춰 폭을 자동 계산해 EDGE~W-EDGE를 꽉 채운다.
 # pitch = (span+gap)/count 로 두면 마지막 칸 오른쪽 끝이 정확히 W-EDGE에 떨어진다.
@@ -478,7 +489,9 @@ LAYOUT = {
         "north": ["1반", "2반", "3반", "생활지도부", "2학년부", "4반"],
         "south_left": [("Class6", "6반", 20, 720), ("CareerDept", "진로진학부", 750, 1640)],
         "south_right": [("ScienceLab1", "과학실1", 1920, 2260)],
-        "bottom_left": [("CareerRoom", "진로실", 20, 1200)],
+        # 하단 띠(진로실·하단 계단 B)는 #710에서 걷어냈다 — 진로실은 단서 0개에
+        # 은신처 하나뿐이었고, 계단 B는 계단 A와 같은 2층으로 가는 두 번째 길이었다.
+        "bottom_left": [],
     },
     2: {
         "north": ["1반", "2반", "3반", "1학년부", "4반", "5반"],
@@ -1144,7 +1157,7 @@ PLACEMENT = {
 }
 # 영구 봉인 계단(열쇠로도 열리지 않음). 2층 하단 중앙 계단은 그 아래가 1층
 # 현관·중앙 구역이라 계단이 내려갈 자리가 없다 — 도면 구조를 지키려고 막는다.
-NO_STAIRWELL = {2: {1}}
+NO_STAIRWELL = {2: {1}, 3: {1}}
 
 # 각 층 계단은 그 층 열쇠로 연다. 열쇠 획득처는 PLACEMENT 참조(한 층 위에서도 얻는다).
 #
@@ -1355,8 +1368,9 @@ EXTRA_HIDING = {
          "4반 청소함. 대걸레 자루가 어깨를 누른다."),
         ("HideScienceLab1", "ScienceLab1", "chem", "약품장에 숨기",
          "약품장 아래 칸. 시큼한 냄새에 숨이 막힌다."),
-        ("HideCareerRoom", "CareerRoom", "files", "서류함에 숨기",
-         "진로실 서류함 뒤. 전단 뭉치에 등을 붙였다."),
+        # 진로실이 없어지며(#710) 남쪽 동 6반으로 옮겼다.
+        ("HideClass6", "Class6", "locker", "사물함에 숨기",
+         "6반 뒤 사물함. 문틈으로 남쪽 복도가 가늘게 보인다."),
         ("HideNorth3", "North3", "curtain", "커튼 뒤에 숨기",
          "창가 커튼 뒤. 유리에 닿은 등이 서늘하다."),
         ("HideStorageR", "StorageR", "files", "적재함에 숨기",
@@ -3295,7 +3309,9 @@ def add_infill(sc, fl, spec):
             fill_band_gap(sc, f"GapMid{i}", gx0, gx1, MID_Y0, MID_Y1)
 
     # 중앙다리 본체 — BridgeL/R 벽으로 이미 둘러싸여 있으니 마루만 깐다.
-    ground_band_gap(sc, "Bridge", BRIDGE_X0, BRIDGE_X1, BRIDGE_Y0, BRIDGE_Y1)
+    # 공백 띠가 없으면(#710) 접근로가 곧장 남쪽 복도에 닿아 낼 것이 없다.
+    if has_void_band():
+        ground_band_gap(sc, "Bridge", BRIDGE_X0, BRIDGE_X1, BRIDGE_Y0, BRIDGE_Y1)
 
     # 남쪽 특별실동 — 다리에서 아래 복도로 이어지는 구간만 통로다.
     # **하단 띠가 없는 층은 그 구간도 막는다**(#702) — 이어질 하단 복도가 없어
@@ -3329,6 +3345,11 @@ def add_infill(sc, fl, spec):
     # 계단실을 없앤 층은 위에서 띠 전체를 메웠으므로 여기서 또 낼 것이 없다.
     if 1 not in gone:
         fill_band_gap(sc, "GapStairB", STAIR_B[0], STAIR_B[2], STAIR_B[3], BOT_Y1)
+
+
+def has_void_band():
+    """중간 띠와 남쪽 복도 사이에 공백 띠(건물 밖)가 있는가(#710에서 없앴다)."""
+    return BRIDGE_Y1 > BRIDGE_Y0
 
 
 def has_bottom_band(fl, spec):
@@ -3447,18 +3468,18 @@ def build_common(fl, spec):
     if fl in LOCKED:
         add_stair_locks(sc, fl, LOCKED[fl], [STAIR_A, STAIR_B])
 
-    # 공백 구역(건물 밖) 봉인 — 중앙다리 폭만 열어 둔다.
-    # 위 경계: 왼쪽은 수평, 오른쪽은 중간 띠와 같은 기울기.
-    sc.wall("VoidTopL", rect(0, MID_Y1, BRIDGE_X0, MID_Y1 + T))
-    sc.wall("VoidTopR", rect(BRIDGE_X1, MID_Y1, W - EDGE, MID_Y1 + T))
-    # 아래 경계: 남쪽 복도와 맞닿는 수평선
-    sc.wall("VoidBotL", rect(0, VOID_Y1 - T, BRIDGE_X0, VOID_Y1))
-    sc.wall("VoidBotR", rect(BRIDGE_X1, VOID_Y1 - T, W - EDGE, VOID_Y1))
-
-    # 공백 구역 내부를 메워 통행 후보에서 뺀다(수위 스폰 방지)
-    fill_void(sc, "VoidFillL", 0, BRIDGE_X0 - T, lambda x: MID_Y1 + T, VOID_Y1 - T)
-    fill_void(sc, "VoidFillR", BRIDGE_X1 + T, W - EDGE,
-              lambda x: MID_Y1 + T, VOID_Y1 - T)
+    # 공백 구역(건물 밖) 봉인 — 중앙다리 폭만 열어 둔다. #710에서 공백 띠를
+    # 없앴으므로 지금은 아무것도 안 낸다(`has_void_band()`).
+    if has_void_band():
+        sc.wall("VoidTopL", rect(0, MID_Y1, BRIDGE_X0, MID_Y1 + T))
+        sc.wall("VoidTopR", rect(BRIDGE_X1, MID_Y1, W - EDGE, MID_Y1 + T))
+        # 아래 경계: 남쪽 복도와 맞닿는 수평선
+        sc.wall("VoidBotL", rect(0, VOID_Y1 - T, BRIDGE_X0, VOID_Y1))
+        sc.wall("VoidBotR", rect(BRIDGE_X1, VOID_Y1 - T, W - EDGE, VOID_Y1))
+        # 공백 구역 내부를 메워 통행 후보에서 뺀다(수위 스폰 방지)
+        fill_void(sc, "VoidFillL", 0, BRIDGE_X0 - T, lambda x: MID_Y1 + T, VOID_Y1 - T)
+        fill_void(sc, "VoidFillR", BRIDGE_X1 + T, W - EDGE,
+                  lambda x: MID_Y1 + T, VOID_Y1 - T)
 
     # 복도 오른쪽 끝 마개 — 오른쪽 교실을 걷어내고 폭을 줄이면서 복도가 마루만
     # 깔린 채 열려 끝났다. 방 동쪽 벽(W-EDGE-T ~ W-EDGE)과 같은 선에 벽을 세운다.
@@ -3470,9 +3491,10 @@ def build_common(fl, spec):
     for cy0, cy1, cx1 in ends:
         sc.wall(f"CorridorEnd_{int(cy0)}", rect(cx1 - T, cy0, cx1, cy1))
 
-    # 중앙다리 — 좌·우 벽
-    sc.wall("BridgeL", rect(BRIDGE_X0 - T, BRIDGE_Y0, BRIDGE_X0, BRIDGE_Y1))
-    sc.wall("BridgeR", rect(BRIDGE_X1, BRIDGE_Y0, BRIDGE_X1 + T, BRIDGE_Y1))
+    # 중앙다리 — 좌·우 벽(공백 띠가 있을 때만)
+    if has_void_band():
+        sc.wall("BridgeL", rect(BRIDGE_X0 - T, BRIDGE_Y0, BRIDGE_X0, BRIDGE_Y1))
+        sc.wall("BridgeR", rect(BRIDGE_X1, BRIDGE_Y0, BRIDGE_X1 + T, BRIDGE_Y1))
 
     # 남쪽 동
     for key, lb, x0, x1 in spec["south_left"] + spec["south_right"]:
