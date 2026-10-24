@@ -1,0 +1,116 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/journal_panel.gd" id="1_journal_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/YeonSung-Regular.ttf" id="2_title_font"]
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSansKR-VF.ttf" id="3_body_font"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_paper"]
+bg_color = Color(0.09, 0.085, 0.08, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.36, 0.33, 0.28, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="JournalPanel" type="CanvasLayer"]
+process_mode = 3
+; 일시정지 메뉴(4)와 같은 층 — HUD·UI(FadeRect)가 3이라 그 위에 온다.
+layer = 4
+script = ExtResource("1_journal_script")
+
+[node name="Root" type="Control" parent="."]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dim" type="ColorRect" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.02, 0.03, 0.72)
+
+[node name="Paper" type="PanelContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -520.0
+offset_top = -380.0
+offset_right = 520.0
+offset_bottom = 380.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_paper")
+
+[node name="Margin" type="MarginContainer" parent="Root/Paper"]
+layout_mode = 2
+theme_override_constants/margin_left = 44
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 44
+theme_override_constants/margin_bottom = 22
+
+[node name="Rows" type="VBoxContainer" parent="Root/Paper/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Title" type="Label" parent="Root/Paper/Margin/Rows"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91, 0.86, 0.75, 1)
+theme_override_fonts/font = ExtResource("2_title_font")
+theme_override_font_sizes/font_size = 46
+text = "이설의 수첩"
+
+[node name="Scroll" type="ScrollContainer" parent="Root/Paper/Margin/Rows"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Text" type="RichTextLabel" parent="Root/Paper/Margin/Rows/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/normal_font = ExtResource("3_body_font")
+theme_override_font_sizes/normal_font_size = 20
+theme_override_constants/line_separation = 6
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+autowrap_mode = 3
+
+[node name="Hint" type="Label" parent="Root/Paper/Margin/Rows"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.5, 0.48, 0.44, 1)
+theme_override_fonts/font = ExtResource("3_body_font")
+theme_override_font_sizes/font_size = 17
+text = "[W/S] 넘기기     [J] 닫기"
+horizontal_alignment = 2
+
+[node name="Toast" type="Label" parent="."]
+; 새 내용이 적혔다는 알림 — 오른쪽 위 목표·소지품 상자(HUD TopRight, y 16~86) 바로 아래.
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -420.0
+offset_top = 98.0
+offset_right = -18.0
+offset_bottom = 128.0
+grow_horizontal = 0
+theme_override_colors/font_color = Color(0.85, 0.64, 0.25, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_fonts/font = ExtResource("3_body_font")
+theme_override_font_sizes/font_size = 19
+text = "수첩에 적었다  [J]"
+horizontal_alignment = 2

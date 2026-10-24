@@ -2921,7 +2921,7 @@ def add_room_fixtures(sc, key, kind, x0, x1, topf, botf, door, keepout, units):
                 cursor += w + 8
 
 
-def add_props(sc, corridors=()):
+def add_props(sc, corridors=(), x1_of=None):
     """방마다 종류에 맞는 집기를 깔고, 복도 벽에 비품을 붙인다.
 
     add_story·add_hiding 뒤에 불러야 한다 — 단서·은신처 좌표(sc.clue_pts)가
@@ -2974,19 +2974,25 @@ def add_props(sc, corridors=()):
             sc.prop(f"{key}_{i}", rect(rx0, ry0, rx1, ry1), color)
         add_room_fixtures(sc, key, kind, x0, x1, topf, botf, door, keepout, rects)
 
-    add_corridor_props(sc, corridors)
+    add_corridor_props(sc, corridors, x1_of)
 
 
-def add_corridor_props(sc, corridors):
+def add_corridor_props(sc, corridors, x1_of=None):
     """복도 벽마다 사물함·게시판·소화기를 붙인다.
 
     복도가 맨바닥이라 층을 내려가도 같은 회색 통로만 보였다. 사물함은 실체가
     있어 시야도 조금 가리고, 게시판·소화기는 충돌이 없어 통행에 영향이 없다.
+
+    `x1_of`는 `add_ground`와 같은 **복도 오른쪽 끝**이다(#702). 그 너머 방 벽은
+    잘린 복도(실체)에 맞닿으므로 아무것도 붙이지 않는다 — 안 그러면 사물함이
+    벽 속에 선다(`verify_props`가 잡았다).
     """
+    x1_of = x1_of or {}
     for cy0, cy1 in corridors:
         seat = 0          # 벽면 순번 — 몇 칸에 하나씩 정수기를 둔다
+        cx_end = x1_of.get(cy0, W - EDGE)
         for key, (label, door, x0, x1, topf, botf) in sc.room_meta.items():
-            if not label:
+            if not label or x0 >= cx_end:
                 continue
             cx = (x0 + x1) / 2
             door_gap = (cx - DOOR / 2 - CORR_DOOR_PAD, cx + DOOR / 2 + CORR_DOOR_PAD)
@@ -3110,7 +3116,7 @@ PLANK_SEAM = 2        # 널 이음매 두께
 PLANK_JOINT = 560     # 널 이음매 간격(줄마다 엇갈림)
 
 
-def add_ground(sc, corridors):
+def add_ground(sc, corridors, x1_of=None):
     """복도 바닥을 깐다.
 
     Rooms보다 먼저 선언된 Ground 아래에 들어가므로 방 바닥이 이 위에 덮인다 —
@@ -3119,9 +3125,14 @@ def add_ground(sc, corridors):
     널 선은 **폴리곤이 아니라 `floor_board` 무늬가 낸다**(#268). #242는 64px마다
     Polygon2D로 그렸는데, 널을 직각으로 돌리자 층당 150개가 넘게 생겨 노드
     예산을 넘겼다. 무늬로 옮기니 노드 0개에 타일 격자(32px)와도 정확히 맞는다.
+
+    `x1_of`는 **복도 위쪽 y → 오른쪽 끝**이다(#702). 앞에 아무것도 없는 막다른
+    꼬리를 자를 때 쓴다 — 잘린 자리는 `add_infill`이 실체로 메운다.
     """
+    x1_of = x1_of or {}
     for cy0, cy1 in corridors:
-        sc.ground(f"Corridor_{int(cy0)}", rect(EDGE, cy0, W - EDGE, cy1),
+        cx1 = x1_of.get(cy0, W - EDGE)
+        sc.ground(f"Corridor_{int(cy0)}", rect(EDGE, cy0, cx1, cy1),
                   C_CORRIDOR)
 
 
@@ -3197,12 +3208,25 @@ def add_infill(sc, fl, spec):
     ground_band_gap(sc, "Bridge", BRIDGE_X0, BRIDGE_X1, BRIDGE_Y0, BRIDGE_Y1)
 
     # 남쪽 특별실동 — 다리에서 아래 복도로 이어지는 구간만 통로다.
+    # **하단 띠가 없는 층은 그 구간도 막는다**(#702) — 이어질 하단 복도가 없어
+    # 420px짜리 막다른 길이 된다(2층 미리보기에서 보였다).
+    bottom = has_bottom_band(fl, spec)
     south = [(x0, x1) for _, _, x0, x1 in spec["south_left"] + spec["south_right"]]
     for i, (gx0, gx1) in enumerate(gaps_in(south, EDGE, W - EDGE)):
-        if bridge_lane(gx0, gx1):
+        if bottom and bridge_lane(gx0, gx1):
             ground_band_gap(sc, f"SouthLane{i}", gx0, gx1, SOUTH_Y0, SOUTH_Y1)
         else:
             fill_band_gap(sc, f"GapSouth{i}", gx0, gx1, SOUTH_Y0, SOUTH_Y1)
+
+    # 하단 띠가 없는 층(#702)은 캔버스가 남쪽 특별실동 바로 아래에서 끝난다 —
+    # 메울 띠도, 하단 복도도 없다.
+    if not has_bottom_band(fl, spec):
+        return
+
+    # 하단 복도의 잘린 꼬리(#702) — 앞에 아무것도 없는 막다른 복도였던 자리.
+    bot_end = bottom_corridor_end(fl, spec)
+    if bot_end < W - EDGE:
+        fill_band_gap(sc, "GapBotCorridor", bot_end, W - EDGE, SOUTH_Y1, BOT_Y0)
 
     # 하단 띠 — 방과 계단실 B 사이의 빈 구간(전부 막다른 곳).
     # 계단실을 없앤 층(#398)은 그 x 구간도 빈 것으로 넘겨 실체로 메운다.
@@ -3217,11 +3241,46 @@ def add_infill(sc, fl, spec):
         fill_band_gap(sc, "GapStairB", STAIR_B[0], STAIR_B[2], STAIR_B[3], BOT_Y1)
 
 
+def has_bottom_band(fl, spec):
+    """하단 띠에 쓸모가 있는가 — 방이나 계단실 B가 하나라도 있어야 한다(#702).
+
+    2층은 하단 왼쪽 방이 원래 없고, 하단 계단실은 #398에서, 하단 오른쪽
+    화장실은 #692에서 없어져 **하단 복도(2240px)와 하단 띠가 아무것도 안 잇는
+    채로** 남았다. 그 복도의 유일한 쓰임은 3층 하단 계단의 착지점이었는데,
+    그것은 `floor_manager.ARRIVE_OVERRIDE`가 남쪽 복도로 옮긴다.
+    """
+    return bool(spec["bottom_left"] or BOTTOM_RIGHT) \
+        or 1 not in NO_STAIRWELL.get(fl, set())
+
+
+def floor_height(fl, spec):
+    """층 캔버스 높이. 하단 띠가 없으면 남쪽 특별실동 바로 아래에서 끝난다(#702).
+
+    `floor_manager.FLOOR_BOUNDS`가 같은 값을 쥐어야 한다 — 어긋나면
+    `verify_floor_reach.check_camera`가 잡는다.
+    """
+    return H if has_bottom_band(fl, spec) else SOUTH_Y1 + EDGE
+
+
+def bottom_corridor_end(fl, spec):
+    """하단 복도의 오른쪽 끝(#702). 그 너머 앞에 아무것도 없으면 자른다.
+
+    3층은 하단 오른쪽 방이 없어(#692) 계단실 B(x ~1890) 너머 370px이 문 하나
+    없는 막다른 복도였다. 하단 방과 계단실 B 중 가장 오른쪽 것까지만 깐다.
+    """
+    ends = [x1 for _, _, _x0, x1 in spec["bottom_left"] + BOTTOM_RIGHT]
+    if 1 not in NO_STAIRWELL.get(fl, set()):
+        ends.append(STAIR_B[2])
+    return max(ends) if ends else W - EDGE
+
+
 def build_common(fl, spec):
     sc = Scene()
     sc.floor_no = fl
+    hf = floor_height(fl, spec)
+    bottom = has_bottom_band(fl, spec)
     sc.rect_shapes = [("RectangleShape2D_wall_h", f"Vector2({W}, 40)"),
-                      ("RectangleShape2D_wall_v", f"Vector2(40, {H})")]
+                      ("RectangleShape2D_wall_v", f"Vector2(40, {hf})")]
     sc.rect_shapes += [("RectangleShape2D_stair_zone", "Vector2(240, 56)"),
                        ("RectangleShape2D_key_zone", "Vector2(48, 48)"),
                        # 근접 클로즈업(#451) — 조사 존(48)보다 훨씬 넓다.
@@ -3232,7 +3291,7 @@ def build_common(fl, spec):
                        f"Vector2({EXAMINE_ZONE[0]}, {EXAMINE_ZONE[1]})")]
 
     sc.node('[node name="SchoolFloor" type="Node2D"]\n' + TEX_FLAGS)
-    sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, W, H))
+    sc.poly2d("Floor", ".", C_FLOOR, rect(0, 0, W, hf))
     sc.node('[node name="Ground" type="Node2D" parent="."]\n')
     sc.node('[node name="WallGlow" type="CanvasLayer" parent="."]\n'
             'layer = 1\nfollow_viewport_enabled = true\n')
@@ -3313,8 +3372,13 @@ def build_common(fl, spec):
 
     # 복도 오른쪽 끝 마개 — 오른쪽 교실을 걷어내고 폭을 줄이면서 복도가 마루만
     # 깔린 채 열려 끝났다. 방 동쪽 벽(W-EDGE-T ~ W-EDGE)과 같은 선에 벽을 세운다.
-    for cy0, cy1 in ((NORTH_Y1, MID_Y0), (VOID_Y1, SOUTH_Y0), (SOUTH_Y1, BOT_Y0)):
-        sc.wall(f"CorridorEnd_{int(cy0)}", rect(W - EDGE - T, cy0, W - EDGE, cy1))
+    # 하단 복도는 **그 너머 앞에 아무것도 없으면 일찍 끝난다**(#702).
+    bot_end = bottom_corridor_end(fl, spec)
+    ends = [(NORTH_Y1, MID_Y0, W - EDGE), (VOID_Y1, SOUTH_Y0, W - EDGE)]
+    if bottom:
+        ends.append((SOUTH_Y1, BOT_Y0, bot_end))
+    for cy0, cy1, cx1 in ends:
+        sc.wall(f"CorridorEnd_{int(cy0)}", rect(cx1 - T, cy0, cx1, cy1))
 
     # 중앙다리 — 좌·우 벽
     sc.wall("BridgeL", rect(BRIDGE_X0 - T, BRIDGE_Y0, BRIDGE_X0, BRIDGE_Y1))
@@ -3330,14 +3394,17 @@ def build_common(fl, spec):
     add_furniture(sc, fl)
     add_story(sc, fl)
     add_hiding(sc, fl)
-    corridors = [(NORTH_Y1, MID_Y0), (VOID_Y1, SOUTH_Y0), (SOUTH_Y1, BOT_Y0)]
-    add_ground(sc, corridors)
+    corridors = [(NORTH_Y1, MID_Y0), (VOID_Y1, SOUTH_Y0)]
+    if bottom:
+        corridors.append((SOUTH_Y1, BOT_Y0))
+    # 하단 복도만 일찍 끝날 수 있다(#702) — 나머지는 캔버스 폭 그대로.
+    add_ground(sc, corridors, x1_of={SOUTH_Y1: bot_end})
     add_infill(sc, fl, spec)
-    add_props(sc, corridors)
+    add_props(sc, corridors, x1_of={SOUTH_Y1: bot_end})
     add_clutter(sc)
     add_examine(sc)
     add_sliding_doors(sc)
-    add_outer(sc)
+    add_outer(sc, W, hf)
     return sc
 
 
