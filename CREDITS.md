@@ -29,7 +29,7 @@
 
 | 게임 안 파일 | 쓰는 곳 | 원본 | 제작자 | 조건 |
 |---|---|---|---|---|
-| `assets/sprites/ext/hs_*.png` | 2·3층 교실 학생 자리·교탁, 교무실·부서실 책상 섬(#717), 단서 그림 13개(#723), 방·복도 바닥 7종(#725, `Inside_A2.png`), 벽 앞면(#727, `Inside_A4.png`) | [Haunted School Tiles - RMMZ](https://thurraya.itch.io/haunted-school-rpmmz) `Inside_B.png` | Thurraya | CC BY-NC 4.0 — 비상업 사용, 원본 그대로 재배포·재판매 금지, AI·LLM 학습·NFT 사용 금지, 크레딧 선택 |
+| `assets/sprites/ext/hs_*.png` | 2·3층 교실 학생 자리·교탁, 교무실·부서실 책상 섬(#717), 단서 그림 13개(#723), 방 바닥 5종(#725, `Inside_A2.png` — 교무실·수위실·화장실·창고 등), 벽 앞면(#727, `Inside_A4.png`) | [Haunted School Tiles - RMMZ](https://thurraya.itch.io/haunted-school-rpmmz) `Inside_B.png` | Thurraya | CC BY-NC 4.0 — 비상업 사용, 원본 그대로 재배포·재판매 금지, AI·LLM 학습·NFT 사용 금지, 크레딧 선택 |
 
 - 원본 시트는 저장소에 넣지 않는다. 쓰는 칸만 잘라 넣는다(`tools/import_ext_sprites.py --haunted`).
   게임에서는 1배(그림 1칸 = 월드 1px)로 놓는다.

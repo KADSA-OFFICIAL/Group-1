@@ -9,6 +9,7 @@
 [ext_resource type="Script" path="res://scripts/game/art_room_intro.gd" id="12_artintro"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_cement.png" id="tex_floor_cement"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_matte.png" id="tex_floor_matte"]
+[ext_resource type="Texture2D" path="res://assets/tiles/floor_wood.png" id="tex_floor_wood"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_bin.png" id="tex_obj_bin"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_bust.png" id="tex_obj_bust"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_canvas.png" id="tex_obj_canvas"]
@@ -28,7 +29,6 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_bag_spilled.png" id="ext_hs_bag_spilled"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_book_purple.png" id="ext_hs_book_purple"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_calendar.png" id="ext_hs_calendar"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_floor_planks.png" id="ext_hs_floor_planks"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_wall_face.png" id="ext_hs_wall_face"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/painting_dark.png" id="ext_painting_dark"]
 [ext_resource type="Texture2D" path="res://assets/sprites/janitor_sheet.png" id="18_janitor"]
@@ -146,8 +146,8 @@ full_distance = 300.0
 [node name="PropBodies" type="StaticBody2D" parent="."]
 
 [node name="ArtRoom" type="Polygon2D" parent="Rooms"]
-texture = ExtResource("ext_hs_floor_planks")
-color = Color(0.33, 0.31, 0.3, 1)
+texture = ExtResource("tex_floor_wood")
+color = Color(0.1949, 0.159, 0.1179, 1)
 polygon = PackedVector2Array(20, 20, 1136, 20, 1136, 880, 20, 880)
 
 [node name="L_ArtRoom" type="Label" parent="WallGlow/Labels"]
@@ -163,8 +163,8 @@ text = "미술실"
 horizontal_alignment = 1
 
 [node name="ArtPrep" type="Polygon2D" parent="Rooms"]
-texture = ExtResource("ext_hs_floor_planks")
-color = Color(0.33, 0.31, 0.3, 1)
+texture = ExtResource("tex_floor_wood")
+color = Color(0.1949, 0.159, 0.1179, 1)
 polygon = PackedVector2Array(1120, 20, 1780, 20, 1780, 880, 1120, 880)
 
 [node name="L_ArtPrep" type="Label" parent="WallGlow/Labels"]

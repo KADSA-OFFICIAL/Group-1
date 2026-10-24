@@ -7,6 +7,7 @@
 [ext_resource type="Script" path="res://scripts/interactions/sliding_door.gd" id="6_sliding"]
 [ext_resource type="Script" path="res://scripts/game/room_lights.gd" id="7_roomlights"]
 [ext_resource type="Script" path="res://scripts/game/interact_marks.gd" id="8_marks"]
+[ext_resource type="Texture2D" path="res://assets/tiles/floor_board.png" id="tex_floor_board"]
 [ext_resource type="Texture2D" path="res://assets/tiles/floor_cement.png" id="tex_floor_cement"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_bed.png" id="tex_obj_bed"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_bin.png" id="tex_obj_bin"]
@@ -32,7 +33,6 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/globe.png" id="ext_globe"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/grandfather_clock.png" id="ext_grandfather_clock"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_floor_herringbone.png" id="ext_hs_floor_herringbone"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_floor_planks_h.png" id="ext_hs_floor_planks_h"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_floor_stone.png" id="ext_hs_floor_stone"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_floor_tile_white.png" id="ext_hs_floor_tile_white"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_floor_worn.png" id="ext_hs_floor_worn"]
@@ -1882,8 +1882,8 @@ color = Color(0.2436, 0.2179, 0.1923, 1)
 polygon = PackedVector2Array(1180, 1000, 1360, 1000, 1360, 1044, 1180, 1044)
 
 [node name="G_Corridor_540" type="Polygon2D" parent="Ground"]
-texture = ExtResource("ext_hs_floor_planks_h")
-color = Color(0.3, 0.28, 0.27, 1)
+texture = ExtResource("tex_floor_board")
+color = Color(0.2513, 0.2051, 0.1538, 1)
 polygon = PackedVector2Array(20, 540, 2260, 540, 2260, 720, 20, 720)
 
 [node name="PC_NurseRoom_0" type="CollisionPolygon2D" parent="PropBodies"]
