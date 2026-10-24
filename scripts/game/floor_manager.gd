@@ -40,6 +40,9 @@ const YARD_ARRIVE := Vector2(1700, 380)
 const FLOOR_BOUNDS := {
 	0: Rect2(0, 0, 3400, 1700),
 	1: Rect2(0, 0, 2280, 1500),   # 현관 로비 층(#498, #554) — 가로 2280px로 콤팩트 축소
+	# 2층(#702) — 하단 띠가 비어 있어(방·계단실 B 없음) 남쪽 특별실동 아래에서 끝난다.
+	# `gen_floors.floor_height()`와 같아야 한다(`verify_floor_reach.check_camera`).
+	2: Rect2(0, 0, 2280, 1700),
 	4: Rect2(0, 0, 1800, 1000),   # 도입부(#405) — 두 방뿐이라 훨씬 작다
 }
 const DEFAULT_BOUNDS := Rect2(0, 0, 2280, 2240)  # 2·3층 — 폭은 오른쪽 교실을 걷어내(#692), 높이는 방 없는 중앙다리 띠를 줄여(#691)
@@ -107,7 +110,22 @@ func _stair_zone(r: Rect2, up: bool) -> Rect2:
 
 ## 도착 지점은 "목표 층"의 계단실 기준으로 잡는다. 층마다 계단 수가 달라
 ## (1층은 1곳) 인덱스가 없으면 마지막 계단으로 떨어진다.
+## 계단 착지점 예외(#702). `Vector2i(도착 층, 계단 순번) → 자리`.
+##
+## 2층은 하단 계단실(#398)도 하단 띠(#702)도 없다. 3층 하단 계단(StairB)으로 내려오면
+## 예전처럼 `STAIR_B` 위쪽 (1611, 1832)에 내렸는데 — 그 자리가 **문 하나 없는
+## 2240px 하단 복도**였고, 그 복도를 걷어내자 2층 캔버스(높이 1700) 밖이 됐다.
+## 그 복도가 이어지던 유일한 출구, **남쪽 복도의 중앙다리 접속부**에 내린다.
+## `verify_stairs`가 이 자리가 그 층 캔버스 안·벽 밖인지 본다.
+const ARRIVE_OVERRIDE := {
+	Vector2i(2, 1): Vector2(1780, 1200),
+}
+
+
 func _arrive_on(target: int, index: int, up: bool) -> Vector2:
+	var key := Vector2i(target, index)
+	if ARRIVE_OVERRIDE.has(key):
+		return ARRIVE_OVERRIDE[key]
 	var list: Array = STAIRS[target]
 	var r: Rect2 = list[min(index, list.size() - 1)]
 	var mid := r.position.x + r.size.x / 2.0
