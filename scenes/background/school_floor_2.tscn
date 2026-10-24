@@ -1,4 +1,4 @@
-[gd_scene load_steps=143 format=3]
+[gd_scene load_steps=145 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/locked_door.gd" id="1_locked_door"]
 [ext_resource type="Script" path="res://scripts/interactions/pickup_item.gd" id="2_pickup"]
@@ -28,13 +28,15 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_grain.png" id="tex_prop_grain"]
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_metal.png" id="tex_prop_metal"]
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/books_pile.png" id="ext_books_pile"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_book_open.png" id="ext_hs_book_open"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_locker.png" id="ext_hs_locker"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_locker_open.png" id="ext_hs_locker_open"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_office_desk_down.png" id="ext_hs_office_desk_down"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_office_desk_up.png" id="ext_hs_office_desk_up"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_paper_crumpled.png" id="ext_hs_paper_crumpled"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_student_desk.png" id="ext_hs_student_desk"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_teacher_desk.png" id="ext_hs_teacher_desk"]
-[ext_resource type="Texture2D" path="res://assets/sprites/note.png" id="10_note"]
 [ext_resource type="Texture2D" path="res://assets/sprites/eye_key.png" id="15_eyekey"]
 [ext_resource type="Texture2D" path="res://assets/sprites/head_top.png" id="16_headtop"]
 
@@ -2197,8 +2199,8 @@ grants_flag = "found_kangyujin"
 [node name="YujinClueVisual" type="Sprite2D" parent="YujinClue"]
 z_index = 1
 texture_filter = 1
-texture = ExtResource("10_note")
-
+texture = ExtResource("ext_hs_paper_crumpled")
+scale = Vector2(2, 2)
 
 [node name="YujinClueZone" type="CollisionShape2D" parent="YujinClue"]
 shape = SubResource("RectangleShape2D_key_zone")
@@ -2223,8 +2225,8 @@ grants_flag = "read_crisis_manual"
 [node name="CrisisManualVisual" type="Sprite2D" parent="CrisisManual"]
 z_index = 1
 texture_filter = 1
-texture = ExtResource("10_note")
-
+texture = ExtResource("ext_books_pile")
+scale = Vector2(2, 2)
 
 [node name="CrisisManualZone" type="CollisionShape2D" parent="CrisisManual"]
 shape = SubResource("RectangleShape2D_key_zone")
@@ -2249,8 +2251,8 @@ grants_flag = "read_siwoo_past"
 [node name="HistoryClueVisual" type="Sprite2D" parent="HistoryClue"]
 z_index = 1
 texture_filter = 1
-texture = ExtResource("10_note")
-
+texture = ExtResource("ext_hs_book_open")
+scale = Vector2(2, 2)
 
 [node name="HistoryClueZone" type="CollisionShape2D" parent="HistoryClue"]
 shape = SubResource("RectangleShape2D_key_zone")
