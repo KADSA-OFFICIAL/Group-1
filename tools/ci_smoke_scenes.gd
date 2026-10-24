@@ -591,15 +591,22 @@ func _check_artroom_intro() -> void:
 			_fault("도입부 3막: 책이 없는데 국어책 표시가 안 뜬다(5초 대기)")
 		else:
 			_ok("도입부 3막 국어책 화면 표시")
-		# 챙기면 표시가 걷힌다 — 가방에 있는 것을 계속 가리키면 안 된다.
+		# 챙기면 표시가 **창문으로 옮겨 간다**(#700). 가방에 있는 것을 계속 가리키면
+		# 안 되고(#477), 걷기만 하면 다음 목표를 화면에서 못 찾는다 — 예전에는 3막이
+		# 창문을 한 번도 가리키지 않았다.
 		bg.get_node("KoreanBook").call("interact", player)
 		await process_frame
+		var win_pos: Vector2 = win.global_position if win != null else Vector2.INF
 		if not bool(gs.call("has_item", need)):
 			_fault("도입부 3막: 국어책을 조사했는데 가방에 안 들어왔다")
-		elif wp != null and not await _until(func() -> bool: return not wp.visible, 5.0):
-			_fault("도입부 3막: 국어책을 챙겼는데 표시가 안 사라진다")
+		elif wp == null:
+			_fault("도입부 3막: HUD에 Waypoint가 없다")
+		elif not await _until(func() -> bool:
+				return wp.visible and Vector2(wp.get("_target")).distance_to(win_pos) < 4.0, 5.0):
+			_fault("도입부 3막: 국어책을 챙겼는데 표시가 창문으로 안 옮겨 간다 (보임 %s, 목표 %s, 창문 %s)"
+				% [wp.visible, wp.get("_target"), win_pos])
 		else:
-			_ok("도입부 3막 국어책 챙긴 뒤 표시 정리")
+			_ok("도입부 3막 국어책 챙긴 뒤 표시가 창문으로")
 
 	# ── 창문으로 내려가기 시작하면 유예가 끊긴다(#472) ─────────────
 	# 컷신(#468)이 도는 18초 동안에도 4층 씬은 살아 있어 유예(20초)가 계속 돌았고,
@@ -705,6 +712,29 @@ func _check_artroom_intro() -> void:
 		else:
 			_ok("창문 컷신: 대사 끝 %.2f초 뒤 전환 (전체 %.1f초)"
 				% [(travel_at - drained_at) / 1000.0, (travel_at - t0) / 1000.0])
+
+		# ── 3층에 내려선 뒤 위층에서 수위가 돌아온다(#700) ──────────
+		# 원문(story.md 3-5)의 마지막 대사. **페이드 중에 나오면 안 보인다** —
+		# `UI`(FadeRect)가 `HUD`와 같은 layer 3인데 뒤에 선언돼 위로 온다.
+		# 그래서 대사가 나온 순간 층 전환이 끝나 있었는지(`changing_floor`)를 본다.
+		var gs2: Node = get_first_node_in_group("game_state")
+		if travel_at >= 0 and gs2 != null:
+			var heard := {"at_changing": true, "seen": false}
+			var on_speech := func(speaker: String, text: String, _e: String = "") -> void:
+				if speaker == "수위" and text.contains("없구만") and not heard["seen"]:
+					heard["seen"] = true
+					heard["at_changing"] = bool(main.get("changing_floor"))
+			gs2.connect("speech_requested", on_speech)
+			await _until(func() -> bool: return bool(heard["seen"]), 10.0)
+			gs2.disconnect("speech_requested", on_speech)
+			if not bool(heard["seen"]):
+				_fault("창문 하강: 3층에 내려선 뒤 수위의 '없구만'이 안 나온다(10초 대기)")
+			elif bool(heard["at_changing"]):
+				_fault("창문 하강: 도착 대사가 페이드가 걷히기 전에 나왔다 — 까만 화면 아래 깔린다")
+			elif int(main.get("current_floor")) != 3:
+				_fault("창문 하강: 도착 대사가 3층이 아닌 곳에서 나왔다 (%s층)" % main.get("current_floor"))
+			else:
+				_ok("창문 하강: 3층 도착 뒤 위층의 수위 대사")
 
 	main.free()
 	await process_frame
