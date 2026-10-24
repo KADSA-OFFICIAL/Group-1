@@ -23,8 +23,10 @@ NL = chr(10)   # 노드 블록을 줄 단위로 조립할 때 쓴다
 
 T = 16          # 벽 두께
 DOOR = 110      # 문 틈 폭
-W, H = 2280, 2240   # 캔버스 — 폭은 오른쪽 교실을 걷어내며 3400에서(#692),
-                    # 높이는 방 없는 중앙다리 띠를 줄이며 2500에서 줄였다(#691)
+W, H = 2280, 2160   # 캔버스 — 폭은 오른쪽 교실을 걷어내며 3400에서(#692),
+                    # 높이는 중앙다리 띠를 줄이고(#691) 없애며(#710) 2500에서 줄였다.
+                    # **H는 하단 띠가 있는 층의 높이다** — 지금은 그런 층이 없다
+                    # (2층 #702, 3층 #710). 실제 높이는 `floor_height()`가 정한다.
 
 C_FLOOR = "Color(0.14, 0.14, 0.16, 1)"
 C_ROOM = "Color(0.1, 0.11, 0.12, 1)"
@@ -153,6 +155,9 @@ ROOM_FLOOR = {
     "computer":  "Color(0.100, 0.108, 0.128, 1)",
     "entrance":  "Color(0.148, 0.126, 0.100, 1)",
     "janitor":   "Color(0.134, 0.112, 0.090, 1)",
+    # #708 — 보건실은 밝은 비닐 바닥, 교장실은 붉은 기 도는 카펫.
+    "nurse":     "Color(0.124, 0.136, 0.140, 1)",
+    "principal": "Color(0.132, 0.092, 0.086, 1)",
 }
 
 # 방 종류별 부속 — 규격 사각형만으로는 실험대와 선반이 크기만 다른 상자였다.
@@ -235,6 +240,8 @@ TEX = {
     ROOM_FLOOR["office"]: "floor_wood",
     ROOM_FLOOR["entrance"]: "floor_wood",
     ROOM_FLOOR["janitor"]: "floor_wood",
+    ROOM_FLOOR["nurse"]: "floor_vinyl",
+    ROOM_FLOOR["principal"]: "floor_matte",
     ROOM_FLOOR["storage"]: "floor_cement",
     ROOM_FLOOR["lab"]: "floor_vinyl",
     ROOM_FLOOR["computer"]: "floor_panel",
@@ -429,17 +436,26 @@ EDGE = 20
 NORTH_Y0, NORTH_Y1 = EDGE, 540       # 북쪽 교실동 — 위쪽 외벽에 밀착
 MID_Y0, MID_Y1 = 720, 1000           # 중간 띠(화장실·막힌공간)
 STAIR_A = (300, 720, 740, 1000)      # 좌측 계단실 — 중간 띠와 같은 높이(공백 봉인 벽과 겹치지 않게)
-BRIDGE_X0, BRIDGE_X1 = 1670, 1890    # 중앙다리(유일한 남북 통로)
+BRIDGE_X0, BRIDGE_X1 = 1670, 1890    # 중간 띠 오른쪽 남북 통로의 x(옛 중앙다리)
 # **중앙다리 띠는 140px이다**(#691에서 400에서 줄였다). 400일 때 이 띠에는 방이
 # 하나도 없고 걸을 수 있는 칸이 17.6%뿐이라, 캔버스 높이의 16%가 다리 하나를
 # 건너려고만 있었다(실측: 방 없는 구간 y 1000~1520, 520px). 남쪽 복도와 같은
 # 폭으로 줄이면 "건물 밖 공백"이라는 성격은 남고 빈 칸만 사라진다.
 # 아래 띠는 전부 260px 올라갔다.
-BRIDGE_Y0, BRIDGE_Y1 = 1000, 1140    # 위=중간 띠 아래, 아래=남쪽 복도
-VOID_Y1 = 1140                       # 공백 구역(건물 밖) 하단 = 남쪽 복도 시작
-SOUTH_Y0, SOUTH_Y1 = 1260, 1680      # 남쪽 특별실동(위 복도 1140~1260)
-BOT_Y0, BOT_Y1 = 1860, 2220          # 하단 띠 — 아래쪽 외벽에 밀착
-STAIR_B = (1450, 1860, 1890, 2180)   # 중앙 하단 계단실 (2~3층 동일)
+#
+# **#710에서 그 140px도 없앴다** — 폭 2280 중 다리 220px만 걸을 수 있고 나머지는
+# 봉인된 빈 칸이었다(층마다 약 0.29M px²). 중간 띠 바로 아래에서 남쪽 복도가
+# 시작하고, 남북 통로는 중간 띠 오른쪽 접근로(x 1640~1920)가 곧장 잇는다.
+# **남쪽 복도는 120 → 180px**(북쪽 복도와 같다). 위쪽이 공백 벽에서 방 벽으로
+# 바뀌어 복도 양쪽에 사물함이 붙고 위쪽 벽 앞면(`WALL_FACE`)까지 들어오자 120px
+# 복도가 막혀 과학실1·교육실이 도달 불가가 됐다(`verify_floor_reach`가 잡았다).
+# 그래서 아래 띠는 80px만 올라갔다. 높이가 0이면 공백 벽·다리 벽·메움을 안 낸다
+# (`has_void_band()`) — 되살리려면 값만 돌려놓으면 된다.
+BRIDGE_Y0, BRIDGE_Y1 = 1000, 1000    # 위=중간 띠 아래, 아래=남쪽 복도(높이 0 = 없음)
+VOID_Y1 = BRIDGE_Y1                  # 공백 구역(건물 밖) 하단 = 남쪽 복도 시작
+SOUTH_Y0, SOUTH_Y1 = 1180, 1600      # 남쪽 특별실동(위 복도 1000~1180)
+BOT_Y0, BOT_Y1 = 1780, 2140          # 하단 띠 — 지금은 이 띠를 쓰는 층이 없다
+STAIR_B = (1450, 1780, 1890, 2100)   # 중앙 하단 계단실 — 2층(#398)·3층(#710) 다 없다
 
 # 북쪽 교실: 칸 수에 맞춰 폭을 자동 계산해 EDGE~W-EDGE를 꽉 채운다.
 # pitch = (span+gap)/count 로 두면 마지막 칸 오른쪽 끝이 정확히 W-EDGE에 떨어진다.
@@ -473,7 +489,9 @@ LAYOUT = {
         "north": ["1반", "2반", "3반", "생활지도부", "2학년부", "4반"],
         "south_left": [("Class6", "6반", 20, 720), ("CareerDept", "진로진학부", 750, 1640)],
         "south_right": [("ScienceLab1", "과학실1", 1920, 2260)],
-        "bottom_left": [("CareerRoom", "진로실", 20, 1200)],
+        # 하단 띠(진로실·하단 계단 B)는 #710에서 걷어냈다 — 진로실은 단서 0개에
+        # 은신처 하나뿐이었고, 계단 B는 계단 A와 같은 2층으로 가는 두 번째 길이었다.
+        "bottom_left": [],
     },
     2: {
         "north": ["1반", "2반", "3반", "1학년부", "4반", "5반"],
@@ -517,38 +535,50 @@ for _spec in LAYOUT.values():
         _spec[_band] = close_gaps(_spec[_band])
 
 
-# ── 1층: 현관 로비 층 (#498) ────────────────────────────────────
+# ── 1층: 현관 로비 층 (#498, 전면 개편 #708) ─────────────────────
 # 1층은 다른 층의 축소판이 아니라 **탈출하는 층**이다. 교실을 늘리는 대신
 # 현관이 층에 들어선 순간 보이게 하고, 그 빛으로 층을 밝힌다.
 #
-# **캔버스가 다른 층(3400x2500)보다 낮다.** 도면상 1층은 아래쪽 절반만 건물이라
-# 북쪽 절반(y 0~1020, 맵의 40%)이 걸어 들어갈 수도 채울 수도 없는 봉인 공백이었다.
-# 그것을 없앴다 — 가로도 3400에서 2280px로 콤팩트 축소(#554).
+# **#708에서 도면을 통째로 다시 짰다.** 예전 하단 띠는 680px라 화장실 둘이
+# 280x680짜리 복도 같은 방이었고, 계단실 왼쪽·아래가 봉인된 빈 칸이었고,
+# 교실1·창고는 1층에서 아무 역할이 없는 큰 방이었다(단서 0개). 교장 편지는
+# "교장 책상 위"인데 교장실이 없어 교무실 한쪽에 집무 구역을 흉내 냈다.
+#   상단(520): 보건실 · 교무실 · 교장실
+#   복도(180)
+#   하단(400): 계단 · 남 · 여 화장실 · 현관 로비 · 수위실 · 창고
+# 수위실은 현관 바로 옆이다 — 실제 학교에서도 그렇고, 열쇠를 꺼내 바로 옆
+# 문으로 나가는 마지막 몇 걸음이 이 층의 긴장이다.
 # `floor_manager.FLOOR_BOUNDS[1]`이 카메라 한계를 맞춘다(`verify_floor_reach.check_camera`가 대조한다).
-F1W, F1H = 2280, 1500
+F1W, F1H = 2280, 1140
 
 # 띠 셋. **계단실은 하단 띠 안에 있고 그 위가 복도여야 한다** —
 # `floor_manager._arrive_on`이 계단실 사각형 **위쪽에서** 도착 지점을 잡으므로
 # (`r.position.y - ARRIVE_DY`) 그 자리가 복도가 아니면 벽이나 방 안에 떨어진다.
-F1_TOP_Y0, F1_TOP_Y1 = 20, 620        # 상단 방 띠 — 교실1·창고·교무실
-F1_COR_Y0, F1_COR_Y1 = 620, 800       # 복도 180px. 다른 층(160px)보다 조금 넓다
-F1_BOT_Y0, F1_BOT_Y1 = 800, 1480      # 하단 방 띠 — 계단·화장실 둘·현관 로비·수위실
-F1_STAIR_H = 320                      # 계단실 깊이. 하단 띠보다 얕아 아래에 자투리가 남는다
+F1_TOP_Y0, F1_TOP_Y1 = 20, 540        # 상단 방 띠 — 다른 층 북쪽 교실과 같은 깊이
+F1_COR_Y0, F1_COR_Y1 = 540, 720       # 복도 180px. 다른 층(160px)보다 조금 넓다
+F1_BOT_Y0, F1_BOT_Y1 = 720, 1120      # 하단 방 띠 — 680에서 400으로(#708)
+# 계단실이 하단 띠를 **꽉 채운다**(#708). 예전에는 320이라 그 아래 자투리를
+# 실체로 메웠고, 계단 왼쪽(x 20~220)도 봉인 칸이었다.
+F1_STAIR_H = F1_BOT_Y1 - F1_BOT_Y0
 
 FLOOR1 = {
     "rooms": [   # (키, 라벨, x0, y0, x1, y1, 문 위치)
-        ("Class1", "교실1", 20, F1_TOP_Y0, 640, F1_TOP_Y1, "bottom"),
-        ("Storage1", "창고", 670, F1_TOP_Y0, 1270, F1_TOP_Y1, "bottom"),
-        ("MensRoom1", "남자 화장실", 690, F1_BOT_Y0, 970, F1_BOT_Y1, "top"),
-        ("WomensRoom1", "여자 화장실", 1000, F1_BOT_Y0, 1280, F1_BOT_Y1, "top"),
-        ("Entrance", "현관", 1310, F1_BOT_Y0, 1830, F1_BOT_Y1, "top"),
-        ("JanitorRoom", "수위실", 1860, F1_BOT_Y0, 2260, F1_BOT_Y1, "top"),
+        # 보건실 — 침상 줄과 약품장. 은신처(침대 커튼·약품장)가 여기 있다.
+        ("NurseRoom", "보건실", 20, F1_TOP_Y0, 620, F1_TOP_Y1, "bottom"),
+        # 교장실 — 교장 편지가 "교장 책상 위"라 방이 곧 의미다(#708).
+        ("PrincipalRoom", "교장실", 1640, F1_TOP_Y0, 2260, F1_TOP_Y1, "bottom"),
+        ("MensRoom1", "남자 화장실", 460, F1_BOT_Y0, 720, F1_BOT_Y1, "top"),
+        ("WomensRoom1", "여자 화장실", 720, F1_BOT_Y0, 980, F1_BOT_Y1, "top"),
+        # 현관 로비 — 하단 띠 가운데. 정문은 로비 아래 외벽이다.
+        ("Entrance", "현관", 980, F1_BOT_Y0, 1560, F1_BOT_Y1, "top"),
+        ("JanitorRoom", "수위실", 1560, F1_BOT_Y0, 2000, F1_BOT_Y1, "top"),
+        ("Storage1", "창고", 2000, F1_BOT_Y0, 2260, F1_BOT_Y1, "top"),
     ],
-    # 교무실은 상단 띠 **오른쪽 끝**이다.
-    "staff": (1300, F1_TOP_Y0, 2260, F1_TOP_Y1),
-    # 1층 계단은 한 곳뿐이고 하단 띠 왼쪽이다. **`floor_manager.STAIRS[1]`과
+    # 교무실은 상단 띠 가운데다 — 계단에서 복도를 따라가면 처음 지나는 큰 방.
+    "staff": (620, F1_TOP_Y0, 1640, F1_TOP_Y1),
+    # 1층 계단은 한 곳뿐이고 하단 띠 왼쪽 끝이다. **`floor_manager.STAIRS[1]`과
     # 같은 자리여야 한다**(`verify_stairs`가 대조한다).
-    "stair": (220, F1_BOT_Y0, 660, F1_BOT_Y0 + F1_STAIR_H),
+    "stair": (20, F1_BOT_Y0, 460, F1_BOT_Y0 + F1_STAIR_H),
 }
 
 
@@ -1114,18 +1144,20 @@ PLACEMENT = {
         # 끌린 자국은 열쇠와 무관한 스토리 단서라 화장실에 남는다.
         ("MensRoomL", ["ShowerMarks"]),           # 화장실 ← 샤워실 (하단 화장실은 오른쪽 축소로 없어졌다)
         ],
-    1: [("StaffRoom", ["PrincipalLetter"]),                       # 교무실 ← 교장실
+    # 교장 편지는 **교장실**에 돌아왔다(#708) — "교장 책상 위"라는 문구 그대로다.
+    # 예전에는 1층에 교장실이 없어 교무실 한쪽에 집무 구역을 흉내 냈다.
+    1: [("PrincipalRoom", ["PrincipalLetter"]),
         ("JanitorRoom", ["PhotoWall", "StudentCards", "JanitorNotebook", "JanitorSafe"]),
         # 1층 계단 열쇠는 없앴다(#396) — 자물쇠도 같이 없어서 열 것이 없다.
         # story_objects.json의 StairKey 항목은 남겨 둔다(4층 #219와 같은 처리,
-        # 되돌리기 쉽게). 창고(← 행정실)는 그래서 단서 없는 방이 됐다.
+        # 되돌리기 쉽게).
         ("Entrance", ["ExitDoor"]),
         # YardExit + YardGateDoor 폐지(#513)
         ],
 }
 # 영구 봉인 계단(열쇠로도 열리지 않음). 2층 하단 중앙 계단은 그 아래가 1층
 # 현관·중앙 구역이라 계단이 내려갈 자리가 없다 — 도면 구조를 지키려고 막는다.
-NO_STAIRWELL = {2: {1}}
+NO_STAIRWELL = {2: {1}, 3: {1}}
 
 # 각 층 계단은 그 층 열쇠로 연다. 열쇠 획득처는 PLACEMENT 참조(한 층 위에서도 얻는다).
 #
@@ -1145,13 +1177,17 @@ LOCKED = {2: "stair_key_2", 3: "stair_key_3"}
 # 특정 단서의 위치를 방 안 자동 배치 대신 직접 지정한다.
 # 현관(ExitDoor)은 바깥으로 나가는 아래쪽 정문 앞에 둬야 안내와 실제 위치가 맞는다.
 POS_OVERRIDE = {
-    # 현관 로비 남쪽 외벽 앞(#498, #554). 정문 그림(`Door_FrontGate`) 48px 안쪽.
-    (1, "ExitDoor"): (1570, F1_BOT_Y1 - 48),
-    (1, "PrincipalLetter"): (1520, 320),
-    (1, "PhotoWall"): (1960, 846),
-    (1, "StudentCards"): (2040, 1020),
-    (1, "JanitorNotebook"): (2140, 1020),
-    (1, "JanitorSafe"): (2180, 1380),
+    # 현관 로비 남쪽 외벽 앞(#498, #708). 정문 그림(`Door_FrontGate`) 48px 안쪽.
+    (1, "ExitDoor"): (1270, F1_BOT_Y1 - 48),
+    # 교장실 책상 위(#708) — 아래 FURNITURE의 DeskPrincipal 한가운데.
+    (1, "PrincipalLetter"): (1950, 170),
+    # 수위실(1560~2000, 720~1120, 문은 위 x 1725~1835). 단서 넷을 **네 구석**으로
+    # 벌린다 — 가운데를 비워야 집기(책상·침상)와 은신처가 들어가고, 문 앞도 안 막힌다.
+    # 사진 벽은 아래쪽(안쪽) 벽에 붙고, 금고는 문에서 가장 먼 구석이다.
+    (1, "PhotoWall"): (1660, 1094),
+    (1, "StudentCards"): (1620, 800),
+    (1, "JanitorNotebook"): (1930, 800),
+    (1, "JanitorSafe"): (1950, 1070),
     # YardGateDoor 폐지(#513)
     # 4층 창의체험부(750,1520)~(1640,1940) — 자동 배치는 방 한가운데라 대사와 어긋났다(#215).
     # 액자는 "벽에 걸린" 것이므로 아래쪽 벽 안쪽에 붙이고,
@@ -1196,8 +1232,11 @@ POS_OVERRIDE = {
 # 영향을 주기 때문. 단서보다 먼저 그려서 아래에 깔린다.
 FURNITURE = {
     1: [
-        ("DeskPrincipal", 1440, 280, 1600, 360),
-        ("DeskJanitor", 2000, 980, 2180, 1060),
+        # 교장 책상(#708) — 편지가 그 위에 놓인다.
+        ("DeskPrincipal", 1870, 140, 2030, 200),
+        # 수위실 책상 둘 — 학생증 서랍과 공책이 놓인 자리.
+        ("DeskJanitorL", 1590, 776, 1660, 830),
+        ("DeskJanitorR", 1890, 776, 1970, 830),
     ],
     4: [("DeskCreativeDept", 960, 1720, 1130, 1800)],
 }
@@ -1303,6 +1342,13 @@ HIDE_POS = {
     # 준비실 왼쪽 벽 한가운데는 **연결문 틈**이다 — 기본 자리(L, 0.5)로 두면
     # 적재함이 문을 막고 선다. 오른쪽 벽 아래쪽으로 옮긴다(#405).
     (4, "HidePrepShelf"): ("R", 0.75),
+    # 1층(#708). 교장실 오른쪽 벽 위쪽은 책장 자리라 아래로 내린다.
+    (1, "HidePrincipal"): ("R", 0.78),
+    # 수위실은 단서 넷이 네 구석이라 옆벽 한가운데만 빈다.
+    (1, "HideJanitorTools"): ("R", 0.5),
+    # 보건실 — 커튼은 왼쪽 벽, 약품장은 오른쪽 벽.
+    (1, "HideNurseBed"): ("L", 0.5),
+    (1, "HideNurseCabinet"): ("R", 0.5),
 }
 # 노드 중심을 벽면에서 이만큼 띄운다(#342). **시각은 벽에 붙이고 중심만 띄운다** —
 # 도달성 격자가 벽을 플레이어 반경(10)만큼 부풀리므로 중심이 벽에 딱 붙으면
@@ -1322,8 +1368,9 @@ EXTRA_HIDING = {
          "4반 청소함. 대걸레 자루가 어깨를 누른다."),
         ("HideScienceLab1", "ScienceLab1", "chem", "약품장에 숨기",
          "약품장 아래 칸. 시큼한 냄새에 숨이 막힌다."),
-        ("HideCareerRoom", "CareerRoom", "files", "서류함에 숨기",
-         "진로실 서류함 뒤. 전단 뭉치에 등을 붙였다."),
+        # 진로실이 없어지며(#710) 남쪽 동 6반으로 옮겼다.
+        ("HideClass6", "Class6", "locker", "사물함에 숨기",
+         "6반 뒤 사물함. 문틈으로 남쪽 복도가 가늘게 보인다."),
         ("HideNorth3", "North3", "curtain", "커튼 뒤에 숨기",
          "창가 커튼 뒤. 유리에 닿은 등이 서늘하다."),
         ("HideStorageR", "StorageR", "files", "적재함에 숨기",
@@ -1346,24 +1393,26 @@ EXTRA_HIDING = {
          "세워 둔 매트 뒤. 곰팡내가 코를 막는다."),
         ("HideWomensRoomL", "WomensRoomL", "stall", "칸에 숨기",
          "가운데 칸. 문틈으로 세면대가 보인다.")],
-    1: [("HideClass1_1", "Class1", "locker", "사물함에 숨기",
-         "교실1 뒤 사물함. 문이 반쯤 어긋나 닫힌다."),
-        ("HideClass1Curtain", "Class1", "curtain", "커튼 뒤에 숨기",
-         "교실1 창가 커튼 뒤. 유리에 닿은 등이 서늘하다."),
-        ("HideEmptyRoom", "Storage1", "files", "선반에 숨기",
-         "창고 선반 아래. 먼지가 목을 긁는다."),
-        ("HideStorage1", "Storage1", "files", "적재함에 숨기",
-         "창고 적재함 뒤. 먼지가 목을 긁는다."),
+    # 1층(#708) — 방마다 하나씩, 화장실 둘·창고 둘. 교무실은 `_office`가
+    # 옆벽을 캐비닛으로 채우지만 넓어서(1020px) 한 자리는 남는다(예전에도 있었다).
+    1: [("HideNurseBed", "NurseRoom", "curtain", "침대 커튼 뒤에 숨기",
+         "보건실 침대 커튼 뒤. 소독약 냄새가 목에 걸린다."),
+        ("HideNurseCabinet", "NurseRoom", "chem", "약품장에 숨기",
+         "약품장 아래 칸. 붕대 상자에 무릎이 닿는다."),
+        ("HideStaffRoom", "StaffRoom", "files", "서류 캐비닛에 숨기",
+         "교무실 캐비닛 사이. 결재판 냄새가 난다."),
+        ("HidePrincipal", "PrincipalRoom", "curtain", "커튼 뒤에 숨기",
+         "교장실 커튼 뒤. 두꺼운 천이 숨소리를 먹는다."),
+        ("HideMensRoom1", "MensRoom1", "stall", "칸에 숨기",
+         "남자 화장실 끝 칸. 물 떨어지는 소리만 들린다."),
         ("HideWomensRoom1", "WomensRoom1", "stall", "칸에 숨기",
          "화장실 칸 안. 문고리를 안에서 붙잡았다."),
         ("HideLobbyLocker", "Entrance", "locker", "신발장 뒤에 숨기",
          "현관 신발장 뒤. 유리문으로 든 빛이 발끝에 닿는다."),
-        ("HideStaffRoom", "StaffRoom", "files", "서류 캐비닛에 숨기",
-         "교무실 캐비닛 사이. 결재판 냄새가 난다."),
-        ("HideStorage2", "JanitorRoom", "gear", "도구함에 숨기",
+        ("HideJanitorTools", "JanitorRoom", "gear", "도구함에 숨기",
          "수위실 도구함 뒤. 기름 냄새가 난다."),
-        ("HideMensRoom1", "MensRoom1", "stall", "칸에 숨기",
-         "남자 화장실 끝 칸. 물 떨어지는 소리만 들린다.")],
+        ("HideStorage1", "Storage1", "files", "적재함에 숨기",
+         "창고 적재함 뒤. 먼지가 목을 긁는다.")],
 }
 
 
@@ -1612,6 +1661,8 @@ PROP_SPECS = {
     "toilet":    ((58, 44), (20, 16), C_STALL),    # 칸막이
     "entrance":  ((110, 36), (36, 28), C_BENCH),   # 신발장·벤치
     "janitor":   ((96, 40), (28, 24), C_DESK),
+    # 보건실 침상(#708) — 세로로 긴 침대를 줄지어 놓는다.
+    "nurse":     ((48, 84), (34, 30), C_BED),
     "hall":      ((84, 40), (30, 26), C_BENCH),    # 탁자
 }
 
@@ -1632,6 +1683,10 @@ def prop_kind(key, label):
         return "entrance"
     if key == "JanitorRoom":
         return "janitor"
+    if key == "NurseRoom":
+        return "nurse"
+    if key == "PrincipalRoom":
+        return "principal"
     if key.startswith("ComputerRoom"):
         return "computer"
     if key.startswith("ScienceLab") or key == "InfoDept":
@@ -2044,6 +2099,43 @@ def _stack(sc, key, x0, x1, y0, y1, items, taken, keepout, outer):
         if not placed:
             return
         n += 1
+
+
+def _principal(sc, key, x0, y0, x1, y1, door, keepout):
+    """교장실(#708) — 창가 큰 책상 + 접견 소파 + 진열장.
+
+    교장 편지가 "교장 책상 위"라 책상은 `FURNITURE`의 `DeskPrincipal`(시각만)이
+    맡고, 여기서는 그 둘레를 채운다. 문(아래 가운데) 앞과 책상 앞을 비운다 —
+    문에서 책상까지 똑바로 걸어갈 수 있어야 편지를 집는다.
+    """
+    wl, wr = x0 + T, x1 - T
+    wt, wb = y0 + T + WALL_FACE, y1 - T
+    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+    _windows(sc, key, (x0, y0, x1, y1), wl + OFFICE_EDGE, wr - OFFICE_EDGE, cy,
+             (y0 + T, y0 + T + WALL_FACE))
+    lane = (cx - DOOR / 2 - PROP_DOOR_PAD, wt, cx + DOOR / 2 + PROP_DOOR_PAD, wb)
+    taken = [lane]
+    items = [
+        # 접견 세트 — 책상 왼쪽 아래, 소파 둘이 낮은 탁자를 사이에 두고 마주 본다.
+        ("sofaA", (wl + 44, cy - 40, wl + 154, cy - 10), C_SOFA),
+        ("table", (wl + 59, cy + 6, wl + 139, cy + 46), C_DESK),
+        ("sofaB", (wl + 44, cy + 62, wl + 154, cy + 92), C_SOFA),
+        # 진열장(상패·트로피) — 왼쪽 벽 위쪽.
+        ("trophy", (wl + 6, wt + 20, wl + 34, wt + 170), C_CABINET),
+        # 책장 — 오른쪽 벽 위쪽. 아래쪽은 은신처(커튼) 자리다.
+        ("books", (wr - 34, wt + 20, wr - 6, wt + 210), C_SHELF),
+        # 화분 — 문 왼쪽 구석.
+        ("plantL", (wl + 6, wb - 34, wl + 32, wb - 8), C_PLANT),
+    ]
+    for name, cell, color in items:
+        if any(_overlap(cell, k) for k in keepout + taken):
+            continue
+        sc.prop(f"{key}_{name}", rect(*cell), color)
+        taken.append(cell)
+    # 태극기 — 책상 뒤 창 사이가 아니라 오른쪽 벽면(장식), 책장 아래.
+    flag = (wr - 6, wt + 230, wr, wt + 290)
+    if not any(_overlap(flag, k) for k in taken[1:]):
+        sc.decor(f"{key}_flag", rect(*flag), C_FLAG)
 
 
 def _office(sc, key, x0, y0, x1, y1, door, keepout):
@@ -2673,6 +2765,7 @@ WALL_DECOR = {
     "lab":      ("wboard", 170, 10, C_WBOARD),
     "computer": ("wboard", 150, 10, C_WBOARD),
     "janitor":  ("keys", 90, 10, C_KEYBOARD_WALL),
+    "nurse":    ("sign", 120, 8, C_SIGN),
     "entrance": ("sign", 160, 10, C_SIGN),
     "storage":  ("sign", 90, 8, C_SIGN),
     "hall":     ("sign", 110, 8, C_SIGN),
@@ -2685,6 +2778,7 @@ CORNER_PROP = {
     "lab":      ("chem", 28, 60, C_CABINET),
     "office":   ("cabinet", 28, 56, C_CABINET),
     "janitor":  ("bed", 28, 64, C_BED),
+    "nurse":    ("chem", 28, 60, C_CABINET),
     "hall":     ("plant", 26, 26, C_PLANT),
     "entrance": ("plant", 26, 26, C_PLANT),
     "toilet":   ("bin", 22, 24, C_BIN),
@@ -2938,6 +3032,9 @@ def add_props(sc, corridors=(), x1_of=None):
         if kind == "office":
             _office(sc, key, x0, topf(x0), x1, botf(x1), door, keepout)
             continue
+        if kind == "principal":
+            _principal(sc, key, x0, topf(x0), x1, botf(x1), door, keepout)
+            continue
         unit, gap, color = PROP_SPECS[kind]
 
         def inner_top(x, f=topf):
@@ -2973,6 +3070,11 @@ def add_props(sc, corridors=(), x1_of=None):
         for i, (rx0, ry0, rx1, ry1) in enumerate(rects):
             sc.prop(f"{key}_{i}", rect(rx0, ry0, rx1, ry1), color)
         add_room_fixtures(sc, key, kind, x0, x1, topf, botf, door, keepout, rects)
+        if kind == "nurse":
+            # 보건실도 북쪽 외벽이라 창이 있다(#708) — 교실과 같은 `_windows()`.
+            wt = topf(cx) + T
+            _windows(sc, key, (x0, topf(x0), x1, botf(x1)), ix0, ix1,
+                     (topf(cx) + botf(cx)) / 2, (wt, wt + WALL_FACE))
 
     add_corridor_props(sc, corridors, x1_of)
 
@@ -3181,8 +3283,10 @@ def add_infill(sc, fl, spec):
                                     in FLOOR1["rooms"] if y0 == F1_BOT_Y0]
         for i, (gx0, gx1) in enumerate(gaps_in(bottom, EDGE, F1W - EDGE)):
             fill_band_gap(sc, f"GapBot{i}", gx0, gx1, F1_BOT_Y0, F1_BOT_Y1)
-        # 계단실은 하단 띠보다 얕다 — 그 아래 자투리를 메운다.
-        fill_band_gap(sc, "GapStair", stx0, stx1, sty1, F1_BOT_Y1)
+        # 계단실이 하단 띠보다 얕으면 그 아래 자투리를 메운다(#708부터는
+        # 띠를 꽉 채워 낼 것이 없다).
+        if sty1 < F1_BOT_Y1:
+            fill_band_gap(sc, "GapStair", stx0, stx1, sty1, F1_BOT_Y1)
         # 상단 띠에도 틈이 생기면(방 표를 고칠 때) 같이 메운다. 교무실은
         # `rooms`가 아니라 `staff`에 있어 따로 넣어야 한다.
         top = [(x0, x1) for _, _, x0, y0, x1, _y1, _d in FLOOR1["rooms"]
@@ -3205,7 +3309,9 @@ def add_infill(sc, fl, spec):
             fill_band_gap(sc, f"GapMid{i}", gx0, gx1, MID_Y0, MID_Y1)
 
     # 중앙다리 본체 — BridgeL/R 벽으로 이미 둘러싸여 있으니 마루만 깐다.
-    ground_band_gap(sc, "Bridge", BRIDGE_X0, BRIDGE_X1, BRIDGE_Y0, BRIDGE_Y1)
+    # 공백 띠가 없으면(#710) 접근로가 곧장 남쪽 복도에 닿아 낼 것이 없다.
+    if has_void_band():
+        ground_band_gap(sc, "Bridge", BRIDGE_X0, BRIDGE_X1, BRIDGE_Y0, BRIDGE_Y1)
 
     # 남쪽 특별실동 — 다리에서 아래 복도로 이어지는 구간만 통로다.
     # **하단 띠가 없는 층은 그 구간도 막는다**(#702) — 이어질 하단 복도가 없어
@@ -3239,6 +3345,11 @@ def add_infill(sc, fl, spec):
     # 계단실을 없앤 층은 위에서 띠 전체를 메웠으므로 여기서 또 낼 것이 없다.
     if 1 not in gone:
         fill_band_gap(sc, "GapStairB", STAIR_B[0], STAIR_B[2], STAIR_B[3], BOT_Y1)
+
+
+def has_void_band():
+    """중간 띠와 남쪽 복도 사이에 공백 띠(건물 밖)가 있는가(#710에서 없앴다)."""
+    return BRIDGE_Y1 > BRIDGE_Y0
 
 
 def has_bottom_band(fl, spec):
@@ -3357,18 +3468,18 @@ def build_common(fl, spec):
     if fl in LOCKED:
         add_stair_locks(sc, fl, LOCKED[fl], [STAIR_A, STAIR_B])
 
-    # 공백 구역(건물 밖) 봉인 — 중앙다리 폭만 열어 둔다.
-    # 위 경계: 왼쪽은 수평, 오른쪽은 중간 띠와 같은 기울기.
-    sc.wall("VoidTopL", rect(0, MID_Y1, BRIDGE_X0, MID_Y1 + T))
-    sc.wall("VoidTopR", rect(BRIDGE_X1, MID_Y1, W - EDGE, MID_Y1 + T))
-    # 아래 경계: 남쪽 복도와 맞닿는 수평선
-    sc.wall("VoidBotL", rect(0, VOID_Y1 - T, BRIDGE_X0, VOID_Y1))
-    sc.wall("VoidBotR", rect(BRIDGE_X1, VOID_Y1 - T, W - EDGE, VOID_Y1))
-
-    # 공백 구역 내부를 메워 통행 후보에서 뺀다(수위 스폰 방지)
-    fill_void(sc, "VoidFillL", 0, BRIDGE_X0 - T, lambda x: MID_Y1 + T, VOID_Y1 - T)
-    fill_void(sc, "VoidFillR", BRIDGE_X1 + T, W - EDGE,
-              lambda x: MID_Y1 + T, VOID_Y1 - T)
+    # 공백 구역(건물 밖) 봉인 — 중앙다리 폭만 열어 둔다. #710에서 공백 띠를
+    # 없앴으므로 지금은 아무것도 안 낸다(`has_void_band()`).
+    if has_void_band():
+        sc.wall("VoidTopL", rect(0, MID_Y1, BRIDGE_X0, MID_Y1 + T))
+        sc.wall("VoidTopR", rect(BRIDGE_X1, MID_Y1, W - EDGE, MID_Y1 + T))
+        # 아래 경계: 남쪽 복도와 맞닿는 수평선
+        sc.wall("VoidBotL", rect(0, VOID_Y1 - T, BRIDGE_X0, VOID_Y1))
+        sc.wall("VoidBotR", rect(BRIDGE_X1, VOID_Y1 - T, W - EDGE, VOID_Y1))
+        # 공백 구역 내부를 메워 통행 후보에서 뺀다(수위 스폰 방지)
+        fill_void(sc, "VoidFillL", 0, BRIDGE_X0 - T, lambda x: MID_Y1 + T, VOID_Y1 - T)
+        fill_void(sc, "VoidFillR", BRIDGE_X1 + T, W - EDGE,
+                  lambda x: MID_Y1 + T, VOID_Y1 - T)
 
     # 복도 오른쪽 끝 마개 — 오른쪽 교실을 걷어내고 폭을 줄이면서 복도가 마루만
     # 깔린 채 열려 끝났다. 방 동쪽 벽(W-EDGE-T ~ W-EDGE)과 같은 선에 벽을 세운다.
@@ -3380,9 +3491,10 @@ def build_common(fl, spec):
     for cy0, cy1, cx1 in ends:
         sc.wall(f"CorridorEnd_{int(cy0)}", rect(cx1 - T, cy0, cx1, cy1))
 
-    # 중앙다리 — 좌·우 벽
-    sc.wall("BridgeL", rect(BRIDGE_X0 - T, BRIDGE_Y0, BRIDGE_X0, BRIDGE_Y1))
-    sc.wall("BridgeR", rect(BRIDGE_X1, BRIDGE_Y0, BRIDGE_X1 + T, BRIDGE_Y1))
+    # 중앙다리 — 좌·우 벽(공백 띠가 있을 때만)
+    if has_void_band():
+        sc.wall("BridgeL", rect(BRIDGE_X0 - T, BRIDGE_Y0, BRIDGE_X0, BRIDGE_Y1))
+        sc.wall("BridgeR", rect(BRIDGE_X1, BRIDGE_Y0, BRIDGE_X1 + T, BRIDGE_Y1))
 
     # 남쪽 동
     for key, lb, x0, x1 in spec["south_left"] + spec["south_right"]:
@@ -3519,70 +3631,20 @@ def build_floor1():
 
 
 def _add_floor1_details(sc):
-    """1층 공간 압축 및 고품질 비주얼 디테일(#554)."""
-    # ── 1. 교무실 (StaffRoom: 1300~2260, y 20~620) ──────────────────────────
-    # 교장실 집무 구역 바닥 카펫
-    sc.poly2d("Staff_Rug", "Ground", C_MAT, rect(1350, 100, 1720, 520))
-    # 교장 임원 회전 의자
-    sc.poly2d("PrincipalChair", "Ground", C_CHAIR, rect(1490, 200, 1550, 250))
-    # 교장실 응접 소파 세트 & 티테이블
-    sc.poly2d("StaffSofa1", "Ground", C_SOFA, rect(1370, 390, 1470, 440))
-    sc.poly2d("StaffSofa2", "Ground", C_SOFA, rect(1590, 390, 1690, 440))
-    sc.poly2d("StaffSofaTable", "Ground", C_DESK, rect(1490, 400, 1570, 430))
-    # 상장 및 트로피 진열장
-    sc.poly2d("StaffTrophyCase", "Ground", C_SHELF, rect(1350, 40, 1500, 70))
-    # 교무실 벽면 4단 서류 캐비닛 열
-    sc.poly2d("StaffCabinets", "Ground", C_LOCKER, rect(1750, 40, 2050, 70))
-    # 복사기/인쇄 복합기 & 정수기
-    sc.poly2d("StaffPrinter", "Ground", C_COPIER, rect(2080, 40, 2150, 90))
-    sc.poly2d("StaffWaterCooler", "Ground", C_WATER, rect(2180, 40, 2220, 80))
-    # 학사 일정 화이트보드
-    sc.poly2d("StaffWhiteboard", "Ground", C_WBOARD, rect(1850, 580, 2050, 595))
+    """1층 손배치 장식(#708). **바닥에 까는 것만** 여기서 낸다.
 
-    # ── 2. 현관 로비 (Entrance: 1310~1830, y 800~1480) ──────────────────────
-    # 정문 웰컴 러버 매트
-    sc.poly2d("LobbyMat", "Ground", C_MAT, rect(1480, 1340, 1660, 1460))
-    # 학생 신발장 라인 (좌/우)
-    sc.poly2d("ShoeRackL1", "Ground", C_LOCKER, rect(1330, 850, 1370, 1050))
-    sc.poly2d("ShoeRackL2", "Ground", C_LOCKER, rect(1330, 1100, 1370, 1300))
-    sc.poly2d("ShoeRackR1", "Ground", C_LOCKER, rect(1770, 850, 1810, 1050))
-    sc.poly2d("ShoeRackR2", "Ground", C_LOCKER, rect(1770, 1100, 1810, 1300))
-    # 우산꽂이
-    sc.poly2d("UmbrellaL", "Ground", C_BIN, rect(1330, 1350, 1370, 1390))
-    sc.poly2d("UmbrellaR", "Ground", C_BIN, rect(1770, 1350, 1810, 1390))
-    # 대형 관엽식물 화분 4개
-    sc.poly2d("LobbyPlant1", "Ground", C_PLANT, rect(1380, 820, 1420, 860))
-    sc.poly2d("LobbyPlant2", "Ground", C_PLANT, rect(1720, 820, 1760, 860))
-    sc.poly2d("LobbyPlant3", "Ground", C_PLANT, rect(1380, 1420, 1420, 1460))
-    sc.poly2d("LobbyPlant4", "Ground", C_PLANT, rect(1720, 1420, 1760, 1460))
-    # 대기용 목재 벤치 2개
-    sc.poly2d("LobbyBench1", "Ground", C_BENCH, rect(1420, 950, 1500, 990))
-    sc.poly2d("LobbyBench2", "Ground", C_BENCH, rect(1640, 950, 1720, 990))
-    # 학교 교훈 및 안내 게시판
-    sc.poly2d("LobbyBoard", "Ground", C_NOTICE, rect(1530, 830, 1610, 845))
-
-    # ── 3. 수위실 (JanitorRoom: 1860~2260, y 800~1480) ──────────────────────
-    # 당직 침상 & 전기 난로
-    sc.poly2d("JanitorBed", "Ground", C_BED, rect(1880, 840, 2040, 940))
-    sc.poly2d("JanitorHeater", "Ground", C_FIRE, rect(1980, 850, 2020, 890))
-    # CCTV 모니터 랙
-    sc.poly2d("JanitorCCTV", "Ground", C_SHELF, rect(1880, 1150, 1960, 1250))
-    # 순찰용 공구 상자
-    sc.poly2d("JanitorToolbox", "Ground", C_CASE, rect(1880, 1300, 1940, 1360))
-
-    # ── 4. 창고1 (Storage1: 670~1270, y 20~620) ─────────────────────────────
-    # 비품 적재 선반 랙
-    sc.poly2d("StorageRack1", "Ground", C_SHELF, rect(700, 80, 880, 130))
-    sc.poly2d("StorageRack2", "Ground", C_SHELF, rect(920, 80, 1100, 130))
-    sc.poly2d("StorageRack3", "Ground", C_SHELF, rect(700, 200, 880, 250))
-    sc.poly2d("StorageRack4", "Ground", C_SHELF, rect(920, 200, 1100, 250))
-    # 용지/골판지 박스 스택
-    sc.poly2d("StorageBoxes1", "Ground", C_BOOK, rect(700, 360, 780, 440))
-    sc.poly2d("StorageBoxes2", "Ground", C_BOOK, rect(820, 360, 900, 440))
-    sc.poly2d("StorageBoxes3", "Ground", C_BOOK, rect(1140, 80, 1220, 200))
-    # 접이식 의자 적재함 & 청소 도구함
-    sc.poly2d("StorageChairStack", "Ground", C_CHAIR, rect(1140, 260, 1240, 360))
-    sc.poly2d("StorageCleanRack", "Ground", C_CLEAN, rect(1140, 420, 1240, 500))
+    예전(#554) 것은 신발장·침상·소파까지 전부 `Ground`에 냈는데, `Ground`는 방
+    바닥(`Rooms`)보다 **먼저** 그려져 게임에서는 방 바닥에 가려 하나도 안
+    보였다(미리보기 도구는 선언 순서대로 칠해서 보였다). 집기는 `add_props`가
+    방 종류별로 깔고, 여기서는 바닥 표시(`FM_`, 방 바닥 위)만 더한다.
+    교장실 카펫은 바닥색(`ROOM_FLOOR["principal"]`)이 맡는다 — 큰 매트를
+    깔았더니 미리보기에서 회색 판으로 읽혔다.
+    """
+    lobby = f1_room("Entrance")
+    lx0, lx1 = lobby[2], lobby[4]
+    mx = (lx0 + lx1) / 2
+    # 정문 앞 매트 — 현관 빛이 떨어지는 자리.
+    sc.floor_mark("LobbyMat", rect(mx - 90, F1_BOT_Y1 - 120, mx + 90, F1_BOT_Y1 - 76), C_MAT)
 
 
 def fill_void(sc, key, x0, x1, top_fn, y_bottom, step=100):
