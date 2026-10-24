@@ -312,7 +312,78 @@ TEX = {
 # 물건"이다. 여기 있는 색은 TEX보다 우선하고, 물건마다 로컬 UV가 들어가 그림
 # 한 장이 그 물건에 맞춰 늘어난다 — 44x26 책상에도 상판·모서리·서랍선이 제자리에
 # 온다. 재질만 쓰던 때는 월드 격자의 아무 조각이나 잘려 들어갔다.
+# ── 외부 가구 그림(#716) ─────────────────────────────────────
+# Darklight Academia Furniture Pack(kueyhorse, 무료판 비상업 — `CREDITS.md`)에서
+# `tools/import_ext_sprites.py`가 잘라 낸 그림. **정수 2배로 놓는다**(`EXT_SCALE`) —
+# 월드 도트 한 칸이 2px라 그래야 도트 폭이 고르다. `obj_*`처럼 상자에 맞춰
+# 늘리면 같은 그림이 방마다 다른 비율로 찌그러진다.
+#
+# `SPRITE`의 값이 `ext:<이름>`이면 이 그림을 쓴다. **색은 흰색으로 덮어쓴다** —
+# 완성된 그림이라 팔레트 색을 곱하면 안 된다(어둠·손전등은 그대로 받는다).
+# 아래 색들은 그래서 화면에 안 나오고, 표를 찾는 열쇠로만 쓴다 — **서로 달라야
+# 한다**(같은 문자열이면 나중 것이 이겨 조회가 빗나간다).
+EXT_DIR = "res://assets/sprites/ext"
+EXT_SCALE = 2
+C_X_DESK = "Color(0.301, 0.201, 0.141, 1)"      # 교장 책상
+C_X_SOFA = "Color(0.402, 0.142, 0.122, 1)"      # 붉은 소파
+C_X_ARMCHAIR = "Color(0.403, 0.143, 0.123, 1)"  # 붉은 안락의자
+C_X_BOOKCASE = "Color(0.281, 0.191, 0.131, 1)"  # 키 큰 책장
+C_X_CLOCK = "Color(0.282, 0.192, 0.132, 1)"     # 괘종시계
+C_X_GLOBE = "Color(0.311, 0.271, 0.181, 1)"     # 지구본
+C_X_LAMP = "Color(0.331, 0.281, 0.191, 1)"      # 스탠드
+C_X_VASE = "Color(0.301, 0.381, 0.441, 1)"      # 화병
+C_X_BED = "Color(0.341, 0.421, 0.281, 1)"       # 보건실 침대
+C_X_RUG = "Color(0.351, 0.171, 0.121, 1)"       # 긴 러그
+# Haunted School Tiles(Thurraya, #717) — 가장 많이 나오는 책상·의자.
+C_X_SDESK = "Color(0.421, 0.331, 0.211, 1)"     # 학생 자리(책상+의자)
+C_X_TDESK = "Color(0.261, 0.181, 0.121, 1)"     # 교탁(책상+의자)
+C_X_ODESK_DOWN = "Color(0.262, 0.182, 0.122, 1)"  # 교무실 섬 위 자리
+C_X_ODESK_UP = "Color(0.263, 0.183, 0.123, 1)"    # 교무실 섬 아래 자리
+
+
+def _png_size(path):
+    data = path.read_bytes()[16:24]
+    return int.from_bytes(data[:4], "big"), int.from_bytes(data[4:], "big")
+
+
+_EXT_LOCAL = pathlib.Path(__file__).resolve().parent.parent / "assets/sprites/ext"
+EXT_SIZES = {p.stem: _png_size(p) for p in sorted(_EXT_LOCAL.glob("*.png"))}
+
+
+def ext_scale(name):
+    """그림마다 배율. **팩이 정한다**(#717).
+
+    Darklight(32px 칸, 몸이 작은 캐릭터 기준)는 2배, Haunted School(`hs_`, 48px
+    칸 RPG Maker MZ)은 1배다 — 1배면 학생 자리(44x52)가 예전 책상+의자(43x44)와
+    거의 같고, 이설 스프라이트(74x76)도 그림 1칸 = 월드 1px라 질감이 맞는다.
+    """
+    return 1 if name.startswith("hs_") else EXT_SCALE
+
+
+def ext_size(name):
+    """그 그림을 놓을 월드 크기(정수 배율)."""
+    if name not in EXT_SIZES:
+        raise SystemExit(f"외부 그림 {name}.png가 없다 — tools/import_ext_sprites.py를 돌렸는가")
+    w, h = EXT_SIZES[name]
+    k = ext_scale(name)
+    return w * k, h * k
+
+
 SPRITE = {
+    C_X_DESK: "ext:desk_exec",
+    C_X_SOFA: "ext:sofa_red",
+    C_X_ARMCHAIR: "ext:armchair_red",
+    C_X_BOOKCASE: "ext:bookcase_tall",
+    C_X_CLOCK: "ext:grandfather_clock",
+    C_X_GLOBE: "ext:globe",
+    C_X_LAMP: "ext:floor_lamp",
+    C_X_VASE: "ext:vase_blue",
+    C_X_BED: "ext:bed_green",
+    C_X_RUG: "ext:rug_long",
+    C_X_SDESK: "ext:hs_student_desk",
+    C_X_TDESK: "ext:hs_teacher_desk",
+    C_X_ODESK_DOWN: "ext:hs_office_desk_down",
+    C_X_ODESK_UP: "ext:hs_office_desk_up",
     C_DESK: "obj_desk",
     C_CHAIR: "obj_chair",
     C_LOCKER: "obj_locker",
@@ -353,7 +424,7 @@ SPRITE = {
 SPRITE_SIZE = 32    # gen_tiles.py의 OBJ와 반드시 같아야 한다
 
 
-def uv_for(polygon):
+def uv_for(polygon, tw=None, th=None):
     """폴리곤 경계상자를 오브젝트 그림 한 장에 대응시키는 UV.
 
     UV는 텍스처 픽셀 좌표다 — 정점마다 (0,0)~(SPRITE_SIZE,SPRITE_SIZE) 안의
@@ -365,13 +436,17 @@ def uv_for(polygon):
     x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
     w = (x1 - x0) or 1.0
     h = (y1 - y0) or 1.0
-    pts = [((x - x0) / w * SPRITE_SIZE, (y - y0) / h * SPRITE_SIZE)
+    tw = SPRITE_SIZE if tw is None else tw
+    th = SPRITE_SIZE if th is None else th
+    pts = [((x - x0) / w * tw, (y - y0) / h * th)
            for x, y in zip(xs, ys)]
     return poly(*pts)
 
 
 TEXTURES = {f"tex_{stem}": f"{TEX_DIR}/{stem}.png"
-            for stem in sorted(set(TEX.values()) | set(SPRITE.values()))}
+            for stem in sorted(set(TEX.values()) | set(SPRITE.values()))
+            if not stem.startswith("ext:")}
+TEXTURES.update({f"ext_{name}": f"{EXT_DIR}/{name}.png" for name in EXT_SIZES})
 
 # 단서·열쇠 도트 스프라이트(#333, #390). 타일 무늬가 아니라 그림 한 장이라
 # TEX/SPRITE 표와 따로 둔다 — 경로도 assets/tiles가 아니라 assets/sprites다.
@@ -671,6 +746,16 @@ class Scene:
         # 오브젝트 그림이 재질보다 우선한다(#259). 물건 하나에 한 장을 맞춰 늘리려고
         # 로컬 UV를 넣는다 — 재질은 UV를 비워 월드 격자에 정렬시키는 것과 반대다.
         obj = SPRITE.get(color)
+        if obj is not None and obj.startswith("ext:"):
+            ext = obj[4:]
+            tw, th = EXT_SIZES[ext]
+            tex_line = (f'texture = ExtResource("ext_{ext}")\n'
+                        f"uv = {uv_for(polygon, tw, th)}\n")
+            if parent in CANVAS_ITEM_ROOTS:
+                tex_line = TEX_FLAGS + tex_line
+            self.node(f'[node name="{name}" type="Polygon2D" parent="{parent}"]\n'
+                      f'{z_line}{tex_line}color = Color(1, 1, 1, 1)\npolygon = {polygon}\n')
+            return
         stem = obj or TEX.get(color)
         if stem:
             tex_line = f'texture = ExtResource("tex_{stem}")\n'
@@ -1232,8 +1317,9 @@ POS_OVERRIDE = {
 # 영향을 주기 때문. 단서보다 먼저 그려서 아래에 깔린다.
 FURNITURE = {
     1: [
-        # 교장 책상(#708) — 편지가 그 위에 놓인다.
-        ("DeskPrincipal", 1870, 140, 2030, 200),
+        # 교장 책상(#708) — 편지가 그 위에 놓인다. 외부 그림(#716)은 56x25라
+        # 2배로 112x50이다.
+        ("DeskPrincipal", 1894, 140, 2006, 190, C_X_DESK),
         # 수위실 책상 둘 — 학생증 서랍과 공책이 놓인 자리.
         ("DeskJanitorL", 1590, 776, 1660, 830),
         ("DeskJanitorR", 1890, 776, 1970, 830),
@@ -1254,8 +1340,8 @@ def add_furniture(sc, floor):
     if not items:
         return
     sc.node('[node name="Furniture" type="Node2D" parent="."]\n')
-    for name, x0, y0, x1, y1 in items:
-        sc.poly2d(name, "Furniture", C_DESK, rect(x0, y0, x1, y1))
+    for name, x0, y0, x1, y1, *rest in items:
+        sc.poly2d(name, "Furniture", rest[0] if rest else C_DESK, rect(x0, y0, x1, y1))
         sc.furniture.append((x0, y0, x1, y1))
 
 # 열쇠를 주는 오브젝트는 층에 상관없이 "다가가면 획득"으로 통일한다(사용자 요청).
@@ -1609,16 +1695,17 @@ PROP_AISLE_MAX = 62
 PROP_MIN_W = 34       # 이보다 좁은 자리에는 아무것도 두지 않는다
 PROP_MIN_H = 24
 
-# 교실 전용 치수 — 책상 하나가 사각형 하나면 뭔지 알아볼 수 없어 책상+의자로 놓는다.
+# 교실 전용 치수. 학생 자리·교탁 크기는 외부 그림이 정한다(#717 — `hs_student_desk`
+# 44x52, `hs_teacher_desk` 47x47). 예전 `CLASS_DESK`·`CLASS_CHAIR`·`CLASS_TEACHER`는
+# 상자를 늘리던 값이라 걷어냈다.
 CLASS_EDGE = 24       # 교실은 벽 여유를 줄여 책상 열을 하나라도 더 넣는다
-CLASS_DESK = (44, 26)
-CLASS_CHAIR = (26, 12)
-CLASS_CHAIR_GAP = 5   # 책상과 의자 사이
 CLASS_COL_GAP = 20
-CLASS_ROW_GAP = 22
+# 행 사이 틈. 22였는데 외부 그림 학생 자리(#717)가 예전보다 8px 높아(52) 반쪽마다
+# 3행이 2행으로 줄어 교실 책상이 12 → 6이 됐다. 행 사이는 원래 사람이 못 지나는
+# 틈이라(통로는 가운데 가로 통로·문 앞 세로 통로·열 사이 한 자리) 좁혀도 된다.
+CLASS_ROW_GAP = 10
 CLASS_AISLE = 68      # 문과 같은 x에 내는 중앙 통로 폭
 CLASS_BOARD_H = 14    # 칠판 두께(장식, 충돌 없음)
-CLASS_TEACHER = (86, 32)
 CLASS_LOCKER_D = 30   # 뒷벽 사물함 깊이
 CLASS_CLEAN_W = 38    # 청소도구함 폭(뒷벽 한쪽 구석)
 CLASS_BIN = 24        # 쓰레기통 한 변
@@ -1661,8 +1748,9 @@ PROP_SPECS = {
     "toilet":    ((58, 44), (20, 16), C_STALL),    # 칸막이
     "entrance":  ((110, 36), (36, 28), C_BENCH),   # 신발장·벤치
     "janitor":   ((96, 40), (28, 24), C_DESK),
-    # 보건실 침상(#708) — 세로로 긴 침대를 줄지어 놓는다.
-    "nurse":     ((48, 84), (34, 30), C_BED),
+    # 보건실 침상(#708) — 세로로 긴 침대를 줄지어 놓는다. 외부 그림(#716)
+    # 20x32의 정수 2배 — 자리가 좁으면 `PROP_MIN_*`까지 줄어 찌그러질 수 있다.
+    "nurse":     ((40, 64), (34, 30), C_X_BED),
     "hall":      ((84, 40), (30, 26), C_BENCH),    # 탁자
 }
 
@@ -1912,15 +2000,12 @@ def _classroom(sc, key, x0, y0, x1, y1, door, keepout):
                                    cy + bh / 2 + 46), C_TV)
 
     # ── 교탁 · 교사 의자 · 학급문고 ────────────────────────────
-    tw, th = CLASS_TEACHER[1], CLASS_TEACHER[0]
+    # 외부 그림(#717)은 **책상과 의자가 한 장**이다 — 의자가 칠판 쪽(왼쪽)에
+    # 붙어 학생을 본다. 크기를 그림이 정한다(`ext_size`).
+    tw, th = ext_size("hs_teacher_desk")
     teach = (ix0, cy - th / 2, ix0 + tw, cy + th / 2)
     if not any(_overlap(teach, k) for k in keepout):
-        sc.prop(f"{key}_teacher", rect(*teach), C_DESK)
-        sc.overlay(f"{key}_papers", rect(ix0 + 6, cy - 12, ix0 + tw - 8, cy + 12),
-                   C_PAPER)
-        chair = (ix0 + tw + 6, cy - 16, ix0 + tw + 22, cy + 16)
-        if not any(_overlap(chair, k) for k in keepout):
-            sc.prop(f"{key}_tchair", rect(*chair), C_CHAIR)
+        sc.prop(f"{key}_teacher", rect(*teach), C_X_TDESK)
     # 학급문고 — 교탁 위아래 빈 구석. 책상 격자가 교탁 오른쪽부터라 여기가 남는다.
     for i, shelf in enumerate(((ix0, iy0, ix0 + tw, iy0 + 68),
                                (ix0, iy1 - 68, ix0 + tw, iy1))):
@@ -1978,9 +2063,11 @@ def _classroom(sc, key, x0, y0, x1, y1, door, keepout):
                                                note_y[1]), C_NOTICE)
 
     # ── 학생 책상 — 교탁과 사물함 사이. 책상 오른쪽에 의자(왼쪽을 본다) ──
-    dw, dh = CLASS_DESK[1], CLASS_DESK[0]      # 90도 돌린 책상
-    cw, ch = CLASS_CHAIR[1], CLASS_CHAIR[0]
-    unit_w = dw + CLASS_CHAIR_GAP + cw
+    # 외부 그림(#717): 세로 책상 + 오른쪽 의자가 **한 장**(44x52)이라 단위가
+    # 곧 그림이다. 예전 책상(26x44) + 틈(5) + 의자(12x26) = 43x44와 거의 같아
+    # 열·행 계산과 통로 규칙(#274·#277)이 그대로 맞는다.
+    dw, dh = ext_size("hs_student_desk")
+    unit_w = dw
     gx0, gx1 = ix0 + tw + 26, lx0 - 18
     if gx1 - gx0 < unit_w:
         return
@@ -2042,21 +2129,16 @@ def _classroom(sc, key, x0, y0, x1, y1, door, keepout):
             for r in range(rows):
                 y = oy + r * (dh + CLASS_ROW_GAP)
                 desk = (x, y, x + dw, y + dh)
-                chair = (x + dw + CLASS_CHAIR_GAP, y + (dh - ch) / 2,
-                         x + dw + CLASS_CHAIR_GAP + cw, y + (dh + ch) / 2)
-                if any(_overlap(desk, k) or _overlap(chair, k) for k in block):
+                if any(_overlap(desk, k) for k in block):
                     continue
-                sc.prop(f"{key}_d{idx}", rect(*desk), C_DESK)
-                sc.prop(f"{key}_c{idx}", rect(*chair), C_CHAIR)
-                # 책상마다 다 올리면 격자가 뭉개져 보인다 — 셋에 하나만.
-                if idx % 3 == 0:
-                    sc.overlay(f"{key}_txt{idx}",
-                               rect(x + 4, y + 9, x + dw - 4, y + dh - 9), C_BOOK)
+                sc.prop(f"{key}_d{idx}", rect(*desk), C_X_SDESK)
                 idx += 1
 
 
 OFFICE_EDGE = 18          # 벽면 장식 전용 띠
-OFFICE_DESK = (84, 36)    # 교사 책상 — 가로로 눕힌다
+# 교사 책상 — 외부 그림(#717)의 폭(44)이다. 높이 36은 그림 속 책상 부분이라
+# 섬 높이(책상 둘 + 칸막이 + 의자 칸) 계산에 쓴다. 예전 84는 상자를 늘리던 값.
+OFFICE_DESK = (44, 36)
 OFFICE_PART = 6           # 마주 본 책상 사이 칸막이 두께
 OFFICE_CHAIR = 22         # 의자 한 변
 OFFICE_WALK = 46          # 사람이 지나갈 통로(도달 격자 20px + 플레이어 여유)
@@ -2102,40 +2184,55 @@ def _stack(sc, key, x0, x1, y0, y1, items, taken, keepout, outer):
 
 
 def _principal(sc, key, x0, y0, x1, y1, door, keepout):
-    """교장실(#708) — 창가 큰 책상 + 접견 소파 + 진열장.
+    """교장실(#708, 외부 그림 #716) — 창가 큰 책상 + 책장 + 괘종시계 + 접견 세트.
 
     교장 편지가 "교장 책상 위"라 책상은 `FURNITURE`의 `DeskPrincipal`(시각만)이
     맡고, 여기서는 그 둘레를 채운다. 문(아래 가운데) 앞과 책상 앞을 비운다 —
     문에서 책상까지 똑바로 걸어갈 수 있어야 편지를 집는다.
+
+    **집기 크기는 그림이 정한다**(`ext_size`, 정수 2배). 자리만 여기서 잡는다.
+    키 큰 것(책장·시계)은 **위쪽 벽에 등을 댄다** — 정면 3/4 그림이라 위쪽 벽 앞에
+    서야 벽에 붙은 것으로 읽힌다. 그래서 창은 책상 위 가운데에만 낸다.
     """
     wl, wr = x0 + T, x1 - T
     wt, wb = y0 + T + WALL_FACE, y1 - T
     cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
-    _windows(sc, key, (x0, y0, x1, y1), wl + OFFICE_EDGE, wr - OFFICE_EDGE, cy,
-             (y0 + T, y0 + T + WALL_FACE))
+    _windows(sc, key, (x0, y0, x1, y1), cx - 150, cx + 150, cy,
+             (y0 + T, y0 + T + WALL_FACE), 2)
     lane = (cx - DOOR / 2 - PROP_DOOR_PAD, wt, cx + DOOR / 2 + PROP_DOOR_PAD, wb)
     taken = [lane]
+
+    def at(name, color, px, py):
+        w, h = ext_size(name)
+        return (name, (px, py, px + w, py + h), color)
+
+    case_w, _ = ext_size("bookcase_tall")
+    clock_w, _ = ext_size("grandfather_clock")
+    sofa_w, sofa_h = ext_size("sofa_red")
     items = [
-        # 접견 세트 — 책상 왼쪽 아래, 소파 둘이 낮은 탁자를 사이에 두고 마주 본다.
-        ("sofaA", (wl + 44, cy - 40, wl + 154, cy - 10), C_SOFA),
-        ("table", (wl + 59, cy + 6, wl + 139, cy + 46), C_DESK),
-        ("sofaB", (wl + 44, cy + 62, wl + 154, cy + 92), C_SOFA),
-        # 진열장(상패·트로피) — 왼쪽 벽 위쪽.
-        ("trophy", (wl + 6, wt + 20, wl + 34, wt + 170), C_CABINET),
-        # 책장 — 오른쪽 벽 위쪽. 아래쪽은 은신처(커튼) 자리다.
-        ("books", (wr - 34, wt + 20, wr - 6, wt + 210), C_SHELF),
-        # 화분 — 문 왼쪽 구석.
-        ("plantL", (wl + 6, wb - 34, wl + 32, wb - 8), C_PLANT),
+        # 책장 둘 — 위쪽 벽 왼쪽 구석부터.
+        at("bookcase_tall", C_X_BOOKCASE, wl + 8, wt + 2),
+        at("bookcase_tall", C_X_BOOKCASE, wl + 8 + case_w + 4, wt + 2),
+        # 괘종시계 — 위쪽 벽 오른쪽 구석.
+        at("grandfather_clock", C_X_CLOCK, wr - 8 - clock_w, wt + 2),
+        # 접견 세트 — 왼쪽 가운데. 소파 + 안락의자, 옆에 스탠드.
+        at("floor_lamp", C_X_LAMP, wl + 8, cy + 10),
+        at("sofa_red", C_X_SOFA, wl + 44, cy + 20),
+        at("armchair_red", C_X_ARMCHAIR, wl + 44 + sofa_w + 6, cy + 20),
+        # 지구본 — 오른쪽 벽 위쪽(시계 아래).
+        at("globe", C_X_GLOBE, wr - 8 - ext_size("globe")[0], wt + 110),
+        # 화병 — 문 왼쪽 구석.
+        at("vase_blue", C_X_VASE, wl + 8, wb - 8 - ext_size("vase_blue")[1]),
     ]
-    for name, cell, color in items:
+    for i, (name, cell, color) in enumerate(items):
         if any(_overlap(cell, k) for k in keepout + taken):
             continue
-        sc.prop(f"{key}_{name}", rect(*cell), color)
+        sc.prop(f"{key}_{name}{i}", rect(*cell), color)
         taken.append(cell)
-    # 태극기 — 책상 뒤 창 사이가 아니라 오른쪽 벽면(장식), 책장 아래.
-    flag = (wr - 6, wt + 230, wr, wt + 290)
-    if not any(_overlap(flag, k) for k in taken[1:]):
-        sc.decor(f"{key}_flag", rect(*flag), C_FLAG)
+    # 러그 — 접견 세트 아래 바닥(집기 밑에 깔린다).
+    rw, rh = ext_size("rug_long")
+    sc.floor_mark(f"{key}_rug", rect(wl + 24, cy + 20 + sofa_h - 10,
+                                     wl + 24 + rw, cy + 20 + sofa_h - 10 + rh), C_X_RUG)
 
 
 def _office(sc, key, x0, y0, x1, y1, door, keepout):
@@ -2201,16 +2298,20 @@ def _office(sc, key, x0, y0, x1, y1, door, keepout):
 
     # ── 책상 섬 ────────────────────────────────────────────────
     def seat(nm, lx, dy, chair_below):
-        """책상 한 자리 — 모니터·서류를 올리고 바깥쪽에 의자를 붙인다."""
-        sc.prop(f"{key}_desk{nm}", rect(lx, dy, lx + dw, dy + dh), C_DESK)
-        sc.overlay(f"{key}_pc{nm}", rect(lx + 8, dy + 6, lx + 34, dy + dh - 6),
-                   C_MONITOR)
-        sc.overlay(f"{key}_doc{nm}", rect(lx + 42, dy + 9, lx + dw - 8, dy + dh - 9),
-                   C_PAPER)
-        chy = dy + dh + 4 if chair_below else dy - 4 - OFFICE_CHAIR
-        sc.prop(f"{key}_ch{nm}",
-                rect(lx + dw / 2 - OFFICE_CHAIR / 2, chy,
-                     lx + dw / 2 + OFFICE_CHAIR / 2, chy + OFFICE_CHAIR), C_CHAIR)
+        """책상 한 자리 — 외부 그림(#717)은 책상과 의자가 한 장이다.
+
+        위 자리는 "의자 위·책상 아래", 아래 자리는 "책상 위·의자 아래"로 둘 다
+        **칸막이를 향해 앉는다.** 그림의 책상 쪽 끝을 칸막이에 맞춘다 — 위
+        자리는 아래 끝을 `dy + dh`에, 아래 자리는 위 끝을 `dy`에. 그림 높이는
+        자리 칸(책상 + 틈 + 의자)보다 작아 섬 밖으로 안 나간다.
+        """
+        if chair_below:
+            w, h = ext_size("hs_office_desk_up")
+            sc.prop(f"{key}_desk{nm}", rect(lx, dy, lx + w, dy + h), C_X_ODESK_UP)
+        else:
+            w, h = ext_size("hs_office_desk_down")
+            sc.prop(f"{key}_desk{nm}", rect(lx, dy + dh - h, lx + w, dy + dh),
+                    C_X_ODESK_DOWN)
 
     n = 0
     for r in range(rows):
@@ -2581,6 +2682,14 @@ def _room_kind(sc, room_key):
     return prop_kind(room_key, meta[0])
 
 
+# 외부 그림 집기는 조사 문구를 예전 집기에서 빌린다(#717) — 표가 색으로 찾으므로
+# 새 색(`C_X_*`)을 넣으면 교실 책상 서랍 문구가 통째로 사라진다. 소품(`CLUTTER`)은
+# 빌리지 않는다: 그림에 이미 결이 있어 위에 상자를 얹으면 덧칠로 보인다.
+EXAMINE_ALIAS = {
+    C_X_SDESK: C_DESK, C_X_TDESK: C_DESK, C_X_ODESK_DOWN: C_DESK, C_X_ODESK_UP: C_DESK,
+}
+
+
 def add_examine(sc):
     """집기를 훑어 조사 대상을 붙인다(#301). 놓은 개수를 돌려준다.
 
@@ -2606,6 +2715,7 @@ def add_examine(sc):
                                       key=lambda it: _name_hash(it[0])):
             if count >= EXAMINE_PER_ROOM:
                 break
+            color = EXAMINE_ALIAS.get(color, color)
             lines = EXAMINE_LINES.get((color, kind)) or EXAMINE_LINES.get((color, None))
             if not lines:
                 continue
