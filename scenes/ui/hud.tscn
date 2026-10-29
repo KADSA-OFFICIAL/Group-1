@@ -10,9 +10,10 @@
 [sub_resource type="FontVariation" id="FontVariation_inv_item"]
 ; 소지품 칸 아래 물건 이름·조작 키(#748). 가변 글꼴 기본 굵기는 가늘어서 굵은 연성 제목과
 ; 2px 칸 테두리 옆에서 약했다(사용자: "물건 폰트 좀 더 두껍게"). 건너뛰기 버튼(#639)과 같은 방식.
+; 700은 "너무 두껍다"(사용자, #751) — 500이다.
 base_font = ExtResource("6_body_font")
 variation_opentype = {
-2003265652: 700
+2003265652: 500
 }
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inv_panel"]
