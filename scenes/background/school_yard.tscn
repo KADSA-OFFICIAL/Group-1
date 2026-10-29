@@ -1,17 +1,19 @@
-[gd_scene load_steps=30 format=3]
+[gd_scene load_steps=32 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 [ext_resource type="Script" path="res://scripts/interactions/front_gate.gd" id="4_front_gate"]
 [ext_resource type="Script" path="res://scripts/game/interact_marks.gd" id="8_marks"]
+[ext_resource type="Texture2D" path="res://assets/tiles/obj_bench.png" id="tex_obj_bench"]
+[ext_resource type="Texture2D" path="res://assets/tiles/obj_bike.png" id="tex_obj_bike"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_goal.png" id="tex_obj_goal"]
-[ext_resource type="Texture2D" path="res://assets/tiles/obj_locker.png" id="tex_obj_locker"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_panel.png" id="tex_obj_panel"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_podium.png" id="tex_obj_podium"]
-[ext_resource type="Texture2D" path="res://assets/tiles/obj_shelf.png" id="tex_obj_shelf"]
+[ext_resource type="Texture2D" path="res://assets/tiles/obj_pole.png" id="tex_obj_pole"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_stand.png" id="tex_obj_stand"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_tree.png" id="tex_obj_tree"]
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_glass.png" id="tex_prop_glass"]
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
+[ext_resource type="Texture2D" path="res://assets/tiles/yard_chalk.png" id="tex_yard_chalk"]
 [ext_resource type="Texture2D" path="res://assets/tiles/yard_dirt.png" id="tex_yard_dirt"]
 [ext_resource type="Texture2D" path="res://assets/tiles/yard_paving.png" id="tex_yard_paving"]
 [ext_resource type="Texture2D" path="res://assets/tiles/yard_track.png" id="tex_yard_track"]
@@ -112,6 +114,36 @@ polygon = PackedVector2Array(240, 420, 3160, 420, 3160, 1450, 240, 1450)
 texture = ExtResource("tex_yard_dirt")
 color = Color(0.2513, 0.1923, 0.1359, 1)
 polygon = PackedVector2Array(430, 550, 2970, 550, 2970, 1320, 430, 1320)
+
+[node name="YardLane0T" type="Polygon2D" parent="Ground"]
+texture = ExtResource("tex_yard_chalk")
+color = Color(0.5641, 0.5385, 0.4872, 1)
+polygon = PackedVector2Array(260.8, 935, 260.8, 627.2, 264.5, 589.4, 275.5, 553.1, 293.4, 519.6, 317.5, 490.3, 346.8, 466.2, 380.3, 448.3, 416.6, 437.3, 454.4, 433.6, 2945.6, 433.6, 2983.4, 437.3, 3019.7, 448.3, 3053.2, 466.2, 3082.5, 490.3, 3106.6, 519.6, 3124.5, 553.1, 3135.5, 589.4, 3139.2, 627.2, 3139.2, 935, 3135.2, 935, 3135.2, 627.2, 3131.6, 590.2, 3120.8, 554.6, 3103.2, 521.9, 3079.7, 493.1, 3050.9, 469.6, 3018.2, 452, 2982.6, 441.2, 2945.6, 437.6, 454.4, 437.6, 417.4, 441.2, 381.8, 452, 349.1, 469.6, 320.3, 493.1, 296.8, 521.9, 279.2, 554.6, 268.4, 590.2, 264.8, 627.2, 264.8, 935)
+
+[node name="YardLane0B" type="Polygon2D" parent="Ground"]
+texture = ExtResource("tex_yard_chalk")
+color = Color(0.5641, 0.5385, 0.4872, 1)
+polygon = PackedVector2Array(3139.2, 935, 3139.2, 1242.8, 3135.5, 1280.6, 3124.5, 1316.9, 3106.6, 1350.4, 3082.5, 1379.7, 3053.2, 1403.8, 3019.7, 1421.7, 2983.4, 1432.7, 2945.6, 1436.4, 454.4, 1436.4, 416.6, 1432.7, 380.3, 1421.7, 346.8, 1403.8, 317.5, 1379.7, 293.4, 1350.4, 275.5, 1316.9, 264.5, 1280.6, 260.8, 1242.8, 260.8, 935, 264.8, 935, 264.8, 1242.8, 268.4, 1279.8, 279.2, 1315.4, 296.8, 1348.1, 320.3, 1376.9, 349.1, 1400.4, 381.8, 1418, 417.4, 1428.8, 454.4, 1432.4, 2945.6, 1432.4, 2982.6, 1428.8, 3018.2, 1418, 3050.9, 1400.4, 3079.7, 1376.9, 3103.2, 1348.1, 3120.8, 1315.4, 3131.6, 1279.8, 3135.2, 1242.8, 3135.2, 935)
+
+[node name="YardLane1T" type="Polygon2D" parent="Ground"]
+texture = ExtResource("tex_yard_chalk")
+color = Color(0.5641, 0.5385, 0.4872, 1)
+polygon = PackedVector2Array(333, 935, 333, 615.8, 335.6, 589.9, 343.1, 565, 355.4, 542, 371.9, 521.9, 392, 505.4, 415, 493.1, 439.9, 485.6, 465.8, 483, 2934.2, 483, 2960.1, 485.6, 2985, 493.1, 3008, 505.4, 3028.1, 521.9, 3044.6, 542, 3056.9, 565, 3064.4, 589.9, 3067, 615.8, 3067, 935, 3063, 935, 3063, 615.8, 3060.5, 590.7, 3053.2, 566.5, 3041.3, 544.2, 3025.3, 524.7, 3005.8, 508.7, 2983.5, 496.8, 2959.3, 489.5, 2934.2, 487, 465.8, 487, 440.7, 489.5, 416.5, 496.8, 394.2, 508.7, 374.7, 524.7, 358.7, 544.2, 346.8, 566.5, 339.5, 590.7, 337, 615.8, 337, 935)
+
+[node name="YardLane1B" type="Polygon2D" parent="Ground"]
+texture = ExtResource("tex_yard_chalk")
+color = Color(0.5641, 0.5385, 0.4872, 1)
+polygon = PackedVector2Array(3067, 935, 3067, 1254.2, 3064.4, 1280.1, 3056.9, 1305, 3044.6, 1328, 3028.1, 1348.1, 3008, 1364.6, 2985, 1376.9, 2960.1, 1384.4, 2934.2, 1387, 465.8, 1387, 439.9, 1384.4, 415, 1376.9, 392, 1364.6, 371.9, 1348.1, 355.4, 1328, 343.1, 1305, 335.6, 1280.1, 333, 1254.2, 333, 935, 337, 935, 337, 1254.2, 339.5, 1279.3, 346.8, 1303.5, 358.7, 1325.8, 374.7, 1345.3, 394.2, 1361.3, 416.5, 1373.2, 440.7, 1380.5, 465.8, 1383, 2934.2, 1383, 2959.3, 1380.5, 2983.5, 1373.2, 3005.8, 1361.3, 3025.3, 1345.3, 3041.3, 1325.8, 3053.2, 1303.5, 3060.5, 1279.3, 3063, 1254.2, 3063, 935)
+
+[node name="YardLane2T" type="Polygon2D" parent="Ground"]
+texture = ExtResource("tex_yard_chalk")
+color = Color(0.5641, 0.5385, 0.4872, 1)
+polygon = PackedVector2Array(405.2, 935, 405.2, 604.4, 406.6, 590.4, 410.7, 576.8, 417.3, 564.4, 426.3, 553.5, 437.2, 544.5, 449.6, 537.9, 463.2, 533.8, 477.2, 532.4, 2922.8, 532.4, 2936.8, 533.8, 2950.4, 537.9, 2962.8, 544.5, 2973.7, 553.5, 2982.7, 564.4, 2989.3, 576.8, 2993.4, 590.4, 2994.8, 604.4, 2994.8, 935, 2990.8, 935, 2990.8, 604.4, 2989.5, 591.1, 2985.6, 578.4, 2979.3, 566.6, 2970.9, 556.3, 2960.6, 547.9, 2948.8, 541.6, 2936.1, 537.7, 2922.8, 536.4, 477.2, 536.4, 463.9, 537.7, 451.2, 541.6, 439.4, 547.9, 429.1, 556.3, 420.7, 566.6, 414.4, 578.4, 410.5, 591.1, 409.2, 604.4, 409.2, 935)
+
+[node name="YardLane2B" type="Polygon2D" parent="Ground"]
+texture = ExtResource("tex_yard_chalk")
+color = Color(0.5641, 0.5385, 0.4872, 1)
+polygon = PackedVector2Array(2994.8, 935, 2994.8, 1265.6, 2993.4, 1279.6, 2989.3, 1293.2, 2982.7, 1305.6, 2973.7, 1316.5, 2962.8, 1325.5, 2950.4, 1332.1, 2936.8, 1336.2, 2922.8, 1337.6, 477.2, 1337.6, 463.2, 1336.2, 449.6, 1332.1, 437.2, 1325.5, 426.3, 1316.5, 417.3, 1305.6, 410.7, 1293.2, 406.6, 1279.6, 405.2, 1265.6, 405.2, 935, 409.2, 935, 409.2, 1265.6, 410.5, 1278.9, 414.4, 1291.6, 420.7, 1303.4, 429.1, 1313.7, 439.4, 1322.1, 451.2, 1328.4, 463.9, 1332.3, 477.2, 1333.6, 2922.8, 1333.6, 2936.1, 1332.3, 2948.8, 1328.4, 2960.6, 1322.1, 2970.9, 1313.7, 2979.3, 1303.4, 2985.6, 1291.6, 2989.5, 1278.9, 2990.8, 1265.6, 2990.8, 935)
 
 [node name="YardPathOuter" type="Polygon2D" parent="Ground"]
 texture = ExtResource("tex_yard_dirt")
@@ -776,173 +808,175 @@ color = Color(0.407, 0.407, 0.4205, 1)
 polygon = PackedVector2Array(980, 390, 1300, 390, 1300, 490, 980, 490)
 
 [node name="PC_FlagPole" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1330, 396, 1352, 396, 1352, 418, 1330, 418)
+polygon = PackedVector2Array(1336.4, 396, 1345.6, 396, 1352, 402.4, 1352, 411.6, 1345.6, 418, 1336.4, 418, 1330, 411.6, 1330, 402.4)
 
 [node name="PV_FlagPole" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_locker")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3246, 0.3506, 0.4024, 1)
-polygon = PackedVector2Array(1330, 396, 1352, 396, 1352, 418, 1330, 418)
+texture = ExtResource("tex_obj_pole")
+uv = PackedVector2Array(9.3, 0, 22.7, 0, 32, 9.3, 32, 22.7, 22.7, 32, 9.3, 32, 0, 22.7, 0, 9.3)
+color = Color(0.2857, 0.2986, 0.3246, 1)
+polygon = PackedVector2Array(1336.4, 396, 1345.6, 396, 1352, 402.4, 1352, 411.6, 1345.6, 418, 1336.4, 418, 1330, 411.6, 1330, 402.4)
 
 [node name="PC_Tree0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(180, 1470, 276, 1470, 276, 1566, 180, 1566)
+polygon = PackedVector2Array(207.8, 1470, 248.2, 1470, 276, 1497.8, 276, 1538.2, 248.2, 1566, 207.8, 1566, 180, 1538.2, 180, 1497.8)
 
 [node name="PV_Tree0" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_tree")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+uv = PackedVector2Array(9.3, 0, 22.7, 0, 32, 9.3, 32, 22.7, 22.7, 32, 9.3, 32, 0, 22.7, 0, 9.3)
 color = Color(0.1614, 0.2606, 0.1861, 1)
-polygon = PackedVector2Array(180, 1470, 276, 1470, 276, 1566, 180, 1566)
+polygon = PackedVector2Array(207.8, 1470, 248.2, 1470, 276, 1497.8, 276, 1538.2, 248.2, 1566, 207.8, 1566, 180, 1538.2, 180, 1497.8)
 
 [node name="PC_Tree1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(530, 1470, 626, 1470, 626, 1566, 530, 1566)
+polygon = PackedVector2Array(557.8, 1470, 598.2, 1470, 626, 1497.8, 626, 1538.2, 598.2, 1566, 557.8, 1566, 530, 1538.2, 530, 1497.8)
 
 [node name="PV_Tree1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_tree")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+uv = PackedVector2Array(9.3, 0, 22.7, 0, 32, 9.3, 32, 22.7, 22.7, 32, 9.3, 32, 0, 22.7, 0, 9.3)
 color = Color(0.1737, 0.2805, 0.2004, 1)
-polygon = PackedVector2Array(530, 1470, 626, 1470, 626, 1566, 530, 1566)
+polygon = PackedVector2Array(557.8, 1470, 598.2, 1470, 626, 1497.8, 626, 1538.2, 598.2, 1566, 557.8, 1566, 530, 1538.2, 530, 1497.8)
 
 [node name="PC_Tree2" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(880, 1470, 976, 1470, 976, 1566, 880, 1566)
+polygon = PackedVector2Array(907.8, 1470, 948.2, 1470, 976, 1497.8, 976, 1538.2, 948.2, 1566, 907.8, 1566, 880, 1538.2, 880, 1497.8)
 
 [node name="PV_Tree2" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_tree")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+uv = PackedVector2Array(9.3, 0, 22.7, 0, 32, 9.3, 32, 22.7, 22.7, 32, 9.3, 32, 0, 22.7, 0, 9.3)
 color = Color(0.166, 0.2682, 0.1916, 1)
-polygon = PackedVector2Array(880, 1470, 976, 1470, 976, 1566, 880, 1566)
+polygon = PackedVector2Array(907.8, 1470, 948.2, 1470, 976, 1497.8, 976, 1538.2, 948.2, 1566, 907.8, 1566, 880, 1538.2, 880, 1497.8)
 
 [node name="PC_Tree3" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1230, 1470, 1326, 1470, 1326, 1566, 1230, 1566)
+polygon = PackedVector2Array(1257.8, 1470, 1298.2, 1470, 1326, 1497.8, 1326, 1538.2, 1298.2, 1566, 1257.8, 1566, 1230, 1538.2, 1230, 1497.8)
 
 [node name="PV_Tree3" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_tree")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+uv = PackedVector2Array(9.3, 0, 22.7, 0, 32, 9.3, 32, 22.7, 22.7, 32, 9.3, 32, 0, 22.7, 0, 9.3)
 color = Color(0.1584, 0.2558, 0.1827, 1)
-polygon = PackedVector2Array(1230, 1470, 1326, 1470, 1326, 1566, 1230, 1566)
+polygon = PackedVector2Array(1257.8, 1470, 1298.2, 1470, 1326, 1497.8, 1326, 1538.2, 1298.2, 1566, 1257.8, 1566, 1230, 1538.2, 1230, 1497.8)
 
 [node name="PC_Tree4" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1580, 1470, 1676, 1470, 1676, 1566, 1580, 1566)
+polygon = PackedVector2Array(1607.8, 1470, 1648.2, 1470, 1676, 1497.8, 1676, 1538.2, 1648.2, 1566, 1607.8, 1566, 1580, 1538.2, 1580, 1497.8)
 
 [node name="PV_Tree4" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_tree")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+uv = PackedVector2Array(9.3, 0, 22.7, 0, 32, 9.3, 32, 22.7, 22.7, 32, 9.3, 32, 0, 22.7, 0, 9.3)
 color = Color(0.172, 0.2777, 0.1984, 1)
-polygon = PackedVector2Array(1580, 1470, 1676, 1470, 1676, 1566, 1580, 1566)
+polygon = PackedVector2Array(1607.8, 1470, 1648.2, 1470, 1676, 1497.8, 1676, 1538.2, 1648.2, 1566, 1607.8, 1566, 1580, 1538.2, 1580, 1497.8)
 
 [node name="PC_Tree5" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1930, 1470, 2026, 1470, 2026, 1566, 1930, 1566)
+polygon = PackedVector2Array(1957.8, 1470, 1998.2, 1470, 2026, 1497.8, 2026, 1538.2, 1998.2, 1566, 1957.8, 1566, 1930, 1538.2, 1930, 1497.8)
 
 [node name="PV_Tree5" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_tree")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+uv = PackedVector2Array(9.3, 0, 22.7, 0, 32, 9.3, 32, 22.7, 22.7, 32, 9.3, 32, 0, 22.7, 0, 9.3)
 color = Color(0.1643, 0.2654, 0.1896, 1)
-polygon = PackedVector2Array(1930, 1470, 2026, 1470, 2026, 1566, 1930, 1566)
+polygon = PackedVector2Array(1957.8, 1470, 1998.2, 1470, 2026, 1497.8, 2026, 1538.2, 1998.2, 1566, 1957.8, 1566, 1930, 1538.2, 1930, 1497.8)
 
 [node name="PC_Tree7" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2630, 1470, 2726, 1470, 2726, 1566, 2630, 1566)
+polygon = PackedVector2Array(2657.8, 1470, 2698.2, 1470, 2726, 1497.8, 2726, 1538.2, 2698.2, 1566, 2657.8, 1566, 2630, 1538.2, 2630, 1497.8)
 
 [node name="PV_Tree7" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_tree")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+uv = PackedVector2Array(9.3, 0, 22.7, 0, 32, 9.3, 32, 22.7, 22.7, 32, 9.3, 32, 0, 22.7, 0, 9.3)
 color = Color(0.169, 0.2729, 0.195, 1)
-polygon = PackedVector2Array(2630, 1470, 2726, 1470, 2726, 1566, 2630, 1566)
+polygon = PackedVector2Array(2657.8, 1470, 2698.2, 1470, 2726, 1497.8, 2726, 1538.2, 2698.2, 1566, 2657.8, 1566, 2630, 1538.2, 2630, 1497.8)
 
 [node name="PC_Tree8" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2980, 1470, 3076, 1470, 3076, 1566, 2980, 1566)
+polygon = PackedVector2Array(3007.8, 1470, 3048.2, 1470, 3076, 1497.8, 3076, 1538.2, 3048.2, 1566, 3007.8, 1566, 2980, 1538.2, 2980, 1497.8)
 
 [node name="PV_Tree8" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_tree")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+uv = PackedVector2Array(9.3, 0, 22.7, 0, 32, 9.3, 32, 22.7, 22.7, 32, 9.3, 32, 0, 22.7, 0, 9.3)
 color = Color(0.1626, 0.2626, 0.1876, 1)
-polygon = PackedVector2Array(2980, 1470, 3076, 1470, 3076, 1566, 2980, 1566)
+polygon = PackedVector2Array(3007.8, 1470, 3048.2, 1470, 3076, 1497.8, 3076, 1538.2, 3048.2, 1566, 3007.8, 1566, 2980, 1538.2, 2980, 1497.8)
 
 [node name="PC_Bench0" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(320, 340, 450, 340, 450, 374, 320, 374)
 
 [node name="PV_Bench0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_shelf")
+texture = ExtResource("tex_obj_bench")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3284, 0.304, 0.2553, 1)
+color = Color(0.3405, 0.304, 0.2432, 1)
 polygon = PackedVector2Array(320, 340, 450, 340, 450, 374, 320, 374)
 
 [node name="PC_Bench1" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(620, 340, 750, 340, 750, 374, 620, 374)
 
 [node name="PV_Bench1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_shelf")
+texture = ExtResource("tex_obj_bench")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.354, 0.3277, 0.2753, 1)
+color = Color(0.3671, 0.3277, 0.2622, 1)
 polygon = PackedVector2Array(620, 340, 750, 340, 750, 374, 620, 374)
 
 [node name="PC_Bench2" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(920, 340, 1050, 340, 1050, 374, 920, 374)
 
 [node name="PV_Bench2" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_shelf")
+texture = ExtResource("tex_obj_bench")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3602, 0.3334, 0.2801, 1)
+color = Color(0.3735, 0.3334, 0.2668, 1)
 polygon = PackedVector2Array(920, 340, 1050, 340, 1050, 374, 920, 374)
 
 [node name="PC_Bench3" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1220, 340, 1350, 340, 1350, 374, 1220, 374)
 
 [node name="PV_Bench3" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_shelf")
+texture = ExtResource("tex_obj_bench")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3443, 0.3187, 0.2677, 1)
+color = Color(0.357, 0.3187, 0.255, 1)
 polygon = PackedVector2Array(1220, 340, 1350, 340, 1350, 374, 1220, 374)
 
 [node name="PC_Bike0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2500, 340, 2530, 340, 2530, 428, 2500, 428)
+polygon = PackedVector2Array(2529.5, 342.4, 2526.5, 353, 2534.7, 355.3, 2531.6, 365.9, 2523.9, 363.7, 2517.9, 384.8, 2519.8, 385.4, 2516.8, 396, 2514.9, 395.4, 2511.8, 406, 2511.3, 405.8, 2505.3, 427, 2500.5, 425.6, 2506.5, 404.5, 2506.1, 404.3, 2509.1, 393.7, 2507.2, 393.2, 2510.2, 382.6, 2512.1, 383.2, 2518.2, 362, 2510.5, 359.8, 2513.5, 349.2, 2521.7, 351.6, 2524.7, 341)
 
 [node name="PV_Bike0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_locker")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3214, 0.3472, 0.3985, 1)
-polygon = PackedVector2Array(2500, 340, 2530, 340, 2530, 428, 2500, 428)
+texture = ExtResource("tex_obj_bike")
+uv = PackedVector2Array(18.67, 0.0, 18.67, 4.0, 27.73, 4.0, 27.73, 8.0, 19.2, 8.0, 19.2, 16.0, 21.33, 16.0, 21.33, 20.0, 19.2, 20.0, 19.2, 24.0, 18.67, 24.0, 18.67, 32.0, 13.33, 32.0, 13.33, 24.0, 12.8, 24.0, 12.8, 20.0, 10.67, 20.0, 10.67, 16.0, 12.8, 16.0, 12.8, 8.0, 4.27, 8.0, 4.27, 4.0, 13.33, 4.0, 13.33, 0.0)
+color = Color(0.5142, 0.5271, 0.5528, 1)
+polygon = PackedVector2Array(2529.5, 342.4, 2526.5, 353, 2534.7, 355.3, 2531.6, 365.9, 2523.9, 363.7, 2517.9, 384.8, 2519.8, 385.4, 2516.8, 396, 2514.9, 395.4, 2511.8, 406, 2511.3, 405.8, 2505.3, 427, 2500.5, 425.6, 2506.5, 404.5, 2506.1, 404.3, 2509.1, 393.7, 2507.2, 393.2, 2510.2, 382.6, 2512.1, 383.2, 2518.2, 362, 2510.5, 359.8, 2513.5, 349.2, 2521.7, 351.6, 2524.7, 341)
 
 [node name="PC_Bike1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2560, 340, 2590, 340, 2590, 428, 2560, 428)
+polygon = PackedVector2Array(2589.5, 342.4, 2586.5, 353, 2594.7, 355.3, 2591.6, 365.9, 2583.9, 363.7, 2577.9, 384.8, 2579.8, 385.4, 2576.8, 396, 2574.9, 395.4, 2571.8, 406, 2571.3, 405.8, 2565.3, 427, 2560.5, 425.6, 2566.5, 404.5, 2566.1, 404.3, 2569.1, 393.7, 2567.2, 393.2, 2570.2, 382.6, 2572.1, 383.2, 2578.2, 362, 2570.5, 359.8, 2573.5, 349.2, 2581.7, 351.6, 2584.7, 341)
 
 [node name="PV_Bike1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_locker")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3361, 0.3631, 0.4168, 1)
-polygon = PackedVector2Array(2560, 340, 2590, 340, 2590, 428, 2560, 428)
+texture = ExtResource("tex_obj_bike")
+uv = PackedVector2Array(18.67, 0.0, 18.67, 4.0, 27.73, 4.0, 27.73, 8.0, 19.2, 8.0, 19.2, 16.0, 21.33, 16.0, 21.33, 20.0, 19.2, 20.0, 19.2, 24.0, 18.67, 24.0, 18.67, 32.0, 13.33, 32.0, 13.33, 24.0, 12.8, 24.0, 12.8, 20.0, 10.67, 20.0, 10.67, 16.0, 12.8, 16.0, 12.8, 8.0, 4.27, 8.0, 4.27, 4.0, 13.33, 4.0, 13.33, 0.0)
+color = Color(0.484, 0.2151, 0.2017, 1)
+polygon = PackedVector2Array(2589.5, 342.4, 2586.5, 353, 2594.7, 355.3, 2591.6, 365.9, 2583.9, 363.7, 2577.9, 384.8, 2579.8, 385.4, 2576.8, 396, 2574.9, 395.4, 2571.8, 406, 2571.3, 405.8, 2565.3, 427, 2560.5, 425.6, 2566.5, 404.5, 2566.1, 404.3, 2569.1, 393.7, 2567.2, 393.2, 2570.2, 382.6, 2572.1, 383.2, 2578.2, 362, 2570.5, 359.8, 2573.5, 349.2, 2581.7, 351.6, 2584.7, 341)
 
 [node name="PC_Bike2" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2620, 340, 2650, 340, 2650, 428, 2620, 428)
+polygon = PackedVector2Array(2649.5, 342.4, 2646.5, 353, 2654.7, 355.3, 2651.6, 365.9, 2643.9, 363.7, 2637.9, 384.8, 2639.8, 385.4, 2636.8, 396, 2634.9, 395.4, 2631.8, 406, 2631.3, 405.8, 2625.3, 427, 2620.5, 425.6, 2626.5, 404.5, 2626.1, 404.3, 2629.1, 393.7, 2627.2, 393.2, 2630.2, 382.6, 2632.1, 383.2, 2638.2, 362, 2630.5, 359.8, 2633.5, 349.2, 2641.7, 351.6, 2644.7, 341)
 
 [node name="PV_Bike2" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_locker")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3304, 0.3569, 0.4097, 1)
-polygon = PackedVector2Array(2620, 340, 2650, 340, 2650, 428, 2620, 428)
+texture = ExtResource("tex_obj_bike")
+uv = PackedVector2Array(18.67, 0.0, 18.67, 4.0, 27.73, 4.0, 27.73, 8.0, 19.2, 8.0, 19.2, 16.0, 21.33, 16.0, 21.33, 20.0, 19.2, 20.0, 19.2, 24.0, 18.67, 24.0, 18.67, 32.0, 13.33, 32.0, 13.33, 24.0, 12.8, 24.0, 12.8, 20.0, 10.67, 20.0, 10.67, 16.0, 12.8, 16.0, 12.8, 8.0, 4.27, 8.0, 4.27, 4.0, 13.33, 4.0, 13.33, 0.0)
+color = Color(0.2246, 0.2246, 0.2511, 1)
+polygon = PackedVector2Array(2649.5, 342.4, 2646.5, 353, 2654.7, 355.3, 2651.6, 365.9, 2643.9, 363.7, 2637.9, 384.8, 2639.8, 385.4, 2636.8, 396, 2634.9, 395.4, 2631.8, 406, 2631.3, 405.8, 2625.3, 427, 2620.5, 425.6, 2626.5, 404.5, 2626.1, 404.3, 2629.1, 393.7, 2627.2, 393.2, 2630.2, 382.6, 2632.1, 383.2, 2638.2, 362, 2630.5, 359.8, 2633.5, 349.2, 2641.7, 351.6, 2644.7, 341)
 
 [node name="PC_Bike3" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2680, 340, 2710, 340, 2710, 428, 2680, 428)
+polygon = PackedVector2Array(2709.5, 342.4, 2706.5, 353, 2714.7, 355.3, 2711.6, 365.9, 2703.9, 363.7, 2697.9, 384.8, 2699.8, 385.4, 2696.8, 396, 2694.9, 395.4, 2691.8, 406, 2691.3, 405.8, 2685.3, 427, 2680.5, 425.6, 2686.5, 404.5, 2686.1, 404.3, 2689.1, 393.7, 2687.2, 393.2, 2690.2, 382.6, 2692.1, 383.2, 2698.2, 362, 2690.5, 359.8, 2693.5, 349.2, 2701.7, 351.6, 2704.7, 341)
 
 [node name="PV_Bike3" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_locker")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3067, 0.3312, 0.3802, 1)
-polygon = PackedVector2Array(2680, 340, 2710, 340, 2710, 428, 2680, 428)
+texture = ExtResource("tex_obj_bike")
+uv = PackedVector2Array(18.67, 0.0, 18.67, 4.0, 27.73, 4.0, 27.73, 8.0, 19.2, 8.0, 19.2, 16.0, 21.33, 16.0, 21.33, 20.0, 19.2, 20.0, 19.2, 24.0, 18.67, 24.0, 18.67, 32.0, 13.33, 32.0, 13.33, 24.0, 12.8, 24.0, 12.8, 20.0, 10.67, 20.0, 10.67, 16.0, 12.8, 16.0, 12.8, 8.0, 4.27, 8.0, 4.27, 4.0, 13.33, 4.0, 13.33, 0.0)
+color = Color(0.2208, 0.2944, 0.4662, 1)
+polygon = PackedVector2Array(2709.5, 342.4, 2706.5, 353, 2714.7, 355.3, 2711.6, 365.9, 2703.9, 363.7, 2697.9, 384.8, 2699.8, 385.4, 2696.8, 396, 2694.9, 395.4, 2691.8, 406, 2691.3, 405.8, 2685.3, 427, 2680.5, 425.6, 2686.5, 404.5, 2686.1, 404.3, 2689.1, 393.7, 2687.2, 393.2, 2690.2, 382.6, 2692.1, 383.2, 2698.2, 362, 2690.5, 359.8, 2693.5, 349.2, 2701.7, 351.6, 2704.7, 341)
 
 [node name="PC_Bike4" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2740, 340, 2770, 340, 2770, 428, 2740, 428)
+polygon = PackedVector2Array(2769.5, 342.4, 2766.5, 353, 2774.7, 355.3, 2771.6, 365.9, 2763.9, 363.7, 2757.9, 384.8, 2759.8, 385.4, 2756.8, 396, 2754.9, 395.4, 2751.8, 406, 2751.3, 405.8, 2745.3, 427, 2740.5, 425.6, 2746.5, 404.5, 2746.1, 404.3, 2749.1, 393.7, 2747.2, 393.2, 2750.2, 382.6, 2752.1, 383.2, 2758.2, 362, 2750.5, 359.8, 2753.5, 349.2, 2761.7, 351.6, 2764.7, 341)
 
 [node name="PV_Bike4" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_locker")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3394, 0.3666, 0.4209, 1)
-polygon = PackedVector2Array(2740, 340, 2770, 340, 2770, 428, 2740, 428)
+texture = ExtResource("tex_obj_bike")
+uv = PackedVector2Array(18.67, 0.0, 18.67, 4.0, 27.73, 4.0, 27.73, 8.0, 19.2, 8.0, 19.2, 16.0, 21.33, 16.0, 21.33, 20.0, 19.2, 20.0, 19.2, 24.0, 18.67, 24.0, 18.67, 32.0, 13.33, 32.0, 13.33, 24.0, 12.8, 24.0, 12.8, 20.0, 10.67, 20.0, 10.67, 16.0, 12.8, 16.0, 12.8, 8.0, 4.27, 8.0, 4.27, 4.0, 13.33, 4.0, 13.33, 0.0)
+color = Color(0.2715, 0.4073, 0.2988, 1)
+polygon = PackedVector2Array(2769.5, 342.4, 2766.5, 353, 2774.7, 355.3, 2771.6, 365.9, 2763.9, 363.7, 2757.9, 384.8, 2759.8, 385.4, 2756.8, 396, 2754.9, 395.4, 2751.8, 406, 2751.3, 405.8, 2745.3, 427, 2740.5, 425.6, 2746.5, 404.5, 2746.1, 404.3, 2749.1, 393.7, 2747.2, 393.2, 2750.2, 382.6, 2752.1, 383.2, 2758.2, 362, 2750.5, 359.8, 2753.5, 349.2, 2761.7, 351.6, 2764.7, 341)
 
 [node name="PC_LampPost0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(469, 349, 491, 349, 491, 371, 469, 371)
+polygon = PackedVector2Array(475.4, 349, 484.6, 349, 491, 355.4, 491, 364.6, 484.6, 371, 475.4, 371, 469, 364.6, 469, 355.4)
 
 [node name="PV_LampPost0" type="Polygon2D" parent="Props"]
-color = Color(0.22, 0.23, 0.25, 1)
-polygon = PackedVector2Array(469, 349, 491, 349, 491, 371, 469, 371)
+texture = ExtResource("tex_obj_pole")
+uv = PackedVector2Array(9.3, 0, 22.7, 0, 32, 9.3, 32, 22.7, 22.7, 32, 9.3, 32, 0, 22.7, 0, 9.3)
+color = Color(0.2824, 0.2952, 0.3209, 1)
+polygon = PackedVector2Array(475.4, 349, 484.6, 349, 491, 355.4, 491, 364.6, 484.6, 371, 475.4, 371, 469, 364.6, 469, 355.4)
 
 [node name="Lamp_0" type="PointLight2D" parent="Lights"]
 position = Vector2(480, 360)
@@ -955,11 +989,13 @@ texture = SubResource("GradientTexture2D_moon")
 texture_scale = 1.35
 
 [node name="PC_LampPost1" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2889, 349, 2911, 349, 2911, 371, 2889, 371)
+polygon = PackedVector2Array(2895.4, 349, 2904.6, 349, 2911, 355.4, 2911, 364.6, 2904.6, 371, 2895.4, 371, 2889, 364.6, 2889, 355.4)
 
 [node name="PV_LampPost1" type="Polygon2D" parent="Props"]
-color = Color(0.22, 0.23, 0.25, 1)
-polygon = PackedVector2Array(2889, 349, 2911, 349, 2911, 371, 2889, 371)
+texture = ExtResource("tex_obj_pole")
+uv = PackedVector2Array(9.3, 0, 22.7, 0, 32, 9.3, 32, 22.7, 22.7, 32, 9.3, 32, 0, 22.7, 0, 9.3)
+color = Color(0.2695, 0.2817, 0.3061, 1)
+polygon = PackedVector2Array(2895.4, 349, 2904.6, 349, 2911, 355.4, 2911, 364.6, 2904.6, 371, 2895.4, 371, 2889, 364.6, 2889, 355.4)
 
 [node name="Lamp_1" type="PointLight2D" parent="Lights"]
 position = Vector2(2900, 360)
@@ -972,11 +1008,13 @@ texture = SubResource("GradientTexture2D_moon")
 texture_scale = 1.35
 
 [node name="PC_LampPost2" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(409, 1499, 431, 1499, 431, 1521, 409, 1521)
+polygon = PackedVector2Array(415.4, 1499, 424.6, 1499, 431, 1505.4, 431, 1514.6, 424.6, 1521, 415.4, 1521, 409, 1514.6, 409, 1505.4)
 
 [node name="PV_LampPost2" type="Polygon2D" parent="Props"]
-color = Color(0.22, 0.23, 0.25, 1)
-polygon = PackedVector2Array(409, 1499, 431, 1499, 431, 1521, 409, 1521)
+texture = ExtResource("tex_obj_pole")
+uv = PackedVector2Array(9.3, 0, 22.7, 0, 32, 9.3, 32, 22.7, 22.7, 32, 9.3, 32, 0, 22.7, 0, 9.3)
+color = Color(0.2904, 0.3035, 0.3299, 1)
+polygon = PackedVector2Array(415.4, 1499, 424.6, 1499, 431, 1505.4, 431, 1514.6, 424.6, 1521, 415.4, 1521, 409, 1514.6, 409, 1505.4)
 
 [node name="Lamp_2" type="PointLight2D" parent="Lights"]
 position = Vector2(420, 1510)
@@ -989,11 +1027,13 @@ texture = SubResource("GradientTexture2D_moon")
 texture_scale = 1.35
 
 [node name="PC_LampPost3" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1109, 1499, 1131, 1499, 1131, 1521, 1109, 1521)
+polygon = PackedVector2Array(1115.4, 1499, 1124.6, 1499, 1131, 1505.4, 1131, 1514.6, 1124.6, 1521, 1115.4, 1521, 1109, 1514.6, 1109, 1505.4)
 
 [node name="PV_LampPost3" type="Polygon2D" parent="Props"]
-color = Color(0.22, 0.23, 0.25, 1)
-polygon = PackedVector2Array(1109, 1499, 1131, 1499, 1131, 1521, 1109, 1521)
+texture = ExtResource("tex_obj_pole")
+uv = PackedVector2Array(9.3, 0, 22.7, 0, 32, 9.3, 32, 22.7, 22.7, 32, 9.3, 32, 0, 22.7, 0, 9.3)
+color = Color(0.2774, 0.29, 0.3152, 1)
+polygon = PackedVector2Array(1115.4, 1499, 1124.6, 1499, 1131, 1505.4, 1131, 1514.6, 1124.6, 1521, 1115.4, 1521, 1109, 1514.6, 1109, 1505.4)
 
 [node name="Lamp_3" type="PointLight2D" parent="Lights"]
 position = Vector2(1120, 1510)
@@ -1006,11 +1046,13 @@ texture = SubResource("GradientTexture2D_moon")
 texture_scale = 1.35
 
 [node name="PC_LampPost4" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(2389, 1339, 2411, 1339, 2411, 1361, 2389, 1361)
+polygon = PackedVector2Array(2395.4, 1339, 2404.6, 1339, 2411, 1345.4, 2411, 1354.6, 2404.6, 1361, 2395.4, 1361, 2389, 1354.6, 2389, 1345.4)
 
 [node name="PV_LampPost4" type="Polygon2D" parent="Props"]
-color = Color(0.22, 0.23, 0.25, 1)
-polygon = PackedVector2Array(2389, 1339, 2411, 1339, 2411, 1361, 2389, 1361)
+texture = ExtResource("tex_obj_pole")
+uv = PackedVector2Array(9.3, 0, 22.7, 0, 32, 9.3, 32, 22.7, 22.7, 32, 9.3, 32, 0, 22.7, 0, 9.3)
+color = Color(0.2983, 0.3118, 0.3389, 1)
+polygon = PackedVector2Array(2395.4, 1339, 2404.6, 1339, 2411, 1345.4, 2411, 1354.6, 2404.6, 1361, 2395.4, 1361, 2389, 1354.6, 2389, 1345.4)
 
 [node name="Lamp_4" type="PointLight2D" parent="Lights"]
 position = Vector2(2400, 1350)
