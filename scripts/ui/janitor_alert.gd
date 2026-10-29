@@ -32,9 +32,10 @@ const ARROW_DIAG := preload("res://assets/ui/alert_arrow_diag.png")
 ## 도트 한 칸 = 화면 4px. 정수 배라야 도트 폭이 고르다.
 const PIXEL_SCALE := 4.0
 ## 화살표 중심이 화면 가장자리에서 떨어지는 거리. 위쪽은 목표·소지품·진행 표
-## (`TopLeft`·`TopRight`, y 16~92)를 피해 더 내린다.
+## (`TopLeft`·`TopRight`, y 16~약 104)를 피해 더 내린다. `TopRight`에 키 안내 줄이
+## 붙어(#742) 길어진 만큼 136 → 158로 내렸다(화살표 반 높이 38px을 빼도 상자 아래다).
 const EDGE_MARGIN := 60.0
-const TOP_MARGIN := 136.0
+const TOP_MARGIN := 158.0
 ## 뒤 그림자가 밀려 나는 거리(도트)와 어둡히는 정도.
 const SHADOW_OFFSET_DOTS := Vector2(2, 2)
 const SHADOW_DARKEN := 0.62
