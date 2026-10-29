@@ -984,6 +984,31 @@ func _check_journal() -> void:
 	var text: RichTextLabel = jp.get_node("Root/Paper/Margin/Rows/Scroll/Text")
 	var toast: Label = jp.get_node("Toast")
 
+	# ── 여는 키 안내(#742) — 늘 보이고, 길어진 상자가 알림·화살표를 안 덮는다 ──
+	var top_right: Control = main.get_node_or_null("HUD/Root/TopRight")
+	var key_hint: Label = main.get_node_or_null("HUD/Root/TopRight/Margin/TextRows/KeyHintLabel")
+	if top_right == null or key_hint == null:
+		_fault("수첩: HUD 키 안내(TopRight/.../KeyHintLabel)를 못 찾았다")
+	elif not key_hint.is_visible_in_tree() \
+			or not key_hint.text.contains("[J]") or not key_hint.text.contains("[R]"):
+		_fault("수첩: HUD 키 안내가 안 보이거나 J·R을 안 적는다 (%s)" % key_hint.text)
+	else:
+		var box_bottom := top_right.get_global_rect().end.y
+		var alert: Node = main.get_node_or_null("HUD/Root/JanitorAlert")
+		var arrow_top := 0.0
+		if alert != null:
+			var consts: Dictionary = alert.get_script().get_script_constant_map()
+			arrow_top = float(consts["TOP_MARGIN"]) \
+				- (consts["ARROW"] as Texture2D).get_height() * float(consts["PIXEL_SCALE"]) * 0.5
+		if toast.get_global_rect().position.y < box_bottom:
+			_fault("수첩: '수첩에 적었다' 알림(y %.0f)이 오른쪽 위 상자(끝 y %.0f)에 겹친다"
+				% [toast.get_global_rect().position.y, box_bottom])
+		elif alert != null and arrow_top < box_bottom:
+			_fault("수첩: 수위 화살표 위쪽 끝(y %.0f)이 오른쪽 위 상자(끝 y %.0f)에 겹친다"
+				% [arrow_top, box_bottom])
+		else:
+			_ok("수첩 키 안내 (상자 끝 y %.0f)" % box_bottom)
+
 	# ── 열 수 없는 때(일시정지 메뉴와 같은 규칙) ───────────────────
 	paused = true
 	_press_journal()

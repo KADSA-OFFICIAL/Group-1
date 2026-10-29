@@ -117,6 +117,15 @@ text = "목표: 학교를 탈출하세요."
 layout_mode = 2
 text = "소지품: 없음"
 
+[node name="KeyHintLabel" type="Label" parent="Root/TopRight/Margin/TextRows"]
+; 여는 키 안내(#742). 수첩(J)은 새 내용이 풀릴 때 2.6초짜리 알림에만 나왔고 소지품(R)은
+; 어디에도 안 나왔다. 상자가 이만큼 길어지므로 그 아래에 붙는 수첩 알림(`journal_panel.tscn`의
+; Toast)과 수위 화살표 위쪽 여백(`janitor_alert.gd`의 TOP_MARGIN)을 같이 내렸다.
+layout_mode = 2
+theme_override_colors/font_color = Color(0.62, 0.62, 0.68, 1)
+theme_override_font_sizes/font_size = 13
+text = "[J] 수첩     [R] 소지품"
+
 [node name="CloseUp" type="PanelContainer" parent="Root"]
 ; 근접 클로즈업(#451). 층수 표시(y=114~160) 아래에 둔다 — 겹치지 않게 offset_top = 175.0.
 ; 평소에는 visible = false다.
