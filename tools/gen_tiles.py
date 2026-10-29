@@ -640,31 +640,64 @@ def solid_obj(fn):
 # 그래서 널·장 같은 큰 단위가 없고 잔 잡음 위에 넓은 얼룩만 얹는다.
 
 def p_dirt(dx: int, dy: int, gw: int, gh: int) -> float:
-    """운동장 다져진 흙. 굵은 자갈 알갱이 + 발이 다져 놓은 넓은 얼룩."""
+    """운동장 다져진 흙(마사토). 부드러운 얼룩 + 자갈 알 + 물 자국(#736).
+
+    #487의 흙은 2px 알갱이가 ±2.5% 흔들릴 뿐이라 게임 배율에서 운동장
+    대부분이 평평한 갈색 한 장이었다. 운동장은 어둠이 옅고 시야 마스크가
+    거의 없어(25배) **실내보다 바닥이 훨씬 넓게 보이는** 구간이라, 흙에도
+    칸(32px)보다 큰 결이 있어야 한다.
+
+    **얼룩에 문턱을 걸지 않는다.** `blot`은 격자점 사이를 잇는 값이라 문턱으로
+    자르면 격자점마다 십자 모양이 생기고, 그것이 타일(256px)마다 되풀이되어
+    바닥에 같은 표식이 줄지어 찍힌다(실제로 그랬다 — 파인 자리를 그렇게 냈다).
+    얼룩은 크기를 섞어 밝기로만 더하고, 날카로운 것은 점 단위 자갈뿐이다.
+    """
     dx, dy = dx % gw, dy % gh
-    v = 0.86 + jit(0.05, dx // 4, dy // 4, 181)       # 다져진 자리마다 톤 차이
-    v += jit(0.05, dx, dy, 182)                       # 잔 알갱이
-    r = rnd(dx, dy, 183)
-    if r > 0.972:
-        v += 0.10                                     # 드러난 자갈
-    elif r < 0.045:
-        v -= 0.12                                     # 파인 자리
-    v += wear(dx, dy, gw, gh, 184, 0.16, 0.06)        # 물 지나간 자국
+    patch = blot(dx, dy, gw, gh, 16, 185) * 0.6 + blot(dx, dy, gw, gh, 8, 186) * 0.4
+    v = 0.84 + (patch - 0.5) * 0.30                  # 다져진/부슬한 자리
+    v += jit(0.08, dx // 2, dy // 2, 181)            # 굵은 알갱이(4px)
+    v += jit(0.05, dx, dy, 182)                      # 잔 알갱이
+    # 자갈 — 부슬한 자리(밝은 쪽)에 더 많다. 한 알 위가 밝고 바로 아래가 그늘.
+    odds = 0.990 - 0.030 * max(0.0, patch - 0.45)
+    if rnd(dx, dy, 183) > odds:
+        v += 0.20
+    elif rnd(dx, (dy - 1) % gh, 183) > odds:
+        v -= 0.14
+    v += wear(dx, dy, gw, gh, 184, 0.14, 0.05)        # 물 지나간 자국
     return v
 
 
 def p_track(dx: int, dy: int, gw: int, gh: int) -> float:
-    """트랙. 흙보다 곱고 레인 선이 가로로 지난다(64px마다 = 칸 두 개)."""
+    """트랙 흙. 안쪽 흙보다 곱고 고르다(#736).
+
+    레인 선은 여기서 내지 않는다 — 트랙이 사각형 한 장이라 무늬로 선을 내면
+    좌우 다리에서도 선이 가로로 지났다. 게다가 무늬의 가장 밝은 도트는 평균의
+    1/MEAN(1.28)배를 못 넘어서(`bake`) 석회 선이 흙빛 줄무늬에 그쳤다. 선은
+    `gen_floors._yard_lanes()`가 석회색 띠로 깐다.
+    """
     dx, dy = dx % gw, dy % gh
-    v = 0.86 + jit(0.05, dx, dy, 191)                 # 고운 우레탄 알갱이
+    v = 0.86 + jit(0.06, dx, dy, 191)                 # 고운 알갱이
     v += jit(0.05, dx // 2, dy // 2, 192)
-    if dy % (SUB * 2) == 0:
-        v += 0.22                                     # 레인 선(2px)
-    elif dy % (SUB * 2) == 1:
-        v += 0.08                                     # 선 아래 그늘로 한 단
+    v += (blot(dx, dy, gw, gh, 16, 195) - 0.5) * 0.12  # 스파이크에 갈린 자리
     if rnd(dx, dy, 194) > 0.985:
-        v -= 0.14                                     # 벗겨진 자리
+        v -= 0.14                                     # 패인 발자국
     v += wear(dx, dy, gw, gh, 193, 0.16, 0.06)
+    return v
+
+
+def p_chalk(dx: int, dy: int, gw: int, gh: int) -> float:
+    """트랙 석회 선(#736). 닳아서 군데군데 흙이 비친다.
+
+    선 띠(폭 4px)에 월드 좌표로 깔리므로 선을 따라 얼룩이 지나간다 — 끊긴
+    자리가 일정한 간격으로 반복되면 점선이 되므로 넓은 얼룩(`blot`)으로 낸다.
+    """
+    dx, dy = dx % gw, dy % gh
+    v = 0.90 + jit(0.10, dx, dy, 211)                 # 가루가 고르지 않다
+    b = blot(dx, dy, gw, gh, 16, 212)
+    if b < 0.30:
+        v -= 0.42                                     # 닳아 흙이 드러난 자리
+    elif b < 0.42:
+        v -= 0.20
     return v
 
 
@@ -689,12 +722,17 @@ def o_tree(dx: int, dy: int, gw: int, gh: int) -> float:
     # 수관이 **밝고** 바깥이 어둡다. 화분(o_plant)은 반대인데, 저쪽은 밝은
     # 실내 바닥 위에 놓이는 물건이고 나무는 캄캄한 흙 위에 선 덩어리다 —
     # 바깥을 밝히면 사각형 잔디밭 한가운데 검은 원이 있는 것처럼 보인다.
+    #
+    # 폴리곤이 팔각형이라(#736) 원 밖은 팔각형 귀퉁이 작은 조각만 남는다 —
+    # 그 조각을 가장자리 잎과 같은 톤으로 칠해야 귀퉁이가 안 튄다.
     cx0, cy0 = (gw - 1) / 2.0, (gh - 1) / 2.0
     r = (((dx - cx0) / (gw * 0.48)) ** 2 + ((dy - cy0) / (gh * 0.48)) ** 2) ** 0.5
     if r > 1.0:
-        return 0.42 + jit(0.05, dx, dy, 433)          # 수관 밖 — 그늘진 흙
+        return 0.62 + jit(0.08, dx, dy, 433)          # 수관 밖 — 그늘진 잎
     v = 0.88 + jit(0.14, dx // 2, dy // 2, 431)       # 잎 덩어리
     v += jit(0.07, dx, dy, 432)
+    # 빛은 위왼쪽에서 — 잎 덩어리 위쪽이 밝고 아래오른쪽이 그늘이다.
+    v += 0.10 * ((cx0 - dx) / gw + (cy0 - dy) / gh)
     if r > 0.86:
         v -= 0.16                                     # 가장자리 잎이 어둡다
     return v
@@ -727,6 +765,72 @@ def o_podium(dx: int, dy: int, gw: int, gh: int) -> float:
     return 0.85 + jit(0.05, dx, dy, 463)              # 상판
 
 
+def o_bench(dx: int, dy: int, gw: int, gh: int) -> float:
+    """운동장 벤치(#736). 길이 방향 나무 살 셋 + 양 끝 받침.
+
+    130x34에 늘어나므로 가로 한 도트가 8px, 세로 한 도트가 2px쯤이다 —
+    살 사이 틈(1도트)이 2px 줄로 남는다. 실내 선반 그림(`obj_shelf`)을 쓰던
+    때는 책 칸이 세로로 서서 책장이 바닥에 누운 것으로 보였다.
+    """
+    slat = dy * 3 // gh                               # 0·1·2번 살
+    top = slat * gh // 3
+    if dy == top and slat > 0:
+        return 0.34                                   # 살 사이 틈 — 아래 흙 그늘
+    if dx in (1, gw - 2):
+        return 0.66 + jit(0.04, dx, dy, 472)          # 받침이 살 위로 비친다
+    v = 0.86 + jit(0.06, dx, slat, 471)               # 살마다 나뭇결 톤
+    v += jit(0.05, dx, dy, 473)
+    if dy == top + 1 or (slat == 0 and dy == 0):
+        v += 0.08                                     # 살 윗모서리
+    return v
+
+
+def o_bike(dx: int, dy: int, gw: int, gh: int) -> float:
+    """세워 둔 자전거를 위에서 본 것(#736). 앞이 위.
+
+    폴리곤이 자전거 윤곽(`gen_floors._bike_shape`: 앞바퀴 / 핸들 / 프레임 /
+    안장 / 프레임 / 뒷바퀴)이라 그 밖의 칸은 안 보인다. 세로 한 도트가
+    5.5px이고 줄마다 부품 하나다 — 그래서 무늬도 줄 단위로 정한다. 색은
+    한 대마다 다르다(`C_BIKE_*`) — 도장된 프레임이 가장 밝아야 색이 산다.
+    실내 사물함 그림(`obj_locker`)을 쓰던 때는 거치대에 사물함이 줄 서 있었다.
+    """
+    cx0 = (gw - 1) / 2.0
+    off = abs(dx - cx0)
+    wheel_row = dy <= 1 or dy >= gh - 4
+    if wheel_row and off > 2.0:
+        # 바퀴 줄의 바깥은 폴리곤 밖이다. 밝게 둬야 보이는 칸의 명암이 안 눌린다
+        # — 그림 평균을 MEAN에 맞추므로(`bake`) 안 보이는 칸이 어두우면 타이어가
+        # 회색으로 뜬다(실제로 그랬다).
+        return 0.96
+    if dy <= 1 or dy >= gh - 1:
+        return 0.30                                   # 타이어 끝(고무)
+    if dy in (2, 3):
+        return 0.58 if off > gw * 0.30 else 0.92      # 손잡이 고무 / 핸들 쇠
+    if dy in (8, 9):
+        return 0.40 if off < gw * 0.25 else 0.96      # 안장(검은 가죽)
+    if dy >= gh - 4:
+        return 0.42 + jit(0.06, dx, dy, 481)          # 뒷바퀴
+    if dy <= 5 and off < 1.5:
+        return 0.48                                   # 앞바퀴 뒷부분·포크
+    return 0.96                                       # 도장된 프레임(+ 폴리곤 밖)
+
+
+def o_pole(dx: int, dy: int, gw: int, gh: int) -> float:
+    """가로등·게양대 기둥을 위에서 본 것(#736). 둥근 쇠기둥 머리.
+
+    폴리곤이 팔각형이라 원 밖 조각은 작다. 위왼쪽에 반사광 한 점.
+    """
+    cx0, cy0 = (gw - 1) / 2.0, (gh - 1) / 2.0
+    r = (((dx - cx0) / (gw * 0.5)) ** 2 + ((dy - cy0) / (gh * 0.5)) ** 2) ** 0.5
+    if r > 1.0:
+        return 0.80                                   # 팔각형 귀퉁이 조각
+    v = 0.96 - 0.30 * r * r                           # 둥근 면 — 가장자리가 어둡다
+    hx, hy = cx0 - gw * 0.18, cy0 - gh * 0.18
+    if ((dx - hx) ** 2 + (dy - hy) ** 2) ** 0.5 < gw * 0.14:
+        v += 0.34                                     # 반사광
+    return v
+
+
 OBJECTS = {
     "obj_desk": solid_obj(o_desk),
     "obj_chair": solid_obj(o_chair),
@@ -750,6 +854,10 @@ OBJECTS = {
     "obj_goal": solid_obj(o_goal),
     "obj_stand": solid_obj(o_stand),
     "obj_podium": solid_obj(o_podium),
+    # 운동장 전용(#736) — 벤치가 선반, 자전거가 사물함 그림을 빌려 썼다.
+    "obj_bench": solid_obj(o_bench),
+    "obj_bike": o_bike,          # 위에서 본 얇은 물건이라 앞면·옆면이 없다
+    "obj_pole": o_pole,          # 둥근 머리 — 네모 앞면을 얹으면 상자가 된다
 }
 
 
@@ -769,6 +877,7 @@ PATTERNS = {
     "yard_dirt": (p_dirt, FLOOR),
     "yard_track": (p_track, FLOOR),
     "yard_paving": (p_paving, FLOOR),
+    "yard_chalk": (p_chalk, FLOOR),  # 트랙 석회 선(#736)
 }
 
 # #242가 이미 격자를 그리는 면. 여기에는 선이 있는 무늬를 쓸 수 없다 —

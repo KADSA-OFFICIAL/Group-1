@@ -225,6 +225,19 @@ C_PODIUM = "Color(0.30, 0.30, 0.31, 1)"
 # 관람석. 실내 계단 디딤판(C_STEP)을 빌려 쓰던 것을 갈랐다(#487) —
 # 같은 색이면 SPRITE 조회가 계단까지 관람석 그림으로 바꿔 버린다.
 C_YARD_STAND = "Color(0.27, 0.28, 0.30, 1)"
+# 운동장 벤치·자전거(#736). 실내 벤치(C_BENCH → 선반 그림)·사물함(C_METAL)을
+# 빌려 쓰던 것을 갈랐다 — 색이 곧 SPRITE 열쇠라 **값이 달라야 한다**.
+C_YARD_BENCH = "Color(0.28, 0.25, 0.2, 1)"
+# 자전거는 한 대마다 색이 다르다 — 같은 남색 다섯 대는 어둠 속에서 쇠막대 줄이었다.
+C_BIKE_RED = "Color(0.36, 0.16, 0.15, 1)"
+C_BIKE_BLUE = "Color(0.18, 0.24, 0.38, 1)"
+C_BIKE_SILVER = "Color(0.4, 0.41, 0.43, 1)"
+C_BIKE_GREEN = "Color(0.2, 0.3, 0.22, 1)"
+C_BIKE_BLACK = "Color(0.17, 0.17, 0.19, 1)"
+C_BIKES = (C_BIKE_SILVER, C_BIKE_RED, C_BIKE_BLACK, C_BIKE_BLUE, C_BIKE_GREEN)
+# 트랙 석회 선(#736). 흙보다 확연히 밝아야 선으로 읽힌다 — 무늬(`yard_chalk`)가
+# 닳은 자리를 내므로 색은 깨끗한 석회 쪽으로 둔다.
+C_YARD_LINE = "Color(0.44, 0.42, 0.38, 1)"
 
 # 색 상수 -> 타일 이름. 여기 없는 색은 단색으로 남는다 — 열쇠·화살표·천장등처럼
 # 표식이거나, 마루 널 이음매(C_SEAM 2px)·칸막이 문
@@ -254,6 +267,7 @@ TEX = {
     C_YARD_PATH_DARK: "yard_dirt",
     C_YARD_PEBBLE: "yard_paving",
     C_YARD_TRACK: "yard_track",
+    C_YARD_LINE: "yard_chalk",
     C_WALK: "yard_paving",
     C_PAINT_BLUE: "floor_matte",
     C_PAINT_RED: "floor_matte",
@@ -420,6 +434,13 @@ SPRITE = {
     C_GOAL: "obj_goal",
     C_YARD_STAND: "obj_stand",
     C_PODIUM: "obj_podium",
+    C_YARD_BENCH: "obj_bench",   # #736
+    C_BIKE_RED: "obj_bike",
+    C_BIKE_BLUE: "obj_bike",
+    C_BIKE_SILVER: "obj_bike",
+    C_BIKE_GREEN: "obj_bike",
+    C_BIKE_BLACK: "obj_bike",
+    C_LAMPPOST: "obj_pole",      # 가로등·게양대 기둥
 }
 SPRITE_SIZE = 32    # gen_tiles.py의 OBJ와 반드시 같아야 한다
 
@@ -772,7 +793,7 @@ class Scene:
     def node(self, text):
         self.nodes.append(text)
 
-    def poly2d(self, name, parent, color, polygon, z=None):
+    def poly2d(self, name, parent, color, polygon, z=None, uv=None):
         z_line = f"z_index = {z}\n" if z is not None else ""
         tex_line = ""
         # 외부 바닥(#725) — 재질처럼 UV를 비워 월드 격자로 되풀이한다(1배).
@@ -803,7 +824,9 @@ class Scene:
         if stem:
             tex_line = f'texture = ExtResource("tex_{stem}")\n'
             if obj:
-                tex_line += f"uv = {uv_for(polygon)}\n"
+                # `uv`를 주면 그대로 쓴다 — 돌려 놓은 물건(운동장 자전거, #736)은
+                # 경계상자로 UV를 잡으면 그림이 안 따라 돈다.
+                tex_line += f"uv = {uv or uv_for(polygon)}\n"
             color = tex_color(color)
             if obj:
                 color = shade_jitter(color, name)
@@ -3957,14 +3980,110 @@ def _yard_light(sc, key, x, y):
         ""]))
 
 
-def _yard_prop(sc, key, x0, y0, x1, y1, color, solid=True):
-    """운동장 집기. 층과 같은 PC_/PV_ 한 쌍이다."""
-    box = poly((x0, y0), (x1, y0), (x1, y1), (x0, y1))
+def _yard_prop(sc, key, x0, y0, x1, y1, color, solid=True, shape=None, uv=None):
+    """운동장 집기. 층과 같은 PC_/PV_ 한 쌍이다.
+
+    `shape`는 경계상자 안의 다른 모양(#736) — 나무·기둥은 팔각형, 자전거는
+    십자다. 그림(UV)은 여전히 경계상자에 맞춰 늘어나고(`uv_for`), 겹침 검사는
+    경계상자(`prop_rects`)로 본다.
+    """
+    box = shape or poly((x0, y0), (x1, y0), (x1, y1), (x0, y1))
     if solid:
         sc.node('[node name="PC_' + key + '" type="CollisionPolygon2D" '
                 'parent="PropBodies"]' + NL + "polygon = " + box + NL)
-    sc.poly2d("PV_" + key, "Props", color, box)
+    sc.poly2d("PV_" + key, "Props", color, box, uv=uv)
     sc.prop_rects.append((key, (x0, y0, x1, y1), color))
+
+
+def _octagon(x0, y0, x1, y1):
+    """경계상자에 꼭 맞는 팔각형(귀퉁이를 29%씩 깎는다 — 정팔각형 비율)."""
+    cx, cy = (x1 - x0) * 0.29, (y1 - y0) * 0.29
+    return poly((x0 + cx, y0), (x1 - cx, y0), (x1, y0 + cy), (x1, y1 - cy),
+                (x1 - cx, y1), (x0 + cx, y1), (x0, y1 - cy), (x0, y0 + cy))
+
+
+BIKE_LEAN = 16.0      # 자전거가 받침대에 기댄 각도(도). 0이면 묘비 십자로 읽힌다.
+
+
+def _bike_shape(x0, y0, x1, y1):
+    """위에서 본 자전거 윤곽 — 받침대에 기대 기울었다(#736).
+
+    네모로 내면 사물함이고, 똑바로 세우면 몸통 + 가로대가 **묘비 십자가**다
+    (공포 게임이라 그렇게 읽힌다). 다섯 대가 같은 쪽으로 기울면 세워 둔 자전거
+    줄이 된다. 돌린 모양이라 UV를 정점마다 직접 준다 — 경계상자 UV(`uv_for`)는
+    그림이 안 따라 돈다. 돌아간 경계상자를 함께 돌려준다(겹침 검사가 쓴다).
+    """
+    import math
+    w, h = x1 - x0, y1 - y0
+    cx, cy = (x0 + x1) / 2, (y0 + y1) / 2
+    # 줄 경계(16칸 중) — o_bike와 맞춘다: 앞바퀴 0~2 / 핸들 2~4 / 프레임 4~8 /
+    # 안장 8~10 / 프레임 10~12 / 뒷바퀴 12~16. 폭(반)은 바퀴 2.5·프레임 3·
+    # 안장 5·핸들 11px — 폭이 줄마다 달라야 칼·십자가가 아니라 자전거로 읽힌다.
+    rows = ((0, 2, 2.5), (2, 4, 11), (4, 8, 3), (8, 10, 5), (10, 12, 3), (12, 16, 2.5))
+    right, left = [], []
+    for r0, r1, hw in rows:
+        ya, yb = y0 + h * r0 / 16, y0 + h * r1 / 16
+        right += [(cx + hw, ya), (cx + hw, yb)]
+        left += [(cx - hw, ya), (cx - hw, yb)]
+    local = right + left[::-1]
+    a = math.radians(BIKE_LEAN)
+    ca, sa = math.cos(a), math.sin(a)
+    pts = [(round(cx + (x - cx) * ca - (y - cy) * sa, 1),
+            round(cy + (x - cx) * sa + (y - cy) * ca, 1)) for x, y in local]
+    uvs = [(round((x - x0) / w * SPRITE_SIZE, 2), round((y - y0) / h * SPRITE_SIZE, 2))
+           for x, y in local]
+    xs, ys = [p[0] for p in pts], [p[1] for p in pts]
+    uv = "PackedVector2Array(" + ", ".join(f"{u}, {v}" for u, v in uvs) + ")"
+    return poly(*pts), uv, (min(xs), min(ys), max(xs), max(ys))
+
+
+def _yard_lanes(sc):
+    """트랙 석회 선 셋(#736).
+
+    트랙(사각형 한 장)과 안쪽 흙 사이 띠에 모서리가 둥근 고리를 셋 깐다.
+    무늬로 내던 레인 선은 좌우 다리에서도 가로로 지났고, 흙빛 줄무늬 이상으로
+    밝힐 수 없었다(`gen_tiles.p_track`). 복도 바닥의 얇은 막대(#271~#277)와
+    달리 운동장을 한 바퀴 도는 **닫힌 고리**라 떨어진 물건으로 안 읽힌다.
+
+    고리 하나를 위·아래 반쪽 둘로 낸다 — 구멍 난 폴리곤 한 장은 Polygon2D가
+    삼각분할에 실패할 수 있다. 흙길(`_add_yard_paths`)보다 **먼저** 깔아야
+    사람이 다닌 자리에서 선이 지워진다.
+    """
+    import math
+    ox0, oy0, ox1, oy1 = 240, YARD_FACADE + 120, YW - 240, YARD_FENCE - 150
+    ix0, iy0, ix1, iy1 = 430, YARD_FACADE + 250, YW - 430, YARD_FENCE - 280
+    half_w = 2.0                                      # 선 폭 4px(도트 둘)
+    for li, f in enumerate((0.12, 0.5, 0.88)):
+        x0 = ox0 + (ix0 - ox0) * f
+        x1 = ox1 + (ix1 - ox1) * f
+        y0 = oy0 + (iy0 - oy0) * f
+        y1 = oy1 + (iy1 - oy1) * f
+        r = 70 + (0.88 - f) * 160                     # 바깥 선일수록 크게 돈다
+        corners = ((x1 - r, y0 + r, -90), (x1 - r, y1 - r, 0),
+                   (x0 + r, y1 - r, 90), (x0 + r, y0 + r, 180))
+
+        def arc(cx, cy, a0, rr):
+            return [(cx + rr * math.cos(math.radians(a0 + 90 * k / 8)),
+                     cy + rr * math.sin(math.radians(a0 + 90 * k / 8)))
+                    for k in range(9)]
+
+        # 위 반쪽: 왼쪽 중간 → 왼위 모서리 → 오위 모서리 → 오른쪽 중간
+        # 아래 반쪽: 오른쪽 중간 → 오아래 → 왼아래 → 왼쪽 중간
+        ym = (y0 + y1) / 2
+        for half, cs in (("T", (corners[3], corners[0])), ("B", (corners[1], corners[2]))):
+            out, inn = [], []
+            for rr, dst in ((r + half_w, out), (r - half_w, inn)):
+                xs = x0 if half == "T" else x1
+                xe = x1 if half == "T" else x0
+                d = -half_w if rr > r else half_w
+                sx = xs + (d if half == "T" else -d)
+                ex = xe - (d if half == "T" else -d)
+                dst.append((sx, ym))
+                for cx, cy, a0 in cs:
+                    dst.extend(arc(cx, cy, a0, rr))
+                dst.append((ex, ym))
+            pts = [(round(x, 1), round(y, 1)) for x, y in out + inn[::-1]]
+            sc.poly2d("YardLane%d%s" % (li, half), "Ground", C_YARD_LINE, poly(*pts))
 
 
 def _add_yard_paths(sc):
@@ -4139,6 +4258,7 @@ def build_yard():
               rect(240, YARD_FACADE + 120, YW - 240, YARD_FENCE - 150))
     sc.poly2d("Infield", "Ground", C_YARD,
               rect(430, YARD_FACADE + 250, YW - 430, YARD_FENCE - 280))
+    _yard_lanes(sc)
     # 현관에서 정문으로 이어지는 유기적인 닳은 흙길과 디테일 패치(#520, #526)
     _add_yard_paths(sc)
     sc.poly2d("Walk", "Ground", C_WALK, rect(0, YARD_FENCE + T, YW, YH))
@@ -4188,23 +4308,25 @@ def build_yard():
                    YW - 120, YARD_FENCE - 268 + i * 44, C_YARD_STAND)
     _yard_prop(sc, "Podium", 980, YARD_FACADE + 90, 1300, YARD_FACADE + 190, C_PODIUM)
     _yard_prop(sc, "FlagPole", 1330, YARD_FACADE + 96, 1352, YARD_FACADE + 118,
-               C_METAL)
+               C_LAMPPOST, shape=_octagon(1330, YARD_FACADE + 96, 1352, YARD_FACADE + 118))
     for i in range(9):
         tx = 180 + i * 350
         if gx0 - 130 < tx < gx1 + 40:
             continue
         _yard_prop(sc, "Tree" + str(i), tx, YARD_FENCE - 130, tx + 96,
-                   YARD_FENCE - 34, C_TREE)
+                   YARD_FENCE - 34, C_TREE,
+                   shape=_octagon(tx, YARD_FENCE - 130, tx + 96, YARD_FENCE - 34))
     for i in range(4):
         bx = 320 + i * 300
         if gx0 - 160 < bx < gx1 + 40:
             continue
         # YARD_SIDE 폐지(#513) — 옆문 앞 벤치 회피 코드 제거
         _yard_prop(sc, "Bench" + str(i), bx, YARD_FACADE + 40, bx + 130,
-                   YARD_FACADE + 74, C_BENCH)
+                   YARD_FACADE + 74, C_YARD_BENCH)
     for i in range(5):
-        _yard_prop(sc, "Bike" + str(i), 2500 + i * 60, YARD_FACADE + 40,
-                   2530 + i * 60, YARD_FACADE + 128, C_METAL)
+        bx0, by0 = 2500 + i * 60, YARD_FACADE + 40
+        shape, uv, bb = _bike_shape(bx0, by0, bx0 + 30, by0 + 88)
+        _yard_prop(sc, "Bike" + str(i), *bb, C_BIKES[i], shape=shape, uv=uv)
 
     # ── 가로등 ──────────────────────────────────────────────
     # 정문 앞 등은 마지막에 둔다 — 나가는 곳이 어디인지 불빛으로 먼저 보인다.
@@ -4215,7 +4337,7 @@ def build_yard():
              ((YARD_GATE_X0 + YARD_GATE_X1) / 2, YARD_FENCE - 250)]
     for i, (lx, ly) in enumerate(lamps):
         _yard_prop(sc, "LampPost" + str(i), lx - 11, ly - 11, lx + 11, ly + 11,
-                   C_LAMPPOST)
+                   C_LAMPPOST, shape=_octagon(lx - 11, ly - 11, lx + 11, ly + 11))
         _yard_light(sc, str(i), lx, ly)
 
     # ── 정문(탈출) ──────────────────────────────────────────
