@@ -1,37 +1,44 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=10 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1_hud_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/subtitle_dialogue.tscn" id="2_subtitle"]
 [ext_resource type="Script" path="res://scripts/ui/janitor_alert.gd" id="3_alert"]
 [ext_resource type="Script" path="res://scripts/ui/hud_waypoint.gd" id="4_waypoint"]
+[ext_resource type="FontFile" path="res://assets/fonts/YeonSung-Regular.ttf" id="5_title_font"]
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSansKR-VF.ttf" id="6_body_font"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inv_panel"]
-bg_color = Color(0.22, 0.22, 0.25, 0.97)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.55, 0.55, 0.62, 1)
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+; 소지품 창 바탕(#745) — 수첩(`journal_panel.tscn`의 Paper)과 같은 어두운 갈색 종이 톤.
+bg_color = Color(0.09, 0.085, 0.08, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.36, 0.33, 0.28, 1)
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inv_slot"]
-bg_color = Color(0.12, 0.12, 0.14, 1)
-border_width_left = 3
-border_width_top = 3
-border_width_right = 3
-border_width_bottom = 3
-border_color = Color(0.42, 0.42, 0.48, 1)
-corner_radius_top_left = 2
-corner_radius_top_right = 2
-corner_radius_bottom_right = 2
-corner_radius_bottom_left = 2
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inv_slot_filled"]
+; 물건이 든 칸 — 테두리를 또렷하게(사용자: "물품 테두리 강조").
+bg_color = Color(0.05, 0.046, 0.042, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.62, 0.55, 0.43, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inv_slot_empty"]
+; 빈 칸 — 같은 두께, 어둡게. 몇 칸이 남았는지는 보이되 든 칸보다 앞에 나서지 않는다.
+bg_color = Color(0.045, 0.042, 0.04, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.24, 0.22, 0.19, 1)
 
 [node name="HUD" type="CanvasLayer"]
 layer = 3
 script = ExtResource("1_hud_script")
+slot_style_filled = SubResource("StyleBoxFlat_inv_slot_filled")
+slot_style_empty = SubResource("StyleBoxFlat_inv_slot_empty")
 
 [node name="Root" type="Control" parent="."]
 layout_mode = 3
@@ -163,6 +170,8 @@ horizontal_alignment = 1
 autowrap_mode = 2
 
 [node name="InventoryPanel" type="PanelContainer" parent="Root"]
+; 소지품 창(#745). 사용자가 실제 게임 캡처 시안 셋 중 'A 수첩 톤'을 골랐다 — 회색 라운드
+; 상자 + 글자만 있던 칸이 웹 폼처럼 보였다. 칸 안에는 그림, 이름은 칸 아래(`hud.gd`가 채운다).
 visible = false
 layout_mode = 1
 anchors_preset = 8
@@ -170,109 +179,223 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -216.0
-offset_top = -84.0
-offset_right = 216.0
-offset_bottom = 84.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_inv_panel")
 
 [node name="Margin" type="MarginContainer" parent="Root/InventoryPanel"]
 layout_mode = 2
-theme_override_constants/margin_left = 20
-theme_override_constants/margin_top = 14
-theme_override_constants/margin_right = 20
-theme_override_constants/margin_bottom = 14
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 16
 
 [node name="Rows" type="VBoxContainer" parent="Root/InventoryPanel/Margin"]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 12
 
-[node name="InventoryTitle" type="Label" parent="Root/InventoryPanel/Margin/Rows"]
+[node name="Header" type="HBoxContainer" parent="Root/InventoryPanel/Margin/Rows"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 22
-text = "소지품 (0/5)"
-horizontal_alignment = 1
 
-[node name="Slots" type="GridContainer" parent="Root/InventoryPanel/Margin/Rows"]
+[node name="InventoryTitle" type="Label" parent="Root/InventoryPanel/Margin/Rows/Header"]
+; 제목은 연성을 크게 — 사용자: "'소지품' 폰트 강조". 붉은 그림자는 메뉴의 붉은 선·핏자국과 같은 계열.
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91, 0.86, 0.75, 1)
+theme_override_colors/font_shadow_color = Color(0.42, 0.07, 0.06, 1)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_fonts/font = ExtResource("5_title_font")
+theme_override_font_sizes/font_size = 48
+text = "소지품"
+
+[node name="Spacer" type="Control" parent="Root/InventoryPanel/Margin/Rows/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="InventoryCount" type="Label" parent="Root/InventoryPanel/Margin/Rows/Header"]
+layout_mode = 2
+size_flags_vertical = 8
+theme_override_colors/font_color = Color(0.55, 0.52, 0.47, 1)
+theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_font_sizes/font_size = 17
+text = "0 / 5"
+
+[node name="Rule" type="ColorRect" parent="Root/InventoryPanel/Margin/Rows"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.36, 0.33, 0.28, 0.6)
+
+[node name="Slots" type="HBoxContainer" parent="Root/InventoryPanel/Margin/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 14
+
+[node name="Slot1" type="VBoxContainer" parent="Root/InventoryPanel/Margin/Rows/Slots"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Box" type="PanelContainer" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot1"]
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inv_slot_empty")
+
+[node name="Icon" type="TextureRect" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot1/Box"]
 layout_mode = 2
 size_flags_horizontal = 4
-columns = 5
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
+size_flags_vertical = 4
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
 
-[node name="Slot1" type="PanelContainer" parent="Root/InventoryPanel/Margin/Rows/Slots"]
-custom_minimum_size = Vector2(64, 64)
+[node name="Name" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot1"]
+custom_minimum_size = Vector2(84, 0)
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_inv_slot")
-
-[node name="ItemLabel" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot1"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = ""
+theme_override_colors/font_color = Color(0.82, 0.78, 0.7, 1)
+theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
 
-[node name="Slot2" type="PanelContainer" parent="Root/InventoryPanel/Margin/Rows/Slots"]
-custom_minimum_size = Vector2(64, 64)
+[node name="Key" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot1"]
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_inv_slot")
-
-[node name="ItemLabel" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot2"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = ""
+theme_override_colors/font_color = Color(0.85, 0.64, 0.25, 1)
+theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_font_sizes/font_size = 13
 horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
 
-[node name="Slot3" type="PanelContainer" parent="Root/InventoryPanel/Margin/Rows/Slots"]
-custom_minimum_size = Vector2(64, 64)
+[node name="Slot2" type="VBoxContainer" parent="Root/InventoryPanel/Margin/Rows/Slots"]
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_inv_slot")
+theme_override_constants/separation = 6
 
-[node name="ItemLabel" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot3"]
+[node name="Box" type="PanelContainer" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot2"]
+custom_minimum_size = Vector2(84, 84)
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = ""
+theme_override_styles/panel = SubResource("StyleBoxFlat_inv_slot_empty")
+
+[node name="Icon" type="TextureRect" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot2/Box"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot2"]
+custom_minimum_size = Vector2(84, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.78, 0.7, 1)
+theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
 
-[node name="Slot4" type="PanelContainer" parent="Root/InventoryPanel/Margin/Rows/Slots"]
-custom_minimum_size = Vector2(64, 64)
+[node name="Key" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot2"]
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_inv_slot")
-
-[node name="ItemLabel" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot4"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = ""
+theme_override_colors/font_color = Color(0.85, 0.64, 0.25, 1)
+theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_font_sizes/font_size = 13
 horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
 
-[node name="Slot5" type="PanelContainer" parent="Root/InventoryPanel/Margin/Rows/Slots"]
-custom_minimum_size = Vector2(64, 64)
+[node name="Slot3" type="VBoxContainer" parent="Root/InventoryPanel/Margin/Rows/Slots"]
 layout_mode = 2
-theme_override_styles/panel = SubResource("StyleBoxFlat_inv_slot")
+theme_override_constants/separation = 6
 
-[node name="ItemLabel" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot5"]
+[node name="Box" type="PanelContainer" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot3"]
+custom_minimum_size = Vector2(84, 84)
 layout_mode = 2
-theme_override_font_sizes/font_size = 12
-text = ""
+theme_override_styles/panel = SubResource("StyleBoxFlat_inv_slot_empty")
+
+[node name="Icon" type="TextureRect" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot3/Box"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot3"]
+custom_minimum_size = Vector2(84, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.78, 0.7, 1)
+theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
-vertical_alignment = 1
-autowrap_mode = 3
+
+[node name="Key" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot3"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.64, 0.25, 1)
+theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1
+
+[node name="Slot4" type="VBoxContainer" parent="Root/InventoryPanel/Margin/Rows/Slots"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Box" type="PanelContainer" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot4"]
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inv_slot_empty")
+
+[node name="Icon" type="TextureRect" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot4/Box"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot4"]
+custom_minimum_size = Vector2(84, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.78, 0.7, 1)
+theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+
+[node name="Key" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot4"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.64, 0.25, 1)
+theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1
+
+[node name="Slot5" type="VBoxContainer" parent="Root/InventoryPanel/Margin/Rows/Slots"]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="Box" type="PanelContainer" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot5"]
+custom_minimum_size = Vector2(84, 84)
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_inv_slot_empty")
+
+[node name="Icon" type="TextureRect" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot5/Box"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+texture_filter = 1
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Name" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot5"]
+custom_minimum_size = Vector2(84, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.82, 0.78, 0.7, 1)
+theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+
+[node name="Key" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot5"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.85, 0.64, 0.25, 1)
+theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_font_sizes/font_size = 13
+horizontal_alignment = 1
 
 [node name="InventoryHint" type="Label" parent="Root/InventoryPanel/Margin/Rows"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.6, 0.6, 0.65, 1)
-theme_override_font_sizes/font_size = 13
-text = "R 키로 닫기"
-horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.5, 0.48, 0.44, 1)
+theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_font_sizes/font_size = 14
+text = "[R] 닫기"
+horizontal_alignment = 2
 
 [node name="Waypoint" type="Control" parent="Root"]
 layout_mode = 1
