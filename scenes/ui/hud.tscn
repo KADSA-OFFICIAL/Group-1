@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/hud.gd" id="1_hud_script"]
 [ext_resource type="PackedScene" path="res://scenes/ui/subtitle_dialogue.tscn" id="2_subtitle"]
@@ -6,6 +6,14 @@
 [ext_resource type="Script" path="res://scripts/ui/hud_waypoint.gd" id="4_waypoint"]
 [ext_resource type="FontFile" path="res://assets/fonts/YeonSung-Regular.ttf" id="5_title_font"]
 [ext_resource type="FontFile" path="res://assets/fonts/NotoSansKR-VF.ttf" id="6_body_font"]
+
+[sub_resource type="FontVariation" id="FontVariation_inv_item"]
+; 소지품 칸 아래 물건 이름·조작 키(#748). 가변 글꼴 기본 굵기는 가늘어서 굵은 연성 제목과
+; 2px 칸 테두리 옆에서 약했다(사용자: "물건 폰트 좀 더 두껍게"). 건너뛰기 버튼(#639)과 같은 방식.
+base_font = ExtResource("6_body_font")
+variation_opentype = {
+2003265652: 700
+}
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_inv_panel"]
 ; 소지품 창 바탕(#745) — 수첩(`journal_panel.tscn`의 Paper)과 같은 어두운 갈색 종이 톤.
@@ -250,14 +258,14 @@ stretch_mode = 5
 custom_minimum_size = Vector2(84, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.82, 0.78, 0.7, 1)
-theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_fonts/font = SubResource("FontVariation_inv_item")
 theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
 
 [node name="Key" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot1"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.64, 0.25, 1)
-theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_fonts/font = SubResource("FontVariation_inv_item")
 theme_override_font_sizes/font_size = 13
 horizontal_alignment = 1
 
@@ -282,14 +290,14 @@ stretch_mode = 5
 custom_minimum_size = Vector2(84, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.82, 0.78, 0.7, 1)
-theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_fonts/font = SubResource("FontVariation_inv_item")
 theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
 
 [node name="Key" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot2"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.64, 0.25, 1)
-theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_fonts/font = SubResource("FontVariation_inv_item")
 theme_override_font_sizes/font_size = 13
 horizontal_alignment = 1
 
@@ -314,14 +322,14 @@ stretch_mode = 5
 custom_minimum_size = Vector2(84, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.82, 0.78, 0.7, 1)
-theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_fonts/font = SubResource("FontVariation_inv_item")
 theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
 
 [node name="Key" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot3"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.64, 0.25, 1)
-theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_fonts/font = SubResource("FontVariation_inv_item")
 theme_override_font_sizes/font_size = 13
 horizontal_alignment = 1
 
@@ -346,14 +354,14 @@ stretch_mode = 5
 custom_minimum_size = Vector2(84, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.82, 0.78, 0.7, 1)
-theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_fonts/font = SubResource("FontVariation_inv_item")
 theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
 
 [node name="Key" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot4"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.64, 0.25, 1)
-theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_fonts/font = SubResource("FontVariation_inv_item")
 theme_override_font_sizes/font_size = 13
 horizontal_alignment = 1
 
@@ -378,14 +386,14 @@ stretch_mode = 5
 custom_minimum_size = Vector2(84, 0)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.82, 0.78, 0.7, 1)
-theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_fonts/font = SubResource("FontVariation_inv_item")
 theme_override_font_sizes/font_size = 14
 horizontal_alignment = 1
 
 [node name="Key" type="Label" parent="Root/InventoryPanel/Margin/Rows/Slots/Slot5"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.85, 0.64, 0.25, 1)
-theme_override_fonts/font = ExtResource("6_body_font")
+theme_override_fonts/font = SubResource("FontVariation_inv_item")
 theme_override_font_sizes/font_size = 13
 horizontal_alignment = 1
 
