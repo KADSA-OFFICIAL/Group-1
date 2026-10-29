@@ -66,6 +66,7 @@ func _run() -> void:
 	# 마지막에 둔다 — 씬을 실제로 갈아 끼워(change_scene_to_file) 본다.
 	await _check_pause_menu()
 	await _check_journal()
+	await _check_inventory()
 	await _check_ending_backgrounds()
 	await _check_ending_result()
 
@@ -1079,6 +1080,65 @@ func _check_journal() -> void:
 	else:
 		_ok("수첩 J·Esc로 닫힘")
 
+	await _drop_scenes(main)
+
+
+## 소지품 창(#745) — R로 열리고, 든 칸에는 그림·이름·조작 키, 빈 칸은 비고 테두리가
+## 어둡다. 노드 구조(Box/Icon·Name·Key)와 `hud.gd`의 그림 표가 어긋나면 칸이 통째로
+## 비어도 정적 검사는 통과한다.
+func _check_inventory() -> void:
+	if current_scene != null:
+		current_scene.free()
+		await process_frame
+	var main: Node = (load(MAIN) as PackedScene).instantiate()
+	root.add_child(main)
+	for i in 8:
+		await process_frame
+	var gs: Node = main.get_node_or_null("GameState")
+	var hud: Node = main.get_node_or_null("HUD")
+	var panel: Control = main.get_node_or_null("HUD/Root/InventoryPanel")
+	if gs == null or hud == null or panel == null:
+		_fault("소지품: GameState/HUD/InventoryPanel을 못 찾았다")
+		await _drop_scenes(main)
+		return
+	for id in ["korean_book", "stair_key_3", "ink_can"]:
+		gs.call("add_item", id)
+	await process_frame
+
+	var ev := InputEventAction.new()
+	ev.action = &"inventory"
+	ev.pressed = true
+	root.push_input(ev)
+	await process_frame
+	if not panel.visible:
+		_fault("소지품: R로 안 열린다")
+		await _drop_scenes(main)
+		return
+
+	var slots: Array[Node] = panel.get_node("Margin/Rows/Slots").get_children()
+	var filled: StyleBox = hud.get("slot_style_filled")
+	var empty: StyleBox = hud.get("slot_style_empty")
+	var bad := PackedStringArray()
+	for i in slots.size():
+		var slot: Node = slots[i]
+		var icon: TextureRect = slot.get_node("Box/Icon")
+		var nm: Label = slot.get_node("Name")
+		var style: StyleBox = (slot.get_node("Box") as PanelContainer).get_theme_stylebox("panel")
+		var has := i < 3
+		if has and (icon.texture == null or icon.size.x < 1.0 or nm.text == "" or style != filled):
+			bad.append("칸%d(그림=%s, 크기=%s, 이름='%s', 든 칸 테두리=%s)"
+				% [i + 1, icon.texture != null, icon.size, nm.text, style == filled])
+		elif not has and (icon.texture != null or nm.text != "" or style != empty):
+			bad.append("빈 칸%d이 비어 있지 않다" % [i + 1])
+	var ink_key: String = (slots[2].get_node("Key") as Label).text
+	if filled == null or empty == null:
+		_fault("소지품: HUD에 칸 테두리(slot_style_filled/empty)가 안 물려 있다")
+	elif not bad.is_empty():
+		_fault("소지품: " + ", ".join(bad))
+	elif not ink_key.contains("[Q]"):
+		_fault("소지품: 잉크통 칸에 조작 키가 없다 ('%s')" % ink_key)
+	else:
+		_ok("소지품 칸 그림·이름·빈 칸")
 	await _drop_scenes(main)
 
 

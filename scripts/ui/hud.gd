@@ -16,6 +16,18 @@ const USABLE_ITEM_KEYS := {
 	"ink_can": "[Q] 던지기",
 }
 
+## 소지품 칸 그림(#745) — 맵에 놓인 그 그림을 정수 배로 키운다(도트 폭이 고르게).
+## 열쇠는 계단·현관 모두 같은 그림이다(`_item_icon`). 표에 없으면 칸에 이름만 나온다.
+const ITEM_ICONS := {
+	"korean_book": [preload("res://assets/sprites/ext/hs_book_purple.png"), 3],
+	"ink_can": [preload("res://assets/sprites/ink_can.png"), 1],
+}
+const KEY_ICON := [preload("res://assets/sprites/key.png"), 2]
+
+## 물건이 든 칸 / 빈 칸 테두리. 든 칸이 또렷해야 무엇을 가졌는지 먼저 읽힌다(#745).
+@export var slot_style_filled: StyleBox
+@export var slot_style_empty: StyleBox
+
 @onready var objective_label: Label = $Root/TopRight/Margin/TextRows/ObjectiveLabel
 @onready var inventory_label: Label = $Root/TopRight/Margin/TextRows/InventoryLabel
 ## 엔딩 조건 현황 레이블(#540, #545)
@@ -29,14 +41,9 @@ const USABLE_ITEM_KEYS := {
 @onready var waypoint: Control = $Root/Waypoint
 @onready var close_up_image: TextureRect = $Root/CloseUp/Margin/Rows/Image
 @onready var close_up_caption: Label = $Root/CloseUp/Margin/Rows/Caption
-@onready var inventory_title: Label = $Root/InventoryPanel/Margin/Rows/InventoryTitle
-@onready var slot_labels: Array[Label] = [
-	$Root/InventoryPanel/Margin/Rows/Slots/Slot1/ItemLabel,
-	$Root/InventoryPanel/Margin/Rows/Slots/Slot2/ItemLabel,
-	$Root/InventoryPanel/Margin/Rows/Slots/Slot3/ItemLabel,
-	$Root/InventoryPanel/Margin/Rows/Slots/Slot4/ItemLabel,
-	$Root/InventoryPanel/Margin/Rows/Slots/Slot5/ItemLabel,
-]
+@onready var inventory_count: Label = $Root/InventoryPanel/Margin/Rows/Header/InventoryCount
+## 칸 하나 = `Box`(테두리)/`Icon` + 아래 `Name`·`Key`.
+@onready var slots: Array[Node] = $Root/InventoryPanel/Margin/Rows/Slots.get_children()
 
 ## 자막 대기열(#454). 대기열이 없으면 연달아 오는 대사가 서로를 **덮는다** —
 ## 이설이 2층 머리를 보고 말하는 도중 수위 혼잣말이 끼어들자 그 줄이 통째로
@@ -160,21 +167,31 @@ func set_inventory(items: Array[String]) -> void:
 
 
 func _refresh_inventory_panel() -> void:
-	inventory_title.text = "소지품 (%d/%d)" % [current_items.size(), max_items]
+	inventory_count.text = "%d / %d" % [current_items.size(), max_items]
 
-	# 슬롯에 아이템 이름 표시 (아이템 이미지는 추후 교체 예정)
 	# 쓸 수 있는 아이템은 조작 키를 같이 적는다 — 획득 시 안내는 3초 뒤 사라지지만
 	# 정작 필요한 순간은 한참 뒤라, R로 다시 확인할 수 있어야 한다(#169).
-	for i in slot_labels.size():
-		if i >= current_items.size():
-			slot_labels[i].text = ""
-			continue
+	for i in slots.size():
+		var slot: Node = slots[i]
+		var box: PanelContainer = slot.get_node("Box")
+		var icon: TextureRect = slot.get_node("Box/Icon")
+		var item_id := current_items[i] if i < current_items.size() else ""
+		var art := _item_icon(item_id)
+		icon.texture = art[0] if not art.is_empty() else null
+		icon.custom_minimum_size = art[0].get_size() * art[1] if not art.is_empty() else Vector2.ZERO
+		(slot.get_node("Name") as Label).text = _get_item_display_name(item_id) if item_id != "" else ""
+		(slot.get_node("Key") as Label).text = USABLE_ITEM_KEYS.get(item_id, "")
+		box.add_theme_stylebox_override("panel",
+			slot_style_filled if item_id != "" else slot_style_empty)
 
-		var item_id := current_items[i]
-		var label := _get_item_display_name(item_id)
-		if item_id in USABLE_ITEM_KEYS:
-			label += "\n" + USABLE_ITEM_KEYS[item_id]
-		slot_labels[i].text = label
+
+## 칸 그림 `[텍스처, 배율]`. 없으면 빈 배열.
+func _item_icon(item_id: String) -> Array:
+	if item_id in ITEM_ICONS:
+		return ITEM_ICONS[item_id]
+	if item_id.begins_with("stair_key_") or item_id == "front_gate_key":
+		return KEY_ICON
+	return []
 
 
 ## 지문·서술. 화자가 없으므로 프롤로그의 독백 배치로 나온다.
