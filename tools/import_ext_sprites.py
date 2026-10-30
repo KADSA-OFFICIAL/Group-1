@@ -41,6 +41,13 @@ DARKLIGHT = {
     "painting_dark": "painting1.png",         # 시우 그림 — 밤 풍경 액자
     "book_closed": "book.png",                # 인사 기록(서류철)
     "books_pile": "booksPile1.png",           # 대응 매뉴얼
+    # 선반·캐비닛(#758) — **앞모습과 옆모습이 짝**이다. 옆벽(세로 벽)에 붙은 집기는
+    # 옆모습, 가로로 긴 집기는 앞모습을 쓴다(`gen_floors.WALL_ART`).
+    "dl_bookshelf": "bookshelf.png",
+    "dl_bookshelf_side": "bookshelfSide.png",
+    "dl_cabinet": "cabinet1.png",
+    "dl_cabinet_side": "cabinet1Side.png",
+    "dl_crate": "crate.png",                  # 창고 벽 줄 상자
 }
 
 # 게임 안 이름 → (시트, x0, y0, x1, y1) — 끝 좌표 포함.

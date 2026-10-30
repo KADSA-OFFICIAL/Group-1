@@ -20,7 +20,7 @@
 
 | 게임 안 파일 | 쓰는 곳 | 원본 | 제작자 | 조건 |
 |---|---|---|---|---|
-| `assets/sprites/ext/` 중 `hs_`가 아닌 것 | 1층 교장실(책상·소파·안락의자·책장·괘종시계·지구본·스탠드·화병·러그), 보건실 침대, 단서 그림 셋(시우 그림·인사 기록·대응 매뉴얼, #723) | [Darklight Academia Furniture Pack](https://kueyhorse.itch.io/darklight-academia-furniture-pack) 무료판 | kueyhorse | 비상업 사용 허용, 원본·수정본 재배포·재판매 금지, NFT·AI 관련 프로젝트·생성기·학습 도구 사용 금지 |
+| `assets/sprites/ext/` 중 `hs_`가 아닌 것 | 1층 교장실(책상·소파·안락의자·책장·괘종시계·지구본·스탠드·화병·러그), 보건실 침대, 단서 그림 셋(시우 그림·인사 기록·대응 매뉴얼, #723), 선반·캐비닛(앞모습·옆모습)·창고 상자(`dl_*`, #758) | [Darklight Academia Furniture Pack](https://kueyhorse.itch.io/darklight-academia-furniture-pack) 무료판 | kueyhorse | 비상업 사용 허용, 원본·수정본 재배포·재판매 금지, NFT·AI 관련 프로젝트·생성기·학습 도구 사용 금지 |
 
 - 원본 팩은 저장소에 넣지 않는다. 쓰는 그림만 투명 여백을 잘라 넣는다
   (`tools/import_ext_sprites.py`). 크기는 바꾸지 않고 게임에서 정수 2배로 놓는다.

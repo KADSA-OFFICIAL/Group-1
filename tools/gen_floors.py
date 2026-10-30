@@ -353,6 +353,7 @@ C_X_SDESK = "Color(0.421, 0.331, 0.211, 1)"     # 학생 자리(책상+의자)
 C_X_TDESK = "Color(0.261, 0.181, 0.121, 1)"     # 교탁(책상+의자)
 C_X_ODESK_DOWN = "Color(0.262, 0.182, 0.122, 1)"  # 교무실 섬 위 자리
 C_X_ODESK_UP = "Color(0.263, 0.183, 0.123, 1)"    # 교무실 섬 아래 자리
+C_CRATE = "Color(0.301, 0.221, 0.141, 1)"         # 나무 상자(#758) — 창고 벽 줄
 
 
 def _png_size(path):
@@ -398,10 +399,13 @@ SPRITE = {
     C_X_TDESK: "ext:hs_teacher_desk",
     C_X_ODESK_DOWN: "ext:hs_office_desk_down",
     C_X_ODESK_UP: "ext:hs_office_desk_up",
+    # 선반·캐비닛·상자(#758) — **놓인 방향**으로 그림을 고른다(`WALL_ART`).
+    C_SHELF: "wall:shelf",
+    C_CABINET: "wall:cabinet",
+    C_CRATE: "wall:crate",
     C_DESK: "obj_desk",
     C_CHAIR: "obj_chair",
     C_LOCKER: "obj_locker",
-    C_SHELF: "obj_shelf",
     C_SINK: "obj_sink",
     C_URINAL: "obj_sink",
     # 미술실 전용 그림(#405)
@@ -415,7 +419,6 @@ SPRITE = {
     C_STALL: "obj_panel",
     C_STALLDOOR: "obj_panel",
     C_LEAF: "obj_panel",
-    C_CABINET: "obj_cabinet",
     C_CLEAN: "obj_cabinet",
     C_METAL: "obj_locker",
     C_BIN: "obj_bin",
@@ -443,6 +446,20 @@ SPRITE = {
     C_LAMPPOST: "obj_pole",      # 가로등·게양대 기둥
 }
 SPRITE_SIZE = 32    # gen_tiles.py의 OBJ와 반드시 같아야 한다
+
+# 방향을 타는 외부 그림(#758, Darklight) — 이름 -> (앞모습, 옆모습).
+# 집기는 배치 코드가 정한 상자 그대로다(충돌·통로 불변). 그림을 **상자의 짧은 변에
+# 맞춰 줄이고 긴 변으로 되풀이한다** — 늘려 맞추면 66x40 선반과 26x64 벽 줄이
+# 같은 그림을 다른 비율로 찌그러뜨린다. 세로로 긴 상자는 옆벽에 붙은 것이라
+# 옆모습을 쓰고, 방 가운데보다 왼쪽이면 좌우를 뒤집어 앞면이 방 안을 보게 한다.
+WALL_ART = {
+    "shelf": ("dl_bookshelf", "dl_bookshelf_side"),
+    "cabinet": ("dl_cabinet", "dl_cabinet_side"),
+    "crate": ("dl_crate", "dl_crate"),
+}
+# 그림 옆모습의 앞면이 어느 쪽을 보나 — "left"면 방 오른쪽 벽에 그대로 맞는다.
+WALL_ART_SIDE_FACES = {"dl_bookshelf_side": "left", "dl_cabinet_side": "left",
+                       "dl_crate": "left"}
 
 # 바닥 → 외부 그림(#725, Haunted School `Inside_A2.png`). 방 종류별 바닥색(`ROOM_FLOOR`)과
 # 복도 마루(`C_CORRIDOR`)를 열쇠로 찾는다 — `TEX`보다 우선한다. 막힌 공간·맵 바탕은
@@ -818,6 +835,9 @@ class Scene:
         # 오브젝트 그림이 재질보다 우선한다(#259). 물건 하나에 한 장을 맞춰 늘리려고
         # 로컬 UV를 넣는다 — 재질은 UV를 비워 월드 격자에 정렬시키는 것과 반대다.
         obj = SPRITE.get(color)
+        if obj is not None and obj.startswith("wall:"):
+            self._wall_art(name, parent, polygon, obj[5:], z_line)
+            return
         if obj is not None and obj.startswith("ext:"):
             ext = obj[4:]
             tw, th = EXT_SIZES[ext]
@@ -844,6 +864,53 @@ class Scene:
                 tex_line = TEX_FLAGS + tex_line
         self.node(f'[node name="{name}" type="Polygon2D" parent="{parent}"]\n'
                   f'{z_line}{tex_line}color = {color}\npolygon = {polygon}\n')
+
+    def _wall_art(self, name, parent, polygon, kind, z_line):
+        """방향을 타는 외부 그림을 상자에 맞춰 깐다(#758, `WALL_ART`).
+
+        세로로 긴 상자 → 옆모습, 아니면 앞모습. 짧은 변에 맞춰 줄인 그림을 긴
+        변으로 정수 번 되풀이한다(UV가 그림 크기를 넘으면 루트의 `texture_repeat`가
+        이어 붙인다). 옆모습은 방 가운데보다 왼쪽이면 뒤집어 앞면이 방 안을 보게 한다.
+        """
+        front, side = WALL_ART[kind]
+        nums = [float(v) for v in polygon[polygon.index("(") + 1:polygon.rindex(")")].split(",")]
+        xs, ys = nums[0::2], nums[1::2]
+        x0, x1, y0, y1 = min(xs), max(xs), min(ys), max(ys)
+        w, h = (x1 - x0) or 1.0, (y1 - y0) or 1.0
+        vertical = h > w * 1.15
+        art = side if vertical else front
+        tw, th = EXT_SIZES[art]
+        flip = False
+        if vertical:
+            k = w / tw                                   # 폭에 맞춘 배율
+            reps = max(1, round(h / (th * k)))
+            uw, vh = tw, th * reps
+            room = self.room_at((x0 + x1) / 2, (y0 + y1) / 2)
+            if room is not None:
+                faces_left = WALL_ART_SIDE_FACES.get(art) == "left"
+                on_left = (x0 + x1) / 2 < (room[0] + room[1]) / 2
+                flip = faces_left == on_left
+        else:
+            k = h / th                                   # 높이에 맞춘 배율
+            reps = max(1, round(w / (tw * k)))
+            uw, vh = tw * reps, th
+        pts = []
+        for x, y in zip(xs, ys):
+            u = (x - x0) / w * uw
+            pts.append((uw - u if flip else u, (y - y0) / h * vh))
+        uv = "PackedVector2Array(" + ", ".join(f"{n(a)}, {n(b)}" for a, b in pts) + ")"
+        tex_line = f'texture = ExtResource("ext_{art}")\nuv = {uv}\n'
+        if parent in CANVAS_ITEM_ROOTS:
+            tex_line = TEX_FLAGS + tex_line
+        self.node(f'[node name="{name}" type="Polygon2D" parent="{parent}"]\n'
+                  f'{z_line}{tex_line}color = Color(1, 1, 1, 1)\npolygon = {polygon}\n')
+
+    def room_at(self, x, y):
+        """그 점이 든 방의 (x0, x1)을 돌려준다. 복도·바깥이면 None."""
+        for _label, _door, rx0, rx1, topf, botf in self.room_meta.values():
+            if rx0 <= x <= rx1 and topf(x) <= y <= botf(x):
+                return rx0, rx1
+        return None
 
     def solid(self, key, parent_body, polygon):
         """충돌 + 광원차단 한 쌍 (시각은 별도로 추가)."""
@@ -1901,7 +1968,9 @@ PROP_SPECS = {
     "office":    ((96, 40), (28, 24), C_DESK),     # 교사 책상
     "computer":  ((54, 36), (22, 22), C_METAL),    # 컴퓨터 책상
     "lab":       ((140, 38), (30, 26), C_DESK),    # 실험대
-    "storage":   ((68, 40), (20, 18), C_SHELF),    # 선반
+    # 창고는 나무 상자 더미다(#758). 책장 그림을 깔았더니 체육창고가 도서실로
+    # 읽혔다 — 창고에 서는 것은 책이 아니라 짐이다.
+    "storage":   ((68, 40), (20, 18), C_CRATE),
     "toilet":    ((58, 44), (20, 16), C_STALL),    # 칸막이
     "entrance":  ((110, 36), (36, 28), C_BENCH),   # 신발장·벤치
     "janitor":   ((96, 40), (28, 24), C_DESK),
@@ -2587,9 +2656,7 @@ CLUTTER = {
     C_CHAIR:   [("bag", 0.66, 0.40, C_BAG), ("gym", 0.60, 0.34, C_CLOTHES)],
     C_LOCKER:  [("tag", 0.70, 0.09, C_PAPER)],
     C_METAL:   [("tag", 0.70, 0.09, C_PAPER), ("box", 0.44, 0.24, C_BOOK)],
-    C_SHELF:   [("box", 0.50, 0.28, C_BOOK), ("files", 0.64, 0.18, C_PAPER),
-                ("kit", 0.30, 0.24, C_CASE)],
-    C_CABINET: [("files", 0.60, 0.15, C_PAPER), ("box", 0.42, 0.24, C_BOOK)],
+    # 선반·캐비닛은 그림에 이미 책·유리문이 있어 소품을 얹지 않는다(#758).
     C_CLEAN:   [("tag", 0.56, 0.10, C_PAPER)],
     C_SINK:    [("soap", 0.20, 0.15, C_CUP)],
     C_BENCH:   [("bag", 0.34, 0.28, C_BAG), ("cup", 0.14, 0.18, C_CUP)],
@@ -2602,8 +2669,7 @@ CLUTTER = {
 # 집기 색 -> 소품이 붙을 확률(%). 노드 예산(3300) 안에서 방이 채워 보이게 맞춘 값.
 # 책상은 사람이 쓰던 자리라 높이고, 벽에 붙는 수납장은 낮춘다.
 CLUTTER_CHANCE = {
-    C_DESK: 88, C_CHAIR: 44, C_LOCKER: 40, C_METAL: 55, C_SHELF: 80,
-    C_CABINET: 60, C_CLEAN: 70, C_SINK: 60, C_BENCH: 55, C_BED: 60,
+    C_DESK: 88, C_CHAIR: 44, C_LOCKER: 40, C_METAL: 55, C_CLEAN: 70, C_SINK: 60, C_BENCH: 55, C_BED: 60,
     C_RACK: 60, C_SOFA: 70, C_COPIER: 60,
 }
 CLUTTER_PAD = 3        # 집기 가장자리에서 띄우는 여백
@@ -2858,6 +2924,7 @@ def _room_kind(sc, room_key):
 # 빌리지 않는다: 그림에 이미 결이 있어 위에 상자를 얹으면 덧칠로 보인다.
 EXAMINE_ALIAS = {
     C_X_SDESK: C_DESK, C_X_TDESK: C_DESK, C_X_ODESK_DOWN: C_DESK, C_X_ODESK_UP: C_DESK,
+    C_CRATE: C_SHELF,   # 창고 상자(#758)는 예전 창고 선반 문구를 쓴다
 }
 
 
@@ -3026,7 +3093,7 @@ PROP_OVERLAY = {
     "office":   ("papers", 0.55, 0.42, C_PAPER),
     "computer": ("monitor", 0.72, 0.52, C_MONITOR),
     "lab":      ("sink", 0.20, 0.60, C_SINK),
-    "storage":  ("box", 0.62, 0.46, C_BOOK),
+    # 창고 선반 위 상자는 걷었다(#758) — 선반이 책 꽂힌 그림이 됐다.
     "entrance": ("mat", 0.80, 0.34, C_MAT),
     "janitor":  ("papers", 0.55, 0.42, C_PAPER),
     "hall":     ("cup", 0.40, 0.36, C_PAPER),
@@ -3308,9 +3375,9 @@ LINING = {
     "nurse": ([("chem", 28, 60, C_CABINET), ("shelf", 26, 64, C_SHELF),
                ("sink", 26, 30, C_SINK)], None),
     "janitor": ([("tools", 28, 52, C_METAL), ("shelf", 26, 64, C_SHELF)],
-                [("shelf", 26, 64, C_SHELF), ("box", 26, 40, C_CABINET)]),
-    "storage": ([("shelf", 28, 68, C_SHELF), ("box", 28, 40, C_CABINET)],
-                [("shelf", 28, 68, C_SHELF), ("box", 28, 40, C_CABINET)]),
+                [("shelf", 26, 64, C_SHELF), ("box", 26, 40, C_CRATE)]),
+    "storage": ([("box", 28, 40, C_CRATE), ("box", 28, 34, C_CRATE)],
+                [("box", 28, 40, C_CRATE), ("box", 28, 34, C_CRATE)]),
     "lab": ([("chem", 28, 60, C_CABINET), ("shelf", 26, 64, C_SHELF)],
             [("chem", 28, 60, C_CABINET), ("sink", 26, 30, C_SINK)]),
     "hall": ([("shelf", 26, 64, C_SHELF), ("cab", 28, 52, C_CABINET)],

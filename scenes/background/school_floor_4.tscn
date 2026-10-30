@@ -1,4 +1,4 @@
-[gd_scene load_steps=53 format=3]
+[gd_scene load_steps=55 format=3]
 
 [ext_resource type="Script" path="res://scripts/interactions/interactable.gd" id="3_interactable"]
 [ext_resource type="Script" path="res://scripts/interactions/hiding_spot.gd" id="5_hiding"]
@@ -26,6 +26,8 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_grain.png" id="tex_prop_grain"]
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_metal.png" id="tex_prop_metal"]
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/dl_bookshelf.png" id="ext_dl_bookshelf"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/dl_bookshelf_side.png" id="ext_dl_bookshelf_side"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_bag_spilled.png" id="ext_hs_bag_spilled"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_book_purple.png" id="ext_hs_book_purple"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_calendar.png" id="ext_hs_calendar"]
@@ -876,27 +878,27 @@ polygon = PackedVector2Array(36, 530, 46, 530, 46, 700, 36, 700)
 polygon = PackedVector2Array(1720, 120, 1764, 120, 1764, 240, 1720, 240)
 
 [node name="PV_PrepShelf0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_shelf")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.301, 0.2617, 0.2093, 1)
+texture = ExtResource("ext_dl_bookshelf_side")
+uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
+color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1720, 120, 1764, 120, 1764, 240, 1720, 240)
 
 [node name="PC_PrepShelf1" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1720, 270, 1764, 270, 1764, 390, 1720, 390)
 
 [node name="PV_PrepShelf1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_shelf")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.2791, 0.2427, 0.1941, 1)
+texture = ExtResource("ext_dl_bookshelf_side")
+uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
+color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1720, 270, 1764, 270, 1764, 390, 1720, 390)
 
 [node name="PC_PrepShelf2" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1720, 420, 1764, 420, 1764, 540, 1720, 540)
 
 [node name="PV_PrepShelf2" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_shelf")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3093, 0.2689, 0.2151, 1)
+texture = ExtResource("ext_dl_bookshelf_side")
+uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
+color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1720, 420, 1764, 420, 1764, 540, 1720, 540)
 
 [node name="PC_PrepTable" type="CollisionPolygon2D" parent="PropBodies"]
@@ -950,18 +952,18 @@ polygon = PackedVector2Array(1200, 350, 1290, 350, 1290, 410, 1200, 410)
 polygon = PackedVector2Array(1320, 190, 1370, 190, 1370, 240, 1320, 240)
 
 [node name="PV_SupplyBox0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_shelf")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.2917, 0.2536, 0.2028, 1)
+texture = ExtResource("ext_dl_bookshelf")
+uv = PackedVector2Array(0, 0, 30, 0, 30, 32, 0, 32)
+color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1320, 190, 1370, 190, 1370, 240, 1320, 240)
 
 [node name="PC_SupplyBox1" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1320, 250, 1370, 250, 1370, 300, 1320, 300)
 
 [node name="PV_SupplyBox1" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_shelf")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.2781, 0.2418, 0.1934, 1)
+texture = ExtResource("ext_dl_bookshelf")
+uv = PackedVector2Array(0, 0, 30, 0, 30, 32, 0, 32)
+color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1320, 250, 1370, 250, 1370, 300, 1320, 300)
 
 [node name="PC_PaperBin" type="CollisionPolygon2D" parent="PropBodies"]
@@ -1023,9 +1025,9 @@ message = "준비실 적재함 뒤. 비닐봉투 냄새가 코를 찌른다."
 
 [node name="HidePrepShelfVisual" type="Polygon2D" parent="HidePrepShelf"]
 z_index = 1
-texture = ExtResource("tex_obj_shelf")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.2894, 0.2516, 0.2013, 1)
+texture = ExtResource("ext_dl_bookshelf")
+uv = PackedVector2Array(0, 0, 30, 0, 30, 32, 0, 32)
+color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(0, -20, 44, -20, 44, 20, 0, 20)
 
 [node name="HidePrepShelfZone" type="CollisionShape2D" parent="HidePrepShelf"]
@@ -1195,29 +1197,10 @@ polygon = PackedVector2Array(693, 694.5, 747, 694.5, 747, 711.1, 693, 711.1)
 color = Color(0.66, 0.65, 0.60, 1)
 polygon = PackedVector2Array(603, 696, 625.5, 696, 625.5, 708.8, 603, 708.8)
 
-[node name="PT_PrepShelf1_box0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_prop_grain")
-color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(1723, 274.5, 1745, 274.5, 1745, 308.1, 1723, 308.1)
-
-[node name="PT_PrepShelf2_box0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_prop_grain")
-color = Color(0.5769, 0.4359, 0.3077, 1)
-polygon = PackedVector2Array(1723, 426, 1745, 426, 1745, 459.6, 1723, 459.6)
-
 [node name="PT_PrepTable_bottle1" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_metal")
 color = Color(0.3077, 0.3846, 0.4359, 1)
 polygon = PackedVector2Array(1295.7, 626, 1324.3, 626, 1324.3, 639.5, 1295.7, 639.5)
-
-[node name="PT_SupplyBox0_kit0" type="Polygon2D" parent="Props"]
-color = Color(0.44, 0.32, 0.22, 1)
-polygon = PackedVector2Array(1337.5, 193, 1352.5, 193, 1352.5, 205, 1337.5, 205)
-
-[node name="PT_SupplyBox1_files0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_prop_cloth")
-color = Color(0.7051, 0.6923, 0.641, 1)
-polygon = PackedVector2Array(1335, 256, 1367, 256, 1367, 265, 1335, 265)
 
 [node name="Walls" type="StaticBody2D" parent="."]
 
