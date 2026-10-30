@@ -145,7 +145,7 @@ func show_line(speaker: String, text: String, emotion: String = "",
 	text_label.add_theme_font_size_override("font_size", MONOLOGUE_FONT_SIZE if monologue else SPEECH_FONT_SIZE)
 	text_label.add_theme_constant_override("line_spacing", MONOLOGUE_LINE_SPACING if monologue else SPEECH_LINE_SPACING)
 	text_label.add_theme_color_override("font_color", MONOLOGUE_COLOR if monologue else SPEECH_COLOR)
-	text_label.text = text
+	text_label.text = wrap_words(text, _text_width())
 
 	_update_portrait(speaker)
 	# 감춰져 있다가 처음 뜨는 줄에서만 페이드한다 — 같은 장면에서 줄이 넘어갈 때는
@@ -155,6 +155,37 @@ func show_line(speaker: String, text: String, emotion: String = "",
 	if appearing:
 		_fade_in()
 	_start_typing(emotion, queued)
+
+
+## 글을 **띄어쓰기 자리에서만** 줄바꿈해 돌려준다(#770).
+##
+## Godot의 자동 줄바꿈(ICU, UAX #14)은 한글 음절 사이를 전부 줄을 바꿀 수 있는
+## 자리로 본다 — 그래서 "애들"이 "애 / 들"로, "안다"가 "안 / 다"로 쪼개졌다.
+## 글꼴로 폭을 재어 어절 단위로 줄바꿈을 미리 넣는다. 한 어절이 줄보다 길면 그
+## 어절만 자동 줄바꿈(`autowrap_mode`)에 맡긴다. 원래 있던 줄바꿈은 지킨다.
+func wrap_words(text: String, width: float) -> String:
+	if width <= 0.0:
+		return text
+	var font: Font = text_label.get_theme_font("font")
+	var font_size: int = text_label.get_theme_font_size("font_size")
+	var out: PackedStringArray = []
+	for para in text.split("\n"):
+		var line := ""
+		for word in para.split(" ", false):
+			var trial := word if line.is_empty() else line + " " + word
+			if line.is_empty() or font.get_string_size(trial, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x <= width:
+				line = trial
+			else:
+				out.append(line)
+				line = word
+		out.append(line)
+	return "\n".join(out)
+
+
+## 본문이 들어갈 폭 — `show_line()`이 막 바꾼 여백으로 계산한다. Label 크기는
+## 다음 레이아웃 때 갱신되므로 그것을 읽으면 한 줄 늦은 여백으로 잰다.
+func _text_width() -> float:
+	return size.x - lines_box.offset_left + lines_box.offset_right
 
 
 ## 타이핑 중이면 남은 글자를 즉시 전부 표시한다. 실제로 건너뛰었으면 true.
