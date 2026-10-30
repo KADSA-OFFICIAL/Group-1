@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """외부 가구 그림을 잘라 게임에 넣는다(#716, #717). 표준 라이브러리만.
 
-    python3 tools/import_ext_sprites.py --darklight <Darklight 팩 폴더> --haunted <Haunted School 폴더>
+    python3 tools/import_ext_sprites.py --darklight <Darklight 팩 폴더> --haunted <Haunted School 폴더> --horror <Horror 팩 폴더>
 
 둘 중 하나만 줘도 된다 — 준 팩의 그림만 다시 굽는다.
 
@@ -11,6 +11,9 @@
   48px 칸)다. 쓰는 칸의 **사각형을 손으로 적는다** — 시트의 그림끼리 붙어 있는
   곳(책상+의자 묶음)이 있어 자동으로 덩어리를 가르면 묶음이 쪼개지거나 이웃과 붙는다.
   자른 뒤 다시 투명 여백을 걷는다.
+
+- **Top Down Pixel Art Horror**(AnisAous, #763): Haunted School과 같은 48px RPG Maker
+  시트(`Inside_D.png`). 사물함·신발장 칸을 손으로 적는다.
 
 출처·조건은 `CREDITS.md`. **원본 팩은 저장소에 넣지 않는다**(둘 다 원본 재배포 금지).
 크기는 바꾸지 않는다 — 배율은 게임이 정한다(`gen_floors.EXT_SCALE`/`ext_scale()`).
@@ -88,6 +91,14 @@ HAUNTED = {
     "hs_wall_face": ("Inside_A4.png", 192, 195, 287, 224),
 }
 
+# Top Down Pixel Art Horror(#763) — (시트, x0, y0, x1, y1), 끝 좌표 포함. **칠이 벗겨진
+# 어두운 사물함**이라 #721의 깨끗한 철제 사물함("분위기에 안 맞는다", #730)과 다르다.
+HORROR = {
+    "hr_locker_bank": ("Inside_D.png", 683, 301, 753, 372),   # 2단 3칸 사물함 — 앞모습
+    "hr_locker_side": ("Inside_D.png", 401, 345, 417, 383),   # 키 큰 사물함 — 옆모습
+    "hr_shoe_cubby": ("Inside_D.png", 446, 446, 521, 529),    # 신발 든 나무 신발장
+}
+
 
 def trim(w, h, px, x0=0, y0=0, x1=None, y1=None):
     """사각형 안에서 투명 여백을 걷어 낸 RGBA를 돌려준다."""
@@ -111,7 +122,7 @@ def trim(w, h, px, x0=0, y0=0, x1=None, y1=None):
 
 def main():
     args = dict(zip(sys.argv[1::2], sys.argv[2::2]))
-    if not args or set(args) - {"--darklight", "--haunted"}:
+    if not args or set(args) - {"--darklight", "--haunted", "--horror"}:
         raise SystemExit(__doc__)
     OUT.mkdir(parents=True, exist_ok=True)
     if "--darklight" in args:
@@ -120,10 +131,12 @@ def main():
             cw, ch, data = trim(*read_png(src / fname))
             write_png(OUT / f"{name}.png", cw, ch, data)
             print(f"{name}.png: {cw}x{ch}")
-    if "--haunted" in args:
-        src = pathlib.Path(args["--haunted"])
+    for flag, table in (("--haunted", HAUNTED), ("--horror", HORROR)):
+        if flag not in args:
+            continue
+        src = pathlib.Path(args[flag])
         sheets = {}
-        for name, (sheet, x0, y0, x1, y1) in HAUNTED.items():
+        for name, (sheet, x0, y0, x1, y1) in table.items():
             if sheet not in sheets:
                 sheets[sheet] = read_png(src / sheet)
             w, h, px = sheets[sheet]

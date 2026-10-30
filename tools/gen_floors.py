@@ -354,6 +354,7 @@ C_X_TDESK = "Color(0.261, 0.181, 0.121, 1)"     # 교탁(책상+의자)
 C_X_ODESK_DOWN = "Color(0.262, 0.182, 0.122, 1)"  # 교무실 섬 위 자리
 C_X_ODESK_UP = "Color(0.263, 0.183, 0.123, 1)"    # 교무실 섬 아래 자리
 C_CRATE = "Color(0.301, 0.221, 0.141, 1)"         # 나무 상자(#758) — 창고 벽 줄
+C_SHOES = "Color(0.302, 0.181, 0.151, 1)"         # 현관 신발장(#763)
 
 
 def _png_size(path):
@@ -403,9 +404,11 @@ SPRITE = {
     C_SHELF: "wall:shelf",
     C_CABINET: "wall:cabinet",
     C_CRATE: "wall:crate",
+    # 사물함·신발장(#763, Top Down Pixel Art Horror) — 칠이 벗겨진 어두운 사물함.
+    C_LOCKER: "wall:locker",
+    C_SHOES: "wall:shoes",
     C_DESK: "obj_desk",
     C_CHAIR: "obj_chair",
-    C_LOCKER: "obj_locker",
     C_SINK: "obj_sink",
     C_URINAL: "obj_sink",
     # 미술실 전용 그림(#405)
@@ -456,10 +459,19 @@ WALL_ART = {
     "shelf": ("dl_bookshelf", "dl_bookshelf_side"),
     "cabinet": ("dl_cabinet", "dl_cabinet_side"),
     "crate": ("dl_crate", "dl_crate"),
+    "locker": ("hr_locker_bank", "hr_locker_side"),
+    "shoes": ("hr_shoe_cubby", "dl_bookshelf_side"),
 }
 # 그림 옆모습의 앞면이 어느 쪽을 보나 — "left"면 방 오른쪽 벽에 그대로 맞는다.
 WALL_ART_SIDE_FACES = {"dl_bookshelf_side": "left", "dl_cabinet_side": "left",
-                       "dl_crate": "left"}
+                       "dl_crate": "left", "hr_locker_side": "right"}
+# 그림별 밝기(#763). Horror 팩은 Darklight보다 색이 연하고 밝아(파스텔 분홍 신발장,
+# 밝은 회색 사물함) 손전등 아래 어두운 바닥에서 혼자 떠 보였다.
+WALL_ART_TINT = {
+    "hr_locker_bank": "Color(0.58, 0.56, 0.6, 1)",
+    "hr_locker_side": "Color(0.58, 0.56, 0.6, 1)",
+    "hr_shoe_cubby": "Color(0.55, 0.5, 0.5, 1)",
+}
 
 # 바닥 → 외부 그림(#725, Haunted School `Inside_A2.png`). 방 종류별 바닥색(`ROOM_FLOOR`)과
 # 복도 마루(`C_CORRIDOR`)를 열쇠로 찾는다 — `TEX`보다 우선한다. 막힌 공간·맵 바탕은
@@ -921,7 +933,8 @@ class Scene:
         if parent in CANVAS_ITEM_ROOTS:
             tex_line = TEX_FLAGS + tex_line
         self.node(f'[node name="{name}" type="Polygon2D" parent="{parent}"]\n'
-                  f'{z_line}{tex_line}color = Color(1, 1, 1, 1)\npolygon = {polygon}\n')
+                  f'{z_line}{tex_line}color = {WALL_ART_TINT.get(art, "Color(1, 1, 1, 1)")}\n'
+                  f'polygon = {polygon}\n')
 
     def room_at(self, x, y):
         """그 점이 든 방의 (x0, x1)을 돌려준다. 복도·바깥이면 None."""
@@ -1993,7 +2006,7 @@ PROP_SPECS = {
     # 읽혔다 — 창고에 서는 것은 책이 아니라 짐이다.
     "storage":   ((68, 40), (20, 18), C_CRATE),
     "toilet":    ((58, 44), (20, 16), C_STALL),    # 칸막이
-    "entrance":  ((110, 36), (36, 28), C_BENCH),   # 신발장·벤치
+    "entrance":  ((110, 36), (36, 28), C_SHOES),   # 신발장(#763)
     "janitor":   ((96, 40), (28, 24), C_DESK),
     # 보건실 침상(#708) — 세로로 긴 침대를 줄지어 놓는다. 외부 그림(#716)
     # 20x32의 정수 2배 — 자리가 좁으면 `PROP_MIN_*`까지 줄어 찌그러질 수 있다.
@@ -2677,7 +2690,6 @@ CLUTTER = {
                 ("case", 0.34, 0.18, C_CASE), ("note", 0.36, 0.26, C_PAPER),
                 ("bottle", 0.13, 0.26, C_WATER)],
     C_CHAIR:   [("bag", 0.66, 0.40, C_BAG), ("gym", 0.60, 0.34, C_CLOTHES)],
-    C_LOCKER:  [("tag", 0.70, 0.09, C_PAPER)],
     C_METAL:   [("tag", 0.70, 0.09, C_PAPER), ("box", 0.44, 0.24, C_BOOK)],
     # 선반·캐비닛은 그림에 이미 책·유리문이 있어 소품을 얹지 않는다(#758).
     C_CLEAN:   [("tag", 0.56, 0.10, C_PAPER)],
@@ -2692,7 +2704,7 @@ CLUTTER = {
 # 집기 색 -> 소품이 붙을 확률(%). 노드 예산(3300) 안에서 방이 채워 보이게 맞춘 값.
 # 책상은 사람이 쓰던 자리라 높이고, 벽에 붙는 수납장은 낮춘다.
 CLUTTER_CHANCE = {
-    C_DESK: 88, C_CHAIR: 44, C_LOCKER: 40, C_METAL: 55, C_CLEAN: 70, C_SINK: 60, C_BENCH: 55, C_BED: 60,
+    C_DESK: 88, C_CHAIR: 44, C_METAL: 55, C_CLEAN: 70, C_SINK: 60, C_BENCH: 55, C_BED: 60,
     C_RACK: 60, C_SOFA: 70, C_COPIER: 60,
 }
 CLUTTER_PAD = 3        # 집기 가장자리에서 띄우는 여백
@@ -2850,6 +2862,11 @@ EXAMINE_LINES = {
     (C_LOCKER, None): [
         "철제 사물함이다. 손잡이가 차갑다.",
         "문을 당겨 봤지만 잠겨 있다.",
+    ],
+    # 현관 신발장(#763).
+    (C_SHOES, None): [
+        "실내화가 칸마다 꽂혀 있다. 한 칸만 비어 있다.",
+        "운동화 한 짝이 뒤집힌 채 칸에 걸쳐 있다. 이름이 지워져 있다.",
     ],
     (C_SHELF, "classroom"): [
         "학급문고. 표지가 다 해졌는데 대출 카드는 비어 있다.",
@@ -3117,7 +3134,7 @@ PROP_OVERLAY = {
     "computer": ("monitor", 0.72, 0.52, C_MONITOR),
     "lab":      ("sink", 0.20, 0.60, C_SINK),
     # 창고 선반 위 상자는 걷었다(#758) — 선반이 책 꽂힌 그림이 됐다.
-    "entrance": ("mat", 0.80, 0.34, C_MAT),
+    # 현관 신발장 위 매트는 걷었다(#763) — 신발 든 신발장 그림이다.
     "janitor":  ("papers", 0.55, 0.42, C_PAPER),
     "hall":     ("cup", 0.40, 0.36, C_PAPER),
 }
@@ -3406,7 +3423,7 @@ LINING = {
     "hall": ([("shelf", 26, 64, C_SHELF), ("cab", 28, 52, C_CABINET)],
              [("shelf", 26, 64, C_SHELF), ("plant", 26, 26, C_PLANT)]),
     # 현관 — 옆벽에 신발장. 안쪽(아래) 벽은 정문이라 비운다.
-    "entrance": ([("shoes", 26, 70, C_LOCKER), ("plant", 26, 26, C_PLANT)], None),
+    "entrance": ([("shoes", 26, 70, C_SHOES), ("plant", 26, 26, C_PLANT)], None),
 }
 LINING_GAP = 6
 
