@@ -2272,6 +2272,14 @@ texture = ExtResource("tex_wall_brick")
 color = Color(0.3654, 0.3846, 0.4295, 1)
 polygon = PackedVector2Array(2244, 1180, 2260, 1180, 2260, 1520, 2244, 1520)
 
+[node name="Furniture" type="Node2D" parent="."]
+
+[node name="CopierPE" type="Polygon2D" parent="Furniture"]
+texture = ExtResource("tex_obj_cabinet")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.399, 0.4123, 0.4389, 1)
+polygon = PackedVector2Array(1192, 1362, 1244, 1362, 1244, 1404, 1192, 1404)
+
 [node name="Mark_YujinClue" type="Polygon2D" parent="WallGlow/Marks"]
 position = Vector2(946.7, 1390.8)
 z_index = 5
@@ -2299,13 +2307,13 @@ shape = SubResource("RectangleShape2D_key_zone")
 
 
 [node name="Mark_CrisisManual" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(1158.3, 1390.8)
+position = Vector2(1158, 1391)
 z_index = 5
 color = Color(1.00, 0.78, 0.32, 1)
 polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
 
 [node name="CrisisManual" type="Area2D" parent="."]
-position = Vector2(1158.3, 1390.8)
+position = Vector2(1158, 1391)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
