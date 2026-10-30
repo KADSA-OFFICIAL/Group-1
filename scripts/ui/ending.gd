@@ -162,6 +162,14 @@ const ENDINGS: Dictionary = {
 }
 ## 메타가 없을 때 떨어질 곳(에디터에서 이 씬만 실행할 때).
 const DEFAULT_KIND := &"after_school"
+## 엔딩마다 한 곡(#676, `tools/gen_music.py`). 결과 화면(#636)은 테마를 다시 부르지
+## 않으므로 같은 곡이 끊기지 않고 이어진다 — 타이틀로 가면 `main_menu`가 타이틀
+## 테마로 크로스페이드하고, 처음부터 다시하면 본편 `start_music()`이 걷어 간다.
+const THEMES: Dictionary = {
+	&"after_school": &"ending_after_school",
+	&"adults_work": &"ending_adults_work",
+	&"break_time": &"ending_break_time",
+}
 
 const SCENE_FADE_SECONDS := 0.6
 const SCENE_FADE_IN_SECONDS := 1.4
@@ -188,6 +196,7 @@ func _ready() -> void:
 		kind = StringName(get_tree().get_meta("ending_kind"))
 		get_tree().remove_meta("ending_kind")   # 타이틀로 돌아간 뒤 남지 않게
 	scenes = ENDINGS.get(kind, BASIC_SCENES)
+	Sfx.play_theme(THEMES.get(kind, THEMES[DEFAULT_KIND]))
 	_take_score()
 
 	fade_rect.color.a = 1.0

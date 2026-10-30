@@ -62,8 +62,11 @@ func _run() -> void:
 	await _check_artroom_intro()
 	await _check_ink_throw()
 	await _check_jumpscare()
+	await _check_external_audio()
 	# 마지막에 둔다 — 씬을 실제로 갈아 끼워(change_scene_to_file) 본다.
 	await _check_pause_menu()
+	await _check_journal()
+	await _check_inventory()
 	await _check_ending_backgrounds()
 	await _check_ending_result()
 
@@ -591,15 +594,22 @@ func _check_artroom_intro() -> void:
 			_fault("도입부 3막: 책이 없는데 국어책 표시가 안 뜬다(5초 대기)")
 		else:
 			_ok("도입부 3막 국어책 화면 표시")
-		# 챙기면 표시가 걷힌다 — 가방에 있는 것을 계속 가리키면 안 된다.
+		# 챙기면 표시가 **창문으로 옮겨 간다**(#700). 가방에 있는 것을 계속 가리키면
+		# 안 되고(#477), 걷기만 하면 다음 목표를 화면에서 못 찾는다 — 예전에는 3막이
+		# 창문을 한 번도 가리키지 않았다.
 		bg.get_node("KoreanBook").call("interact", player)
 		await process_frame
+		var win_pos: Vector2 = win.global_position if win != null else Vector2.INF
 		if not bool(gs.call("has_item", need)):
 			_fault("도입부 3막: 국어책을 조사했는데 가방에 안 들어왔다")
-		elif wp != null and not await _until(func() -> bool: return not wp.visible, 5.0):
-			_fault("도입부 3막: 국어책을 챙겼는데 표시가 안 사라진다")
+		elif wp == null:
+			_fault("도입부 3막: HUD에 Waypoint가 없다")
+		elif not await _until(func() -> bool:
+				return wp.visible and Vector2(wp.get("_target")).distance_to(win_pos) < 4.0, 5.0):
+			_fault("도입부 3막: 국어책을 챙겼는데 표시가 창문으로 안 옮겨 간다 (보임 %s, 목표 %s, 창문 %s)"
+				% [wp.visible, wp.get("_target"), win_pos])
 		else:
-			_ok("도입부 3막 국어책 챙긴 뒤 표시 정리")
+			_ok("도입부 3막 국어책 챙긴 뒤 표시가 창문으로")
 
 	# ── 창문으로 내려가기 시작하면 유예가 끊긴다(#472) ─────────────
 	# 컷신(#468)이 도는 18초 동안에도 4층 씬은 살아 있어 유예(20초)가 계속 돌았고,
@@ -705,6 +715,29 @@ func _check_artroom_intro() -> void:
 		else:
 			_ok("창문 컷신: 대사 끝 %.2f초 뒤 전환 (전체 %.1f초)"
 				% [(travel_at - drained_at) / 1000.0, (travel_at - t0) / 1000.0])
+
+		# ── 3층에 내려선 뒤 위층에서 수위가 돌아온다(#700) ──────────
+		# 원문(story.md 3-5)의 마지막 대사. **페이드 중에 나오면 안 보인다** —
+		# `UI`(FadeRect)가 `HUD`와 같은 layer 3인데 뒤에 선언돼 위로 온다.
+		# 그래서 대사가 나온 순간 층 전환이 끝나 있었는지(`changing_floor`)를 본다.
+		var gs2: Node = get_first_node_in_group("game_state")
+		if travel_at >= 0 and gs2 != null:
+			var heard := {"at_changing": true, "seen": false}
+			var on_speech := func(speaker: String, text: String, _e: String = "") -> void:
+				if speaker == "수위" and text.contains("없구만") and not heard["seen"]:
+					heard["seen"] = true
+					heard["at_changing"] = bool(main.get("changing_floor"))
+			gs2.connect("speech_requested", on_speech)
+			await _until(func() -> bool: return bool(heard["seen"]), 10.0)
+			gs2.disconnect("speech_requested", on_speech)
+			if not bool(heard["seen"]):
+				_fault("창문 하강: 3층에 내려선 뒤 수위의 '없구만'이 안 나온다(10초 대기)")
+			elif bool(heard["at_changing"]):
+				_fault("창문 하강: 도착 대사가 페이드가 걷히기 전에 나왔다 — 까만 화면 아래 깔린다")
+			elif int(main.get("current_floor")) != 3:
+				_fault("창문 하강: 도착 대사가 3층이 아닌 곳에서 나왔다 (%s층)" % main.get("current_floor"))
+			else:
+				_ok("창문 하강: 3층 도착 뒤 위층의 수위 대사")
 
 	main.free()
 	await process_frame
@@ -915,12 +948,252 @@ func _check_pause_menu() -> void:
 	root.get_node("Sfx").call("stop_music")
 
 
+## 수첩(#705)이 받는 J.
+func _press_journal() -> void:
+	var ev := InputEventAction.new()
+	ev.action = &"journal"
+	ev.pressed = true
+	root.push_input(ev)
+
+
+## 수첩(#705) — J로 열고 게임을 멈추는가, 플래그가 칸을 채우고 정리 줄을 푸는가,
+## 새 내용을 알리는가, J·Esc로 닫고 멈춤을 푸는가, 열 수 없는 때는 안 열리는가.
+##
+## 화면과 입력 배선(`project.godot`의 `journal`, 일시정지 메뉴와 Esc를 나눠 받는 것)은
+## 정적 검사로 못 본다.
+func _check_journal() -> void:
+	if current_scene != null:
+		current_scene.free()
+		await process_frame
+	var main: Node = (load(MAIN) as PackedScene).instantiate()
+	root.add_child(main)
+	for i in 8:
+		await process_frame
+	await _wait(0.4)
+
+	var jp: Node = main.get_node_or_null("JournalPanel")
+	var gs: Node = main.get_node_or_null("GameState")
+	if jp == null or gs == null:
+		_fault("수첩: JournalPanel/GameState를 못 찾았다")
+		await _drop_scenes(main)
+		return
+	if not InputMap.has_action(&"journal"):
+		_fault("수첩: 입력 `journal`이 project.godot에 없다")
+		await _drop_scenes(main)
+		return
+	var box: Control = jp.get_node("Root")
+	var text: RichTextLabel = jp.get_node("Root/Paper/Margin/Rows/Scroll/Text")
+	var toast: Label = jp.get_node("Toast")
+
+	# ── 여는 키 안내(#742) — 늘 보이고, 길어진 상자가 알림·화살표를 안 덮는다 ──
+	var top_right: Control = main.get_node_or_null("HUD/Root/TopRight")
+	var key_hint: Label = main.get_node_or_null("HUD/Root/TopRight/Margin/TextRows/KeyHintLabel")
+	if top_right == null or key_hint == null:
+		_fault("수첩: HUD 키 안내(TopRight/.../KeyHintLabel)를 못 찾았다")
+	elif not key_hint.is_visible_in_tree() \
+			or not key_hint.text.contains("[J]") or not key_hint.text.contains("[R]"):
+		_fault("수첩: HUD 키 안내가 안 보이거나 J·R을 안 적는다 (%s)" % key_hint.text)
+	else:
+		var box_bottom := top_right.get_global_rect().end.y
+		var alert: Node = main.get_node_or_null("HUD/Root/JanitorAlert")
+		var arrow_top := 0.0
+		if alert != null:
+			var consts: Dictionary = alert.get_script().get_script_constant_map()
+			arrow_top = float(consts["TOP_MARGIN"]) \
+				- (consts["ARROW"] as Texture2D).get_height() * float(consts["PIXEL_SCALE"]) * 0.5
+		if toast.get_global_rect().position.y < box_bottom:
+			_fault("수첩: '수첩에 적었다' 알림(y %.0f)이 오른쪽 위 상자(끝 y %.0f)에 겹친다"
+				% [toast.get_global_rect().position.y, box_bottom])
+		elif alert != null and arrow_top < box_bottom:
+			_fault("수첩: 수위 화살표 위쪽 끝(y %.0f)이 오른쪽 위 상자(끝 y %.0f)에 겹친다"
+				% [arrow_top, box_bottom])
+		else:
+			_ok("수첩 키 안내 (상자 끝 y %.0f)" % box_bottom)
+
+	# ── 열 수 없는 때(일시정지 메뉴와 같은 규칙) ───────────────────
+	paused = true
+	_press_journal()
+	if bool(jp.get("is_open")):
+		_fault("수첩: 이미 멈춘 트리(현관 선택지)에서 열렸다")
+	paused = false
+	main.set("game_over_active", true)
+	_press_journal()
+	if bool(jp.get("is_open")) or paused:
+		_fault("수첩: 게임 오버 연출 중에 열렸다")
+	main.set("game_over_active", false)
+
+	# ── 새 내용 알림 — 단서 하나를 조사한 것처럼 플래그를 세운다 ─────
+	toast.modulate.a = 0.0
+	gs.call("set_flag", "read_siwoo_painting")
+	await process_frame
+	if toast.modulate.a < 0.5:
+		_fault("수첩: 새 칸이 풀렸는데 '수첩에 적었다' 알림이 안 뜬다")
+	else:
+		_ok("수첩 새 내용 알림")
+
+	# ── 열기 — 멈추고, 풀린 칸은 메모, 못 찾은 칸은 ???? ──────────
+	_press_journal()
+	await process_frame
+	if not bool(jp.get("is_open")) or not box.visible or not paused:
+		_fault("수첩: J로 안 열린다 (open=%s, visible=%s, paused=%s)"
+			% [jp.get("is_open"), box.visible, paused])
+		await _drop_scenes(main)
+		return
+	var shown := text.get_parsed_text()
+	if not shown.contains("도와줘"):
+		_fault("수첩: 조사한 단서(시우 그림)의 메모가 안 적혔다")
+	elif not shown.contains("????"):
+		_fault("수첩: 못 찾은 칸이 ????로 안 남는다")
+	else:
+		_ok("수첩 J로 열림·멈춤·칸 표시")
+
+	# ── 정리 줄 — `needs`가 전부 서야 풀린다 ─────────────────────
+	var link := "학교가 하지 않은 '심판'"
+	if shown.contains(link):
+		_fault("수첩: 조건이 안 찼는데 정리 줄이 보인다")
+	gs.call("set_flag", "heard_confession")
+	await process_frame
+	if text.get_parsed_text().contains(link):
+		_fault("수첩: 조건의 일부(자백)만으로 정리 줄이 풀렸다")
+	gs.call("set_flag", "read_siwoo_counseling")
+	await process_frame
+	if not text.get_parsed_text().contains(link):
+		_fault("수첩: 조건(자백 + 상담기록부)이 다 찼는데 정리 줄이 안 풀린다 — 열린 채로 갱신되나?")
+	else:
+		_ok("수첩 정리 줄 해제")
+
+	# ── 닫기 — J와 Esc 둘 다. Esc는 일시정지 메뉴가 먼저 먹으면 안 된다 ──
+	_press_journal()
+	await process_frame
+	if bool(jp.get("is_open")) or box.visible or paused:
+		_fault("수첩: J로 안 닫히거나 멈춤이 안 풀린다 (open=%s, paused=%s)"
+			% [jp.get("is_open"), paused])
+	_press_journal()
+	await process_frame
+	_press_cancel()
+	await process_frame
+	var pm: Node = main.get_node_or_null("PauseMenu")
+	if bool(jp.get("is_open")) or paused:
+		_fault("수첩: Esc로 안 닫힌다 (open=%s, paused=%s)" % [jp.get("is_open"), paused])
+	elif pm != null and bool(pm.get("is_open")):
+		_fault("수첩: Esc로 닫으려는데 일시정지 메뉴가 열렸다 — 멈춘 트리에서 열리면 안 된다")
+	else:
+		_ok("수첩 J·Esc로 닫힘")
+
+	await _drop_scenes(main)
+
+
+## 소지품 창(#745) — R로 열리고, 든 칸에는 그림·이름·조작 키, 빈 칸은 비고 테두리가
+## 어둡다. 노드 구조(Box/Icon·Name·Key)와 `hud.gd`의 그림 표가 어긋나면 칸이 통째로
+## 비어도 정적 검사는 통과한다.
+func _check_inventory() -> void:
+	if current_scene != null:
+		current_scene.free()
+		await process_frame
+	var main: Node = (load(MAIN) as PackedScene).instantiate()
+	root.add_child(main)
+	for i in 8:
+		await process_frame
+	var gs: Node = main.get_node_or_null("GameState")
+	var hud: Node = main.get_node_or_null("HUD")
+	var panel: Control = main.get_node_or_null("HUD/Root/InventoryPanel")
+	if gs == null or hud == null or panel == null:
+		_fault("소지품: GameState/HUD/InventoryPanel을 못 찾았다")
+		await _drop_scenes(main)
+		return
+	for id in ["korean_book", "stair_key_3", "ink_can"]:
+		gs.call("add_item", id)
+	await process_frame
+
+	var ev := InputEventAction.new()
+	ev.action = &"inventory"
+	ev.pressed = true
+	root.push_input(ev)
+	await process_frame
+	if not panel.visible:
+		_fault("소지품: R로 안 열린다")
+		await _drop_scenes(main)
+		return
+
+	var slots: Array[Node] = panel.get_node("Margin/Rows/Slots").get_children()
+	var filled: StyleBox = hud.get("slot_style_filled")
+	var empty: StyleBox = hud.get("slot_style_empty")
+	var bad := PackedStringArray()
+	for i in slots.size():
+		var slot: Node = slots[i]
+		var icon: TextureRect = slot.get_node("Box/Icon")
+		var nm: Label = slot.get_node("Name")
+		var style: StyleBox = (slot.get_node("Box") as PanelContainer).get_theme_stylebox("panel")
+		var has := i < 3
+		if has and (icon.texture == null or icon.size.x < 1.0 or nm.text == "" or style != filled):
+			bad.append("칸%d(그림=%s, 크기=%s, 이름='%s', 든 칸 테두리=%s)"
+				% [i + 1, icon.texture != null, icon.size, nm.text, style == filled])
+		elif not has and (icon.texture != null or nm.text != "" or style != empty):
+			bad.append("빈 칸%d이 비어 있지 않다" % [i + 1])
+	var ink_key: String = (slots[2].get_node("Key") as Label).text
+	if filled == null or empty == null:
+		_fault("소지품: HUD에 칸 테두리(slot_style_filled/empty)가 안 물려 있다")
+	elif not bad.is_empty():
+		_fault("소지품: " + ", ".join(bad))
+	elif not ink_key.contains("[Q]"):
+		_fault("소지품: 잉크통 칸에 조작 키가 없다 ('%s')" % ink_key)
+	else:
+		_ok("소지품 칸 그림·이름·빈 칸")
+	await _drop_scenes(main)
+
+
 ## 일시정지 메뉴가 받는 Esc. 버튼 포커스와 상관없이 `_unhandled_input`까지 간다.
 func _press_cancel() -> void:
 	var ev := InputEventAction.new()
 	ev.action = &"ui_cancel"
 	ev.pressed = true
 	root.push_input(ev)
+
+## 외부 음원(#713) — 바꾼 소리가 실제로 그 파일을 쓰고, 지속음은 루프가 걸리고,
+## 운동장에 나가면 바람이 깔렸다가 실내로 돌아오면 걷히는가.
+##
+## `EXTERNAL` 표의 경로가 틀리면 `_stream_for`는 경고만 내고 null을 캐시해
+## 소리가 **조용히** 사라진다 — 씬 로드 검사로는 안 보인다.
+func _check_external_audio() -> void:
+	var sfx: Node = root.get_node_or_null("Sfx")
+	if sfx == null:
+		_fault("외부 음원: Sfx autoload가 없다")
+		return
+	var table: Dictionary = sfx.get_script().get_script_constant_map().get("EXTERNAL", {})
+	if table.is_empty():
+		_fault("외부 음원: Sfx.EXTERNAL이 비어 있다")
+		return
+	for id in table:
+		var s: AudioStream = sfx.call("_stream_for", StringName(id))
+		if s == null or s.resource_path != table[id]:
+			_fault("외부 음원: %s가 %s를 안 쓴다" % [id, table[id]])
+	for id in ["ambience", "chase"]:
+		var p: AudioStreamPlayer = sfx.get("_" + id)
+		var wav := p.stream as AudioStreamWAV if p != null else null
+		if wav == null or wav.loop_mode != AudioStreamWAV.LOOP_FORWARD:
+			_fault("외부 음원: %s 루프가 안 걸렸다" % id)
+	_ok("외부 음원 경로·루프")
+
+	if current_scene != null:
+		current_scene.free()
+		await process_frame
+	var main: Node = (load(MAIN) as PackedScene).instantiate()
+	root.add_child(main)
+	for i in 8:
+		await process_frame
+	main.call("travel_to", 0)
+	await _until(func() -> bool: return not bool(main.get("changing_floor")), 6.0)
+	_expect_theme(sfx, &"yard_wind", "운동장 바람")
+	main.call("travel_to", 1)
+	await _until(func() -> bool: return not bool(main.get("changing_floor")), 6.0)
+	if StringName(sfx.get("_theme_id")) == &"yard_wind":
+		_fault("외부 음원: 실내로 돌아왔는데 바람 테마가 남아 있다")
+	else:
+		_ok("실내 복귀 시 바람 정지")
+	sfx.call("stop_theme")
+	sfx.call("stop_music")
+	await _drop_scenes(main)
+
 
 
 ## 점프스케어(#662) — 붙잡히면 대사 뒤에 얼굴 오버레이가 뜨고, 비명이 울리고,
@@ -1022,6 +1295,8 @@ func _check_ending_backgrounds() -> void:
 		var ending: Node = (load("res://scenes/ui/ending.tscn") as PackedScene).instantiate()
 		root.add_child(ending)
 		await process_frame
+		# 엔딩마다 제 곡(#676).
+		_expect_theme(root.get_node("Sfx"), StringName("ending_%s" % kind), "엔딩 %s" % kind)
 		var bg := ending.get_node_or_null("SceneBackground") as TextureRect
 		var cap := ending.get_node_or_null("SceneCaption") as Label
 		if bg == null or cap == null:
@@ -1048,6 +1323,7 @@ func _check_ending_backgrounds() -> void:
 		await process_frame
 		if has_meta("ending_kind"):
 			remove_meta("ending_kind")
+	root.get_node("Sfx").call("stop_theme")
 
 
 ## 엔딩 결과 화면(#636) — 컷신이 끝나면 "생존했다"로 넘어가 엔딩 이름·점수를 싣는가,
@@ -1064,6 +1340,8 @@ func _check_ending_result() -> void:
 	var ending: Node = (load("res://scenes/ui/ending.tscn") as PackedScene).instantiate()
 	root.add_child(ending)
 	await process_frame
+	var sfx: Node = root.get_node("Sfx")
+	var ending_player: AudioStreamPlayer = _expect_theme(sfx, &"ending_adults_work", "엔딩 어른들의 일")
 	for sc: Dictionary in ending.get("scenes"):
 		for line: Array in sc["lines"]:
 			if String(line[1]).begins_with("알아낸 것"):
@@ -1097,6 +1375,17 @@ func _check_ending_result() -> void:
 		_fault("엔딩 결과: 점수 줄이 틀리다 (visible=%s, %s)" % [score_label.visible, score_label.text])
 	else:
 		_ok("엔딩 결과 화면 이름·점수")
+	# 엔딩 곡이 결과 화면으로 끊기지 않고 이어지는가(#676) — 다시 틀면 처음부터 난다.
+	# 다시 틀면 다른 플레이어로 크로스페이드하므로(앞 곡은 사라지는 중에도 playing이다)
+	# 같은 플레이어가 지금 테마인지를 본다.
+	if ending_player != null:
+		var now_player: AudioStreamPlayer = (sfx.get("_theme_players") as Array)[int(sfx.get("_theme_index"))]
+		if StringName(sfx.get("_theme_id")) != &"ending_adults_work" or not ending_player.playing:
+			_fault("엔딩 결과: 컷신 곡이 결과 화면에서 이어지지 않는다 (테마 '%s')" % sfx.get("_theme_id"))
+		elif now_player != ending_player or ending_player.get_playback_position() < 0.3:
+			_fault("엔딩 결과: 결과 화면에서 엔딩 곡이 처음부터 다시 났다")
+		else:
+			_ok("엔딩 곡이 결과 화면까지 이어짐")
 	var rs: GDScript = load("res://scripts/ui/ending_result.gd")
 	if StringName(rs.get("pending_kind")) != &"" or not (rs.get("pending_score") as Array).is_empty():
 		_fault("엔딩 결과: 읽은 뒤 pending 값을 안 비웠다(다음 판이 지난 판 점수를 보인다)")
@@ -1108,4 +1397,13 @@ func _check_ending_result() -> void:
 		_fault("엔딩 결과: 타이틀로 — 타이틀 씬으로 안 넘어간다")
 	else:
 		_ok("엔딩 결과 타이틀로")
+		await process_frame
+		_expect_theme(sfx, &"title", "엔딩 뒤 타이틀")
+		var fade: float = sfx.get_script().get_script_constant_map().get("THEME_FADE", 1.6)
+		await _wait(fade + 0.3)
+		if ending_player != null and ending_player.playing:
+			_fault("엔딩 결과: 타이틀로 간 뒤에도 엔딩 곡이 멈추지 않았다")
+		else:
+			_ok("타이틀로 간 뒤 엔딩 곡 정지")
+	sfx.call("stop_theme")
 	await _drop_scenes(ending)

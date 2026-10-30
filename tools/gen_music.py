@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""밤 학교 앰비언트와 추격 BGM(#176), 타이틀·프롤로그 테마(#606)를 합성한다.
+"""밤 학교 앰비언트와 추격 BGM(#176), 타이틀·프롤로그 테마(#606), 엔딩 테마 셋(#676)을
+합성한다.
 
 gen_sfx.py(#9)와 같은 원칙 — 표준 라이브러리만, 고정 시드, 결정론적.
 파형 도구는 gen_sfx.py에서 가져다 쓴다(중복 정의하면 톤이 갈라진다).
@@ -44,6 +45,12 @@ TITLE_BPM = 72
 PROLOGUE_BPM = 70
 THEME_BARS = 8
 BEATS_PER_BAR = 4
+
+# 엔딩 테마(#676) — 엔딩마다 한 곡, 길이는 타이틀과 같은 8마디.
+# 63 → 21000, 75 → 17640, 60 → 22050 샘플/박.
+AFTER_SCHOOL_BPM = 63
+ADULTS_WORK_BPM = 75
+BREAK_TIME_BPM = 60
 
 # 루프 경계에서 이만큼 넘게 튀면 "툭" 소리가 난다.
 SEAM_TOLERANCE = 0.02
@@ -248,12 +255,12 @@ def thump(seconds: float = 0.42) -> list[float]:
     return out
 
 
-def theme_grid(bpm: int) -> tuple[int, int, int]:
+def theme_grid(bpm: int, bars: int = THEME_BARS) -> tuple[int, int, int]:
     """(한 박 샘플 수, 한 마디 샘플 수, 전체 샘플 수)."""
     beat = RATE * 60 // bpm
     assert beat * bpm == RATE * 60, f"{bpm} BPM은 한 박이 정수 샘플이 아니다"
     bar = beat * BEATS_PER_BAR
-    return beat, bar, bar * THEME_BARS
+    return beat, bar, bar * bars
 
 
 def chord(*names: str) -> list[float]:
@@ -351,6 +358,160 @@ def build_prologue() -> list[float]:
     return out
 
 
+# ── 엔딩 테마 (#676) ─────────────────────────────────────────────
+#
+# 엔딩 셋(#353)이 각자 한 곡이고, 셋 다 타이틀의 학교 종 동기(가단조 C·A·B·E)를
+# 쓴다 — 같은 종이 결말마다 다르게 울린다.
+#
+#   방과 후      종이 더 고장 났다. 둘째 소절의 마지막 음(A)이 끝내 안 온다 —
+#                아무에게도 말하지 못한 결말.
+#   어른들의 일  종 대신 일정한 낮은 박동(굴러가는 절차)과 형광등 같은 높은
+#                지속음. 종 동기는 라단조로 낮게 한 번 지나가고, 마지막 화음은
+#                3음이 없는 sus4라 풀리지 않는다.
+#   쉬는 시간    앞 네 마디는 고장 난 종, 뒤 네 마디에서 같은 도수가 처음으로
+#                **장조 원형**("미도레솔 / 솔레미도")으로, 조율된 오르골로 울린다 —
+#                마지막 장면의 "종이 울렸다".
+
+
+def ring(out: list[float], start: int, beat: int,
+         notes: list[tuple[float, str, float]], noise: Noise, amount: float,
+         detune: tuple[float, float], wow: float, decay: float = 0.85,
+         echo: float = 0.08) -> None:
+    """마디 하나의 오르골 선율. notes는 [(박, 음, 길이(박))].
+
+    detune은 (최소, 최대) 센트 — 음마다 그 사이에서 처진다. echo는 3/4박 뒤
+    한 옥타브 아래 메아리의 크기다(타이틀과 같은 잔향).
+    """
+    for when, name, length in notes:
+        cents = detune[0] + (detune[1] - detune[0]) * (0.5 + 0.5 * noise.next())
+        seconds = max(length * beat / RATE + 1.4, 2.0)
+        place(out, start + int(when * beat),
+              music_box(hz(name), seconds, cents, wow, decay), amount)
+        if echo > 0.0:
+            place(out, start + int((when + 0.75) * beat),
+                  music_box(hz(name) / 2.0, seconds, cents, wow, decay * 0.7), echo)
+
+
+def build_after_school() -> list[float]:
+    """기본 엔딩 "방과 후". 타이틀보다 느리고, 더 풀리고, 선율이 점점 성겨진다.
+
+    2마디에서 종 동기의 둘째 소절(E·B·C·A)이 C에서 멈춘다 — 4박이 비어 있다.
+    5마디부터 종이 반으로 성겨지고 8마디는 화음만 남는다. 마지막 화음이 3음
+    없는 Esus4라 단조로 돌아가는 첫 마디가 해결이 아니라 되풀이로 들린다.
+    """
+    beat, bar, total = theme_grid(AFTER_SCHOOL_BPM)
+    out = [0.0] * total
+    noise = Noise(seed=676001)
+
+    score = [
+        (chord("A3", "C4", "E4"), "A2", [(0, "C5", 1), (1, "A4", 1), (2, "B4", 1), (3, "E4", 1)]),
+        # E·B·C 다음의 A가 안 온다.
+        (chord("E3", "A3", "B3"), "E2", [(0, "E4", 1), (1, "B4", 1), (2, "C5", 1)]),
+        (chord("F3", "A3", "C4", "E4"), "F2", [(0, "C5", 1.5), (1.5, "B4", 0.5), (2, "A4", 2)]),
+        (chord("D3", "F3", "A3"), "D2", [(0, "F4", 2), (2, "E4", 2)]),
+        (chord("A3", "C4", "E4"), "A2", [(0, "C5", 2), (2, "A4", 2)]),
+        (chord("E3", "A3", "B3"), "E2", [(0, "B4", 2), (2, "E4", 2)]),
+        (chord("F3", "A3", "C4"), "F2", [(0, "E4", 3)]),
+        (chord("E3", "A3", "B3"), "E2", []),
+    ]
+    for index, (harmony, root, notes) in enumerate(score):
+        bar_start = index * bar
+        place(out, bar_start - bar // 4, pad(harmony, 1.5 * bar / RATE), 0.11)
+        place(out, bar_start, soft_bass(hz(root), 2.2 * bar / RATE), 0.22)
+        # 타이틀(-7~-14센트, wow 0.004)보다 더 처지고 더 흔들린다.
+        ring(out, bar_start, beat, notes, noise, 0.40, (-18.0, -6.0), 0.008)
+    return out
+
+
+def build_adults_work() -> list[float]:
+    """신고 엔딩 "어른들의 일". 라단조, 박마다 짧고 낮은 음이 일정하게 굴러간다.
+
+    오르골이 주인공이 아니다 — 절차가 굴러가는 소리(박동)와 형광등(높은 A의
+    지속음)이 깔리고, 종 동기는 5~6마디에 라단조 도수(F·D·E·A)로 낮게 한 번만
+    지나간다. 형광등의 A가 7마디 Eb 화음(나폴리)과 증4도로 부딪친다 — 경찰서의
+    "지나치게 밝은" 불빛 아래의 불안이다.
+    """
+    beat, bar, total = theme_grid(ADULTS_WORK_BPM)
+    out = [0.0] * total
+    noise = Noise(seed=676002)
+
+    harmony = [
+        (chord("D3", "A3", "E4", "F4"), "D2"),     # Dm(add9)
+        (chord("Bb2", "F3", "A3", "D4"), "Bb1"),   # Bbmaj7
+        (chord("G2", "D3", "F3", "Bb3"), "G1"),    # Gm7
+        (chord("A2", "D3", "E3", "A3"), "A1"),     # Asus4 — 3음 없음
+        (chord("D3", "A3", "E4", "F4"), "D2"),
+        (chord("Bb2", "F3", "A3", "D4"), "Bb1"),
+        (chord("Eb3", "G3", "Bb3", "D4"), "Eb2"),  # Ebmaj7 — 나폴리
+        (chord("A2", "D3", "E3", "A3"), "A1"),
+    ]
+    for index, (freqs, root) in enumerate(harmony):
+        bar_start = index * bar
+        place(out, bar_start - bar // 4, pad(freqs, 1.5 * bar / RATE), 0.12)
+        place(out, bar_start, soft_bass(hz(root), 1.6 * bar / RATE, 2.0), 0.20)
+        # 박동: 근음 한 옥타브 위를 짧게 뜯는다. 1·3박이 강하다 — 똑같으면 메트로놈이다.
+        tick = soft_bass(hz(root) * 2.0, 0.45, 0.12)
+        for step in range(BEATS_PER_BAR):
+            place(out, bar_start + step * beat, tick, 0.17 if step % 2 == 0 else 0.10)
+
+    # 형광등 — 화음이 바뀌어도 그대로인 높은 A. 천천히 숨을 쉰다.
+    hum = breathing(total / RATE, hz("A5"), triangle, 0.022, 0.4, 0.5)
+    for i, value in enumerate(hum):
+        out[i] += value
+
+    # 위쪽의 성긴 선율 — 1~4마디 질문, 7~8마디는 A에서 멈춘다.
+    upper = [
+        (0, [(0, "E5", 2)]), (1, [(0, "D5", 2)]), (2, [(0, "F5", 2)]), (3, [(0, "E5", 1)]),
+        (6, [(0, "Bb4", 2), (2, "G4", 2)]), (7, [(0, "A4", 4)]),
+    ]
+    for index, notes in upper:
+        ring(out, index * bar, beat, notes, noise, 0.22, (-5.0, -2.0), 0.002, 1.0, 0.05)
+
+    # 종 동기 — 라단조 3·1·2·5도(F·D·E·A)를 두 박씩, 낮게.
+    bell = [(0, "F4", 2), (2, "D4", 2), (4, "E4", 2), (6, "A3", 2)]
+    ring(out, 4 * bar, beat, bell, noise, 0.30, (-4.0, -2.0), 0.002, 1.4, 0.10)
+    return out
+
+
+def build_break_time() -> list[float]:
+    """히든 엔딩 "쉬는 시간". 고장 난 종이 네 마디 만에 고쳐진다.
+
+    1~4마디는 타이틀과 같은 가단조 종(C·A·B·E)이 처진 오르골로 울린다. 4마디
+    끝의 E 화음이 5마디 C장조로 반음계적으로 넘어가며 같은 도수가 장조 원형
+    (E·C·D·G / G·D·E·C — "미도레솔 / 솔레미도")이 된다. 이 절반은 조율이 맞고
+    (detune 0) 흔들림이 거의 없고 잔향이 길다. 8마디 C에서 1마디 Am으로는
+    나란한조라 매끄럽게 되감긴다.
+    """
+    beat, bar, total = theme_grid(BREAK_TIME_BPM)
+    out = [0.0] * total
+    noise = Noise(seed=676003)
+
+    broken = [
+        (chord("A3", "C4", "E4"), "A2", [(0, "C5", 1), (1, "A4", 1), (2, "B4", 1), (3, "E4", 1)]),
+        (chord("G#3", "B3", "E4"), "E2", [(0, "E4", 1), (1, "B4", 1), (2, "C5", 1), (3, "A4", 1)]),
+        (chord("F3", "A3", "C4", "E4"), "F2", [(0, "C5", 1), (1, "B4", 1), (2, "A4", 1), (3, "E4", 1)]),
+        (chord("G#3", "B3", "D4", "E4"), "E2", [(0, "E4", 1), (1, "B4", 1), (2, "C5", 2)]),
+    ]
+    whole = [
+        (chord("C3", "E3", "G3", "B3"), "C2", [(0, "E5", 1), (1, "C5", 1), (2, "D5", 1), (3, "G4", 1)]),
+        (chord("G2", "D3", "G3", "B3"), "G1", [(0, "G4", 1), (1, "D5", 1), (2, "E5", 1), (3, "C5", 1)]),
+        (chord("F3", "A3", "C4", "E4"), "F2", [(0, "E5", 1), (1, "D5", 1), (2, "C5", 1), (3, "G4", 1)]),
+        (chord("C3", "E3", "G3"), "C2", [(0, "G4", 1), (1, "D5", 1), (2, "E5", 1), (3, "C5", 1)]),
+    ]
+    for index, (harmony, root, notes) in enumerate(broken):
+        bar_start = index * bar
+        place(out, bar_start - bar // 4, pad(harmony, 1.5 * bar / RATE), 0.09)
+        place(out, bar_start, soft_bass(hz(root), 2.2 * bar / RATE), 0.20)
+        ring(out, bar_start, beat, notes, noise, 0.36, (-14.0, -4.0), 0.006)
+    for index, (harmony, root, notes) in enumerate(whole, start=len(broken)):
+        bar_start = index * bar
+        # 고쳐진 쪽은 화음이 두텁고 따뜻하다.
+        place(out, bar_start - bar // 4, pad(harmony, 1.5 * bar / RATE), 0.13)
+        place(out, bar_start, soft_bass(hz(root), 2.2 * bar / RATE, 2.2), 0.22)
+        ring(out, bar_start, beat, notes, noise, 0.40, (0.0, 0.0), 0.0015, 1.2, 0.11)
+    return out
+
+
 def dc_block_loop(samples: list[float], pole: float = 0.995) -> list[float]:
     """루프용 DC 차단.
 
@@ -384,7 +545,10 @@ def main() -> int:
         OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     tracks = {"ambience": build_ambience(), "chase": build_chase(),
-              "title": build_title(), "prologue": build_prologue()}
+              "title": build_title(), "prologue": build_prologue(),
+              "ending_after_school": build_after_school(),
+              "ending_adults_work": build_adults_work(),
+              "ending_break_time": build_break_time()}
     problems: list[str] = []
 
     for name, raw in sorted(tracks.items()):

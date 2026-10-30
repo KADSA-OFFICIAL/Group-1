@@ -39,10 +39,13 @@ const YARD_ARRIVE := Vector2(1700, 380)
 ## `player.tscn`에 박아 두면 운동장에서 빈 아래쪽이 보인다.
 const FLOOR_BOUNDS := {
 	0: Rect2(0, 0, 3400, 1700),
-	1: Rect2(0, 0, 2280, 1500),   # 현관 로비 층(#498, #554) — 가로 2280px로 콤팩트 축소
+	1: Rect2(0, 0, 2280, 1140),   # 현관 로비 층(#498) — 전면 개편으로 하단 띠 680→400(#708)
 	4: Rect2(0, 0, 1800, 1000),   # 도입부(#405) — 두 방뿐이라 훨씬 작다
 }
-const DEFAULT_BOUNDS := Rect2(0, 0, 3400, 2500)
+## 2·3층 — 폭은 오른쪽 교실을 걷어내(#692), 높이는 중앙다리 띠를 줄이고(#691) 없애고(#710)
+## 하단 띠를 걷어내(2층 #702, 3층 #710) 남쪽 특별실동 아래에서 끝난다.
+## `gen_floors.floor_height()`·`player.tscn`과 같아야 한다(`verify_floor_reach.check_camera`).
+const DEFAULT_BOUNDS := Rect2(0, 0, 2280, 1620)
 
 ## 밖은 안보다 밝다. "손전등만이 광원"(#74)은 **실내** 규칙이다 — 네 개 층을
 ## 기어 내려온 끝에 시야가 트이는 것이 이 구간의 연출이다.
@@ -71,18 +74,18 @@ const FLOOR_FADE_SCALE := {
 # 층별 계단실 사각형. 인덱스 0 = 위쪽(좌측) 계단, 1 = 하단 중앙 계단.
 # 1층은 도면상 계단이 한 곳뿐이라 목록 길이가 1이다.
 const STAIR_A := Rect2(300, 720, 440, 280)
-const STAIR_B := Rect2(1450, 2120, 440, 320)
+const STAIR_B := Rect2(1450, 1780, 440, 320)
 ## 계단실이 **아예 없는** 자리(#398). `STAIRS`의 사각형은 남긴다 — 위층에서
 ## 내려올 때 `_arrive_on`이 쓰는 도착 지점의 기준이라, 빼면 인덱스가 밀려
 ## 엉뚱한 계단 앞으로 순간이동한다. 층 전환 판정에서만 건너뛴다.
-const NO_STAIRWELL := {2: [1]}
+const NO_STAIRWELL := {2: [1], 3: [1]}
 
 const STAIRS := {
 	0: [],   # 운동장 — 계단 없음(#356)
-	# 현관 로비 층(#498) — 하단 방 띠(800~1480) 왼쪽. `gen_floors.FLOOR1["stair"]`와
+	# 현관 로비 층(#498, #708) — 하단 방 띠(720~1120) 왼쪽 끝. `gen_floors.FLOOR1["stair"]`와
 	# 같은 자리여야 한다(`verify_stairs`가 대조). **위가 복도여야 한다** —
 	# `_arrive_on`이 사각형 위쪽에서 도착 지점을 잡는다.
-	1: [Rect2(220, 800, 440, 320)],
+	1: [Rect2(20, 720, 440, 400)],
 	2: [STAIR_A, STAIR_B],
 	3: [STAIR_A, STAIR_B],
 	4: [],   # 도입부 — 계단 없음. 창문으로 3층에 내려간다(#405)
@@ -107,7 +110,19 @@ func _stair_zone(r: Rect2, up: bool) -> Rect2:
 
 ## 도착 지점은 "목표 층"의 계단실 기준으로 잡는다. 층마다 계단 수가 달라
 ## (1층은 1곳) 인덱스가 없으면 마지막 계단으로 떨어진다.
+## 계단 착지점 예외(#702). `Vector2i(도착 층, 계단 순번) → 자리`.
+##
+## #702에서 3층 하단 계단으로 내려온 자리를 2층 남쪽 복도로 옮겼는데, #710에서
+## 3층 하단 계단도 없어져 지금은 비어 있다. `verify_stairs`가 여기 적힌 자리가
+## 그 층 캔버스 안·벽 밖인지 본다.
+const ARRIVE_OVERRIDE := {
+}
+
+
 func _arrive_on(target: int, index: int, up: bool) -> Vector2:
+	var key := Vector2i(target, index)
+	if ARRIVE_OVERRIDE.has(key):
+		return ARRIVE_OVERRIDE[key]
 	var list: Array = STAIRS[target]
 	var r: Rect2 = list[min(index, list.size() - 1)]
 	var mid := r.position.x + r.size.x / 2.0
@@ -141,6 +156,13 @@ const GAME_OVER_LINE_HOLD := 0.15
 const JUMPSCARE_BLACK_HOLD := 0.35
 
 var game_over_active: bool = false
+## 다음 층에 내려서서 **페이드가 다 걷힌 뒤** 낼 대사(#700). `[화자, 문장, 감정]`의
+## 배열이다. 층 통로(`floor_link.gd`)가 넘기기 직전에 맡긴다 — 그 노드는 층 씬과
+## 함께 해제되므로 도착 뒤에 스스로 말할 수 없다.
+##
+## **페이드 중에 내보내면 안 보인다.** `HUD`와 `UI`가 둘 다 CanvasLayer 3인데
+## `UI`(`FadeRect`)가 뒤에 선언돼 위로 오므로, 까만 화면 아래에 자막이 깔린다.
+var _arrival_speech: Array = []
 
 
 ## 현관 문(#356)이 층 전환을 부르려면 이름이 아니라 그룹으로 찾아야 한다 —
@@ -259,7 +281,7 @@ func _physics_process(_delta: float) -> void:
 ## 층별 기본 등장 지점. `travel_to()`가 등장 지점 없이 불렸을 때 쓴다.
 const DEFAULT_ARRIVES := {
 	0: YARD_ARRIVE,
-	1: Vector2(381, 772),
+	1: Vector2(181, 692),
 	2: Vector2(579, 692),
 	3: Vector2(579, 692),
 	4: INTRO_ARRIVE,
@@ -307,7 +329,29 @@ func _change_floor(target: int, arrive: Vector2) -> void:
 	tween.tween_callback(_swap_floor.bind(target, arrive))
 	tween.tween_property(fade_rect, "color:a", 0.0, FLOOR_FADE_IN_SECONDS)
 	tween.tween_callback(func() -> void:
-		changing_floor = false)
+		changing_floor = false
+		_flush_arrival_speech())
+
+
+## 다음 층 도착 뒤 대사를 맡긴다(#700). 층 전환을 부르기 **전에** 불러야 한다.
+func queue_arrival_speech(lines: Array) -> void:
+	_arrival_speech = lines.duplicate(true)
+
+
+## 페이드가 다 걷힌 뒤에 맡겨 둔 대사를 낸다. 순서·간격은 HUD 대기열(#454)이 맡는다.
+func _flush_arrival_speech() -> void:
+	if _arrival_speech.is_empty():
+		return
+	var lines := _arrival_speech
+	_arrival_speech = []
+	var game_state = get_tree().get_first_node_in_group("game_state")
+	if game_state == null:
+		return
+	for line: Array in lines:
+		if String(line[0]).is_empty():
+			game_state.call("request_notice", line[1])
+		else:
+			game_state.call("request_speech", line[0], line[1], line[2])
 
 
 func _swap_floor(target: int, arrive: Vector2, record_cp: bool = true) -> void:
@@ -363,6 +407,12 @@ func _janitor_active(target: int) -> bool:
 ## 씬 아래쪽 빈 공간이 보인다.
 func _apply_environment(target: int) -> void:
 	var outside := target == YARD_FLOOR
+	# 밖에 나오면 바람 소리(#713). 본편 음악은 현관 문(`exit_door.gd`)이 이미
+	# 껐다. 정문에서 엔딩 테마가 크로스페이드로 이어받는다.
+	if outside:
+		Sfx.play_theme(&"yard_wind")
+	else:
+		Sfx.stop_theme_if(&"yard_wind")
 	if darkness != null:
 		var base_dark: Color = YARD_DARKNESS if outside else INDOOR_DARKNESS
 		darkness.color = FLOOR_DARKNESS.get(target, base_dark)

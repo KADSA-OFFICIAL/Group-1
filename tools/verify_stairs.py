@@ -162,10 +162,43 @@ def no_stairwell():
     return a
 
 
+def _check_arrive_override():
+    """`floor_manager.ARRIVE_OVERRIDE`(#702)의 착지점이 그 층에서 걸을 수 있는 칸인지.
+
+    계단실이 없는 자리로 내려오는 계단은 계단실 사각형에서 착지점을 계산하지
+    않고 이 표를 쓴다 — 그래서 아래 계단 검사(`gone`이면 건너뛴다)에 안 걸린다.
+    #702에서 2층 하단 띠를 걷어내자 옛 착지점(1611, 1832)이 캔버스 밖이 됐는데,
+    이 검사가 없으면 아무도 모른다. 벽 폴리곤만 보면 실체로 메운 자리(`Gap*`)를
+    못 잡으므로 도달 격자(`verify_floor_reach`)로 본다.
+    """
+    sys.path.insert(0, str(ROOT / "tools"))
+    import verify_floor_reach as V
+
+    text = GD.read_text(encoding="utf-8")
+    block = re.search(r"const ARRIVE_OVERRIDE := \{(.*?)\n\}", text, re.S)
+    if block is None:
+        return
+    for fl, idx, x, y in re.findall(
+            r"Vector2i\((\d+),\s*(\d+)\)\s*:\s*Vector2\(([-\d.]+),\s*([-\d.]+)\)",
+            block.group(1)):
+        fl, idx, x, y = int(fl), int(idx), float(x), float(y)
+        path = ROOT / f"scenes/background/school_floor_{fl}.tscn"
+        walls_, _rooms, (w, h), _ = V.parse(path)
+        if not (0 < x < w and 0 < y < h):
+            fail(f"ARRIVE_OVERRIDE[{fl},{idx}] ({x:.0f},{y:.0f})가 {fl}층 캔버스"
+                 f" {w:.0f}x{h:.0f} 밖")
+            continue
+        blocked, cols, rows = V.build_grid(walls_, w, h)
+        c, r = int(x // V.CELL), int(y // V.CELL)
+        if not (0 <= c < cols and 0 <= r < rows) or blocked[r][c]:
+            fail(f"ARRIVE_OVERRIDE[{fl},{idx}] ({x:.0f},{y:.0f})가 {fl}층에서 막힌 칸")
+
+
 def main():
     stairs = parse_rects()
     if not stairs:
         print("\n".join(errors)); return 1
+    _check_arrive_override()
 
     gone_all = no_stairwell()
     for fl in (1, 2, 3, 4):

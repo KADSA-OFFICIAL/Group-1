@@ -11,6 +11,17 @@ extends Node
 
 const SFX_DIR := "res://assets/audio/"
 
+## 외부 음원으로 바꾼 소리(#713). 여기 있는 id는 합성 wav 대신 이 파일을 쓴다.
+## 가공은 `tools/import_ext_audio.py`, 출처·라이선스는 `CREDITS.md`. 합성 원본
+## (`gen_sfx.py`·`gen_music.py`가 굽는 `ambience`·`chase`·`door_open`)은 그대로
+## 남는다 — 이 표에서 줄을 빼면 곧바로 되돌아간다.
+const EXTERNAL := {
+	"ambience": "res://assets/audio/ext/ambience_dark.wav",
+	"chase": "res://assets/audio/ext/chase_eerie.wav",
+	"door_open": "res://assets/audio/ext/door_creak.wav",
+	"yard_wind": "res://assets/audio/ext/yard_wind.wav",
+}
+
 ## 소리별 음량(dB). 합성 단계에서도 크기를 맞췄지만, 실제로 섞어 보면
 ## 스팅어가 조사음을 잡아먹는 식의 불균형이 남는다 — 최종 조정은 여기서 한다.
 ## 전체가 크다는 확인을 받아 서로의 균형은 두고 일괄 6dB(진폭 절반) 내렸다(#196).
@@ -18,7 +29,8 @@ const VOLUMES := {
 	"investigate": -12.0,
 	"pickup": -10.0,
 	"door_locked": -11.0,
-	"door_open": -12.0,
+	# 외부 삐걱임(#713) — 파일 RMS -17.4dB라 합성음(-22.0dB, -12)과 재생 크기를 맞췄다.
+	"door_open": -17.0,
 	"hide_in": -11.0,
 	"hide_out": -11.0,
 	"stairs": -13.0,
@@ -53,7 +65,9 @@ const VOICES := 8
 
 # ── 지속음 (#176) ────────────────────────────────────────────────
 const AMBIENCE_DB := -16.0
-const CHASE_DB := -10.0
+## 외부 루프(#713)는 파일 RMS가 -20.0dB라(합성 -12.5dB) 재생 크기 -22.5dBFS를
+## 지키려고 그만큼 올렸다.
+const CHASE_DB := -2.5
 const MUSIC_SILENT_DB := -50.0     # 사실상 무음. 0 볼륨 대신 dB로 재운다.
 const MUSIC_FADE := 1.1
 ## 추격이 풀려도 이만큼은 음악을 유지한다. janitor의 lose_sight_seconds(1.5)보다
@@ -64,13 +78,22 @@ const CHASE_RELEASE_DELAY := 2.5
 const AMBIENCE_DUCK_DB := -30.0
 
 # ── 테마 (#606) ──────────────────────────────────────────────────
-## 타이틀·프롤로그 음악. 본편 앰비언트와 겹치지 않는 구간이라 따로 둔다 —
+## 타이틀·프롤로그·엔딩 음악. 본편 앰비언트와 겹치지 않는 구간이라 따로 둔다 —
 ## start_music/stop_music은 추격 상태까지 얽혀 있어 거기 끼우면 안 된다.
 ## 프롤로그는 자막만 흐르는 장면이라 타이틀보다 한 단 낮다(실측 RMS가
 ## 타이틀 0.138 / 프롤로그 0.088 / 앰비언트 0.158이라 그만큼 올려 맞췄다).
+##
+## 엔딩 테마(#676)는 대사 아래에 깔리므로 프롤로그 쪽에 맞췄다 — 재생 크기
+## (RMS + 이 값)가 셋 다 약 -31dBFS다(타이틀 -30.2 / 프롤로그 -32.1).
 const THEME_DB := {
 	"title": -13.0,
 	"prologue": -11.0,
+	"ending_after_school": -11.7,
+	"ending_adults_work": -10.1,
+	"ending_break_time": -14.0,
+	# 운동장 바람(#713) — 본편 음악이 현관에서 꺼진 뒤 밖에서 깔린다. 대사가
+	# 없는 구간이지만 다른 테마(-31dBFS)보다 조금 낮게(-33) 둔다.
+	"yard_wind": -13.0,
 }
 ## 타이틀 → 프롤로그 크로스페이드. 시작 버튼의 페이드(0.8초)와 인트로 첫
 ## 페이드인(0.5초)이 이어지는 동안 바뀌도록 그보다 조금 길게 잡았다.
@@ -290,7 +313,7 @@ func quit_cleanly() -> void:
 	get_tree().quit()
 
 
-# ── 타이틀·프롤로그 테마 (#606) ──────────────────────────────────
+# ── 타이틀·프롤로그·엔딩 테마 (#606, #676) ──────────────────────────────────
 
 ## 테마를 튼다. 다른 테마가 울리고 있으면 크로스페이드한다. 같은 곡을 다시
 ## 부르면 아무것도 안 한다 — 처음부터 다시 나면 끊긴 것처럼 들린다.
@@ -314,6 +337,13 @@ func play_theme(id: StringName) -> void:
 	player.volume_db = MUSIC_SILENT_DB
 	player.play()
 	_fade(player, THEME_DB.get(String(id), -12.0), THEME_FADE)
+
+
+## 지금 그 테마가 울리고 있을 때만 끈다. 운동장 바람(#713)을 걷을 때 쓴다 —
+## 그냥 `stop_theme()`을 부르면 층을 옮기는 사이 다른 테마까지 끊을 수 있다.
+func stop_theme_if(id: StringName) -> void:
+	if _theme_id == id:
+		stop_theme()
 
 
 func stop_theme() -> void:
@@ -357,7 +387,7 @@ func _stream_for(id: StringName) -> AudioStream:
 	if _streams.has(key):
 		return _streams[key]
 
-	var path := SFX_DIR + key + ".wav"
+	var path: String = EXTERNAL.get(key, SFX_DIR + key + ".wav")
 	var stream: AudioStream = null
 	if ResourceLoader.exists(path):
 		stream = load(path) as AudioStream

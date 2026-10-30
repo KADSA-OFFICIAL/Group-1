@@ -40,14 +40,14 @@
    ]
   },
   "StudentCards": {
-   "body": "[node name=\"StudentCards\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(170, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"서랍 안에 학생증 두 장이 나란히 놓여 있다. 3학년 1반 강유진. 2학년 2반 조민혁. 잃어버린 물건을 정리해 둔 것처럼 각도까지 맞춰 놓여 있다.\"\nprompt_text = \"서랍 열기\"\ngrants_flag = \"saw_student_cards\"\n\n",
+   "body": "[node name=\"StudentCards\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(170, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"서랍 안에 학생증 세 장이 나란히 놓여 있다. 3학년 1반 강유진. 2학년 2반 조민혁. 1학년 6반 임나연. 잃어버린 물건을 정리해 둔 것처럼 각도까지 맞춰 놓여 있다.\"\nprompt_text = \"서랍 열기\"\ngrants_flag = \"saw_student_cards\"\n\n",
    "kids": [
     "[node name=\"StudentCardsVisual\" type=\"Sprite2D\" parent=\"StudentCards\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"10_note\")\n\n",
     "[node name=\"StudentCardsZone\" type=\"CollisionShape2D\" parent=\"StudentCards\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
    ]
   },
   "JanitorNotebook": {
-   "body": "[node name=\"JanitorNotebook\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(450, 1450)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"손때 묻은 공책. 이름과 짧은 판단이 줄줄이 적혀 있다. '강유진 — 후배 때림.' 그리고 마지막 줄. '조민혁 — 집에서 맞고 온다는 걸 안다. 확실하지 않다. 그래도 만약을 위해.'\"\nprompt_text = \"공책 읽기\"\ngrants_flag = \"read_janitor_notebook\"\n\n",
+   "body": "[node name=\"JanitorNotebook\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(450, 1450)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"손때 묻은 공책. 이름과 짧은 판단이 줄줄이 적혀 있다. '강유진 — 후배 때림.' '임나연 — 애들 시켜 한 명을 따돌림.' 그리고 마지막 줄. '조민혁 — 집에서 맞고 온다는 걸 안다. 확실하지 않다. 그래도 만약을 위해.'\"\nprompt_text = \"공책 읽기\"\ngrants_flag = \"read_janitor_notebook\"\n\n",
    "kids": [
     "[node name=\"JanitorNotebookVisual\" type=\"Sprite2D\" parent=\"JanitorNotebook\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"10_note\")\n\n",
     "[node name=\"JanitorNotebookZone\" type=\"CollisionShape2D\" parent=\"JanitorNotebook\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
@@ -147,7 +147,7 @@
    ]
   },
   "HistoryClue": {
-   "body": "[node name=\"HistoryClue\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(710, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"10년 전 졸업앨범. 2학년 박시우의 사진 위에 검은 테두리가 그려져 있다. 사이에 끼워진 신문 스크랩 — '교내 추락 사고로 학생 1명 사망'.\"\nprompt_text = \"조사\"\ngrants_flag = \"read_siwoo_past\"\n\n",
+   "body": "[node name=\"HistoryClue\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(710, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"10년 전 졸업앨범. 맨 뒤 추모 면, 1학년 박시우의 사진에 검은 테두리가 그려져 있다. 사이에 끼워진 신문 스크랩 — '교내 추락 사고로 학생 1명 사망'.\"\nprompt_text = \"조사\"\ngrants_flag = \"read_siwoo_past\"\n\n",
    "kids": [
     "[node name=\"HistoryClueVisual\" type=\"Sprite2D\" parent=\"HistoryClue\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"10_note\")\n\n",
     "[node name=\"HistoryClueZone\" type=\"CollisionShape2D\" parent=\"HistoryClue\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
@@ -168,7 +168,7 @@
    ]
   },
   "NayeonClue": {
-   "body": "[node name=\"NayeonClue\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(700, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"방송 원고 뭉치 사이에 인쇄된 캡처 화면. 1학년 6반 임나연을 두고 오간 글들이다. 맨 아래 누군가 볼펜으로 눌러 썼다. — '장난이었다잖아.'\"\nprompt_text = \"조사\"\ngrants_flag = \"found_imnayeon\"\n\n",
+   "body": "[node name=\"NayeonClue\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(700, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"생활지도부 사안 파일. '1학년 6반 임나연 — SNS 따돌림 주도.' 붙은 캡처는 단톡방 농담 한 줄이 퍼진 것뿐이다. 여백에 볼펜 글씨 — '장난이었다잖아.' 맨 위에 빨간 도장: 실종 신고 접수.\"\nprompt_text = \"조사\"\ngrants_flag = \"found_imnayeon\"\n\n",
    "kids": [
     "[node name=\"NayeonClueVisual\" type=\"Sprite2D\" parent=\"NayeonClue\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"10_note\")\n\n",
     "[node name=\"NayeonClueZone\" type=\"CollisionShape2D\" parent=\"NayeonClue\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
@@ -238,7 +238,7 @@
    ]
   },
   "CounselRecord": {
-   "body": "[node name=\"CounselRecord\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(2090, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"상담기록부가 펼쳐져 있다. 2학년 박시우 — 7회차. 마지막 장에 학교 회신이 붙어 있다. '가해 학생 특정 어려움. 추가 조치 없음.'\"\nprompt_text = \"조사\"\ngrants_flag = \"read_siwoo_counseling\"\n\n",
+   "body": "[node name=\"CounselRecord\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(2090, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"상담기록부가 펼쳐져 있다. 1학년 박시우 — 7회차. 마지막 장에 학교 회신이 붙어 있다. '가해 학생 특정 어려움. 추가 조치 없음.'\"\nprompt_text = \"조사\"\ngrants_flag = \"read_siwoo_counseling\"\n\n",
    "kids": [
     "[node name=\"CounselRecordVisual\" type=\"Sprite2D\" parent=\"CounselRecord\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"10_note\")\n\n",
     "[node name=\"CounselRecordZone\" type=\"CollisionShape2D\" parent=\"CounselRecord\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
