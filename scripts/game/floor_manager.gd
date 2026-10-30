@@ -203,7 +203,7 @@ func _ready() -> void:
 		var fl_text := "%d층" % restored_floor if restored_floor > 0 else YARD_LABEL
 		tween.tween_callback(func() -> void:
 			if game_state != null:
-				game_state.call("request_notice", "📌 %s 체크포인트에서 재개했습니다." % fl_text)
+				game_state.call("request_notice", "%s 체크포인트에서 재개했습니다." % fl_text)
 		)
 	else:
 		tween.tween_callback(_show_start_hint)
@@ -384,7 +384,10 @@ func _swap_floor(target: int, arrive: Vector2, record_cp: bool = true) -> void:
 		if game_state != null and game_state.has_method("record_checkpoint"):
 			game_state.call("record_checkpoint", target, arrive)
 			var fl_text := "%d층" % target if target > 0 else YARD_LABEL
-			game_state.call("request_notice", "📌 %s 체크포인트 저장됨" % fl_text)
+			# 이모지를 붙이지 않는다(#671). 게임 폰트에 이모지 글리프가 없어 OS 이모지
+			# 폰트(macOS 183MB)를 통째로 불러오고, 그 줄이 찍히는 동안 프레임이
+			# 38~130ms로 끊겼다.
+			game_state.call("request_notice", "%s 체크포인트 저장됨" % fl_text)
 
 
 func _update_floor_label() -> void:
