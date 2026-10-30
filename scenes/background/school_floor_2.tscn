@@ -3808,6 +3808,24 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.465, 0.4772, 0.5016, 1)
 polygon = PackedVector2Array(1174, 462, 1214, 462, 1214, 502, 1174, 502)
 
+[node name="PC_North4_cabR0" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1433.3, 360, 1479.3, 360, 1479.3, 394, 1433.3, 394)
+
+[node name="PV_North4_cabR0" type="Polygon2D" parent="Props"]
+texture = ExtResource("ext_dl_cabinet")
+uv = PackedVector2Array(0, 0, 44, 0, 44, 32, 0, 32)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(1433.3, 360, 1479.3, 360, 1479.3, 394, 1433.3, 394)
+
+[node name="PC_North4_shelfR0" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1439.3, 410, 1479.3, 410, 1479.3, 468, 1439.3, 468)
+
+[node name="PV_North4_shelfR0" type="Polygon2D" parent="Props"]
+texture = ExtResource("ext_dl_bookshelf_side")
+uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(1439.3, 410, 1479.3, 410, 1479.3, 468, 1439.3, 468)
+
 [node name="PD_North4_wboard" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_prop_glass")
 color = Color(0.641, 0.6667, 0.6538, 1)
