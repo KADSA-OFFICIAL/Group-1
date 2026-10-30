@@ -59,6 +59,7 @@ func _run() -> void:
 	await _check_player_footsteps()
 	await _check_intro()
 	await _check_subtitle_queue()
+	await _check_subtitle_wrap()
 	await _check_artroom_intro()
 	await _check_ink_throw()
 	await _check_jumpscare()
@@ -439,6 +440,33 @@ func _check_subtitle_queue() -> void:
 	else:
 		_ok("자막 대기열 서로 다른 줄 유지")
 	main.free()
+	await process_frame
+
+
+## 자막은 띄어쓰기 자리에서만 줄을 바꾼다(#770). Godot 자동 줄바꿈은 한글 음절 사이를
+## 다 끊는 자리로 봐서 "애 / 들"처럼 어절이 쪼개졌다. 줄바꿈이 전부 원문의 띄어쓰기를
+## 바꾼 것이고, 화면 줄 수가 그 줄바꿈 수와 같아야 한다(= 자동 줄바꿈이 끼어들지 않았다).
+func _check_subtitle_wrap() -> void:
+	var sub: Node = (load("res://scenes/ui/subtitle_dialogue.tscn") as PackedScene).instantiate()
+	root.add_child(sub)
+	await process_frame
+	var text := "손때 묻은 공책. 이름과 짧은 판단이 줄줄이 적혀 있다. '강유진 — 후배 때림.' '임나연 — 애들 시켜 한 명을 따돌림.' 그리고 마지막 줄. '조민혁 — 기물 파손. 집에서 맞고 온다는 걸 안다. 다른 애한테도 그럴지는 확실하지 않다. 그래도 만약을 위해.'"
+	sub.call("show_line", "", text)
+	sub.call("skip_typing")
+	for i in 3:
+		await process_frame
+	var label: Label = sub.get_node("Lines/TextLabel")
+	var shown := label.text
+	var breaks := shown.count("\n")
+	if shown.replace("\n", " ") != text:
+		_fault("자막 줄바꿈: 띄어쓰기가 아닌 자리에 줄바꿈이 들어갔다")
+	elif breaks < 1:
+		_fault("자막 줄바꿈: 긴 줄인데 줄바꿈을 안 넣었다(자동 줄바꿈이 어절을 끊는다)")
+	elif label.get_line_count() != breaks + 1:
+		_fault("자막 줄바꿈: 화면 %d줄 ≠ 넣은 줄바꿈 %d + 1 — 자동 줄바꿈이 끼어들었다" % [label.get_line_count(), breaks])
+	else:
+		_ok("자막 어절 단위 줄바꿈(%d줄)" % (breaks + 1))
+	sub.free()
 	await process_frame
 
 
