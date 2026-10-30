@@ -146,9 +146,9 @@ func _update_endings_ui() -> void:
 	if is_instance_valid(basic_ending_label):
 		var has_gate_key: bool = game_state.call("has_item", "front_gate_key") if game_state.has_method("has_item") else false
 		if has_gate_key:
-			basic_ending_label.text = "엔딩 1: 1층 열쇠 (보유)"
+			basic_ending_label.text = "엔딩 1: 현관 열쇠 (보유)"
 		else:
-			basic_ending_label.text = "엔딩 1: 1층 열쇠"
+			basic_ending_label.text = "엔딩 1: 현관 열쇠 (수위실)"
 
 
 func set_inventory(items: Array[String]) -> void:

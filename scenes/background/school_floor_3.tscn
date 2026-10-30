@@ -2300,7 +2300,7 @@ position = Vector2(1388.9, 410.8)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
-message = "상담기록부가 펼쳐져 있다. 1학년 박시우 — 7회차. 마지막 장에 학교 회신이 붙어 있다. '가해 학생 특정 어려움. 추가 조치 없음.'"
+message = "상담기록부가 펼쳐져 있다. 1학년 박시우 — 7회차. 주호소: '쉬는 시간이 제일 무서워요.' 학부모(부, 박종태) 면담. 마지막 장에 학교 회신이 붙어 있다. '가해 학생 특정 어려움. 추가 조치 없음.'"
 prompt_text = "조사"
 grants_flag = "read_siwoo_counseling"
 
@@ -2455,7 +2455,7 @@ position = Vector2(1990, 1280)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
-message = "깨진 비커가 치워지지 않은 채로 있다. 그 아래 가정통신문 뒷면에 눌러쓴 글씨 — '집에서 맞고 학교서 혼나고. 그럼 나는 어디로 가.' 이름 칸: 2학년 2반 조민혁."
+message = "깨진 비커가 치워지지 않은 채로 있다. 그 아래 '기물 파손 경위서' 뒷면에 눌러쓴 글씨 — '집에서 맞고 학교서 혼나고. 그럼 나는 어디로 가.' 이름 칸: 2학년 2반 조민혁."
 prompt_text = "조사"
 grants_flag = "found_jominhyuk"
 
@@ -2481,7 +2481,7 @@ position = Vector2(2190, 1280)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
-message = "교구함에 쪽지가 붙어 있다. '민혁아, 과학실 기구 부수지 마. 걸리면 너만 혼나. 열쇠 여기 숨겨둘게. -태호' 쪽지를 들춰 보니 못만 남아 있다. 누가 먼저 걷어 간 모양이다."
+message = "교구함에 쪽지가 붙어 있다. '민혁아, 과학실 기구 부수지 마. 걸리면 너만 혼나. 열쇠 여기 숨겨둘게. -태호' 쪽지 밑 못에는 아무것도 걸려 있지 않다. 누가 먼저 가져간 모양이다."
 prompt_text = "쪽지 살펴보기"
 grants_flag = "read_taeho_note"
 
@@ -2574,7 +2574,7 @@ collision_layer = 2
 collision_mask = 0
 script = ExtResource("5_hiding")
 prompt_text = "사물함에 숨기"
-message = "6반 뒤 사물함. 문틈으로 남쪽 복도가 가늘게 보인다."
+message = "6반 뒤 사물함. 철판 너머로 내 숨소리가 울린다."
 
 [node name="HideClass6Visual" type="Polygon2D" parent="HideClass6"]
 z_index = 1
@@ -3320,7 +3320,7 @@ position = Vector2(580.0, 96.0)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
-message = "운동장 구석 창고 앞에서 불빛이 하나 움직인다. 손전등 같다. 곧 꺼진다."
+message = "운동장 구석, 가로등 하나가 꺼졌다 켜지기를 되풀이한다."
 prompt_text = "창밖 보기"
 
 [node name="Window_North2Zone" type="CollisionShape2D" parent="Window_North2"]
@@ -5781,7 +5781,7 @@ collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
 interact_priority = 3
-message = "받침대에 체육복 주머니가 걸려 있다. 이름표가 뜯겨 있다."
+message = "책상 고리에 체육복 가방이 걸려 있다. 이름표가 뜯겨 있다."
 prompt_text = "책상 살펴보기"
 
 [node name="Zone" type="CollisionShape2D" parent="Exam_North1_d4"]

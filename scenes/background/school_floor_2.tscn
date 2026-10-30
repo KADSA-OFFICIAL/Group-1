@@ -2361,7 +2361,7 @@ position = Vector2(2215, 950)
 collision_layer = 0
 collision_mask = 1
 script = ExtResource("2_pickup")
-message = "눈이 있어야 할 자리에서 열쇠를 뽑아 냈다. 손이 떨려 두 번 놓쳤다. — '2F 계단'"
+message = "눈이 있어야 할 자리에서 열쇠를 뽑아냈다. 손이 떨려 두 번 놓쳤다. — '2F 계단'"
 item_id = "stair_key_2"
 pickup_id = "found_head_key"
 grants_flag = "found_jominhyuk"
@@ -2473,7 +2473,7 @@ collision_layer = 2
 collision_mask = 0
 script = ExtResource("5_hiding")
 prompt_text = "칸에 숨기"
-message = "샤워칸 안. 타일에 등을 붙이자 서늘하다."
+message = "맨 안쪽 칸. 타일에 등을 붙이자 서늘하다."
 
 [node name="HideMensRoomLVisual" type="Polygon2D" parent="HideMensRoomL"]
 z_index = 1
@@ -2497,7 +2497,7 @@ collision_layer = 2
 collision_mask = 0
 script = ExtResource("5_hiding")
 prompt_text = "사물함에 숨기"
-message = "교육실 사물함. 문틈으로 복도가 가늘게 보인다."
+message = "교육실 사물함. 녹슨 경첩 냄새가 난다."
 
 [node name="HideEduRoomVisual" type="Polygon2D" parent="HideEduRoom"]
 z_index = 1
@@ -5751,7 +5751,7 @@ collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
 interact_priority = 3
-message = "받침대에 체육복 주머니가 걸려 있다. 이름표가 뜯겨 있다."
+message = "책상 고리에 체육복 가방이 걸려 있다. 이름표가 뜯겨 있다."
 prompt_text = "책상 살펴보기"
 
 [node name="Zone" type="CollisionShape2D" parent="Exam_North1_d4"]
@@ -5769,7 +5769,7 @@ collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
 interact_priority = 3
-message = "책상 밑에 씹던 껌이 굳어 있다. 아직 말랑하다."
+message = "책상 밑에 껌이 붙어 있다. 아직 말랑하다."
 prompt_text = "책상 살펴보기"
 
 [node name="Zone" type="CollisionShape2D" parent="Exam_North1_d5"]
