@@ -90,7 +90,7 @@ theme_override_constants/separation = 4
 [node name="TrueEndingLabel" type="Label" parent="Root/TopLeft/Margin/TextRows"]
 layout_mode = 2
 theme_override_colors/font_color = Color(1.0, 0.85, 0.50, 1)
-text = "진엔딩: 0/6 (4층:0/2, 3층:0/2, 2층:0/1, 1층:0/1)"
+text = "진엔딩: 0/6 (4층:0/1, 3층:0/3, 2층:0/1, 1층:0/1)"
 
 [node name="ReportEndingLabel" type="Label" parent="Root/TopLeft/Margin/TextRows"]
 layout_mode = 2
@@ -100,7 +100,7 @@ text = "엔딩 2: 0/3 (2층:0/1, 1층:0/2) [1개+ 필요]"
 [node name="BasicEndingLabel" type="Label" parent="Root/TopLeft/Margin/TextRows"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.75, 0.75, 0.78, 1)
-text = "엔딩 1: 1층 열쇠"
+text = "엔딩 1: 현관 열쇠 (수위실)"
 
 [node name="TopRight" type="PanelContainer" parent="Root"]
 ; 목표 및 소지품 표시(#545)
@@ -127,7 +127,7 @@ theme_override_constants/separation = 4
 
 [node name="ObjectiveLabel" type="Label" parent="Root/TopRight/Margin/TextRows"]
 layout_mode = 2
-text = "목표: 학교를 탈출하세요."
+text = "목표: 학교를 빠져나가자."
 
 [node name="InventoryLabel" type="Label" parent="Root/TopRight/Margin/TextRows"]
 layout_mode = 2
