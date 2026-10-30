@@ -16,7 +16,6 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_chair.png" id="tex_obj_chair"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_desk.png" id="tex_obj_desk"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_easel.png" id="tex_obj_easel"]
-[ext_resource type="Texture2D" path="res://assets/tiles/obj_locker.png" id="tex_obj_locker"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_panel.png" id="tex_obj_panel"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_rack.png" id="tex_obj_rack"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_shelf.png" id="tex_obj_shelf"]
@@ -28,6 +27,7 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/dl_bookshelf.png" id="ext_dl_bookshelf"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/dl_bookshelf_side.png" id="ext_dl_bookshelf_side"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hr_locker_side.png" id="ext_hr_locker_side"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_bag_spilled.png" id="ext_hs_bag_spilled"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_book_purple.png" id="ext_hs_book_purple"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_calendar.png" id="ext_hs_calendar"]
@@ -1001,9 +1001,9 @@ message = "미술실 캐비넷 안. 숨을 참는다. 문틈으로 빛이 지나
 
 [node name="HideArtCabinetVisual" type="Polygon2D" parent="HideArtCabinet"]
 z_index = 1
-texture = ExtResource("tex_obj_locker")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3894, 0.4154, 0.4803, 1)
+texture = ExtResource("ext_hr_locker_side")
+uv = PackedVector2Array(0, 0, 16, 0, 16, 39, 0, 39)
+color = Color(0.58, 0.56, 0.6, 1)
 polygon = PackedVector2Array(-40, -26, -4, -26, -4, 26, -40, 26)
 
 [node name="HideArtCabinetZone" type="CollisionShape2D" parent="HideArtCabinet"]
