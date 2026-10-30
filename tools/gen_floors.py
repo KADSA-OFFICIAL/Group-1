@@ -1495,6 +1495,11 @@ POS_OVERRIDE = {
     # 인사 기록은 오른쪽 위 서류장 쪽(#761). 방을 340으로 얕게 하자 자동 자리가
     # 열쇠 보관함 옆(56px 안)으로 내려와 상호작용 존이 겹쳤다.
     (3, "JanitorWarning"): (1800, 290),
+    # 3층 생활지도부(1140~1513, 200~540, 문 아래)(#772). 얕게 줄이자(#761) 자동 자리
+    # (0.62)의 단서 여유가 책상 섬 자리(아래 절반)를 다 덮어 부서실에 책상이 하나도
+    # 안 섰다. 위쪽 양 구석으로 올린다 — 가운데 위는 부장 책상 자리다.
+    (3, "NayeonClue"): (1200, 268),
+    (3, "CounselRecord"): (1455, 268),
     (3, "KeyCabinet"): (1558, 420),
     (3, "SpareKeyHook"): (1558, 480),
     # 도입부 4층(#405) — 자동 배치는 방을 균등 분할해서 작업대 위에 떨어진다.
@@ -2424,7 +2429,7 @@ OFFICE_CLUE_CLEAR = 62    # 단서·은신처 여유. verify_props는 30이면 �
                           # 체육건강부·진로진학부 은신처가 집기에 막혔다.
 
 
-def _stack(sc, key, x0, x1, y0, y1, items, taken, keepout, outer):
+def _stack(sc, key, x0, x1, y0, y1, items, taken, keepout, outer, skip=False):
     """[x0,x1] 띠에 물건을 위에서 아래로 쌓는다. 목록을 되풀이해 띠를 채운다.
 
     옆벽 자투리를 채우는 데 쓴다 — 방마다 남는 폭이 45px에서 330px까지
@@ -2450,7 +2455,14 @@ def _stack(sc, key, x0, x1, y0, y1, items, taken, keepout, outer):
             y += h + OFFICE_GAP
             placed = True
         if not placed:
-            return
+            # `skip`이면 이 높이를 건너뛰고 **조금 내려가 다시 본다**(#772). 띠 맨 위가
+            # 단서 여유에 걸리면 그 아래가 통째로 비었다(생활지도부 옆벽). 은신처가
+            # 있는 방에는 안 쓴다 — 은신처 위아래로 집기가 차서 다가갈 길이 막혔다
+            # (1층 교무실, `verify_hiding_spots`가 잡았다).
+            if not skip:
+                return
+            y += 8
+            continue
         n += 1
 
 
@@ -2662,7 +2674,8 @@ def _office(sc, key, x0, y0, x1, y1, door, keepout):
                   (f"water{tag}", min(30, sx1 - sx0), 30, C_WATER, True),
                   (f"plant{tag}", min(28, sx1 - sx0), 28, C_PLANT, True)]
         _stack(sc, key, sx0, sx1, ay0, ay1, items, taken, keepout,
-               "left" if tag == "L" else "right")
+               "left" if tag == "L" else "right",
+               skip=not any(h[1] == key for h in EXTRA_HIDING.get(sc.floor_no, [])))
 
     # ── 벽 장식 ────────────────────────────────────────────────
     # 화이트보드는 옆벽에. 가로 벽은 창(외벽)과 문(복도)이 이미 쓴다.
