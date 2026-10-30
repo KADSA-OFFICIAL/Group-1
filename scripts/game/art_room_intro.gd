@@ -222,7 +222,7 @@ func _act1_warning() -> void:
 	if door != null and not door_after_message.is_empty():
 		door.set("message", door_after_message)
 
-	_say(gs, "이설", "(들어온다. 왼쪽 벽 캐비넷에 숨어야 해.)", "fear")
+	_say(gs, "이설", "(들어온다. 왼쪽 벽 캐비닛에 숨어야 해.)", "fear")
 	_pulse_mark(cabinet_mark_path)
 	_point_at(cabinet_path, "숨을 곳")
 
@@ -440,7 +440,7 @@ func _act3_grace(gs) -> void:
 	#
 	# 한 줄이 늘지만 유예 여유(#506, 44초 중 10.4초) 안이다 — 대사는 걸으면서 읽는다.
 	_say(gs, "이설", "(지금밖에 없어. 문은 안 돼 — 열쇠 들고 금방 돌아와.)", "fear")
-	_say(gs, "이설", "(준비실 창문. 바깥 난간이 아래층 창문까지 이어져 있었어.)", "fear")
+	_say(gs, "이설", "(준비실 창문. 바깥 난간 끝에 배수관이 아래층까지 내려가 있었어.)", "fear")
 	# 유예는 책 유무로 가르지 않는다 (#506) — 근거는 `GRACE_SECONDS` 주석에 있다.
 	_grace = GRACE_SECONDS
 	# 책이 없으면 **다시** 알린다 (#477). 1막에서 한 번 말했지만 그 사이에

@@ -16,7 +16,6 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_chair.png" id="tex_obj_chair"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_desk.png" id="tex_obj_desk"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_easel.png" id="tex_obj_easel"]
-[ext_resource type="Texture2D" path="res://assets/tiles/obj_locker.png" id="tex_obj_locker"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_panel.png" id="tex_obj_panel"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_rack.png" id="tex_obj_rack"]
 [ext_resource type="Texture2D" path="res://assets/tiles/obj_shelf.png" id="tex_obj_shelf"]
@@ -28,6 +27,7 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/dl_bookshelf.png" id="ext_dl_bookshelf"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/dl_bookshelf_side.png" id="ext_dl_bookshelf_side"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ext/hr_locker_side.png" id="ext_hr_locker_side"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_bag_spilled.png" id="ext_hs_bag_spilled"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_book_purple.png" id="ext_hs_book_purple"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_calendar.png" id="ext_hs_calendar"]
@@ -462,13 +462,13 @@ collision_layer = 2
 collision_mask = 0
 script = ExtResource("11_floorlink")
 required_item_id = "korean_book"
-locked_message = "창문은 열린다. 바깥에 외벽 난간 — 아래층 창문까지 이어져 있다. …그래도 국어책부터. 미술실 책상 위."
+locked_message = "창문은 열린다. 바깥에 외벽 난간, 그 끝에 배수관이 아래층까지 내려가 있다. …그래도 국어책부터. 미술실 책상 위."
 prompt_text = "창문으로 내려가기"
 cutscene_speaker = "이설"
 cutscene_lines = PackedStringArray("창문을 밀었다. 밤바람이 얼굴을 친다.", "…4층이야. 아래 보지 마.", "외벽 난간에 발을 올렸다. 한 뼘. 그래도 있어.", "난간 끝에 배수관 — 아래층 창틀까지 내려가 있다.", "배관을 끌어안고 한 층을 내려간다. 손바닥이 쓸린다.", "3층 창문 — 열려 있어.")
 cutscene_emotions = PackedStringArray("", "fear", "fear", "", "fear", "")
 arrival_speakers = PackedStringArray("", "수위", "이설")
-arrival_lines = PackedStringArray("머리 위, 미술실 쪽에서 문 여는 소리. 열쇠꾸러미가 짤랑인다.", "…없구만. 당분간은 다시 안 오겠지.", "(조금만 늦었으면.)")
+arrival_lines = PackedStringArray("머리 위, 미술실 쪽에서 문 여는 소리. 열쇠 꾸러미가 짤랑인다.", "…없구만. 당분간은 다시 안 오겠지.", "(조금만 늦었으면.)")
 arrival_emotions = PackedStringArray("", "", "fear")
 cutscene_look_at = Vector2(1465, 46)
 target_floor = 3
@@ -996,14 +996,14 @@ position = Vector2(76, 450)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("5_hiding")
-prompt_text = "캐비넷에 숨기"
-message = "미술실 캐비넷 안. 숨을 참는다. 문틈으로 빛이 지나간다."
+prompt_text = "캐비닛에 숨기"
+message = "미술실 캐비닛 안. 숨을 참는다. 문틈으로 빛이 지나간다."
 
 [node name="HideArtCabinetVisual" type="Polygon2D" parent="HideArtCabinet"]
 z_index = 1
-texture = ExtResource("tex_obj_locker")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3894, 0.4154, 0.4803, 1)
+texture = ExtResource("ext_hr_locker_side")
+uv = PackedVector2Array(0, 0, 16, 0, 16, 39, 0, 39)
+color = Color(0.58, 0.56, 0.6, 1)
 polygon = PackedVector2Array(-40, -26, -4, -26, -4, 26, -40, 26)
 
 [node name="HideArtCabinetZone" type="CollisionShape2D" parent="HideArtCabinet"]
@@ -1021,7 +1021,7 @@ collision_layer = 2
 collision_mask = 0
 script = ExtResource("5_hiding")
 prompt_text = "적재함 뒤에 숨기"
-message = "준비실 적재함 뒤. 비닐봉투 냄새가 코를 찌른다."
+message = "준비실 적재함 뒤. 테레빈유 냄새가 코를 찌른다."
 
 [node name="HidePrepShelfVisual" type="Polygon2D" parent="HidePrepShelf"]
 z_index = 1

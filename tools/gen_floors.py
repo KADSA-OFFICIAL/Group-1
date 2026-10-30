@@ -354,6 +354,7 @@ C_X_TDESK = "Color(0.261, 0.181, 0.121, 1)"     # 교탁(책상+의자)
 C_X_ODESK_DOWN = "Color(0.262, 0.182, 0.122, 1)"  # 교무실 섬 위 자리
 C_X_ODESK_UP = "Color(0.263, 0.183, 0.123, 1)"    # 교무실 섬 아래 자리
 C_CRATE = "Color(0.301, 0.221, 0.141, 1)"         # 나무 상자(#758) — 창고 벽 줄
+C_SHOES = "Color(0.302, 0.181, 0.151, 1)"         # 현관 신발장(#763)
 
 
 def _png_size(path):
@@ -403,9 +404,11 @@ SPRITE = {
     C_SHELF: "wall:shelf",
     C_CABINET: "wall:cabinet",
     C_CRATE: "wall:crate",
+    # 사물함·신발장(#763, Top Down Pixel Art Horror) — 칠이 벗겨진 어두운 사물함.
+    C_LOCKER: "wall:locker",
+    C_SHOES: "wall:shoes",
     C_DESK: "obj_desk",
     C_CHAIR: "obj_chair",
-    C_LOCKER: "obj_locker",
     C_SINK: "obj_sink",
     C_URINAL: "obj_sink",
     # 미술실 전용 그림(#405)
@@ -456,10 +459,19 @@ WALL_ART = {
     "shelf": ("dl_bookshelf", "dl_bookshelf_side"),
     "cabinet": ("dl_cabinet", "dl_cabinet_side"),
     "crate": ("dl_crate", "dl_crate"),
+    "locker": ("hr_locker_bank", "hr_locker_side"),
+    "shoes": ("hr_shoe_cubby", "dl_bookshelf_side"),
 }
 # 그림 옆모습의 앞면이 어느 쪽을 보나 — "left"면 방 오른쪽 벽에 그대로 맞는다.
 WALL_ART_SIDE_FACES = {"dl_bookshelf_side": "left", "dl_cabinet_side": "left",
-                       "dl_crate": "left"}
+                       "dl_crate": "left", "hr_locker_side": "right"}
+# 그림별 밝기(#763). Horror 팩은 Darklight보다 색이 연하고 밝아(파스텔 분홍 신발장,
+# 밝은 회색 사물함) 손전등 아래 어두운 바닥에서 혼자 떠 보였다.
+WALL_ART_TINT = {
+    "hr_locker_bank": "Color(0.58, 0.56, 0.6, 1)",
+    "hr_locker_side": "Color(0.58, 0.56, 0.6, 1)",
+    "hr_shoe_cubby": "Color(0.55, 0.5, 0.5, 1)",
+}
 
 # 바닥 → 외부 그림(#725, Haunted School `Inside_A2.png`). 방 종류별 바닥색(`ROOM_FLOOR`)과
 # 복도 마루(`C_CORRIDOR`)를 열쇠로 찾는다 — `TEX`보다 우선한다. 막힌 공간·맵 바탕은
@@ -617,6 +629,18 @@ NORTH_COLS = 9
 NORTH_FULL_W = 3400
 
 
+# **기능에 비해 큰 방은 얕게 한다**(#761). 부서실(생활지도부·2학년부·1학년부)이
+# 교실과 같은 373x520이라 책상 몇 개가 떠 있는 빈 방이었다(사용자: "어울리지 않게
+# 큰 방"). 북쪽 띠의 방은 **복도 쪽(아래 끝)을 그대로 두고 위를 깎는다** — 문이
+# 복도에 그대로 붙고, 깎인 자리(외벽과 방 사이)는 실체로 메운다(`fill_band_gap`).
+# 깎인 방은 외벽에 안 닿으므로 창을 안 낸다(`Scene.inner_rooms`).
+NORTH_DEPTH = {
+    (3, "North4"): 340,    # 생활지도부
+    (3, "North5"): 340,    # 2학년부
+    (2, "North4"): 340,    # 1학년부
+}
+
+
 def north_x(i, count):
     span = NORTH_FULL_W - 2 * EDGE
     pitch = (span + NORTH_GAP) / NORTH_COLS
@@ -635,7 +659,8 @@ RIGHT_X0 = 1920
 LAYOUT = {
     3: {
         "north": ["1반", "2반", "3반", "생활지도부", "2학년부", "4반"],
-        "south_left": [("Class6", "6반", 20, 720), ("CareerDept", "진로진학부", 750, 1640)],
+        # 진로진학부 905 → 620(#761). 오른쪽 자투리는 `add_infill`이 메운다.
+        "south_left": [("Class6", "6반", 20, 720), ("CareerDept", "진로진학부", 750, 1370)],
         "south_right": [("ScienceLab1", "과학실1", 1920, 2260)],
         # 하단 띠(진로실·하단 계단 B)는 #710에서 걷어냈다 — 진로실은 단서 0개에
         # 은신처 하나뿐이었고, 계단 B는 계단 A와 같은 2층으로 가는 두 번째 길이었다.
@@ -643,7 +668,8 @@ LAYOUT = {
     },
     2: {
         "north": ["1반", "2반", "3반", "1학년부", "4반", "5반"],
-        "south_left": [("PEStorage", "체육창고", 20, 720), ("PEDept", "체육건강부", 750, 1640)],
+        # 체육창고 715 → 500, 체육건강부 905 → 620(#761).
+        "south_left": [("PEStorage", "체육창고", 220, 720), ("PEDept", "체육건강부", 750, 1370)],
         "south_right": [("EduRoom", "교육실", 1920, 2260)],
         "bottom_left": [],
     },
@@ -715,9 +741,12 @@ F1_STAIR_H = F1_BOT_Y1 - F1_BOT_Y0
 FLOOR1 = {
     "rooms": [   # (키, 라벨, x0, y0, x1, y1, 문 위치)
         # 보건실 — 침상 줄과 약품장. 은신처(침대 커튼·약품장)가 여기 있다.
-        ("NurseRoom", "보건실", 20, F1_TOP_Y0, 520, F1_TOP_Y1, "bottom"),
+        # 보건실은 #761에서 500x520 → 360x340으로 줄였다 — 침대 다섯 개가 떠 있는
+        # 빈 방이었다. 복도 쪽(아래 끝)은 그대로라 문 자리가 안 바뀐다.
+        ("NurseRoom", "보건실", 160, F1_TOP_Y1 - 340, 520, F1_TOP_Y1, "bottom"),
         # 교장실 — 교장 편지가 "교장 책상 위"라 방이 곧 의미다(#708).
-        ("PrincipalRoom", "교장실", 1260, F1_TOP_Y0, 1880, F1_TOP_Y1, "bottom"),
+        # 620x520 → 620x400(#761).
+        ("PrincipalRoom", "교장실", 1260, F1_TOP_Y1 - 400, 1880, F1_TOP_Y1, "bottom"),
         ("MensRoom1", "남자 화장실", 460, F1_BOT_Y0, 720, F1_BOT_Y1, "top"),
         ("WomensRoom1", "여자 화장실", 720, F1_BOT_Y0, 980, F1_BOT_Y1, "top"),
         # 현관 로비 — 하단 띠 가운데. 정문은 로비 아래 외벽이다.
@@ -809,6 +838,7 @@ class Scene:
         self.prop_rects = []      # (이름, 경계상자, 색) — add_clutter가 훑는다(#289)
         self.overlay_rects = []   # 이미 놓인 소품 — 겹쳐 놓지 않으려고
         self.decor_rects = []     # 벽 장식(PD_) — 벽 줄 집기가 피한다(#755)
+        self.inner_rooms = set()  # 외벽에 안 닿는 방 — 창을 안 낸다(#761)
         self.raw_subs = []    # 손으로 쓴 sub_resource 블록(달빛 그라디언트)
         self.floor_no = 0     # 창밖 묘사가 층마다 다르다
 
@@ -903,7 +933,8 @@ class Scene:
         if parent in CANVAS_ITEM_ROOTS:
             tex_line = TEX_FLAGS + tex_line
         self.node(f'[node name="{name}" type="Polygon2D" parent="{parent}"]\n'
-                  f'{z_line}{tex_line}color = Color(1, 1, 1, 1)\npolygon = {polygon}\n')
+                  f'{z_line}{tex_line}color = {WALL_ART_TINT.get(art, "Color(1, 1, 1, 1)")}\n'
+                  f'polygon = {polygon}\n')
 
     def room_at(self, x, y):
         """그 점이 든 방의 (x0, x1)을 돌려준다. 복도·바깥이면 None."""
@@ -1176,8 +1207,8 @@ class Scene:
 WINDOW_LINES = {
     1: [
         '운동장이 내려다보인다. 가로등 하나만 켜져 있고 그 아래엔 아무도 없다.',
-        '정문 쪽 유리다. 철문이 사슬로 감겨 있다. 안쪽에서 잠근 모양이다.',
-        '화단 흙이 한 군데만 파헤쳐져 있다. 삽이 그대로 꽂혀 있다.',
+        '정문 쪽 유리다. 철문이 반쯤 열린 채 바람에 삐걱인다. 그 너머 도로는 텅 비었다.',
+        '화단 흙이 한 군데만 파였다가 다시 덮여 있다. 옆에 삽이 기대 서 있다.',
     ],
     2: [
         '창틀에 먼지가 두껍게 앉았다. 손자국 하나가 안쪽에서 찍혀 있다.',
@@ -1185,7 +1216,7 @@ WINDOW_LINES = {
         '빗물 자국 사이로 운동장 트랙이 보인다. 흰 선이 반쯤 지워져 있다.',
     ],
     3: [
-        '운동장 구석 창고 앞에서 불빛이 하나 움직인다. 손전등 같다. 곧 꺼진다.',
+        '운동장 구석, 가로등 하나가 꺼졌다 켜지기를 되풀이한다.',
         '창문이 3cm쯤 열려 있다. 바람이 들어오는데 커튼은 흔들리지 않는다.',
         '유리에 금이 가 있다. 밖에서 뭔가 부딪친 자국이다. 여기는 3층인데.',
     ],
@@ -1437,7 +1468,7 @@ POS_OVERRIDE = {
     # 현관 로비 남쪽 외벽 앞(#498, #708). 정문 그림(`Door_FrontGate`) 48px 안쪽.
     (1, "ExitDoor"): (1220, F1_BOT_Y1 - 48),
     # 교장실 책상 위(#708) — 아래 FURNITURE의 DeskPrincipal 한가운데.
-    (1, "PrincipalLetter"): (1570, 170),
+    (1, "PrincipalLetter"): (1570, 290),
     # 수위실(1460~1880, 720~1120, 문은 위 x 1615~1725). 단서 넷을 **네 구석**으로
     # 벌린다 — 가운데를 비워야 집기(책상·침상)와 은신처가 들어가고, 문 앞도 안 막힌다.
     # 사진 벽은 아래쪽(안쪽) 벽에 붙고, 금고는 문에서 가장 먼 구석이다.
@@ -1461,6 +1492,9 @@ POS_OVERRIDE = {
     # 에서 490px라 시야 마스크(389px부터 완전히 검다)에 가려 문에서는 아예 안 보였다.
     # 지금은 문에서 약 150px라 들어서자마자 보인다. 둘 사이 60px은 상호작용 존이
     # 안 겹치는 최소 간격(`verify_props.CLUE_GAP` 56) 위다.
+    # 인사 기록은 오른쪽 위 서류장 쪽(#761). 방을 340으로 얕게 하자 자동 자리가
+    # 열쇠 보관함 옆(56px 안)으로 내려와 상호작용 존이 겹쳤다.
+    (3, "JanitorWarning"): (1800, 290),
     (3, "KeyCabinet"): (1558, 420),
     (3, "SpareKeyHook"): (1558, 480),
     # 도입부 4층(#405) — 자동 배치는 방을 균등 분할해서 작업대 위에 떨어진다.
@@ -1502,7 +1536,7 @@ FURNITURE = {
     1: [
         # 교장 책상(#708) — 편지가 그 위에 놓인다. 외부 그림(#716)은 56x25라
         # 2배로 112x50이다.
-        ("DeskPrincipal", 1514, 140, 1626, 190, C_X_DESK),
+        ("DeskPrincipal", 1514, 260, 1626, 310, C_X_DESK),
         # 수위실 책상 둘 — 학생증 서랍과 공책이 놓인 자리.
         ("DeskJanitorL", 1490, 776, 1560, 830),
         ("DeskJanitorR", 1770, 776, 1850, 830),
@@ -1627,10 +1661,10 @@ HIDE_STANDOFF = 22
 EXTRA_HIDING = {
     # 도입부 4층(#405) — 미술실 캐비넷 하나뿐이다. 수위가 문 밖에 섰을 때
     # 숨을 곳이 여기밖에 없어야 프롤로그의 그 장면이 그대로 재현된다.
-    4: [("HideArtCabinet", "ArtRoom", "locker", "캐비넷에 숨기",
-         "미술실 캐비넷 안. 숨을 참는다. 문틈으로 빛이 지나간다."),
+    4: [("HideArtCabinet", "ArtRoom", "locker", "캐비닛에 숨기",
+         "미술실 캐비닛 안. 숨을 참는다. 문틈으로 빛이 지나간다."),
         ("HidePrepShelf", "ArtPrep", "files", "적재함 뒤에 숨기",
-         "준비실 적재함 뒤. 비닐봉투 냄새가 코를 찌른다.")],
+         "준비실 적재함 뒤. 테레빈유 냄새가 코를 찌른다.")],
     3: [("HideClass2", "North2", "locker", "사물함에 숨기",
          "2반 뒤 사물함. 문틈으로 복도가 가늘게 보인다."),
         ("HideClass4", "North6", "clean", "청소함에 숨기",
@@ -1639,7 +1673,7 @@ EXTRA_HIDING = {
          "약품장 아래 칸. 시큼한 냄새에 숨이 막힌다."),
         # 진로실이 없어지며(#710) 남쪽 동 6반으로 옮겼다.
         ("HideClass6", "Class6", "locker", "사물함에 숨기",
-         "6반 뒤 사물함. 문틈으로 남쪽 복도가 가늘게 보인다."),
+         "6반 뒤 사물함. 철판 너머로 내 숨소리가 울린다."),
         ("HideNorth3", "North3", "curtain", "커튼 뒤에 숨기",
          "창가 커튼 뒤. 유리에 닿은 등이 서늘하다."),
         ("HideStorageR", "StorageR", "files", "적재함에 숨기",
@@ -1653,9 +1687,9 @@ EXTRA_HIDING = {
         ("HideClass4", "North5", "clean", "청소함에 숨기",
          "4반 청소함. 세제 냄새가 코를 찌른다."),
         ("HideMensRoomL", "MensRoomL", "stall", "칸에 숨기",
-         "샤워칸 안. 타일에 등을 붙이자 서늘하다."),
+         "맨 안쪽 칸. 타일에 등을 붙이자 서늘하다."),
         ("HideEduRoom", "EduRoom", "locker", "사물함에 숨기",
-         "교육실 사물함. 문틈으로 복도가 가늘게 보인다."),
+         "교육실 사물함. 녹슨 경첩 냄새가 난다."),
         ("HideNorth6", "North6", "curtain", "커튼 뒤에 숨기",
          "커튼과 창 사이. 숨을 죽이자 유리가 김으로 흐려진다."),
         ("HidePEStorage", "PEStorage", "gear", "매트 뒤에 숨기",
@@ -1669,7 +1703,7 @@ EXTRA_HIDING = {
         ("HideNurseCabinet", "NurseRoom", "chem", "약품장에 숨기",
          "약품장 아래 칸. 붕대 상자에 무릎이 닿는다."),
         ("HideStaffRoom", "StaffRoom", "files", "서류 캐비닛에 숨기",
-         "교무실 캐비닛 사이. 결재판 냄새가 난다."),
+         "교무실 캐비닛 사이. 묵은 종이 냄새가 난다."),
         ("HidePrincipal", "PrincipalRoom", "curtain", "커튼 뒤에 숨기",
          "교장실 커튼 뒤. 두꺼운 천이 숨소리를 먹는다."),
         ("HideMensRoom1", "MensRoom1", "stall", "칸에 숨기",
@@ -1972,7 +2006,7 @@ PROP_SPECS = {
     # 읽혔다 — 창고에 서는 것은 책이 아니라 짐이다.
     "storage":   ((68, 40), (20, 18), C_CRATE),
     "toilet":    ((58, 44), (20, 16), C_STALL),    # 칸막이
-    "entrance":  ((110, 36), (36, 28), C_BENCH),   # 신발장·벤치
+    "entrance":  ((110, 36), (36, 28), C_SHOES),   # 신발장(#763)
     "janitor":   ((96, 40), (28, 24), C_DESK),
     # 보건실 침상(#708) — 세로로 긴 침대를 줄지어 놓는다. 외부 그림(#716)
     # 20x32의 정수 2배 — 자리가 좁으면 `PROP_MIN_*`까지 줄어 찌그러질 수 있다.
@@ -2153,6 +2187,8 @@ def _windows(sc, key, room, ix0, ix1, cy, win_y, count=3):
     외벽이다. 돌려주는 것은 창 칸 목록이라, 부르는 쪽이 그 앞을 비워
     창가 통로를 낼 수 있다.
     """
+    if key in sc.inner_rooms:        # 외벽에 안 닿는 방(#761) — 창이 없다
+        return []
     cells = list(_spread(ix0, ix1, 72, count, *win_y))
     if not cells:
         return cells
@@ -2654,7 +2690,6 @@ CLUTTER = {
                 ("case", 0.34, 0.18, C_CASE), ("note", 0.36, 0.26, C_PAPER),
                 ("bottle", 0.13, 0.26, C_WATER)],
     C_CHAIR:   [("bag", 0.66, 0.40, C_BAG), ("gym", 0.60, 0.34, C_CLOTHES)],
-    C_LOCKER:  [("tag", 0.70, 0.09, C_PAPER)],
     C_METAL:   [("tag", 0.70, 0.09, C_PAPER), ("box", 0.44, 0.24, C_BOOK)],
     # 선반·캐비닛은 그림에 이미 책·유리문이 있어 소품을 얹지 않는다(#758).
     C_CLEAN:   [("tag", 0.56, 0.10, C_PAPER)],
@@ -2669,7 +2704,7 @@ CLUTTER = {
 # 집기 색 -> 소품이 붙을 확률(%). 노드 예산(3300) 안에서 방이 채워 보이게 맞춘 값.
 # 책상은 사람이 쓰던 자리라 높이고, 벽에 붙는 수납장은 낮춘다.
 CLUTTER_CHANCE = {
-    C_DESK: 88, C_CHAIR: 44, C_LOCKER: 40, C_METAL: 55, C_CLEAN: 70, C_SINK: 60, C_BENCH: 55, C_BED: 60,
+    C_DESK: 88, C_CHAIR: 44, C_METAL: 55, C_CLEAN: 70, C_SINK: 60, C_BENCH: 55, C_BED: 60,
     C_RACK: 60, C_SOFA: 70, C_COPIER: 60,
 }
 CLUTTER_PAD = 3        # 집기 가장자리에서 띄우는 여백
@@ -2789,8 +2824,8 @@ EXAMINE_LINES = {
         "교과서가 펼쳐진 채다. 어제 날짜 진도까지 나갔다.",
         "의자가 비스듬히 밀려 있다. 급하게 일어난 자리다.",
         "낙서가 빼곡하다. '3월 14일'에만 동그라미가 쳐져 있다.",
-        "받침대에 체육복 주머니가 걸려 있다. 이름표가 뜯겨 있다.",
-        "책상 밑에 씹던 껌이 굳어 있다. 아직 말랑하다.",
+        "책상 고리에 체육복 가방이 걸려 있다. 이름표가 뜯겨 있다.",
+        "책상 밑에 껌이 붙어 있다. 아직 말랑하다.",
     ],
     (C_DESK, "office"): [
         "결재판이 쌓여 있다. 맨 위 서류가 반려 도장을 받았다.",
@@ -2827,6 +2862,11 @@ EXAMINE_LINES = {
     (C_LOCKER, None): [
         "철제 사물함이다. 손잡이가 차갑다.",
         "문을 당겨 봤지만 잠겨 있다.",
+    ],
+    # 현관 신발장(#763).
+    (C_SHOES, None): [
+        "실내화가 칸마다 꽂혀 있다. 한 칸만 비어 있다.",
+        "운동화 한 짝이 뒤집힌 채 칸에 걸쳐 있다. 이름이 지워져 있다.",
     ],
     (C_SHELF, "classroom"): [
         "학급문고. 표지가 다 해졌는데 대출 카드는 비어 있다.",
@@ -3094,7 +3134,7 @@ PROP_OVERLAY = {
     "computer": ("monitor", 0.72, 0.52, C_MONITOR),
     "lab":      ("sink", 0.20, 0.60, C_SINK),
     # 창고 선반 위 상자는 걷었다(#758) — 선반이 책 꽂힌 그림이 됐다.
-    "entrance": ("mat", 0.80, 0.34, C_MAT),
+    # 현관 신발장 위 매트는 걷었다(#763) — 신발 든 신발장 그림이다.
     "janitor":  ("papers", 0.55, 0.42, C_PAPER),
     "hall":     ("cup", 0.40, 0.36, C_PAPER),
 }
@@ -3383,7 +3423,7 @@ LINING = {
     "hall": ([("shelf", 26, 64, C_SHELF), ("cab", 28, 52, C_CABINET)],
              [("shelf", 26, 64, C_SHELF), ("plant", 26, 26, C_PLANT)]),
     # 현관 — 옆벽에 신발장. 안쪽(아래) 벽은 정문이라 비운다.
-    "entrance": ([("shoes", 26, 70, C_LOCKER), ("plant", 26, 26, C_PLANT)], None),
+    "entrance": ([("shoes", 26, 70, C_SHOES), ("plant", 26, 26, C_PLANT)], None),
 }
 LINING_GAP = 6
 
@@ -3730,11 +3770,15 @@ def add_infill(sc, fl, spec):
             fill_band_gap(sc, "GapStair", stx0, stx1, sty1, F1_BOT_Y1)
         # 상단 띠에도 틈이 생기면(방 표를 고칠 때) 같이 메운다. 교무실은
         # `rooms`가 아니라 `staff`에 있어 따로 넣어야 한다.
-        top = [(x0, x1) for _, _, x0, y0, x1, _y1, _d in FLOOR1["rooms"]
-               if y0 == F1_TOP_Y0]
+        top = [(x0, x1) for _, _, x0, _y0, x1, y1, _d in FLOOR1["rooms"]
+               if y1 == F1_TOP_Y1]
         top.append((FLOOR1["staff"][0], FLOOR1["staff"][2]))
         for i, (gx0, gx1) in enumerate(gaps_in(top, EDGE, F1W - EDGE)):
             fill_band_gap(sc, f"GapTop{i}", gx0, gx1, F1_TOP_Y0, F1_TOP_Y1)
+        # 얕게 깎은 방(#761) — 외벽과 방 사이를 메운다.
+        for key, _lb, x0, y0, x1, y1, _d in FLOOR1["rooms"]:
+            if y1 == F1_TOP_Y1 and y0 > F1_TOP_Y0:
+                fill_band_gap(sc, f"GapAbove{key}", x0, x1, F1_TOP_Y0, y0)
         return
 
     def bridge_lane(gx0, gx1):
@@ -3887,7 +3931,12 @@ def build_common(fl, spec):
     # 북쪽 교실 8칸 (문은 아래변)
     for i, nm in enumerate(spec["north"]):
         x0, x1 = north_x(i, len(spec["north"]))
-        add_room(sc, f"North{i+1}", nm, x0, NORTH_Y0, x1, NORTH_Y1, "bottom")
+        key = f"North{i+1}"
+        y0 = NORTH_Y1 - NORTH_DEPTH.get((fl, key), NORTH_Y1 - NORTH_Y0)
+        add_room(sc, key, nm, x0, y0, x1, NORTH_Y1, "bottom")
+        if y0 > NORTH_Y0:
+            fill_band_gap(sc, f"GapAbove{key}", x0, x1, NORTH_Y0, y0)
+            sc.inner_rooms.add(key)
 
     # 중간 띠 좌 — 문은 북쪽 복도(위)로 낸다
     for key, lb, x0, x1 in MID_LEFT:
@@ -4762,7 +4811,7 @@ def build_intro():
         # **바깥 난간을 여기서 먼저 보여 준다**(#700). 원문(story.md 3-5)은 이설이
         # 창문을 **보고** 난간을 발견한 다음에 나가는데, 예전에는 난간이 창밖으로
         # 나간 뒤 컷신에서 처음 나왔다 — 선택하기 전에 근거를 본 적이 없었다.
-        'locked_message = "창문은 열린다. 바깥에 외벽 난간 — 아래층 창문까지 이어져 있다. …그래도 국어책부터. 미술실 책상 위."',
+        'locked_message = "창문은 열린다. 바깥에 외벽 난간, 그 끝에 배수관이 아래층까지 내려가 있다. …그래도 국어책부터. 미술실 책상 위."',
         'prompt_text = "창문으로 내려가기"',
         # `message`는 비운다 — 컷신이 창틀·난간·배수관을 이미 다 말한다(#468).
         # 내려가는 컷신(#468). 본편에서 계단이 아닌 유일한 하강이고, 수위가
@@ -4779,7 +4828,7 @@ def build_intro():
         # 빈 방을 확인한다. 간발의 차였다는 확인이 없으면 위험이 실제였는지 모른다.
         # 페이드가 다 걷힌 뒤에 나온다(`floor_manager._flush_arrival_speech`).
         'arrival_speakers = PackedStringArray(\"\", \"수위\", \"이설\")',
-        'arrival_lines = PackedStringArray(\"머리 위, 미술실 쪽에서 문 여는 소리. 열쇠꾸러미가 짤랑인다.\", \"…없구만. 당분간은 다시 안 오겠지.\", \"(조금만 늦었으면.)\")',
+        'arrival_lines = PackedStringArray(\"머리 위, 미술실 쪽에서 문 여는 소리. 열쇠 꾸러미가 짤랑인다.\", \"…없구만. 당분간은 다시 안 오겠지.\", \"(조금만 늦었으면.)\")',
         'arrival_emotions = PackedStringArray(\"\", \"\", \"fear\")',
         "cutscene_look_at = Vector2(1465, %s)" % n(IY0 + T + 10),
         "target_floor = 3",

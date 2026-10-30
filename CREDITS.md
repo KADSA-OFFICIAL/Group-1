@@ -34,6 +34,14 @@
 - 원본 시트는 저장소에 넣지 않는다. 쓰는 칸만 잘라 넣는다(`tools/import_ext_sprites.py --haunted`).
   게임에서는 1배(그림 1칸 = 월드 1px)로 놓는다.
 
+## Top Down Pixel Art Horror 그림 (#763)
+
+| 게임 안 파일 | 쓰는 곳 | 원본 | 제작자 | 조건 |
+|---|---|---|---|---|
+| `assets/sprites/ext/hr_*.png` | 복도·교실 사물함(앞모습·옆모습), 현관 신발장 | [Top Down Pixel Art Horror](https://kamisama887.itch.io/lorenz-fries-school-horror) 무료판 `Inside_D.png` | AnisAous | 개인(비상업) 사용 무료, 수정 허용, 팩 판매·단독 업로드 금지, 크레딧 선택 |
+
+- 원본 시트는 저장소에 넣지 않는다. 쓰는 칸만 잘라 넣는다(`tools/import_ext_sprites.py --horror`).
+
 ## 글꼴
 
 | 글꼴 | 라이선스 |
