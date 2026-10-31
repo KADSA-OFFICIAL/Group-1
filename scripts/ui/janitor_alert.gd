@@ -16,9 +16,10 @@ extends Control
 ## 도트 그림은 임의 각도로 돌리면 칸이 비틀리므로 **8방향으로 끊어** 곧은 것·
 ## 대각선 두 장을 90도 배수로만 돌린다.
 
-## 이 거리 안이면 뜨기 시작한다. 소리 단서와 같은 값(EARSHOT)이라 "들리면
-## 방향도 안다"가 된다.
-const ALERT_RANGE := 720.0
+## 이 거리 안이면 뜨기 시작한다(#775). 시야 마스크가 완전히 검어지는 거리(389px)
+## 바로 바깥이다 — 소리 단서(EARSHOT 720)와 같은 값이던 때는 멀리 있는 수위의
+## 방향까지 알려 줘서 시야를 화살표가 대신했다.
+const ALERT_RANGE := 480.0
 ## 이 안으로 들어오면 최대 진하기.
 const CLOSE_RANGE := 260.0
 ## 진하기가 따라붙는 속도. 튀지 않게 한다.
@@ -39,8 +40,9 @@ const TOP_MARGIN := 158.0
 ## 뒤 그림자가 밀려 나는 거리(도트)와 어둡히는 정도.
 const SHADOW_OFFSET_DOTS := Vector2(2, 2)
 const SHADOW_DARKEN := 0.62
-## 가장 멀 때(들리기 시작할 때)의 불투명도.
-const ALPHA_FLOOR := 0.45
+## 가장 멀 때(뜨기 시작할 때)의 불투명도. 0이라 한계 거리에서 튀어나오지 않고
+## 서서히 나타난다(#775 — 0.45일 때는 멀어도 뚜렷하게 보였다).
+const ALPHA_FLOOR := 0.0
 ## 추격 중 화살표가 수위 쪽으로 한 칸씩 내미는 폭(도트 수).
 const CHASE_NUDGE_DOTS := 2
 
@@ -114,8 +116,7 @@ func _draw() -> void:
 	var start := _origin.clamp(inner.position, inner.end)
 	var anchor := start + _dir * _exit_distance(start, inner)
 
-	# 멀어도 형체는 보이게 바닥을 깐다 — 진하기만으로 거리를 주면 들리기 시작할
-	# 때 어둠에 묻혀 안 보인다.
+	# 바닥(ALPHA_FLOOR)은 0이다 — 멀리서는 안 보여야 한다(#775).
 	var alpha := lerpf(ALPHA_FLOOR, 1.0, _strength)
 	if _chasing:
 		var beat := 0.5 + 0.5 * cos(_pulse * TAU * PULSE_HZ)
