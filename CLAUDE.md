@@ -494,6 +494,11 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
   - **arm64·universal은 `textures/vram_compression/import_etc2_astc=true`가 있어야 구워진다**(없으면 설정 오류로 거부). 텍스처가 전부 무손실(`compress/mode=0`)이라 켜도 재임포트·용량 변화가 없다 — VRAM 압축 텍스처를 들이면 그때 ASTC 사본이 생긴다.
   - **창 크기는 `WindowFit` autoload(`scripts/game/window_fit.gd`)가 시작할 때 한 번 맞춘다.** macOS에서 Godot은 데스크톱 전체를 `screen_get_max_scale()`배 픽셀로 잡는다 — 배율 2인 화면(Retina·Sidecar)이 **하나라도** 붙어 있으면 배율 1 모니터에서도 1600x900px 창이 **800x450pt**로 떴다(실측). 그래서 화면별 `screen_get_scale()`이 아니라 최대 배율을 곱하고, 사용 영역의 85%를 넘으면 16:9로 줄여 가운데 둔다. Windows는 최대 배율이 1이라 아무 일도 없다. 논리 화면(`get_visible_rect`)은 1600x900 그대로다.
   - 실측(Apple M5, Metal, Forward+): 1600x900에서 2.1~2.7ms, 3010x1692로 키워도 최악 10.6ms. 층 전환 `_swap_floor` 100~124ms(페이드에 가려진다). **창이 포커스를 잃으면 1초 멈춤 + 모니터 주사율 고정**이 보이는데 macOS가 가려진 창을 조절하는 것이라 게임 문제가 아니다 — 프레임을 잴 때는 창을 앞에 둘 것.
+- **전체화면(#778)**: `DisplayMode` autoload(`scripts/game/display_mode.gd`)가 쥔다 — **F11**(`fullscreen` 입력)·타이틀 `FullscreenButton`·일시정지 메뉴 `FullscreenButton`이 모두 `DisplayMode.toggle()`을 탄다. 선택은 `user://settings.cfg`(`[display] fullscreen`)에 저장되고 다음 실행에 복원된다.
+  - **`WindowFit` 뒤에 선언해야 한다.** 그 뒤에 전체화면으로 들어가야 풀었을 때 Godot이 돌려놓는 "이전 창 크기"가 `WindowFit`이 맞춘 크기가 된다(반대면 맥에서 800x450pt로 뜬다, #679).
+  - `PROCESS_MODE_ALWAYS`라 일시정지 중에도 F11이 먹고 트리 멈춤은 건드리지 않는다. 버튼 글자는 `changed` 신호로 따라오고, 창 테두리 단추로 바꾼 것은 신호가 없어 일시정지 메뉴가 **열 때 다시 읽는다**.
+  - **헤드리스(CI)에서는 상태 변수만 바꾸고 파일도 안 쓴다** — 스모크(`_check_fullscreen`)가 F11·두 버튼·멈춘 트리에서의 F11을 본다. 실제 창 모드 전환은 사용자 F5 몫이다.
+  - 일시정지 메뉴 버튼 순서는 계속하기 / 전체화면 / 처음부터 / 메인 화면으로이고 `_buttons()`가 같은 순서여야 키보드 이동이 맞는다.
 - project.godot에 사용자의 미커밋 변경이 있을 수 있음 — 내 커밋에 섞지 말 것(필요 시 stash로 분리).
 - .gd 스크립트를 새로 만들면 사용자 에디터가 .uid 파일을 생성함 — 발견 시 해당 이슈 브랜치에 커밋.
 

@@ -24,6 +24,7 @@ const GameStateScript = preload("res://scripts/game/game_state.gd")
 @onready var _root: Control = $Root
 @onready var _fade: ColorRect = $Fade
 @onready var _resume_button: Button = $Root/Box/Buttons/ResumeButton
+@onready var _fullscreen_button: Button = $Root/Box/Buttons/FullscreenButton
 @onready var _restart_button: Button = $Root/Box/Buttons/RestartButton
 @onready var _title_button: Button = $Root/Box/Buttons/TitleButton
 
@@ -36,6 +37,10 @@ func _ready() -> void:
 	_root.visible = false
 	_fade.color.a = 0.0
 	_resume_button.pressed.connect(close)
+	_fullscreen_button.pressed.connect(_on_fullscreen_pressed)
+	# F11로 바꿔도 글자가 따라온다(#778).
+	DisplayMode.changed.connect(_on_display_changed)
+	_sync_fullscreen_text()
 	_restart_button.pressed.connect(_on_restart_pressed)
 	_title_button.pressed.connect(_on_title_pressed)
 	# 마우스를 올린 버튼이 포커스를 가져간다 — 테마(menu_button_theme)가 포커스를
@@ -95,6 +100,8 @@ func open() -> void:
 	is_open = true
 	get_tree().paused = true
 	_root.visible = true
+	# 창 테두리 단추로 바꾼 것은 `changed`가 안 오므로 열 때 다시 읽는다.
+	_sync_fullscreen_text()
 	Sfx.play(&"ui_click")
 	_resume_button.grab_focus()
 
@@ -106,6 +113,19 @@ func close() -> void:
 	_root.visible = false
 	get_tree().paused = false
 	Sfx.play(&"ui_click")
+
+
+func _on_fullscreen_pressed() -> void:
+	Sfx.play(&"ui_click")
+	DisplayMode.toggle()
+
+
+func _on_display_changed(_on: bool) -> void:
+	_sync_fullscreen_text()
+
+
+func _sync_fullscreen_text() -> void:
+	_fullscreen_button.text = DisplayMode.button_text()
 
 
 func _on_restart_pressed() -> void:
@@ -140,7 +160,7 @@ func _leave(scene_path: String) -> void:
 
 
 func _buttons() -> Array[Button]:
-	var list: Array[Button] = [_resume_button, _restart_button, _title_button]
+	var list: Array[Button] = [_resume_button, _fullscreen_button, _restart_button, _title_button]
 	return list
 
 
