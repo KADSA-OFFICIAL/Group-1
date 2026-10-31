@@ -38,9 +38,9 @@ anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -200.0
-offset_top = -250.0
+offset_top = -290.0
 offset_right = 200.0
-offset_bottom = 250.0
+offset_bottom = 290.0
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 36
@@ -86,6 +86,14 @@ theme_override_font_sizes/font_size = 27
 script = ExtResource("4_menu_button")
 text = "계속하기"
 
+[node name="FullscreenButton" type="Button" parent="Root/Box/Buttons"]
+custom_minimum_size = Vector2(280, 56)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 27
+script = ExtResource("4_menu_button")
+text = "전체화면: 꺼짐"
+
 [node name="RestartButton" type="Button" parent="Root/Box/Buttons"]
 custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
@@ -106,7 +114,7 @@ text = "메인 화면으로"
 layout_mode = 2
 theme_override_colors/font_color = Color(0.5, 0.5, 0.56, 1)
 theme_override_font_sizes/font_size = 15
-text = "Esc 계속하기 · 처음부터 다시하면 4층 미술실로 돌아가고 모은 것은 사라집니다"
+text = "Esc 계속하기 · F11 전체화면 · 처음부터 다시하면 4층 미술실로 돌아가고 모은 것은 사라집니다"
 horizontal_alignment = 1
 autowrap_mode = 2
 
