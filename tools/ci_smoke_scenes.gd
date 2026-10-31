@@ -66,6 +66,7 @@ func _run() -> void:
 	await _check_external_audio()
 	# 마지막에 둔다 — 씬을 실제로 갈아 끼워(change_scene_to_file) 본다.
 	await _check_pause_menu()
+	await _check_fullscreen()
 	await _check_journal()
 	await _check_inventory()
 	await _check_ending_backgrounds()
@@ -1176,6 +1177,85 @@ func _press_cancel() -> void:
 	ev.action = &"ui_cancel"
 	ev.pressed = true
 	root.push_input(ev)
+
+func _press_fullscreen_key() -> void:
+	var ev := InputEventAction.new()
+	ev.action = &"fullscreen"
+	ev.pressed = true
+	root.push_input(ev)
+
+
+## 전체화면(#778) — F11·타이틀 버튼·일시정지 버튼이 같은 전환을 타는가, 버튼 글자가
+## 상태를 따라가는가, 트리가 멈춘 중에도 F11이 먹는가.
+##
+## 헤드리스에는 창이 없어 `DisplayMode`가 상태 변수만 바꾼다(파일도 안 쓴다) —
+## 창 모드가 실제로 바뀌는지는 사용자의 수동 F5 몫이다.
+func _check_fullscreen() -> void:
+	var dm: Node = root.get_node_or_null("DisplayMode")
+	if dm == null:
+		_fault("전체화면: DisplayMode autoload가 없다")
+		return
+	if not InputMap.has_action(&"fullscreen"):
+		_fault("전체화면: 입력 `fullscreen`이 project.godot에 없다")
+		return
+	var start: bool = dm.call("is_fullscreen")
+
+	# ── 타이틀 버튼 ────────────────────────────────────────────────
+	var menu: Node = (load(MENU) as PackedScene).instantiate()
+	root.add_child(menu)
+	await process_frame
+	var title_btn := menu.get_node_or_null("Layout/FullscreenButton") as Button
+	if title_btn == null:
+		_fault("전체화면: 타이틀에 FullscreenButton이 없다")
+	elif title_btn.text != dm.call("button_text"):
+		_fault("전체화면: 타이틀 버튼 글자(%s)가 상태와 다르다" % title_btn.text)
+	else:
+		title_btn.pressed.emit()
+		if bool(dm.call("is_fullscreen")) == start:
+			_fault("전체화면: 타이틀 버튼을 눌러도 안 바뀐다")
+		elif title_btn.text != dm.call("button_text"):
+			_fault("전체화면: 타이틀 버튼 글자(%s)가 바뀐 상태를 안 따라온다" % title_btn.text)
+		else:
+			_ok("전체화면 타이틀 버튼")
+		dm.call("set_fullscreen", start, false)
+	menu.free()
+	await process_frame
+
+	# ── 일시정지 버튼 — 메뉴 이동 목록에도 들어 있어야 키보드로 닿는다 ─────
+	var pause: Node = (load("res://scenes/ui/pause_menu.tscn") as PackedScene).instantiate()
+	root.add_child(pause)
+	await process_frame
+	var pause_btn := pause.get_node_or_null("Root/Box/Buttons/FullscreenButton") as Button
+	if pause_btn == null:
+		_fault("전체화면: 일시정지 메뉴에 FullscreenButton이 없다")
+	elif not (pause.call("_buttons") as Array).has(pause_btn):
+		_fault("전체화면: 일시정지 버튼이 키보드 이동 목록에 없다")
+	else:
+		pause_btn.pressed.emit()
+		if bool(dm.call("is_fullscreen")) == start:
+			_fault("전체화면: 일시정지 버튼을 눌러도 안 바뀐다")
+		elif pause_btn.text != dm.call("button_text"):
+			_fault("전체화면: 일시정지 버튼 글자(%s)가 바뀐 상태를 안 따라온다" % pause_btn.text)
+		else:
+			_ok("전체화면 일시정지 버튼")
+		dm.call("set_fullscreen", start, false)
+
+		# ── F11 — 멈춘 트리에서도 먹고, 멈춤은 그대로 둔다 ──────────────
+		paused = true
+		_press_fullscreen_key()
+		if bool(dm.call("is_fullscreen")) == start:
+			_fault("전체화면: 트리가 멈춘 중에 F11이 안 먹는다")
+		elif not paused:
+			_fault("전체화면: F11이 트리 멈춤을 풀었다")
+		elif pause_btn.text != dm.call("button_text"):
+			_fault("전체화면: F11로 바꿨는데 버튼 글자(%s)가 안 따라온다" % pause_btn.text)
+		else:
+			_ok("전체화면 F11 (멈춘 트리)")
+		paused = false
+		dm.call("set_fullscreen", start, false)
+	pause.free()
+	await process_frame
+
 
 ## 외부 음원(#713) — 바꾼 소리가 실제로 그 파일을 쓰고, 지속음은 루프가 걸리고,
 ## 운동장에 나가면 바람이 깔렸다가 실내로 돌아오면 걷히는가.

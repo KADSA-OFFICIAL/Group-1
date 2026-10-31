@@ -7,6 +7,7 @@ extends Control
 @export var fade_seconds: float = 0.8
 
 @onready var start_button: Button = $Layout/StartButton
+@onready var fullscreen_button: Button = $Layout/FullscreenButton
 @onready var fade_rect: ColorRect = $Fade
 
 const GameStateScript = preload("res://scripts/game/game_state.gd")
@@ -16,13 +17,27 @@ func _ready() -> void:
 	# 게임오버·엔딩에서 돌아와도 여기서 다시 튼다(#606). 이미 울리고 있으면 그대로 둔다.
 	Sfx.play_theme(&"title")
 	start_button.pressed.connect(_on_start_pressed)
+	# F11(#778)로 바꿔도 글자가 따라온다.
+	fullscreen_button.pressed.connect(_on_fullscreen_pressed)
+	DisplayMode.changed.connect(_on_display_changed)
+	_on_display_changed(DisplayMode.is_fullscreen())
 	start_button.grab_focus()
+
+
+func _on_fullscreen_pressed() -> void:
+	Sfx.play(&"ui_click")
+	DisplayMode.toggle()
+
+
+func _on_display_changed(_on: bool) -> void:
+	fullscreen_button.text = DisplayMode.button_text()
 
 
 func _on_start_pressed() -> void:
 	Sfx.play(&"ui_click")
 	GameStateScript.clear_checkpoint()
 	start_button.disabled = true
+	fullscreen_button.disabled = true
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 1.0, fade_seconds)
 	tween.tween_callback(_go_to_game)
