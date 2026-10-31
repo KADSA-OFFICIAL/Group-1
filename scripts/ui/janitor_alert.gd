@@ -8,6 +8,7 @@ extends Control
 ##
 ## **시야를 대신하는 것이 아니다.** 수위가 어디 있는지는 안 보여 준다 — 어느
 ## **방향**에서 오는지만 화면 테두리에 띄운다. 거리는 진하기로만 전한다.
+## 수위가 화면 안에 들어오면 직접 보이므로 화살표는 사라진다(#775).
 ##
 ## **화살표는 도트 스프라이트다**(#739). 예전에는 테두리에서 퍼지는 사다리꼴
 ## 그라디언트였는데 화살표가 아니라 손전등 빛줄기로 읽혔고, 갈매기·호·배지·
@@ -16,9 +17,10 @@ extends Control
 ## 도트 그림은 임의 각도로 돌리면 칸이 비틀리므로 **8방향으로 끊어** 곧은 것·
 ## 대각선 두 장을 90도 배수로만 돌린다.
 
-## 이 거리 안이면 뜨기 시작한다. 소리 단서와 같은 값(EARSHOT)이라 "들리면
-## 방향도 안다"가 된다.
-const ALERT_RANGE := 720.0
+## 이 거리 안이면 뜨기 시작한다(#775). 시야 마스크가 완전히 검어지는 거리(389px)
+## 바로 바깥이다 — 소리 단서(EARSHOT 720)와 같은 값이던 때는 멀리 있는 수위의
+## 방향까지 알려 줘서 시야를 화살표가 대신했다.
+const ALERT_RANGE := 480.0
 ## 이 안으로 들어오면 최대 진하기.
 const CLOSE_RANGE := 260.0
 ## 진하기가 따라붙는 속도. 튀지 않게 한다.
@@ -39,8 +41,9 @@ const TOP_MARGIN := 158.0
 ## 뒤 그림자가 밀려 나는 거리(도트)와 어둡히는 정도.
 const SHADOW_OFFSET_DOTS := Vector2(2, 2)
 const SHADOW_DARKEN := 0.62
-## 가장 멀 때(들리기 시작할 때)의 불투명도.
-const ALPHA_FLOOR := 0.45
+## 가장 멀 때(뜨기 시작할 때)의 불투명도. 0이라 한계 거리에서 튀어나오지 않고
+## 서서히 나타난다(#775 — 0.45일 때는 멀어도 뚜렷하게 보였다).
+const ALPHA_FLOOR := 0.0
 ## 추격 중 화살표가 수위 쪽으로 한 칸씩 내미는 폭(도트 수).
 const CHASE_NUDGE_DOTS := 2
 
@@ -87,8 +90,12 @@ func _measure() -> float:
 	var d := to.length()
 	if d > ALERT_RANGE or d < 1.0:
 		return 0.0
+	# 수위가 화면 안에 들어왔으면 눈으로 보이므로 화살표는 필요 없다(#775).
+	var canvas := get_viewport().get_canvas_transform()
+	if get_viewport_rect().has_point(canvas * _janitor.global_position):
+		return 0.0
 	_dir = to / d
-	_origin = get_viewport().get_canvas_transform() * _player.global_position
+	_origin = canvas * _player.global_position
 	_chasing = float(_janitor.get("chase_hold")) > 0.0
 	if d <= CLOSE_RANGE:
 		return 1.0
@@ -114,8 +121,7 @@ func _draw() -> void:
 	var start := _origin.clamp(inner.position, inner.end)
 	var anchor := start + _dir * _exit_distance(start, inner)
 
-	# 멀어도 형체는 보이게 바닥을 깐다 — 진하기만으로 거리를 주면 들리기 시작할
-	# 때 어둠에 묻혀 안 보인다.
+	# 바닥(ALPHA_FLOOR)은 0이다 — 멀리서는 안 보여야 한다(#775).
 	var alpha := lerpf(ALPHA_FLOOR, 1.0, _strength)
 	if _chasing:
 		var beat := 0.5 + 0.5 * cos(_pulse * TAU * PULSE_HZ)
