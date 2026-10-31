@@ -8,6 +8,7 @@ extends Control
 ##
 ## **시야를 대신하는 것이 아니다.** 수위가 어디 있는지는 안 보여 준다 — 어느
 ## **방향**에서 오는지만 화면 테두리에 띄운다. 거리는 진하기로만 전한다.
+## 수위가 화면 안에 들어오면 직접 보이므로 화살표는 사라진다(#775).
 ##
 ## **화살표는 도트 스프라이트다**(#739). 예전에는 테두리에서 퍼지는 사다리꼴
 ## 그라디언트였는데 화살표가 아니라 손전등 빛줄기로 읽혔고, 갈매기·호·배지·
@@ -89,8 +90,12 @@ func _measure() -> float:
 	var d := to.length()
 	if d > ALERT_RANGE or d < 1.0:
 		return 0.0
+	# 수위가 화면 안에 들어왔으면 눈으로 보이므로 화살표는 필요 없다(#775).
+	var canvas := get_viewport().get_canvas_transform()
+	if get_viewport_rect().has_point(canvas * _janitor.global_position):
+		return 0.0
 	_dir = to / d
-	_origin = get_viewport().get_canvas_transform() * _player.global_position
+	_origin = canvas * _player.global_position
 	_chasing = float(_janitor.get("chase_hold")) > 0.0
 	if d <= CLOSE_RANGE:
 		return 1.0
