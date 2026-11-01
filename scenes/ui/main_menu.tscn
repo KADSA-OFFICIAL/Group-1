@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu_script"]
 [ext_resource type="FontFile" path="res://assets/fonts/EastSeaDokdo-Regular.ttf" id="2_title_font"]
 [ext_resource type="Theme" path="res://assets/ui/menu_button_theme.tres" id="3_button_theme"]
 [ext_resource type="Script" path="res://scripts/ui/menu_button.gd" id="4_menu_button"]
+[ext_resource type="PackedScene" path="res://scenes/ui/settings_panel.tscn" id="5_settings_panel"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -61,14 +62,27 @@ theme_override_font_sizes/font_size = 30
 text = "게임 시작"
 script = ExtResource("4_menu_button")
 
-[node name="FullscreenButton" type="Button" parent="Layout"]
-custom_minimum_size = Vector2(260, 56)
-layout_mode = 2
-size_flags_horizontal = 4
+[node name="SettingsButton" type="Button" parent="."]
+; 오른쪽 위 설정(#781). 전체화면 버튼이 있던 자리를 대신해 옵션을 이 안으로 모았다.
+; 포커스 선(menu_button.gd)이 버튼 폭 안에 들어오도록 선을 짧게 둔다.
+custom_minimum_size = Vector2(160, 52)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -184.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 76.0
+grow_horizontal = 0
 theme = ExtResource("3_button_theme")
 theme_override_font_sizes/font_size = 27
-text = "전체화면: 꺼짐"
 script = ExtResource("4_menu_button")
+line_gap = 10.0
+line_length = 24.0
+text = "설정"
+
+[node name="SettingsPanel" parent="." instance=ExtResource("5_settings_panel")]
 
 [node name="Fade" type="ColorRect" parent="."]
 layout_mode = 1

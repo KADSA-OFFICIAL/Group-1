@@ -1185,7 +1185,7 @@ func _press_fullscreen_key() -> void:
 	root.push_input(ev)
 
 
-## 전체화면(#778) — F11·타이틀 버튼·일시정지 버튼이 같은 전환을 타는가, 버튼 글자가
+## 전체화면(#778, #781) — F11·타이틀 설정창 옵션·일시정지 버튼이 같은 전환을 타는가, 버튼 글자가
 ## 상태를 따라가는가, 트리가 멈춘 중에도 F11이 먹는가.
 ##
 ## 헤드리스에는 창이 없어 `DisplayMode`가 상태 변수만 바꾼다(파일도 안 쓴다) —
@@ -1200,24 +1200,59 @@ func _check_fullscreen() -> void:
 		return
 	var start: bool = dm.call("is_fullscreen")
 
-	# ── 타이틀 버튼 ────────────────────────────────────────────────
+	# ── 타이틀 설정창(#781) — 가운데 버튼은 없고, 오른쪽 위 설정 → 창 → 옵션 ──
 	var menu: Node = (load(MENU) as PackedScene).instantiate()
 	root.add_child(menu)
 	await process_frame
-	var title_btn := menu.get_node_or_null("Layout/FullscreenButton") as Button
-	if title_btn == null:
-		_fault("전체화면: 타이틀에 FullscreenButton이 없다")
-	elif title_btn.text != dm.call("button_text"):
-		_fault("전체화면: 타이틀 버튼 글자(%s)가 상태와 다르다" % title_btn.text)
+	var settings_btn := menu.get_node_or_null("SettingsButton") as Button
+	var panel := menu.get_node_or_null("SettingsPanel") as Control
+	var start_btn := menu.get_node_or_null("Layout/StartButton") as Button
+	if menu.get_node_or_null("Layout/FullscreenButton") != null:
+		_fault("전체화면: 타이틀 가운데에 FullscreenButton이 남아 있다(설정창으로 옮겼다)")
+	if settings_btn == null or panel == null or start_btn == null:
+		_fault("전체화면: 타이틀에 SettingsButton/SettingsPanel/StartButton이 없다")
 	else:
-		title_btn.pressed.emit()
-		if bool(dm.call("is_fullscreen")) == start:
-			_fault("전체화면: 타이틀 버튼을 눌러도 안 바뀐다")
-		elif title_btn.text != dm.call("button_text"):
-			_fault("전체화면: 타이틀 버튼 글자(%s)가 바뀐 상태를 안 따라온다" % title_btn.text)
+		var toggle := panel.get_node_or_null("%FullscreenToggle") as Button
+		if panel.visible:
+			_fault("전체화면: 설정창이 처음부터 열려 있다")
+		elif toggle == null:
+			_fault("전체화면: 설정창에 FullscreenToggle이 없다")
+		elif settings_btn.get_global_rect().position.y > 80.0 \
+				or settings_btn.get_global_rect().end.x < root.get_visible_rect().size.x - 80.0:
+			_fault("전체화면: 설정 버튼이 오른쪽 위에 없다(%s)" % settings_btn.get_global_rect())
 		else:
-			_ok("전체화면 타이틀 버튼")
-		dm.call("set_fullscreen", start, false)
+			settings_btn.pressed.emit()
+			await process_frame
+			if not panel.visible or not bool(panel.get("is_open")):
+				_fault("전체화면: 설정 버튼을 눌러도 설정창이 안 열린다")
+			elif start_btn.focus_mode != Control.FOCUS_NONE:
+				_fault("전체화면: 설정창이 열린 동안 시작 버튼이 포커스를 받는다")
+			elif toggle.text != dm.call("state_text"):
+				_fault("전체화면: 설정창 글자(%s)가 상태와 다르다" % toggle.text)
+			else:
+				toggle.pressed.emit()
+				if bool(dm.call("is_fullscreen")) == start:
+					_fault("전체화면: 설정창 옵션을 눌러도 안 바뀐다")
+				elif toggle.text != dm.call("state_text"):
+					_fault("전체화면: 설정창 글자(%s)가 바뀐 상태를 안 따라온다" % toggle.text)
+				else:
+					_ok("전체화면 설정창 옵션")
+				dm.call("set_fullscreen", start, false)
+				# F11 등 밖에서 바꿔도 글자가 따라온다.
+				dm.call("set_fullscreen", not start, false)
+				if toggle.text != dm.call("state_text"):
+					_fault("전체화면: 밖에서 바꿨는데 설정창 글자(%s)가 안 따라온다" % toggle.text)
+				dm.call("set_fullscreen", start, false)
+				# Esc로 닫으면 포커스가 설정 버튼으로 돌아온다.
+				_press_cancel()
+				await process_frame
+				if panel.visible:
+					_fault("전체화면: Esc로 설정창이 안 닫힌다")
+				elif start_btn.focus_mode != Control.FOCUS_ALL \
+						or not settings_btn.has_focus():
+					_fault("전체화면: 설정창을 닫고 포커스가 설정 버튼으로 안 돌아온다")
+				else:
+					_ok("전체화면 설정창 열기·닫기")
 	menu.free()
 	await process_frame
 
