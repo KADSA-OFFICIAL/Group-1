@@ -1,9 +1,13 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu_script"]
 [ext_resource type="FontFile" path="res://assets/fonts/EastSeaDokdo-Regular.ttf" id="2_title_font"]
 [ext_resource type="Theme" path="res://assets/ui/menu_button_theme.tres" id="3_button_theme"]
 [ext_resource type="Script" path="res://scripts/ui/menu_button.gd" id="4_menu_button"]
+[ext_resource type="PackedScene" path="res://scenes/ui/settings_panel.tscn" id="5_settings_panel"]
+[ext_resource type="Texture2D" path="res://assets/ui/settings_gear.png" id="6_gear"]
+
+[sub_resource type="StyleBoxEmpty" id="StyleBox_gear"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -61,14 +65,41 @@ theme_override_font_sizes/font_size = 30
 text = "게임 시작"
 script = ExtResource("4_menu_button")
 
-[node name="FullscreenButton" type="Button" parent="Layout"]
-custom_minimum_size = Vector2(260, 56)
-layout_mode = 2
-size_flags_horizontal = 4
-theme = ExtResource("3_button_theme")
-theme_override_font_sizes/font_size = 27
-text = "전체화면: 꺼짐"
-script = ExtResource("4_menu_button")
+[node name="SettingsButton" type="Button" parent="."]
+; 오른쪽 위 설정(#781) — 글자 대신 톱니바퀴 도트 그림이다(`tools/gen_settings_icon.py`).
+; 그림이 18x18이라 버튼을 정확히 54x54로 두고 상자 여백을 0으로 한 채 expand_icon으로
+; 꽉 채워야 정수 3배가 맞는다(다른 크기면 도트 폭이 들쭉날쭉하다). 색은 그림이 회색조라
+; 아이콘 색이 곱해 입힌다 — 평소 흐린 회색, 고르거나 올리면 미색(메뉴 버튼 테마와 같다).
+; 글자 버튼과 달리 붉은 선(menu_button.gd)은 안 긋는다 — 아이콘 옆에 선이 뻗을 자리가 없다.
+texture_filter = 1
+custom_minimum_size = Vector2(54, 54)
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -78.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 78.0
+grow_horizontal = 0
+tooltip_text = "설정"
+theme_override_colors/icon_disabled_color = Color(0.5, 0.5, 0.55, 1)
+theme_override_colors/icon_focus_color = Color(0.97, 0.93, 0.87, 1)
+theme_override_colors/icon_hover_color = Color(0.97, 0.93, 0.87, 1)
+theme_override_colors/icon_hover_pressed_color = Color(1, 0.97, 0.93, 1)
+theme_override_colors/icon_normal_color = Color(0.5, 0.5, 0.55, 1)
+theme_override_colors/icon_pressed_color = Color(1, 0.97, 0.93, 1)
+theme_override_styles/disabled = SubResource("StyleBox_gear")
+theme_override_styles/focus = SubResource("StyleBox_gear")
+theme_override_styles/hover = SubResource("StyleBox_gear")
+theme_override_styles/hover_pressed = SubResource("StyleBox_gear")
+theme_override_styles/normal = SubResource("StyleBox_gear")
+theme_override_styles/pressed = SubResource("StyleBox_gear")
+icon = ExtResource("6_gear")
+flat = true
+expand_icon = true
+
+[node name="SettingsPanel" parent="." instance=ExtResource("5_settings_panel")]
 
 [node name="Fade" type="ColorRect" parent="."]
 layout_mode = 1

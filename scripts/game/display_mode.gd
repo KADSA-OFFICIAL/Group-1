@@ -66,9 +66,14 @@ func set_fullscreen(on: bool, persist: bool = true) -> void:
 	changed.emit(on)
 
 
-## 메뉴 버튼 글자.
+## 일시정지 메뉴 버튼 글자.
 func button_text() -> String:
-	return "전체화면: 켜짐" if is_fullscreen() else "전체화면: 꺼짐"
+	return "전체화면: " + state_text()
+
+
+## 켜짐/꺼짐만 — 설정창(#781)은 옵션 이름을 따로 적고 값만 버튼에 둔다.
+func state_text() -> String:
+	return "켜짐" if is_fullscreen() else "꺼짐"
 
 
 func _save(on: bool) -> void:
