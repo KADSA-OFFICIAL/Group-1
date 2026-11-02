@@ -67,6 +67,7 @@ func _run() -> void:
 	# 마지막에 둔다 — 씬을 실제로 갈아 끼워(change_scene_to_file) 본다.
 	await _check_pause_menu()
 	await _check_fullscreen()
+	await _check_audio_settings()
 	await _check_journal()
 	await _check_inventory()
 	await _check_ending_backgrounds()
@@ -1294,6 +1295,122 @@ func _check_fullscreen() -> void:
 		paused = false
 		dm.call("set_fullscreen", start, false)
 	pause.free()
+	await process_frame
+
+
+## 음량 설정(#783) — 버스가 있고 소리가 맞는 버스로 나가는가, 설정창 막대가 버스
+## 음량을 바꾸는가(키보드 ←/→ 포함), 0이면 음소거되는가.
+##
+## 헤드리스에는 소리 장치가 없어 실제로 들리는지는 못 본다 — 버스 설정이 맞는지만
+## 본다. 청음은 사용자의 수동 F5 몫이다. 값은 파일에 안 쓰고(`persist` 거짓), 끝에서
+## 기본값으로 되돌린다.
+func _check_audio_settings() -> void:
+	var aset: Node = root.get_node_or_null("AudioSettings")
+	var sfx: Node = root.get_node_or_null("Sfx")
+	if aset == null or sfx == null:
+		_fault("음량: AudioSettings/Sfx autoload가 없다")
+		return
+
+	# ── 버스 ───────────────────────────────────────────────────────
+	for bus_name in ["Music", "SFX"]:
+		var idx := AudioServer.get_bus_index(bus_name)
+		if idx < 0:
+			_fault("음량: 오디오 버스 %s가 없다" % bus_name)
+			return
+		if AudioServer.get_bus_send(idx) != &"Master":
+			_fault("음량: 버스 %s가 Master로 안 이어진다" % bus_name)
+	_ok("음량 버스")
+
+	# ── 플레이어 배정 — 루프·테마는 Music, 효과음 보이스는 SFX ──────────
+	var wrong: Array[String] = []
+	for p: AudioStreamPlayer in sfx.get("_players"):
+		if p.bus != &"SFX":
+			wrong.append("보이스(%s)" % p.bus)
+	var loops: Array = [sfx.get("_ambience"), sfx.get("_chase")]
+	loops.append_array(sfx.get("_theme_players"))
+	for p: AudioStreamPlayer in loops:
+		if p.bus != &"Music":
+			wrong.append("루프(%s)" % p.bus)
+	var janitor: Node = (load("res://scenes/npc/janitor.tscn") as PackedScene).instantiate()
+	for n in ["StepSound", "KeySound", "DoorSound"]:
+		var p2 := janitor.get_node_or_null(n) as AudioStreamPlayer2D
+		if p2 == null:
+			wrong.append("수위 %s 없음" % n)
+		elif p2.bus != &"SFX":
+			wrong.append("수위 %s(%s)" % [n, p2.bus])
+	janitor.free()
+	if not wrong.is_empty():
+		_fault("음량: 버스가 잘못 배정된 소리 — %s" % ", ".join(wrong))
+	else:
+		_ok("음량 플레이어 배정")
+
+	# ── 설정창 막대 ────────────────────────────────────────────────
+	var menu: Node = (load(MENU) as PackedScene).instantiate()
+	root.add_child(menu)
+	await process_frame
+	var panel := menu.get_node_or_null("SettingsPanel") as Control
+	var mbar := panel.get_node_or_null("%MusicBar") as Control if panel != null else null
+	var sbar := panel.get_node_or_null("%SfxBar") as Control if panel != null else null
+	if mbar == null or sbar == null:
+		_fault("음량: 설정창에 MusicBar/SfxBar가 없다")
+		menu.free()
+		return
+	panel.call("open")
+	await process_frame
+	var music_idx := AudioServer.get_bus_index("Music")
+	var sfx_idx := AudioServer.get_bus_index("SFX")
+
+	mbar.call("set_value", 4)
+	if int(aset.call("level", &"music")) != 4:
+		_fault("음량: 막대를 4로 바꿨는데 배경음악 단계가 %d다" % int(aset.call("level", &"music")))
+	elif absf(AudioServer.get_bus_volume_db(music_idx) - linear_to_db(0.4)) > 0.01:
+		_fault("음량: 배경음악 4단계의 버스 음량(%.2f dB)이 0.4배가 아니다" % AudioServer.get_bus_volume_db(music_idx))
+	elif AudioServer.get_bus_volume_db(sfx_idx) != 0.0:
+		_fault("음량: 배경음악을 바꿨는데 효과음 버스가 따라 움직였다")
+	elif (panel.get_node("%MusicPercent") as Label).text != "40%":
+		_fault("음량: 퍼센트 글자(%s)가 40%%가 아니다" % (panel.get_node("%MusicPercent") as Label).text)
+	else:
+		_ok("음량 배경음악 막대")
+
+	# 키보드 → 한 칸 올림. 막대가 그 입력을 먹어야 포커스가 안 옮겨 간다.
+	var key := InputEventAction.new()
+	key.action = &"ui_right"
+	key.pressed = true
+	mbar.call("_gui_input", key)
+	if int(aset.call("level", &"music")) != 5:
+		_fault("음량: →를 눌렀는데 단계가 %d다(5여야 한다)" % int(aset.call("level", &"music")))
+	else:
+		_ok("음량 키보드 조작")
+
+	sbar.call("set_value", 7)
+	if int(aset.call("level", &"sfx")) != 7 \
+			or absf(AudioServer.get_bus_volume_db(sfx_idx) - linear_to_db(0.7)) > 0.01:
+		_fault("음량: 효과음 막대 7이 버스에 안 반영된다")
+	else:
+		_ok("음량 효과음 막대")
+
+	# 0은 음량이 아니라 음소거다.
+	mbar.call("set_value", 0)
+	if not AudioServer.is_bus_mute(music_idx):
+		_fault("음량: 0단계인데 배경음악 버스가 음소거되지 않았다")
+	else:
+		mbar.call("set_value", 3)
+		if AudioServer.is_bus_mute(music_idx):
+			_fault("음량: 0에서 올렸는데 음소거가 안 풀렸다")
+		else:
+			_ok("음량 0 음소거")
+
+	# 밖에서 바꿔도(저장값 복원 등) 막대가 따라온다.
+	aset.call("set_level", &"sfx", 2, false)
+	if int(sbar.get("value")) != 2:
+		_fault("음량: 밖에서 바꾼 값이 막대에 안 따라온다")
+	else:
+		_ok("음량 막대 동기화")
+
+	# 기본값으로 되돌린다.
+	aset.call("set_level", &"music", 10, false)
+	aset.call("set_level", &"sfx", 10, false)
+	menu.free()
 	await process_frame
 
 
