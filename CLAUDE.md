@@ -354,7 +354,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
   - 새 줄이 풀리면 오른쪽 위에 "수첩에 적었다 [J]"가 잠깐 뜬다. 기준은 **한 프레임 뒤에** 잡는다 — 체크포인트 재시도에서 `floor_manager`가 플래그를 복원하며 `clues_changed`를 쏘는데, 그 전에 잡으면 복원된 단서가 전부 새 내용으로 알려진다.
   - **플래그 이름을 고치면 수첩도 같이 고친다.** `verify_progression`의 `check_journal_flags()`가 수첩의 플래그가 층 씬(`grants_flag`·`pickup_id`)이나 스크립트(`set_flag`)에서 실제로 서는지 본다 — 오타 난 플래그는 화면에서 그냥 `????`로 남아 아무도 모른다(일부러 오타를 내 잡히는 것을 확인했다).
   - 단서 문구도 같이 손봤다 — 임나연 사안 파일이 "실종"이 아니라 수위의 판단 근거("장난이었다잖아")를 보여 주고, 수위 공책에 임나연 줄을 더했다(나연이 수첩의 '오해로 지목된 아이' 정리에 들어가는 근거).
-- **일시정지 메뉴(#624)**: 본편에서 **Esc**(`ui_cancel`)로 `PauseMenu`(`scenes/ui/pause_menu.tscn`, CanvasLayer **4** — HUD·`FadeRect`(3) 위)를 연다. 계속하기 / 처음부터 다시하기(체크포인트를 지우고 4층부터) / 메인 화면으로. `get_tree().paused`로 통째로 멈추고 메뉴만 `PROCESS_MODE_ALWAYS`다.
+- **일시정지 메뉴(#624)**: 본편에서 **Esc**(`ui_cancel`)로 `PauseMenu`(`scenes/ui/pause_menu.tscn`, CanvasLayer **4** — HUD·`FadeRect`(3) 위)를 연다. 계속하기 / 설정(#788, 아래 전체화면 항목) / 처음부터 다시하기(체크포인트를 지우고 4층부터) / 메인 화면으로. `get_tree().paused`로 통째로 멈추고 메뉴만 `PROCESS_MODE_ALWAYS`다.
   - **현관 선택지가 이미 멈춰 둔 트리와 게임 오버 연출 중에는 열지 않는다** — 열었다 닫으면 선택지의 멈춤까지 풀린다.
   - **멈춰도 흐르는 것이 둘 있다**: `create_timer()`의 기본값(`process_always = true`)과 `await get_tree().process_frame` 루프. 그래서 `art_room_intro._wait`·`hud._hold_line`은 `create_timer(t, false)`, `_walk_to`·`floor_link._walk_player`는 `can_process()`로 거른다. **본편에 대기를 새로 쓸 때도 같은 규칙을 지킬 것** — 안 그러면 메뉴를 보는 사이 연출이 건너뛰어지고 자막이 사라진다.
   - 씬을 바꾸기 전에 `paused = false`(choice_prompt와 같은 이유)와 `Sfx.stop_music()`(본편 음악은 autoload라 씬을 넘는다).
@@ -501,15 +501,17 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
   - **arm64·universal은 `textures/vram_compression/import_etc2_astc=true`가 있어야 구워진다**(없으면 설정 오류로 거부). 텍스처가 전부 무손실(`compress/mode=0`)이라 켜도 재임포트·용량 변화가 없다 — VRAM 압축 텍스처를 들이면 그때 ASTC 사본이 생긴다.
   - **창 크기는 `WindowFit` autoload(`scripts/game/window_fit.gd`)가 시작할 때 한 번 맞춘다.** macOS에서 Godot은 데스크톱 전체를 `screen_get_max_scale()`배 픽셀로 잡는다 — 배율 2인 화면(Retina·Sidecar)이 **하나라도** 붙어 있으면 배율 1 모니터에서도 1600x900px 창이 **800x450pt**로 떴다(실측). 그래서 화면별 `screen_get_scale()`이 아니라 최대 배율을 곱하고, 사용 영역의 85%를 넘으면 16:9로 줄여 가운데 둔다. Windows는 최대 배율이 1이라 아무 일도 없다. 논리 화면(`get_visible_rect`)은 1600x900 그대로다.
   - 실측(Apple M5, Metal, Forward+): 1600x900에서 2.1~2.7ms, 3010x1692로 키워도 최악 10.6ms. 층 전환 `_swap_floor` 100~124ms(페이드에 가려진다). **창이 포커스를 잃으면 1초 멈춤 + 모니터 주사율 고정**이 보이는데 macOS가 가려진 창을 조절하는 것이라 게임 문제가 아니다 — 프레임을 잴 때는 창을 앞에 둘 것.
-- **전체화면(#778)**: `DisplayMode` autoload(`scripts/game/display_mode.gd`)가 쥔다 — **F11**(`fullscreen` 입력)·타이틀 설정창의 전체화면 옵션·일시정지 메뉴 `FullscreenButton`이 모두 `DisplayMode.toggle()`을 탄다. 선택은 `user://settings.cfg`(`[display] fullscreen`)에 저장되고 다음 실행에 복원된다.
+- **전체화면(#778)**: `DisplayMode` autoload(`scripts/game/display_mode.gd`)가 쥔다 — **F11**(`fullscreen` 입력)·타이틀·일시정지 메뉴 설정창의 전체화면 옵션이 모두 `DisplayMode.toggle()`을 탄다. 선택은 `user://settings.cfg`(`[display] fullscreen`)에 저장되고 다음 실행에 복원된다.
   - **`WindowFit` 뒤에 선언해야 한다.** 그 뒤에 전체화면으로 들어가야 풀었을 때 Godot이 돌려놓는 "이전 창 크기"가 `WindowFit`이 맞춘 크기가 된다(반대면 맥에서 800x450pt로 뜬다, #679).
   - `PROCESS_MODE_ALWAYS`라 일시정지 중에도 F11이 먹고 트리 멈춤은 건드리지 않는다. 버튼 글자는 `changed` 신호로 따라오고, 창 테두리 단추로 바꾼 것은 신호가 없어 일시정지 메뉴가 **열 때 다시 읽는다**.
-  - **헤드리스(CI)에서는 상태 변수만 바꾸고 파일도 안 쓴다** — 스모크(`_check_fullscreen`)가 타이틀 설정창(열기·옵션·Esc 닫기·포커스 복귀)·일시정지 버튼·멈춘 트리에서의 F11을 본다. 실제 창 모드 전환은 사용자 F5 몫이다.
-  - 일시정지 메뉴 버튼 순서는 계속하기 / 전체화면 / 처음부터 / 메인 화면으로이고 `_buttons()`가 같은 순서여야 키보드 이동이 맞는다.
+  - **헤드리스(CI)에서는 상태 변수만 바꾸고 파일도 안 쓴다** — 스모크(`_check_fullscreen`)가 타이틀 설정창(열기·옵션·Esc 닫기·포커스 복귀)·일시정지 설정창(열기·옵션·음량·Esc 두 단계)·멈춘 트리에서의 F11을 본다. 실제 창 모드 전환은 사용자 F5 몫이다.
+  - 일시정지 메뉴 버튼 순서는 계속하기 / 설정 / 처음부터 / 메인 화면으로이고 `_buttons()`가 같은 순서여야 키보드 이동이 맞는다(#788에서 `전체화면` 버튼이 `설정`으로 바뀌었다).
   - **타이틀에는 전체화면 버튼이 없고 오른쪽 위 "설정" 버튼이 설정창을 연다**(#781, `scenes/ui/settings_panel.tscn` + `scripts/ui/settings_panel.gd`). 처음에는 "게임 시작" 바로 아래에 같은 크기 버튼으로 있었는데 설정이 아니라 주 메뉴 항목처럼 읽혔고 옵션이 늘면 가운데가 길어진다. 창은 독립 씬이라 다른 화면에서도 인스턴스해 쓸 수 있고(`open()`/`close()`/`closed` 신호), 바탕은 소지품 창(#745)과 같은 갈색 종이 톤이다. 옵션 행은 이름(`전체화면`)을 라벨로, 값(`켜짐`/`꺼짐`, `DisplayMode.state_text()`)을 버튼에 둔다.
     - **설정 버튼은 글자가 아니라 톱니바퀴 도트 아이콘이다**(사용자 요청, `tools/gen_settings_icon.py` → `assets/ui/settings_gear.png` 18x18). 화면이 전부 도트 그림이라 매끈한 벡터 도형이 아니라 굽는다(#739와 같은 이유). 회색조로 구워 색(평소 흐린 회색 / 고르면 미색)은 버튼의 `icon_*_color`가 입힌다. **버튼을 정확히 54x54로 두고 상자 여백 0 + `expand_icon`으로 꽉 채워야 정수 3배가 맞는다**(스모크가 크기를 본다). 글자 버튼과 달리 붉은 포커스 선(`menu_button.gd`)은 안 긋는다 — 아이콘 옆에 뻗을 자리가 없어 포커스는 색으로만 알린다. 고쳤으면 `python3 tools/gen_settings_icon.py`(가장자리 잘림·구멍·음영을 스스로 검사, 결정론적)와 Godot `--import`.
     - **열려 있는 동안 아래 타이틀 버튼이 포커스를 받으면 안 된다** — Enter가 "게임 시작"을 눌러 버린다. 그래서 `main_menu.gd`가 여는 동안 시작·설정 버튼의 `focus_mode`를 `FOCUS_NONE`으로 두고(마우스는 `Dim`이 막는다), 닫히면(`closed`) 되돌리고 설정 버튼에 포커스를 준다. 창 안의 두 버튼은 서로를 위·아래 이웃으로 삼아 돌고 좌우로는 못 나간다.
-    - **일시정지 메뉴에는 아직 설정창이 없다** — 거기는 `FullscreenButton`이 그대로다. 옮기려면 같은 씬을 인스턴스하되, 일시정지 메뉴의 Esc 닫기와 겹치므로(`_unhandled_input`) 창이 열린 동안 메뉴가 Esc를 먼저 받지 않게 해야 한다.
+    - **일시정지 메뉴에도 같은 설정창이 있다**(#788, `PauseMenu/Root/SettingsPanel`) — "설정" 버튼이 연다. 타이틀과 같은 씬이라 전체화면·배경음악·효과음이 거기 있고 `AudioSettings`·`DisplayMode`가 같아 어느 쪽에서 바꿔도 같다. 처음에는 일시정지 메뉴에 `전체화면` 버튼이 따로 있었는데 설정창 안의 옵션으로 옮겼다(F11도 그대로).
+      - **Esc는 두 단계다** — 설정창이 열려 있으면 그것만 닫고 게임은 멈춘 채 메뉴가 남는다, 닫힌 뒤 Esc가 게임을 재개한다. `PauseMenu._unhandled_input`이 설정창이 열려 있으면 맨 앞에서 돌아선다(W/S/E가 아래 버튼을 누르는 것도 같이 막는다). 설정창 노드가 트리에서 더 깊어 보통 먼저 받지만 `main.tscn`의 노드 순서에 기대지 않으려는 이중 안전이다.
+      - 열린 동안 메뉴 버튼은 `focus_mode = FOCUS_NONE`(Enter가 "처음부터 다시하기"를 누르면 안 된다), 닫히면 되돌리고 설정 버튼에 포커스를 준다 — 타이틀(`main_menu.gd`)과 같은 방식이다. 설정창은 `PauseMenu`(`PROCESS_MODE_ALWAYS`)의 자손이라 트리가 멈춘 중에도 입력을 받는다.
 - project.godot에 사용자의 미커밋 변경이 있을 수 있음 — 내 커밋에 섞지 말 것(필요 시 stash로 분리).
 - .gd 스크립트를 새로 만들면 사용자 에디터가 .uid 파일을 생성함 — 발견 시 해당 이슈 브랜치에 커밋.
 

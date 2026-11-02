@@ -24,7 +24,8 @@ const GameStateScript = preload("res://scripts/game/game_state.gd")
 @onready var _root: Control = $Root
 @onready var _fade: ColorRect = $Fade
 @onready var _resume_button: Button = $Root/Box/Buttons/ResumeButton
-@onready var _fullscreen_button: Button = $Root/Box/Buttons/FullscreenButton
+@onready var _settings_button: Button = $Root/Box/Buttons/SettingsButton
+@onready var _settings_panel: Control = $Root/SettingsPanel
 @onready var _restart_button: Button = $Root/Box/Buttons/RestartButton
 @onready var _title_button: Button = $Root/Box/Buttons/TitleButton
 
@@ -37,10 +38,9 @@ func _ready() -> void:
 	_root.visible = false
 	_fade.color.a = 0.0
 	_resume_button.pressed.connect(close)
-	_fullscreen_button.pressed.connect(_on_fullscreen_pressed)
-	# F11로 바꿔도 글자가 따라온다(#778).
-	DisplayMode.changed.connect(_on_display_changed)
-	_sync_fullscreen_text()
+	# 전체화면·음량은 설정창 안의 옵션이다(#788, 타이틀과 같은 씬).
+	_settings_button.pressed.connect(_on_settings_pressed)
+	_settings_panel.closed.connect(_on_settings_closed)
 	_restart_button.pressed.connect(_on_restart_pressed)
 	_title_button.pressed.connect(_on_title_pressed)
 	# 마우스를 올린 버튼이 포커스를 가져간다 — 테마(menu_button_theme)가 포커스를
@@ -51,6 +51,11 @@ func _ready() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if _leaving:
+		return
+	# 설정창이 열려 있으면 입력은 전부 그쪽 몫이다 — Esc는 설정창만 닫아야 하고(게임이
+	# 재개되면 안 된다), W/S/E가 아래 버튼을 눌러서도 안 된다. 설정창 노드가 트리에서
+	# 더 깊어 보통 먼저 받지만 `main.tscn`의 노드 순서에 기대지 않으려고 여기서도 막는다.
+	if _settings_panel.get("is_open"):
 		return
 
 	if event.is_action_pressed("ui_cancel"):
@@ -100,8 +105,6 @@ func open() -> void:
 	is_open = true
 	get_tree().paused = true
 	_root.visible = true
-	# 창 테두리 단추로 바꾼 것은 `changed`가 안 오므로 열 때 다시 읽는다.
-	_sync_fullscreen_text()
 	Sfx.play(&"ui_click")
 	_resume_button.grab_focus()
 
@@ -115,17 +118,22 @@ func close() -> void:
 	Sfx.play(&"ui_click")
 
 
-func _on_fullscreen_pressed() -> void:
+func _on_settings_pressed() -> void:
 	Sfx.play(&"ui_click")
-	DisplayMode.toggle()
+	# 열린 동안 아래 버튼이 포커스를 받으면 Enter가 "처음부터 다시하기"를 눌러 버린다.
+	_set_menu_focusable(false)
+	_settings_panel.call("open")
 
 
-func _on_display_changed(_on: bool) -> void:
-	_sync_fullscreen_text()
+func _on_settings_closed() -> void:
+	_set_menu_focusable(true)
+	_settings_button.grab_focus()
 
 
-func _sync_fullscreen_text() -> void:
-	_fullscreen_button.text = DisplayMode.button_text()
+func _set_menu_focusable(on: bool) -> void:
+	var mode := Control.FOCUS_ALL if on else Control.FOCUS_NONE
+	for b in _buttons():
+		b.focus_mode = mode
 
 
 func _on_restart_pressed() -> void:
@@ -160,7 +168,7 @@ func _leave(scene_path: String) -> void:
 
 
 func _buttons() -> Array[Button]:
-	var list: Array[Button] = [_resume_button, _fullscreen_button, _restart_button, _title_button]
+	var list: Array[Button] = [_resume_button, _settings_button, _restart_button, _title_button]
 	return list
 
 
