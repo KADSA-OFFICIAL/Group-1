@@ -1186,7 +1186,7 @@ func _press_fullscreen_key() -> void:
 	root.push_input(ev)
 
 
-## 전체화면(#778, #781) — F11·타이틀 설정창 옵션·일시정지 버튼이 같은 전환을 타는가, 버튼 글자가
+## 전체화면(#778, #781, #788) — F11·타이틀 설정창 옵션·일시정지 설정창 옵션이 같은 전환을 타는가, 버튼 글자가
 ## 상태를 따라가는가, 트리가 멈춘 중에도 F11이 먹는가.
 ##
 ## 헤드리스에는 창이 없어 `DisplayMode`가 상태 변수만 바꾼다(파일도 안 쓴다) —
@@ -1262,38 +1262,82 @@ func _check_fullscreen() -> void:
 	menu.free()
 	await process_frame
 
-	# ── 일시정지 버튼 — 메뉴 이동 목록에도 들어 있어야 키보드로 닿는다 ─────
+	# ── 일시정지 설정창(#788) — 전체화면 버튼은 설정창 안으로 옮겼다 ─────────
 	var pause: Node = (load("res://scenes/ui/pause_menu.tscn") as PackedScene).instantiate()
 	root.add_child(pause)
 	await process_frame
-	var pause_btn := pause.get_node_or_null("Root/Box/Buttons/FullscreenButton") as Button
-	if pause_btn == null:
-		_fault("전체화면: 일시정지 메뉴에 FullscreenButton이 없다")
+	var pause_btn := pause.get_node_or_null("Root/Box/Buttons/SettingsButton") as Button
+	var pause_panel := pause.get_node_or_null("Root/SettingsPanel") as Control
+	if pause.get_node_or_null("Root/Box/Buttons/FullscreenButton") != null:
+		_fault("전체화면: 일시정지 메뉴에 FullscreenButton이 남아 있다(설정창으로 옮겼다)")
+	if pause_btn == null or pause_panel == null:
+		_fault("전체화면: 일시정지 메뉴에 SettingsButton/SettingsPanel이 없다")
 	elif not (pause.call("_buttons") as Array).has(pause_btn):
-		_fault("전체화면: 일시정지 버튼이 키보드 이동 목록에 없다")
+		_fault("전체화면: 일시정지 설정 버튼이 키보드 이동 목록에 없다")
 	else:
-		pause_btn.pressed.emit()
-		if bool(dm.call("is_fullscreen")) == start:
-			_fault("전체화면: 일시정지 버튼을 눌러도 안 바뀐다")
-		elif pause_btn.text != dm.call("button_text"):
-			_fault("전체화면: 일시정지 버튼 글자(%s)가 바뀐 상태를 안 따라온다" % pause_btn.text)
+		var pause_toggle := pause_panel.get_node_or_null("%FullscreenToggle") as Button
+		var pause_mbar := pause_panel.get_node_or_null("%MusicBar") as Control
+		var aset: Node = root.get_node("AudioSettings")
+		if pause_toggle == null or pause_mbar == null:
+			_fault("전체화면: 일시정지 설정창에 옵션이 없다")
 		else:
-			_ok("전체화면 일시정지 버튼")
-		dm.call("set_fullscreen", start, false)
-
-		# ── F11 — 멈춘 트리에서도 먹고, 멈춤은 그대로 둔다 ──────────────
-		paused = true
-		_press_fullscreen_key()
-		if bool(dm.call("is_fullscreen")) == start:
-			_fault("전체화면: 트리가 멈춘 중에 F11이 안 먹는다")
-		elif not paused:
-			_fault("전체화면: F11이 트리 멈춤을 풀었다")
-		elif pause_btn.text != dm.call("button_text"):
-			_fault("전체화면: F11로 바꿨는데 버튼 글자(%s)가 안 따라온다" % pause_btn.text)
-		else:
-			_ok("전체화면 F11 (멈춘 트리)")
-		paused = false
-		dm.call("set_fullscreen", start, false)
+			pause.call("open")   # 트리를 멈춘다 — 실제 사용과 같은 조건
+			await process_frame
+			pause_btn.pressed.emit()
+			await process_frame
+			if not bool(pause_panel.get("is_open")) or not paused:
+				_fault("일시정지 설정: 설정 버튼을 눌러도 설정창이 안 열리거나 트리 멈춤이 풀렸다")
+			elif (pause.call("_buttons") as Array).any(func(b: Button) -> bool: return b.focus_mode != Control.FOCUS_NONE):
+				_fault("일시정지 설정: 설정창이 열린 동안 메뉴 버튼이 포커스를 받는다")
+			else:
+				_ok("일시정지 설정창 열림")
+				# 전체화면 옵션
+				pause_toggle.pressed.emit()
+				if bool(dm.call("is_fullscreen")) == start:
+					_fault("일시정지 설정: 전체화면 옵션을 눌러도 안 바뀐다")
+				elif pause_toggle.text != dm.call("state_text"):
+					_fault("일시정지 설정: 전체화면 글자(%s)가 바뀐 상태를 안 따라온다" % pause_toggle.text)
+				else:
+					_ok("일시정지 설정 전체화면 옵션")
+				dm.call("set_fullscreen", start, false)
+				# F11 — 멈춘 트리에서도 먹고, 멈춤은 그대로 둔다
+				_press_fullscreen_key()
+				if bool(dm.call("is_fullscreen")) == start:
+					_fault("전체화면: 트리가 멈춘 중에 F11이 안 먹는다")
+				elif not paused:
+					_fault("전체화면: F11이 트리 멈춤을 풀었다")
+				elif pause_toggle.text != dm.call("state_text"):
+					_fault("전체화면: F11로 바꿨는데 설정창 글자(%s)가 안 따라온다" % pause_toggle.text)
+				else:
+					_ok("전체화면 F11 (멈춘 트리)")
+				dm.call("set_fullscreen", start, false)
+				# 음량 — 타이틀과 같은 저장소를 쓴다
+				pause_mbar.call("set_value", 4)
+				if int(aset.call("level", &"music")) != 4:
+					_fault("일시정지 설정: 막대를 바꿨는데 배경음악 단계가 %d다" % int(aset.call("level", &"music")))
+				else:
+					_ok("일시정지 설정 음량 막대")
+				aset.call("set_level", &"music", 10, false)
+				# Esc — 설정창만 닫히고 게임은 멈춘 채 메뉴가 남는다
+				_press_cancel()
+				await process_frame
+				if pause_panel.visible:
+					_fault("일시정지 설정: Esc로 설정창이 안 닫힌다")
+				elif not bool(pause.get("is_open")) or not paused:
+					_fault("일시정지 설정: Esc가 설정창만 닫지 않고 게임까지 재개했다")
+				elif not pause_btn.has_focus() \
+						or (pause.call("_buttons") as Array).any(func(b: Button) -> bool: return b.focus_mode != Control.FOCUS_ALL):
+					_fault("일시정지 설정: 설정창을 닫고 포커스가 설정 버튼으로 안 돌아온다")
+				else:
+					_ok("일시정지 설정 Esc는 설정창만 닫음")
+				# 한 번 더 Esc — 이제 게임이 재개된다
+				_press_cancel()
+				await process_frame
+				if bool(pause.get("is_open")) or paused:
+					_fault("일시정지 설정: 설정창이 닫힌 뒤 Esc로 게임이 재개되지 않는다")
+				else:
+					_ok("일시정지 설정 닫은 뒤 Esc는 재개")
+	paused = false
 	pause.free()
 	await process_frame
 
