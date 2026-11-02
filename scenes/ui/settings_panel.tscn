@@ -1,0 +1,120 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/settings_panel.gd" id="1_settings_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/YeonSung-Regular.ttf" id="2_title_font"]
+[ext_resource type="FontFile" path="res://assets/fonts/NotoSansKR-VF.ttf" id="3_body_font"]
+[ext_resource type="Theme" path="res://assets/ui/menu_button_theme.tres" id="4_button_theme"]
+[ext_resource type="Script" path="res://scripts/ui/menu_button.gd" id="5_menu_button"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+; 설정창 바탕(#781) — 소지품 창(#745)·수첩과 같은 어두운 갈색 종이 톤.
+bg_color = Color(0.09, 0.085, 0.08, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.36, 0.33, 0.28, 1)
+
+[node name="SettingsPanel" type="Control"]
+; 타이틀 위에 얹는 설정창(#781). 다른 화면(일시정지 메뉴 등)에서도 인스턴스해 쓸 수
+; 있게 독립 씬으로 둔다. 열고 닫는 것은 `open()`/`close()`, 닫히면 `closed`를 쏜다.
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_settings_script")
+
+[node name="Dim" type="ColorRect" parent="."]
+; mouse_filter 기본값(STOP)이라 아래 타이틀 버튼이 클릭을 못 받는다.
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.02, 0.03, 0.72)
+
+[node name="Panel" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(560, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 24
+
+[node name="Rows" type="VBoxContainer" parent="Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Title" type="Label" parent="Panel/Margin/Rows"]
+; 제목은 소지품 창과 같은 연성 + 붉은 그림자.
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91, 0.86, 0.75, 1)
+theme_override_colors/font_shadow_color = Color(0.42, 0.07, 0.06, 1)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_fonts/font = ExtResource("2_title_font")
+theme_override_font_sizes/font_size = 48
+text = "설정"
+
+[node name="Rule" type="ColorRect" parent="Panel/Margin/Rows"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.36, 0.33, 0.28, 0.6)
+
+[node name="FullscreenRow" type="HBoxContainer" parent="Panel/Margin/Rows"]
+layout_mode = 2
+
+[node name="FullscreenLabel" type="Label" parent="Panel/Margin/Rows/FullscreenRow"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.91, 0.86, 0.75, 1)
+theme_override_fonts/font = ExtResource("2_title_font")
+theme_override_font_sizes/font_size = 30
+text = "전체화면"
+
+[node name="Spacer" type="Control" parent="Panel/Margin/Rows/FullscreenRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="FullscreenToggle" type="Button" parent="Panel/Margin/Rows/FullscreenRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 52)
+layout_mode = 2
+theme = ExtResource("4_button_theme")
+theme_override_font_sizes/font_size = 30
+script = ExtResource("5_menu_button")
+line_gap = 8.0
+line_length = 14.0
+text = "꺼짐"
+
+[node name="Hint" type="Label" parent="Panel/Margin/Rows"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.52, 0.47, 1)
+theme_override_fonts/font = ExtResource("3_body_font")
+theme_override_font_sizes/font_size = 15
+text = "F11 키로도 바꿀 수 있습니다. 선택은 다음 실행에도 유지됩니다."
+
+[node name="CloseButton" type="Button" parent="Panel/Margin/Rows"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 52)
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("4_button_theme")
+theme_override_font_sizes/font_size = 27
+script = ExtResource("5_menu_button")
+text = "닫기"
