@@ -1217,6 +1217,11 @@ func _check_fullscreen() -> void:
 			_fault("전체화면: 설정창이 처음부터 열려 있다")
 		elif toggle == null:
 			_fault("전체화면: 설정창에 FullscreenToggle이 없다")
+		elif settings_btn.icon == null or settings_btn.text != "":
+			_fault("전체화면: 설정 버튼이 글자가 아니라 톱니바퀴 아이콘이어야 한다")
+		elif settings_btn.custom_minimum_size != Vector2(54, 54) or not settings_btn.expand_icon:
+			# 18x18 그림이 정수 3배로 놓이려면 버튼이 정확히 54x54이고 아이콘이 꽉 차야 한다.
+			_fault("전체화면: 설정 버튼 크기(%s)가 도트 3배(54x54)가 아니다" % settings_btn.custom_minimum_size)
 		elif settings_btn.get_global_rect().position.y > 80.0 \
 				or settings_btn.get_global_rect().end.x < root.get_visible_rect().size.x - 80.0:
 			_fault("전체화면: 설정 버튼이 오른쪽 위에 없다(%s)" % settings_btn.get_global_rect())
