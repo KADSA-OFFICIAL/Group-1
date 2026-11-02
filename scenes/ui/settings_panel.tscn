@@ -1,10 +1,11 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/settings_panel.gd" id="1_settings_script"]
 [ext_resource type="FontFile" path="res://assets/fonts/YeonSung-Regular.ttf" id="2_title_font"]
 [ext_resource type="FontFile" path="res://assets/fonts/NotoSansKR-VF.ttf" id="3_body_font"]
 [ext_resource type="Theme" path="res://assets/ui/menu_button_theme.tres" id="4_button_theme"]
 [ext_resource type="Script" path="res://scripts/ui/menu_button.gd" id="5_menu_button"]
+[ext_resource type="Script" path="res://scripts/ui/volume_bar.gd" id="6_volume_bar"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
 ; 설정창 바탕(#781) — 소지품 창(#745)·수첩과 같은 어두운 갈색 종이 톤.
@@ -102,12 +103,76 @@ line_gap = 8.0
 line_length = 14.0
 text = "꺼짐"
 
+[node name="MusicRow" type="HBoxContainer" parent="Panel/Margin/Rows"]
+layout_mode = 2
+
+[node name="MusicLabel" type="Label" parent="Panel/Margin/Rows/MusicRow"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.91, 0.86, 0.75, 1)
+theme_override_fonts/font = ExtResource("2_title_font")
+theme_override_font_sizes/font_size = 30
+text = "배경음악"
+
+[node name="Spacer" type="Control" parent="Panel/Margin/Rows/MusicRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="MusicBar" type="Control" parent="Panel/Margin/Rows/MusicRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+script = ExtResource("6_volume_bar")
+
+[node name="MusicPercent" type="Label" parent="Panel/Margin/Rows/MusicRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.55, 0.52, 0.47, 1)
+theme_override_fonts/font = ExtResource("3_body_font")
+theme_override_font_sizes/font_size = 20
+text = "100%"
+horizontal_alignment = 2
+
+[node name="SfxRow" type="HBoxContainer" parent="Panel/Margin/Rows"]
+layout_mode = 2
+
+[node name="SfxLabel" type="Label" parent="Panel/Margin/Rows/SfxRow"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.91, 0.86, 0.75, 1)
+theme_override_fonts/font = ExtResource("2_title_font")
+theme_override_font_sizes/font_size = 30
+text = "효과음"
+
+[node name="Spacer" type="Control" parent="Panel/Margin/Rows/SfxRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="SfxBar" type="Control" parent="Panel/Margin/Rows/SfxRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+script = ExtResource("6_volume_bar")
+
+[node name="SfxPercent" type="Label" parent="Panel/Margin/Rows/SfxRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(72, 0)
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.55, 0.52, 0.47, 1)
+theme_override_fonts/font = ExtResource("3_body_font")
+theme_override_font_sizes/font_size = 20
+text = "100%"
+horizontal_alignment = 2
+
 [node name="Hint" type="Label" parent="Panel/Margin/Rows"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.52, 0.47, 1)
 theme_override_fonts/font = ExtResource("3_body_font")
 theme_override_font_sizes/font_size = 15
-text = "F11 키로도 바꿀 수 있습니다. 선택은 다음 실행에도 유지됩니다."
+text = "←/→ 로 음량을 바꿉니다 · F11 로 전체화면 · 선택은 다음 실행에도 유지됩니다."
 
 [node name="CloseButton" type="Button" parent="Panel/Margin/Rows"]
 unique_name_in_owner = true

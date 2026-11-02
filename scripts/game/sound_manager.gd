@@ -3,6 +3,9 @@ extends Node
 ## 전역 효과음(#9). autoload로 둔다 — 타이틀 → 본편 → 엔딩/게임오버로 씬이
 ## 통째로 바뀌어도 살아 있어야 하고, 씬 전환 직전에 울린 소리가 끊기면 안 된다.
 ##
+## 소리는 두 버스로 나뉜다(#783, `audio_settings.gd`) — 효과음 보이스는 `SFX`,
+## 루프·테마는 `Music`. 설정창의 음량 막대가 각 버스를 조절한다.
+##
 ## 여기는 화면 어디서 나든 상관없는 소리만 맡는다. 위치가 정보인 소리(수위
 ## 발소리·열쇠)는 그 노드에 붙인 AudioStreamPlayer2D가 낸다 — janitor.tscn 참조.
 ##
@@ -136,7 +139,7 @@ func _ready() -> void:
 
 	for i in VOICES:
 		var player := AudioStreamPlayer.new()
-		player.bus = &"Master"
+		player.bus = &"SFX"   # 음량 설정(#783)의 효과음 버스. 이름은 audio_settings.gd가 만든다.
 		add_child(player)
 		_players.append(player)
 
@@ -151,7 +154,7 @@ func _ready() -> void:
 ## 돌고 조용해진다.
 func _make_loop_player(id: StringName) -> AudioStreamPlayer:
 	var player := AudioStreamPlayer.new()
-	player.bus = &"Master"
+	player.bus = &"Music"   # 루프·테마는 전부 배경음악 버스다(#783).
 	player.volume_db = MUSIC_SILENT_DB
 	add_child(player)
 

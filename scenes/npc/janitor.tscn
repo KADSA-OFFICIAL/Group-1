@@ -25,18 +25,21 @@ vframes = 4
 shape = SubResource("CapsuleShape2D_janitor")
 
 [node name="StepSound" type="AudioStreamPlayer2D" parent="."]
+bus = &"SFX"
 stream = ExtResource("2_step")
 volume_db = -4.0
 max_distance = 900.0
 attenuation = 1.6
 
 [node name="KeySound" type="AudioStreamPlayer2D" parent="."]
+bus = &"SFX"
 stream = ExtResource("3_keys")
 volume_db = -7.0
 max_distance = 1100.0
 attenuation = 1.2
 
 [node name="DoorSound" type="AudioStreamPlayer2D" parent="."]
+bus = &"SFX"
 stream = ExtResource("4_door")
 volume_db = -11.0
 max_distance = 1000.0
