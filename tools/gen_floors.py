@@ -326,9 +326,13 @@ TEX = {
 # 물건"이다. 여기 있는 색은 TEX보다 우선하고, 물건마다 로컬 UV가 들어가 그림
 # 한 장이 그 물건에 맞춰 늘어난다 — 44x26 책상에도 상판·모서리·서랍선이 제자리에
 # 온다. 재질만 쓰던 때는 월드 격자의 아무 조각이나 잘려 들어갔다.
-# ── 외부 가구 그림(#716) ─────────────────────────────────────
-# Darklight Academia Furniture Pack(kueyhorse, 무료판 비상업 — `CREDITS.md`)에서
-# `tools/import_ext_sprites.py`가 잘라 낸 그림. **정수 2배로 놓는다**(`EXT_SCALE`) —
+# ── 완성 그림 가구(#716, #791) ────────────────────────────────
+# 두 갈래다. ① `assets/sprites/furniture/` — `tools/gen_furniture_sprites.py`가 직접
+# 굽는 그림(교장실 가구·보건실 침대·선반·캐비닛·상자·단서 셋). 처음에는 Darklight
+# Academia Furniture Pack(#716)이었는데 그 팩의 "AI 관련 프로젝트 사용 금지" 조항
+# 때문에 같은 크기로 다시 그렸다(#791). ② `assets/sprites/ext/` — 외부 팩(`hs_`
+# Haunted School, `hr_` Horror)에서 `tools/import_ext_sprites.py`가 잘라 낸 그림.
+# 둘 다 같은 `ext:<이름>` 규약을 쓴다. ①은 **정수 2배로 놓는다**(`EXT_SCALE`) —
 # 월드 도트 한 칸이 2px라 그래야 도트 폭이 고르다. `obj_*`처럼 상자에 맞춰
 # 늘리면 같은 그림이 방마다 다른 비율로 찌그러진다.
 #
@@ -337,6 +341,7 @@ TEX = {
 # 아래 색들은 그래서 화면에 안 나오고, 표를 찾는 열쇠로만 쓴다 — **서로 달라야
 # 한다**(같은 문자열이면 나중 것이 이겨 조회가 빗나간다).
 EXT_DIR = "res://assets/sprites/ext"
+FURN_DIR = "res://assets/sprites/furniture"
 EXT_SCALE = 2
 C_X_DESK = "Color(0.301, 0.201, 0.141, 1)"      # 교장 책상
 C_X_SOFA = "Color(0.402, 0.142, 0.122, 1)"      # 붉은 소파
@@ -362,14 +367,22 @@ def _png_size(path):
     return int.from_bytes(data[:4], "big"), int.from_bytes(data[4:], "big")
 
 
-_EXT_LOCAL = pathlib.Path(__file__).resolve().parent.parent / "assets/sprites/ext"
-EXT_SIZES = {p.stem: _png_size(p) for p in sorted(_EXT_LOCAL.glob("*.png"))}
+_ROOT = pathlib.Path(__file__).resolve().parent.parent
+EXT_PATHS = {}      # 이름 -> res:// 경로. 두 폴더에 같은 이름이 있으면 멈춘다.
+EXT_SIZES = {}
+for _dir, _res in ((_ROOT / "assets/sprites/ext", EXT_DIR),
+                   (_ROOT / "assets/sprites/furniture", FURN_DIR)):
+    for _p in sorted(_dir.glob("*.png")):
+        if _p.stem in EXT_PATHS:
+            raise SystemExit(f"그림 이름 {_p.stem}이 ext/와 furniture/에 둘 다 있다")
+        EXT_PATHS[_p.stem] = f"{_res}/{_p.name}"
+        EXT_SIZES[_p.stem] = _png_size(_p)
 
 
 def ext_scale(name):
     """그림마다 배율. **팩이 정한다**(#717).
 
-    Darklight(32px 칸, 몸이 작은 캐릭터 기준)는 2배, Haunted School(`hs_`, 48px
+    자체 그림(`furniture/`, 32px 칸 기준)·Horror(`hr_`)는 2배, Haunted School(`hs_`, 48px
     칸 RPG Maker MZ)은 1배다 — 1배면 학생 자리(44x52)가 예전 책상+의자(43x44)와
     거의 같고, 이설 스프라이트(74x76)도 그림 1칸 = 월드 1px라 질감이 맞는다.
     """
@@ -379,7 +392,7 @@ def ext_scale(name):
 def ext_size(name):
     """그 그림을 놓을 월드 크기(정수 배율)."""
     if name not in EXT_SIZES:
-        raise SystemExit(f"외부 그림 {name}.png가 없다 — tools/import_ext_sprites.py를 돌렸는가")
+        raise SystemExit(f"외부 그림 {name}.png가 없다 — tools/gen_furniture_sprites.py·import_ext_sprites.py를 돌렸는가")
     w, h = EXT_SIZES[name]
     k = ext_scale(name)
     return w * k, h * k
@@ -450,22 +463,22 @@ SPRITE = {
 }
 SPRITE_SIZE = 32    # gen_tiles.py의 OBJ와 반드시 같아야 한다
 
-# 방향을 타는 외부 그림(#758, Darklight) — 이름 -> (앞모습, 옆모습).
+# 방향을 타는 그림(#758, 자체 그림 #791) — 이름 -> (앞모습, 옆모습).
 # 집기는 배치 코드가 정한 상자 그대로다(충돌·통로 불변). 그림을 **상자의 짧은 변에
 # 맞춰 줄이고 긴 변으로 되풀이한다** — 늘려 맞추면 66x40 선반과 26x64 벽 줄이
 # 같은 그림을 다른 비율로 찌그러뜨린다. 세로로 긴 상자는 옆벽에 붙은 것이라
 # 옆모습을 쓰고, 방 가운데보다 왼쪽이면 좌우를 뒤집어 앞면이 방 안을 보게 한다.
 WALL_ART = {
-    "shelf": ("dl_bookshelf", "dl_bookshelf_side"),
-    "cabinet": ("dl_cabinet", "dl_cabinet_side"),
-    "crate": ("dl_crate", "dl_crate"),
+    "shelf": ("bookshelf", "bookshelf_side"),
+    "cabinet": ("cabinet", "cabinet_side"),
+    "crate": ("crate", "crate"),
     "locker": ("hr_locker_bank", "hr_locker_side"),
-    "shoes": ("hr_shoe_cubby", "dl_bookshelf_side"),
+    "shoes": ("hr_shoe_cubby", "bookshelf_side"),
 }
 # 그림 옆모습의 앞면이 어느 쪽을 보나 — "left"면 방 오른쪽 벽에 그대로 맞는다.
-WALL_ART_SIDE_FACES = {"dl_bookshelf_side": "left", "dl_cabinet_side": "left",
-                       "dl_crate": "left", "hr_locker_side": "right"}
-# 그림별 밝기(#763). Horror 팩은 Darklight보다 색이 연하고 밝아(파스텔 분홍 신발장,
+WALL_ART_SIDE_FACES = {"bookshelf_side": "left", "cabinet_side": "left",
+                       "crate": "left", "hr_locker_side": "right"}
+# 그림별 밝기(#763). Horror 팩은 다른 가구 그림보다 색이 연하고 밝아(파스텔 분홍 신발장,
 # 밝은 회색 사물함) 손전등 아래 어두운 바닥에서 혼자 떠 보였다.
 WALL_ART_TINT = {
     "hr_locker_bank": "Color(0.58, 0.56, 0.6, 1)",
@@ -528,7 +541,7 @@ def uv_for(polygon, tw=None, th=None):
 TEXTURES = {f"tex_{stem}": f"{TEX_DIR}/{stem}.png"
             for stem in sorted(set(TEX.values()) | set(SPRITE.values()))
             if not stem.startswith("ext:")}
-TEXTURES.update({f"ext_{name}": f"{EXT_DIR}/{name}.png" for name in EXT_SIZES})
+TEXTURES.update({f"ext_{name}": path for name, path in EXT_PATHS.items()})
 
 # 단서·열쇠 도트 스프라이트(#333, #390). 타일 무늬가 아니라 그림 한 장이라
 # TEX/SPRITE 표와 따로 둔다 — 경로도 assets/tiles가 아니라 assets/sprites다.
@@ -1808,7 +1821,7 @@ CLUE_ART = {
 }
 # 단서는 **2배**로 놓는다 — 찾을 것이라 눈에 띄어야 한다. 1배면 책(13x17)이
 # 책상 그림 위의 점 하나라, "3층 열쇠가 안 보인다"(#698)가 단서마다 되풀이된다.
-# Darklight 그림은 원래 2배라 그대로 맞는다.
+# 자체 가구 그림(`furniture/`)은 원래 2배라 그대로 맞는다.
 CLUE_ART_SCALE = 2
 
 
@@ -1816,7 +1829,7 @@ def _clue_visual(name):
     """단서 시각 노드 — 외부 그림 Sprite2D. 부모(단서 Area2D) 자리 한가운데에 선다."""
     art = CLUE_ART[name]
     if art not in EXT_SIZES:
-        raise SystemExit(f"단서 그림 {art}.png가 없다 — tools/import_ext_sprites.py를 돌렸는가")
+        raise SystemExit(f"단서 그림 {art}.png가 없다 — tools/gen_furniture_sprites.py·import_ext_sprites.py를 돌렸는가")
     return (f'[node name="{name}Visual" type="Sprite2D" parent="{name}"]\n'
             "z_index = 1\n"
             "texture_filter = 1\n"

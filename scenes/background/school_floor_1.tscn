@@ -25,17 +25,6 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_grain.png" id="tex_prop_grain"]
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_metal.png" id="tex_prop_metal"]
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/armchair_red.png" id="ext_armchair_red"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/bed_green.png" id="ext_bed_green"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/bookcase_tall.png" id="ext_bookcase_tall"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/desk_exec.png" id="ext_desk_exec"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/dl_bookshelf.png" id="ext_dl_bookshelf"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/dl_bookshelf_side.png" id="ext_dl_bookshelf_side"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/dl_cabinet.png" id="ext_dl_cabinet"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/dl_cabinet_side.png" id="ext_dl_cabinet_side"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/floor_lamp.png" id="ext_floor_lamp"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/globe.png" id="ext_globe"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/grandfather_clock.png" id="ext_grandfather_clock"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hr_locker_bank.png" id="ext_hr_locker_bank"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hr_locker_side.png" id="ext_hr_locker_side"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hr_shoe_cubby.png" id="ext_hr_shoe_cubby"]
@@ -50,9 +39,20 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_office_desk_up.png" id="ext_hs_office_desk_up"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_papers_two.png" id="ext_hs_papers_two"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_wall_face.png" id="ext_hs_wall_face"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/rug_long.png" id="ext_rug_long"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/sofa_red.png" id="ext_sofa_red"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/vase_blue.png" id="ext_vase_blue"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/armchair_red.png" id="ext_armchair_red"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/bed_green.png" id="ext_bed_green"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/bookcase_tall.png" id="ext_bookcase_tall"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/bookshelf.png" id="ext_bookshelf"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/bookshelf_side.png" id="ext_bookshelf_side"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/cabinet.png" id="ext_cabinet"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/cabinet_side.png" id="ext_cabinet_side"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/desk_exec.png" id="ext_desk_exec"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/floor_lamp.png" id="ext_floor_lamp"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/globe.png" id="ext_globe"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/grandfather_clock.png" id="ext_grandfather_clock"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/rug_long.png" id="ext_rug_long"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/sofa_red.png" id="ext_sofa_red"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/vase_blue.png" id="ext_vase_blue"]
 [ext_resource type="Texture2D" path="res://assets/sprites/key.png" id="9_key"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
@@ -1562,7 +1562,7 @@ message = "약품장 아래 칸. 붕대 상자에 무릎이 닿는다."
 
 [node name="HideNurseCabinetVisual" type="Polygon2D" parent="HideNurseCabinet"]
 z_index = 1
-texture = ExtResource("ext_dl_cabinet")
+texture = ExtResource("ext_cabinet")
 uv = PackedVector2Array(0, 0, 22, 0, 22, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(2, -22, 42, -22, 42, 22, 2, 22)
@@ -1586,7 +1586,7 @@ message = "교무실 캐비닛 사이. 묵은 종이 냄새가 난다."
 
 [node name="HideStaffRoomVisual" type="Polygon2D" parent="HideStaffRoom"]
 z_index = 1
-texture = ExtResource("ext_dl_bookshelf")
+texture = ExtResource("ext_bookshelf")
 uv = PackedVector2Array(0, 0, 30, 0, 30, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(-44, -20, 0, -20, 0, 20, -44, 20)
@@ -1765,7 +1765,7 @@ polygon = PackedVector2Array(280, 216, 400, 216, 400, 224, 280, 224)
 polygon = PackedVector2Array(178, 218, 206, 218, 206, 278, 178, 278)
 
 [node name="PV_NurseRoom_chem" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_cabinet_side")
+texture = ExtResource("ext_cabinet_side")
 uv = PackedVector2Array(12, 0, 0, 0, 0, 32, 12, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(178, 218, 206, 218, 206, 278, 178, 278)
@@ -1774,7 +1774,7 @@ polygon = PackedVector2Array(178, 218, 206, 218, 206, 278, 178, 278)
 polygon = PackedVector2Array(178, 436, 206, 436, 206, 496, 178, 496)
 
 [node name="PV_NurseRoom_line0_chem" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_cabinet_side")
+texture = ExtResource("ext_cabinet_side")
 uv = PackedVector2Array(12, 0, 0, 0, 0, 32, 12, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(178, 436, 206, 436, 206, 496, 178, 496)
@@ -1783,7 +1783,7 @@ polygon = PackedVector2Array(178, 436, 206, 436, 206, 496, 178, 496)
 polygon = PackedVector2Array(474, 436, 502, 436, 502, 496, 474, 496)
 
 [node name="PV_NurseRoom_line1_chem" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_cabinet_side")
+texture = ExtResource("ext_cabinet_side")
 uv = PackedVector2Array(0, 0, 12, 0, 12, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(474, 436, 502, 436, 502, 496, 474, 496)
@@ -2489,7 +2489,7 @@ polygon = PackedVector2Array(998, 1076, 1024, 1076, 1024, 1102, 998, 1102)
 polygon = PackedVector2Array(998, 772, 1024, 772, 1024, 842, 998, 842)
 
 [node name="PV_Entrance_line0_shoes" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(15, 0, 0, 0, 0, 32, 15, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(998, 772, 1024, 772, 1024, 842, 998, 842)
@@ -2507,7 +2507,7 @@ polygon = PackedVector2Array(998, 984, 1024, 984, 1024, 1010, 998, 1010)
 polygon = PackedVector2Array(1416, 772, 1442, 772, 1442, 842, 1416, 842)
 
 [node name="PV_Entrance_line2_shoes" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1416, 772, 1442, 772, 1442, 842, 1416, 842)
@@ -2525,7 +2525,7 @@ polygon = PackedVector2Array(1416, 848, 1442, 848, 1442, 874, 1416, 874)
 polygon = PackedVector2Array(1416, 880, 1442, 880, 1442, 950, 1416, 950)
 
 [node name="PV_Entrance_line4_shoes" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1416, 880, 1442, 880, 1442, 950, 1416, 950)
@@ -2543,7 +2543,7 @@ polygon = PackedVector2Array(1416, 956, 1442, 956, 1442, 982, 1416, 982)
 polygon = PackedVector2Array(1416, 988, 1442, 988, 1442, 1058, 1416, 1058)
 
 [node name="PV_Entrance_line6_shoes" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1416, 988, 1442, 988, 1442, 1058, 1416, 1058)
@@ -2598,7 +2598,7 @@ polygon = PackedVector2Array(1478, 868, 1506, 868, 1506, 920, 1478, 920)
 polygon = PackedVector2Array(1478, 926, 1504, 926, 1504, 990, 1478, 990)
 
 [node name="PV_JanitorRoom_line1_shelf" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(15, 0, 0, 0, 0, 32, 15, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1478, 926, 1504, 926, 1504, 990, 1478, 990)
@@ -2992,7 +2992,7 @@ polygon = PackedVector2Array(1103.5, 246, 1169.5, 246, 1169.5, 280, 1103.5, 280)
 polygon = PackedVector2Array(1180, 296, 1226, 296, 1226, 330, 1180, 330)
 
 [node name="PV_StaffRoom_cabR0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_cabinet")
+texture = ExtResource("ext_cabinet")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1180, 296, 1226, 296, 1226, 330, 1180, 330)
@@ -3001,7 +3001,7 @@ polygon = PackedVector2Array(1180, 296, 1226, 296, 1226, 330, 1180, 330)
 polygon = PackedVector2Array(1186, 346, 1226, 346, 1226, 404, 1186, 404)
 
 [node name="PV_StaffRoom_shelfR0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1186, 346, 1226, 346, 1226, 404, 1186, 404)

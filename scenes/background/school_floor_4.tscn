@@ -25,14 +25,14 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_grain.png" id="tex_prop_grain"]
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_metal.png" id="tex_prop_metal"]
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/dl_bookshelf.png" id="ext_dl_bookshelf"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/dl_bookshelf_side.png" id="ext_dl_bookshelf_side"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hr_locker_side.png" id="ext_hr_locker_side"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_bag_spilled.png" id="ext_hs_bag_spilled"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_book_purple.png" id="ext_hs_book_purple"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_calendar.png" id="ext_hs_calendar"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_wall_face.png" id="ext_hs_wall_face"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/painting_dark.png" id="ext_painting_dark"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/bookshelf.png" id="ext_bookshelf"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/bookshelf_side.png" id="ext_bookshelf_side"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/painting_dark.png" id="ext_painting_dark"]
 [ext_resource type="Texture2D" path="res://assets/sprites/janitor_sheet.png" id="18_janitor"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall_h"]
@@ -878,7 +878,7 @@ polygon = PackedVector2Array(36, 530, 46, 530, 46, 700, 36, 700)
 polygon = PackedVector2Array(1720, 120, 1764, 120, 1764, 240, 1720, 240)
 
 [node name="PV_PrepShelf0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1720, 120, 1764, 120, 1764, 240, 1720, 240)
@@ -887,7 +887,7 @@ polygon = PackedVector2Array(1720, 120, 1764, 120, 1764, 240, 1720, 240)
 polygon = PackedVector2Array(1720, 270, 1764, 270, 1764, 390, 1720, 390)
 
 [node name="PV_PrepShelf1" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1720, 270, 1764, 270, 1764, 390, 1720, 390)
@@ -896,7 +896,7 @@ polygon = PackedVector2Array(1720, 270, 1764, 270, 1764, 390, 1720, 390)
 polygon = PackedVector2Array(1720, 420, 1764, 420, 1764, 540, 1720, 540)
 
 [node name="PV_PrepShelf2" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1720, 420, 1764, 420, 1764, 540, 1720, 540)
@@ -952,7 +952,7 @@ polygon = PackedVector2Array(1200, 350, 1290, 350, 1290, 410, 1200, 410)
 polygon = PackedVector2Array(1320, 190, 1370, 190, 1370, 240, 1320, 240)
 
 [node name="PV_SupplyBox0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf")
+texture = ExtResource("ext_bookshelf")
 uv = PackedVector2Array(0, 0, 30, 0, 30, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1320, 190, 1370, 190, 1370, 240, 1320, 240)
@@ -961,7 +961,7 @@ polygon = PackedVector2Array(1320, 190, 1370, 190, 1370, 240, 1320, 240)
 polygon = PackedVector2Array(1320, 250, 1370, 250, 1370, 300, 1320, 300)
 
 [node name="PV_SupplyBox1" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf")
+texture = ExtResource("ext_bookshelf")
 uv = PackedVector2Array(0, 0, 30, 0, 30, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1320, 250, 1370, 250, 1370, 300, 1320, 300)
@@ -1025,7 +1025,7 @@ message = "준비실 적재함 뒤. 테레빈유 냄새가 코를 찌른다."
 
 [node name="HidePrepShelfVisual" type="Polygon2D" parent="HidePrepShelf"]
 z_index = 1
-texture = ExtResource("ext_dl_bookshelf")
+texture = ExtResource("ext_bookshelf")
 uv = PackedVector2Array(0, 0, 30, 0, 30, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(0, -20, 44, -20, 44, 20, 0, 20)

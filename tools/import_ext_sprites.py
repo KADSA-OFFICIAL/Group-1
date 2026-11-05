@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""외부 가구 그림을 잘라 게임에 넣는다(#716, #717). 표준 라이브러리만.
+"""외부 가구 그림을 잘라 게임에 넣는다(#717, #763). 표준 라이브러리만.
 
-    python3 tools/import_ext_sprites.py --darklight <Darklight 팩 폴더> --haunted <Haunted School 폴더> --horror <Horror 팩 폴더>
+    python3 tools/import_ext_sprites.py --haunted <Haunted School 폴더> --horror <Horror 팩 폴더>
 
-둘 중 하나만 줘도 된다 — 준 팩의 그림만 다시 굽는다.
+하나만 줘도 된다 — 준 팩의 그림만 다시 굽는다.
 
-- **Darklight Academia Furniture Pack**(kueyhorse, #716): 그림 한 장이 파일 하나다.
-  투명 여백만 잘라 낸다.
+Darklight Academia Furniture Pack(#716)은 #791에서 걷어냈다 — "AI 관련 프로젝트
+사용 금지" 조항 때문이다. 그 자리의 그림은 `tools/gen_furniture_sprites.py`가 굽는다.
 - **Haunted School Tiles**(Thurraya, #717): RPG Maker MZ용 시트(`Inside_B.png`,
   48px 칸)다. 쓰는 칸의 **사각형을 손으로 적는다** — 시트의 그림끼리 붙어 있는
   곳(책상+의자 묶음)이 있어 자동으로 덩어리를 가르면 묶음이 쪼개지거나 이웃과 붙는다.
@@ -15,7 +15,7 @@
 - **Top Down Pixel Art Horror**(AnisAous, #763): Haunted School과 같은 48px RPG Maker
   시트(`Inside_D.png`). 사물함·신발장 칸을 손으로 적는다.
 
-출처·조건은 `CREDITS.md`. **원본 팩은 저장소에 넣지 않는다**(둘 다 원본 재배포 금지).
+출처·조건은 `CREDITS.md`. **원본 팩은 저장소에 넣지 않는다**(원본 재배포 금지).
 크기는 바꾸지 않는다 — 배율은 게임이 정한다(`gen_floors.EXT_SCALE`/`ext_scale()`).
 """
 import pathlib
@@ -27,31 +27,6 @@ from gen_key_sprite import read_png, write_png  # noqa: E402
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "assets/sprites/ext"
 ALPHA_MIN = 20
-
-# 게임 안 이름 → 원본 파일. 이름은 `gen_floors`가 쓰는 이름과 같아야 한다.
-DARKLIGHT = {
-    "desk_exec": "diningTablelarge.png",      # 교장 책상
-    "sofa_red": "RedSuite-export.png",        # 접견 소파
-    "armchair_red": "RedSuiteOneSeater-export.png",
-    "bookcase_tall": "BookshelfTall.png",
-    "grandfather_clock": "grandfatherClock.png",
-    "globe": "Globe.png",
-    "floor_lamp": "standinglamp1.png",
-    "vase_blue": "VaseBlue.png",
-    "bed_green": "bedGreen.png",              # 보건실 침대
-    "rug_long": "rugLong.png",
-    # 단서(#723)
-    "painting_dark": "painting1.png",         # 시우 그림 — 밤 풍경 액자
-    "book_closed": "book.png",                # 인사 기록(서류철)
-    "books_pile": "booksPile1.png",           # 대응 매뉴얼
-    # 선반·캐비닛(#758) — **앞모습과 옆모습이 짝**이다. 옆벽(세로 벽)에 붙은 집기는
-    # 옆모습, 가로로 긴 집기는 앞모습을 쓴다(`gen_floors.WALL_ART`).
-    "dl_bookshelf": "bookshelf.png",
-    "dl_bookshelf_side": "bookshelfSide.png",
-    "dl_cabinet": "cabinet1.png",
-    "dl_cabinet_side": "cabinet1Side.png",
-    "dl_crate": "crate.png",                  # 창고 벽 줄 상자
-}
 
 # 게임 안 이름 → (시트, x0, y0, x1, y1) — 끝 좌표 포함.
 # **`hs_` 앞머리가 배율을 정한다**(`gen_floors.ext_scale` — 1배).
@@ -122,15 +97,9 @@ def trim(w, h, px, x0=0, y0=0, x1=None, y1=None):
 
 def main():
     args = dict(zip(sys.argv[1::2], sys.argv[2::2]))
-    if not args or set(args) - {"--darklight", "--haunted", "--horror"}:
+    if not args or set(args) - {"--haunted", "--horror"}:
         raise SystemExit(__doc__)
     OUT.mkdir(parents=True, exist_ok=True)
-    if "--darklight" in args:
-        src = pathlib.Path(args["--darklight"])
-        for name, fname in DARKLIGHT.items():
-            cw, ch, data = trim(*read_png(src / fname))
-            write_png(OUT / f"{name}.png", cw, ch, data)
-            print(f"{name}.png: {cw}x{ch}")
     for flag, table in (("--haunted", HAUNTED), ("--horror", HORROR)):
         if flag not in args:
             continue
