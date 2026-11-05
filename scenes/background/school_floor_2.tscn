@@ -27,11 +27,6 @@
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_grain.png" id="tex_prop_grain"]
 [ext_resource type="Texture2D" path="res://assets/tiles/prop_metal.png" id="tex_prop_metal"]
 [ext_resource type="Texture2D" path="res://assets/tiles/wall_brick.png" id="tex_wall_brick"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/books_pile.png" id="ext_books_pile"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/dl_bookshelf_side.png" id="ext_dl_bookshelf_side"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/dl_cabinet.png" id="ext_dl_cabinet"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/dl_cabinet_side.png" id="ext_dl_cabinet_side"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ext/dl_crate.png" id="ext_dl_crate"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hr_locker_bank.png" id="ext_hr_locker_bank"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hr_locker_side.png" id="ext_hr_locker_side"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_book_open.png" id="ext_hs_book_open"]
@@ -44,6 +39,11 @@
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_student_desk.png" id="ext_hs_student_desk"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_teacher_desk.png" id="ext_hs_teacher_desk"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ext/hs_wall_face.png" id="ext_hs_wall_face"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/books_pile.png" id="ext_books_pile"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/bookshelf_side.png" id="ext_bookshelf_side"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/cabinet.png" id="ext_cabinet"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/cabinet_side.png" id="ext_cabinet_side"]
+[ext_resource type="Texture2D" path="res://assets/sprites/furniture/crate.png" id="ext_crate"]
 [ext_resource type="Texture2D" path="res://assets/sprites/eye_key.png" id="15_eyekey"]
 [ext_resource type="Texture2D" path="res://assets/sprites/head_top.png" id="16_headtop"]
 
@@ -2661,7 +2661,7 @@ polygon = PackedVector2Array(36, 410, 52, 410, 52, 446, 36, 446)
 polygon = PackedVector2Array(60, 60, 107, 60, 107, 128, 60, 128)
 
 [node name="PV_North1_shelf0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(15, 0, 0, 0, 0, 32, 15, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(60, 60, 107, 60, 107, 128, 60, 128)
@@ -2675,7 +2675,7 @@ polygon = PackedVector2Array(65, 66, 102, 66, 102, 78, 65, 78)
 polygon = PackedVector2Array(60, 432, 107, 432, 107, 500, 60, 500)
 
 [node name="PV_North1_shelf1" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(15, 0, 0, 0, 0, 32, 15, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(60, 432, 107, 432, 107, 500, 60, 500)
@@ -3012,7 +3012,7 @@ polygon = PackedVector2Array(433.3, 256.5, 480.3, 256.5, 480.3, 303.5, 433.3, 30
 polygon = PackedVector2Array(433.3, 60, 480.3, 60, 480.3, 128, 433.3, 128)
 
 [node name="PV_North2_shelf0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(15, 0, 0, 0, 0, 32, 15, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(433.3, 60, 480.3, 60, 480.3, 128, 433.3, 128)
@@ -3026,7 +3026,7 @@ polygon = PackedVector2Array(438.3, 66, 475.3, 66, 475.3, 78, 438.3, 78)
 polygon = PackedVector2Array(433.3, 432, 480.3, 432, 480.3, 500, 433.3, 500)
 
 [node name="PV_North2_shelf1" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(15, 0, 0, 0, 0, 32, 15, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(433.3, 432, 480.3, 432, 480.3, 500, 433.3, 500)
@@ -3372,7 +3372,7 @@ polygon = PackedVector2Array(806.7, 256.5, 853.7, 256.5, 853.7, 303.5, 806.7, 30
 polygon = PackedVector2Array(806.7, 60, 853.7, 60, 853.7, 128, 806.7, 128)
 
 [node name="PV_North3_shelf0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(15, 0, 0, 0, 0, 32, 15, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(806.7, 60, 853.7, 60, 853.7, 128, 806.7, 128)
@@ -3386,7 +3386,7 @@ polygon = PackedVector2Array(811.7, 66, 848.7, 66, 848.7, 78, 811.7, 78)
 polygon = PackedVector2Array(806.7, 432, 853.7, 432, 853.7, 500, 806.7, 500)
 
 [node name="PV_North3_shelf1" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(15, 0, 0, 0, 0, 32, 15, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(806.7, 432, 853.7, 432, 853.7, 500, 806.7, 500)
@@ -3776,7 +3776,7 @@ polygon = PackedVector2Array(1396.7, 334, 1418.7, 334, 1418.7, 356, 1396.7, 356)
 polygon = PackedVector2Array(1174, 280, 1220, 280, 1220, 314, 1174, 314)
 
 [node name="PV_North4_cabL0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_cabinet")
+texture = ExtResource("ext_cabinet")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1174, 280, 1220, 280, 1220, 314, 1174, 314)
@@ -3785,7 +3785,7 @@ polygon = PackedVector2Array(1174, 280, 1220, 280, 1220, 314, 1174, 314)
 polygon = PackedVector2Array(1174, 330, 1214, 330, 1214, 388, 1174, 388)
 
 [node name="PV_North4_shelfL0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(15, 0, 0, 0, 0, 32, 15, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1174, 330, 1214, 330, 1214, 388, 1174, 388)
@@ -3812,7 +3812,7 @@ polygon = PackedVector2Array(1174, 462, 1214, 462, 1214, 502, 1174, 502)
 polygon = PackedVector2Array(1433.3, 360, 1479.3, 360, 1479.3, 394, 1433.3, 394)
 
 [node name="PV_North4_cabR0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_cabinet")
+texture = ExtResource("ext_cabinet")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1433.3, 360, 1479.3, 360, 1479.3, 394, 1433.3, 394)
@@ -3821,7 +3821,7 @@ polygon = PackedVector2Array(1433.3, 360, 1479.3, 360, 1479.3, 394, 1433.3, 394)
 polygon = PackedVector2Array(1439.3, 410, 1479.3, 410, 1479.3, 468, 1439.3, 468)
 
 [node name="PV_North4_shelfR0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1439.3, 410, 1479.3, 410, 1479.3, 468, 1439.3, 468)
@@ -3864,7 +3864,7 @@ polygon = PackedVector2Array(1529.3, 410, 1545.3, 410, 1545.3, 446, 1529.3, 446)
 polygon = PackedVector2Array(1553.3, 60, 1600.3, 60, 1600.3, 128, 1553.3, 128)
 
 [node name="PV_North5_shelf0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(15, 0, 0, 0, 0, 32, 15, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1553.3, 60, 1600.3, 60, 1600.3, 128, 1553.3, 128)
@@ -3878,7 +3878,7 @@ polygon = PackedVector2Array(1558.3, 66, 1595.3, 66, 1595.3, 78, 1558.3, 78)
 polygon = PackedVector2Array(1553.3, 432, 1600.3, 432, 1600.3, 500, 1553.3, 500)
 
 [node name="PV_North5_shelf1" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(15, 0, 0, 0, 0, 32, 15, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1553.3, 432, 1600.3, 432, 1600.3, 500, 1553.3, 500)
@@ -4206,7 +4206,7 @@ polygon = PackedVector2Array(1902.7, 410, 1918.7, 410, 1918.7, 446, 1902.7, 446)
 polygon = PackedVector2Array(1926.7, 60, 1973.7, 60, 1973.7, 128, 1926.7, 128)
 
 [node name="PV_North6_shelf0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(15, 0, 0, 0, 0, 32, 15, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1926.7, 60, 1973.7, 60, 1973.7, 128, 1926.7, 128)
@@ -4220,7 +4220,7 @@ polygon = PackedVector2Array(1931.7, 66, 1968.7, 66, 1968.7, 78, 1931.7, 78)
 polygon = PackedVector2Array(1926.7, 432, 1973.7, 432, 1973.7, 500, 1926.7, 500)
 
 [node name="PV_North6_shelf1" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(15, 0, 0, 0, 0, 32, 15, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1926.7, 432, 1973.7, 432, 1973.7, 500, 1926.7, 500)
@@ -4772,7 +4772,7 @@ polygon = PackedVector2Array(1173, 952, 1191, 952, 1191, 972, 1173, 972)
 polygon = PackedVector2Array(1968, 777, 2009, 777, 2009, 817, 1968, 817)
 
 [node name="PV_StorageR_0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 22, 0, 22, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1968, 777, 2009, 777, 2009, 817, 1968, 817)
@@ -4781,7 +4781,7 @@ polygon = PackedVector2Array(1968, 777, 2009, 777, 2009, 817, 1968, 817)
 polygon = PackedVector2Array(2171, 777, 2212, 777, 2212, 817, 2171, 817)
 
 [node name="PV_StorageR_1" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 22, 0, 22, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(2171, 777, 2212, 777, 2212, 817, 2171, 817)
@@ -4790,7 +4790,7 @@ polygon = PackedVector2Array(2171, 777, 2212, 777, 2212, 817, 2171, 817)
 polygon = PackedVector2Array(2076, 903, 2139, 903, 2139, 943, 2076, 943)
 
 [node name="PV_StorageR_2" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(2076, 903, 2139, 903, 2139, 943, 2076, 943)
@@ -4804,7 +4804,7 @@ polygon = PackedVector2Array(2045, 976, 2135, 976, 2135, 984, 2045, 984)
 polygon = PackedVector2Array(1938, 772, 1966, 772, 1966, 812, 1938, 812)
 
 [node name="PV_StorageR_line0_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(22, 0, 0, 0, 0, 28, 22, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1938, 772, 1966, 772, 1966, 812, 1938, 812)
@@ -4813,7 +4813,7 @@ polygon = PackedVector2Array(1938, 772, 1966, 772, 1966, 812, 1938, 812)
 polygon = PackedVector2Array(1938, 818, 1966, 818, 1966, 852, 1938, 852)
 
 [node name="PV_StorageR_line1_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(22, 0, 0, 0, 0, 28, 22, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1938, 818, 1966, 818, 1966, 852, 1938, 852)
@@ -4822,7 +4822,7 @@ polygon = PackedVector2Array(1938, 818, 1966, 818, 1966, 852, 1938, 852)
 polygon = PackedVector2Array(2214, 772, 2242, 772, 2242, 812, 2214, 812)
 
 [node name="PV_StorageR_line2_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 22, 0, 22, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(2214, 772, 2242, 772, 2242, 812, 2214, 812)
@@ -4831,7 +4831,7 @@ polygon = PackedVector2Array(2214, 772, 2242, 772, 2242, 812, 2214, 812)
 polygon = PackedVector2Array(2214, 818, 2242, 818, 2242, 852, 2214, 852)
 
 [node name="PV_StorageR_line3_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 22, 0, 22, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(2214, 818, 2242, 818, 2242, 852, 2214, 852)
@@ -4840,7 +4840,7 @@ polygon = PackedVector2Array(2214, 818, 2242, 818, 2242, 852, 2214, 852)
 polygon = PackedVector2Array(358, 1249.5, 396.5, 1249.5, 396.5, 1289.5, 358, 1289.5)
 
 [node name="PV_PEStorage_0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 22, 0, 22, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(358, 1249.5, 396.5, 1249.5, 396.5, 1289.5, 358, 1289.5)
@@ -4849,7 +4849,7 @@ polygon = PackedVector2Array(358, 1249.5, 396.5, 1249.5, 396.5, 1289.5, 358, 128
 polygon = PackedVector2Array(588.8, 1249.5, 656.8, 1249.5, 656.8, 1289.5, 588.8, 1289.5)
 
 [node name="PV_PEStorage_1" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(588.8, 1249.5, 656.8, 1249.5, 656.8, 1289.5, 588.8, 1289.5)
@@ -4858,7 +4858,7 @@ polygon = PackedVector2Array(588.8, 1249.5, 656.8, 1249.5, 656.8, 1289.5, 588.8,
 polygon = PackedVector2Array(400.5, 1410.5, 468.5, 1410.5, 468.5, 1450.5, 400.5, 1450.5)
 
 [node name="PV_PEStorage_2" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(400.5, 1410.5, 468.5, 1410.5, 468.5, 1450.5, 400.5, 1450.5)
@@ -4867,7 +4867,7 @@ polygon = PackedVector2Array(400.5, 1410.5, 468.5, 1410.5, 468.5, 1450.5, 400.5,
 polygon = PackedVector2Array(488.5, 1410.5, 556.5, 1410.5, 556.5, 1450.5, 488.5, 1450.5)
 
 [node name="PV_PEStorage_3" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(488.5, 1410.5, 556.5, 1410.5, 556.5, 1450.5, 488.5, 1450.5)
@@ -4876,7 +4876,7 @@ polygon = PackedVector2Array(488.5, 1410.5, 556.5, 1410.5, 556.5, 1450.5, 488.5,
 polygon = PackedVector2Array(576.5, 1410.5, 644.5, 1410.5, 644.5, 1450.5, 576.5, 1450.5)
 
 [node name="PV_PEStorage_4" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(576.5, 1410.5, 644.5, 1410.5, 644.5, 1450.5, 576.5, 1450.5)
@@ -4890,7 +4890,7 @@ polygon = PackedVector2Array(432.5, 1496, 522.5, 1496, 522.5, 1504, 432.5, 1504)
 polygon = PackedVector2Array(238, 1232, 266, 1232, 266, 1272, 238, 1272)
 
 [node name="PV_PEStorage_line0_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(22, 0, 0, 0, 0, 28, 22, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(238, 1232, 266, 1232, 266, 1272, 238, 1272)
@@ -4899,7 +4899,7 @@ polygon = PackedVector2Array(238, 1232, 266, 1232, 266, 1272, 238, 1272)
 polygon = PackedVector2Array(238, 1414, 266, 1414, 266, 1448, 238, 1448)
 
 [node name="PV_PEStorage_line1_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(22, 0, 0, 0, 0, 28, 22, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(238, 1414, 266, 1414, 266, 1448, 238, 1448)
@@ -4908,7 +4908,7 @@ polygon = PackedVector2Array(238, 1414, 266, 1414, 266, 1448, 238, 1448)
 polygon = PackedVector2Array(238, 1454, 266, 1454, 266, 1494, 238, 1494)
 
 [node name="PV_PEStorage_line2_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(22, 0, 0, 0, 0, 28, 22, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(238, 1454, 266, 1454, 266, 1494, 238, 1494)
@@ -4917,7 +4917,7 @@ polygon = PackedVector2Array(238, 1454, 266, 1454, 266, 1494, 238, 1494)
 polygon = PackedVector2Array(689, 1232, 717, 1232, 717, 1272, 689, 1272)
 
 [node name="PV_PEStorage_line3_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 22, 0, 22, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(689, 1232, 717, 1232, 717, 1272, 689, 1272)
@@ -4926,7 +4926,7 @@ polygon = PackedVector2Array(689, 1232, 717, 1232, 717, 1272, 689, 1272)
 polygon = PackedVector2Array(689, 1278, 717, 1278, 717, 1312, 689, 1312)
 
 [node name="PV_PEStorage_line4_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 22, 0, 22, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(689, 1278, 717, 1278, 717, 1312, 689, 1312)
@@ -4935,7 +4935,7 @@ polygon = PackedVector2Array(689, 1278, 717, 1278, 717, 1312, 689, 1312)
 polygon = PackedVector2Array(689, 1318, 717, 1318, 717, 1358, 689, 1358)
 
 [node name="PV_PEStorage_line5_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 22, 0, 22, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(689, 1318, 717, 1318, 717, 1358, 689, 1358)
@@ -4944,7 +4944,7 @@ polygon = PackedVector2Array(689, 1318, 717, 1318, 717, 1358, 689, 1358)
 polygon = PackedVector2Array(689, 1364, 717, 1364, 717, 1398, 689, 1398)
 
 [node name="PV_PEStorage_line6_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 22, 0, 22, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(689, 1364, 717, 1364, 717, 1398, 689, 1398)
@@ -4953,7 +4953,7 @@ polygon = PackedVector2Array(689, 1364, 717, 1364, 717, 1398, 689, 1398)
 polygon = PackedVector2Array(689, 1404, 717, 1404, 717, 1444, 689, 1444)
 
 [node name="PV_PEStorage_line7_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 22, 0, 22, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(689, 1404, 717, 1404, 717, 1444, 689, 1444)
@@ -4962,7 +4962,7 @@ polygon = PackedVector2Array(689, 1404, 717, 1404, 717, 1444, 689, 1444)
 polygon = PackedVector2Array(689, 1450, 717, 1450, 717, 1484, 689, 1484)
 
 [node name="PV_PEStorage_line8_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 22, 0, 22, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(689, 1450, 717, 1450, 717, 1484, 689, 1484)
@@ -4971,7 +4971,7 @@ polygon = PackedVector2Array(689, 1450, 717, 1450, 717, 1484, 689, 1484)
 polygon = PackedVector2Array(272, 1474, 312, 1474, 312, 1502, 272, 1502)
 
 [node name="PV_PEStorage_line9_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(272, 1474, 312, 1474, 312, 1502, 272, 1502)
@@ -4980,7 +4980,7 @@ polygon = PackedVector2Array(272, 1474, 312, 1474, 312, 1502, 272, 1502)
 polygon = PackedVector2Array(318, 1474, 352, 1474, 352, 1502, 318, 1502)
 
 [node name="PV_PEStorage_line10_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(318, 1474, 352, 1474, 352, 1502, 318, 1502)
@@ -4989,7 +4989,7 @@ polygon = PackedVector2Array(318, 1474, 352, 1474, 352, 1502, 318, 1502)
 polygon = PackedVector2Array(358, 1474, 398, 1474, 398, 1502, 358, 1502)
 
 [node name="PV_PEStorage_line11_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(358, 1474, 398, 1474, 398, 1502, 358, 1502)
@@ -4998,7 +4998,7 @@ polygon = PackedVector2Array(358, 1474, 398, 1474, 398, 1502, 358, 1502)
 polygon = PackedVector2Array(524, 1474, 558, 1474, 558, 1502, 524, 1502)
 
 [node name="PV_PEStorage_line12_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(524, 1474, 558, 1474, 558, 1502, 524, 1502)
@@ -5007,7 +5007,7 @@ polygon = PackedVector2Array(524, 1474, 558, 1474, 558, 1502, 524, 1502)
 polygon = PackedVector2Array(564, 1474, 604, 1474, 604, 1502, 564, 1502)
 
 [node name="PV_PEStorage_line13_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(564, 1474, 604, 1474, 604, 1502, 564, 1502)
@@ -5016,7 +5016,7 @@ polygon = PackedVector2Array(564, 1474, 604, 1474, 604, 1502, 564, 1502)
 polygon = PackedVector2Array(610, 1474, 644, 1474, 644, 1502, 610, 1502)
 
 [node name="PV_PEStorage_line14_box" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_crate")
+texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(610, 1474, 644, 1474, 644, 1502, 610, 1502)
@@ -5162,7 +5162,7 @@ polygon = PackedVector2Array(811.2, 1214, 943.2, 1214, 943.2, 1290, 811.2, 1290)
 polygon = PackedVector2Array(769, 1306, 815, 1306, 815, 1340, 769, 1340)
 
 [node name="PV_PEDept_cabL0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_cabinet")
+texture = ExtResource("ext_cabinet")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(769, 1306, 815, 1306, 815, 1340, 769, 1340)
@@ -5171,7 +5171,7 @@ polygon = PackedVector2Array(769, 1306, 815, 1306, 815, 1340, 769, 1340)
 polygon = PackedVector2Array(769, 1356, 809, 1356, 809, 1414, 769, 1414)
 
 [node name="PV_PEDept_shelfL0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(15, 0, 0, 0, 0, 32, 15, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(769, 1356, 809, 1356, 809, 1414, 769, 1414)
@@ -5189,7 +5189,7 @@ polygon = PackedVector2Array(1161.8, 1214, 1293.8, 1214, 1293.8, 1290, 1161.8, 1
 polygon = PackedVector2Array(1290, 1306, 1336, 1306, 1336, 1340, 1290, 1340)
 
 [node name="PV_PEDept_cabR0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_cabinet")
+texture = ExtResource("ext_cabinet")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1290, 1306, 1336, 1306, 1336, 1340, 1290, 1340)
@@ -5198,7 +5198,7 @@ polygon = PackedVector2Array(1290, 1306, 1336, 1306, 1336, 1340, 1290, 1340)
 polygon = PackedVector2Array(1296, 1356, 1336, 1356, 1336, 1414, 1296, 1414)
 
 [node name="PV_PEDept_shelfR0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1296, 1356, 1336, 1356, 1336, 1414, 1296, 1414)
@@ -5289,7 +5289,7 @@ polygon = PackedVector2Array(1938, 1476, 1964, 1476, 1964, 1502, 1938, 1502)
 polygon = PackedVector2Array(2216, 1232, 2242, 1232, 2242, 1296, 2216, 1296)
 
 [node name="PV_EduRoom_line0_shelf" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(2216, 1232, 2242, 1232, 2242, 1296, 2216, 1296)
@@ -5298,7 +5298,7 @@ polygon = PackedVector2Array(2216, 1232, 2242, 1232, 2242, 1296, 2216, 1296)
 polygon = PackedVector2Array(2214, 1302, 2242, 1302, 2242, 1354, 2214, 1354)
 
 [node name="PV_EduRoom_line1_cab" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_cabinet_side")
+texture = ExtResource("ext_cabinet_side")
 uv = PackedVector2Array(0, 0, 12, 0, 12, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(2214, 1302, 2242, 1302, 2242, 1354, 2214, 1354)
@@ -5307,7 +5307,7 @@ polygon = PackedVector2Array(2214, 1302, 2242, 1302, 2242, 1354, 2214, 1354)
 polygon = PackedVector2Array(2216, 1360, 2242, 1360, 2242, 1424, 2216, 1424)
 
 [node name="PV_EduRoom_line2_shelf" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_bookshelf_side")
+texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(2216, 1360, 2242, 1360, 2242, 1424, 2216, 1424)
@@ -5316,7 +5316,7 @@ polygon = PackedVector2Array(2216, 1360, 2242, 1360, 2242, 1424, 2216, 1424)
 polygon = PackedVector2Array(2214, 1430, 2242, 1430, 2242, 1482, 2214, 1482)
 
 [node name="PV_EduRoom_line3_cab" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_dl_cabinet_side")
+texture = ExtResource("ext_cabinet_side")
 uv = PackedVector2Array(0, 0, 12, 0, 12, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(2214, 1430, 2242, 1430, 2242, 1482, 2214, 1482)
