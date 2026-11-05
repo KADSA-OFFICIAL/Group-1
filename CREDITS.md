@@ -1,7 +1,10 @@
 # 크레딧 — 외부 에셋
 
 「방과 후」는 학교 프로젝트(비상업)다. 여기 없는 그림·소리는 전부 이 저장소의
-`tools/gen_*.py`가 만들었거나 팀이 직접 그린 원본에서 구운 것이다.
+`tools/gen_*.py`가 만들었거나 팀이 직접 그린 원본에서 구운 것이다. 교장실·보건실
+가구, 선반·캐비닛·창고 상자, 단서 그림 셋(`assets/sprites/furniture/`)은
+`tools/gen_furniture_sprites.py`가 굽는다 — 예전 Darklight Academia Furniture Pack은
+"AI 관련 프로젝트 사용 금지" 조항 때문에 #791에서 걷어냈다.
 
 ## 소리 (#713)
 
@@ -15,15 +18,6 @@
 - 원본 팩은 저장소에 넣지 않는다. 가공(모노·22050Hz·루프 이음매·음량)은
   `tools/import_ext_audio.py`가 하고, 그 결과만 커밋한다.
 - Liminal Games 팩은 페이지에 AI로 만든 소리라고 적혀 있다.
-
-## 가구 그림 (#716)
-
-| 게임 안 파일 | 쓰는 곳 | 원본 | 제작자 | 조건 |
-|---|---|---|---|---|
-| `assets/sprites/ext/` 중 `hs_`가 아닌 것 | 1층 교장실(책상·소파·안락의자·책장·괘종시계·지구본·스탠드·화병·러그), 보건실 침대, 단서 그림 셋(시우 그림·인사 기록·대응 매뉴얼, #723), 선반·캐비닛(앞모습·옆모습)·창고 상자(`dl_*`, #758) | [Darklight Academia Furniture Pack](https://kueyhorse.itch.io/darklight-academia-furniture-pack) 무료판 | kueyhorse | 비상업 사용 허용, 원본·수정본 재배포·재판매 금지, NFT·AI 관련 프로젝트·생성기·학습 도구 사용 금지 |
-
-- 원본 팩은 저장소에 넣지 않는다. 쓰는 그림만 투명 여백을 잘라 넣는다
-  (`tools/import_ext_sprites.py`). 크기는 바꾸지 않고 게임에서 정수 2배로 놓는다.
 
 ## Haunted School 그림 (#717, #723, #725, #727)
 
