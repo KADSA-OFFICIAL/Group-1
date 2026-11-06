@@ -26,6 +26,14 @@ jobs:
       - name: verify_scenes.py 실행
         run: python3 tools/verify_scenes.py
 
+      # 판마다 바뀌는 단서·열쇠 자리(#794). 후보 번호마다 씬을 다시 구워 검사 7종을
+      # 돌리고 기본 씬으로 되돌린다 — 결정론적이라 커밋한 씬·후보 표와 같아야 한다.
+      - name: verify_clue_sites.py 실행 (모든 단서 후보 자리)
+        run: python3 tools/verify_clue_sites.py
+
+      - name: 생성물이 커밋과 같은지
+        run: git diff --exit-code -- scenes/background scripts/game/clue_sites.gd
+
   godot-check:
     name: Godot 헤드리스 임포트·씬 로드
     runs-on: ubuntu-latest

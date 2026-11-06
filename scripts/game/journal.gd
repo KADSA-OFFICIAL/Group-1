@@ -43,7 +43,7 @@ const SECTIONS := [
 			["read_principal_letter",
 				"교장에게 보낸 편지 — '제 딸 시우가 죽은 지 10년입니다. …이제는 제가 하겠습니다. — 박종태'"],
 			["read_janitor_notebook",
-				"수위실 공책 — 이름 옆에 '죄'가 하나씩. 조민혁 옆에는 '집에서 맞고 온다. 확실하지 않다. 그래도 만약을 위해.'"],
+				"손때 묻은 공책 — 이름 옆에 '죄'가 하나씩. 조민혁 옆에는 '집에서 맞고 온다. 확실하지 않다. 그래도 만약을 위해.'"],
 		],
 		"links": [
 			[["heard_confession", "read_siwoo_counseling"],
@@ -68,9 +68,9 @@ const SECTIONS := [
 			["saw_shower_marks",
 				"2층 화장실 — 바닥에 길게 끌린 자국. 벽에 손끝으로 쓴 '살려'."],
 			["found_head_key",
-				"2층 창고. …조민혁이었다. 눈이 있어야 할 자리에 열쇠가 박혀 있었다."],
+				"2층. …조민혁이었다. 눈이 있어야 할 자리에 열쇠가 박혀 있었다."],
 			["saw_student_cards",
-				"수위실 서랍 — 사라진 아이들의 학생증이 각을 맞춰 나란히 놓여 있다."],
+				"서랍 안 — 사라진 아이들의 학생증이 각을 맞춰 나란히 놓여 있다."],
 		],
 		"links": [
 			[["found_imnayeon", "found_jominhyuk", "found_kangyujin"],

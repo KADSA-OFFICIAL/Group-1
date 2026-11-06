@@ -26,7 +26,7 @@
    ]
   },
   "PrincipalLetter": {
-   "body": "[node name=\"PrincipalLetter\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(1150, 250)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"교장 책상 위, 열어 보지 않은 편지. '제 딸 시우가 죽은 지 10년입니다. 선생님들은 그때도 모른 척하셨습니다. 이제는 제가 하겠습니다. — 박종태'\"\nprompt_text = \"편지 읽기\"\ngrants_flag = \"read_principal_letter\"\n\n",
+   "body": "[node name=\"PrincipalLetter\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(1150, 250)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"열어 보지 않은 편지. 겉봉에 '교장 선생님께'. '제 딸 시우가 죽은 지 10년입니다. 선생님들은 그때도 모른 척하셨습니다. 이제는 제가 하겠습니다. — 박종태'\"\nprompt_text = \"편지 읽기\"\ngrants_flag = \"read_principal_letter\"\n\n",
    "kids": [
     "[node name=\"PrincipalLetterVisual\" type=\"Sprite2D\" parent=\"PrincipalLetter\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"10_note\")\n\n",
     "[node name=\"PrincipalLetterZone\" type=\"CollisionShape2D\" parent=\"PrincipalLetter\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
@@ -96,7 +96,7 @@
    ]
   },
   "YujinClue": {
-   "body": "[node name=\"YujinClue\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(180, 1560)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"체육건강부 구석 사물함에 체육복 상의가 개켜져 있다. 이름표는 3학년 1반 강유진. 주머니에서 나온 쪽지 — '유진아 후배 병원 갔다더라.' 뒷면에 다른 글씨, 굵고 눌러쓴 어른 글씨. '아무도 안 도와주니까 내가 한다.'\"\nprompt_text = \"조사\"\ngrants_flag = \"found_kangyujin\"\n\n",
+   "body": "[node name=\"YujinClue\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(180, 1560)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"구석 사물함에 체육복 상의가 개켜져 있다. 이름표는 3학년 1반 강유진. 주머니에서 나온 쪽지 — '유진아 후배 병원 갔다더라.' 뒷면에 다른 글씨, 굵고 눌러쓴 어른 글씨. '아무도 안 도와주니까 내가 한다.'\"\nprompt_text = \"조사\"\ngrants_flag = \"found_kangyujin\"\n\n",
    "kids": [
     "[node name=\"YujinClueVisual\" type=\"Sprite2D\" parent=\"YujinClue\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"10_note\")\n\n",
     "[node name=\"YujinClueZone\" type=\"CollisionShape2D\" parent=\"YujinClue\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
@@ -140,7 +140,7 @@
    ]
   },
   "CrisisManual": {
-   "body": "[node name=\"CrisisManual\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(2430, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"인쇄기 옆에 시험 인쇄물이 남아 있다. '학생 사망 사고 대응 매뉴얼 — 언론 차단, 유가족 합의 우선, 재학생 동요 최소화.'\"\nprompt_text = \"조사\"\ngrants_flag = \"read_crisis_manual\"\n\n",
+   "body": "[node name=\"CrisisManual\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(2430, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"누가 뽑아 놓고 잊은 인쇄물이 남아 있다. '학생 사망 사고 대응 매뉴얼 — 언론 차단, 유가족 합의 우선, 재학생 동요 최소화.'\"\nprompt_text = \"조사\"\ngrants_flag = \"read_crisis_manual\"\n\n",
    "kids": [
     "[node name=\"CrisisManualVisual\" type=\"Sprite2D\" parent=\"CrisisManual\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"10_note\")\n\n",
     "[node name=\"CrisisManualZone\" type=\"CollisionShape2D\" parent=\"CrisisManual\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
@@ -175,7 +175,7 @@
    ]
   },
   "ReportFlyer": {
-   "body": "[node name=\"ReportFlyer\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(200, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"벽에 붙은 학교폭력 신고 절차 전단. 그 위에 빨간 펜으로 크게 X. 여백에 적힌 글씨 — '이걸로 해결된 적 있어?'\"\nprompt_text = \"조사\"\ngrants_flag = \"read_report_flyer\"\n\n",
+   "body": "[node name=\"ReportFlyer\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(200, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"벽에서 뜯겨 나온 학교폭력 신고 절차 전단. 그 위에 빨간 펜으로 크게 X. 여백에 적힌 글씨 — '이걸로 해결된 적 있어?'\"\nprompt_text = \"조사\"\ngrants_flag = \"read_report_flyer\"\n\n",
    "kids": [
     "[node name=\"ReportFlyerVisual\" type=\"Sprite2D\" parent=\"ReportFlyer\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"10_note\")\n\n",
     "[node name=\"ReportFlyerZone\" type=\"CollisionShape2D\" parent=\"ReportFlyer\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
@@ -189,7 +189,7 @@
    ]
   },
   "KeyCabinet": {
-   "body": "[node name=\"KeyCabinet\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(1240, 250)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"2학년부 열쇠 보관함. '2F 계단' 고리에는 열쇠 대신 점검표가 걸려 있다. — '2층 창고 적재함 정리. 확인 요망. -박'\"\nprompt_text = \"보관함 열기\"\ngrants_flag = \"opened_key_cabinet\"\n\n",
+   "body": "[node name=\"KeyCabinet\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(1240, 250)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"교무용 열쇠 보관함. '2F 계단' 고리에는 열쇠 대신 점검표가 걸려 있다. — '2층 창고 적재함 정리. 확인 요망. -박'\"\nprompt_text = \"보관함 열기\"\ngrants_flag = \"opened_key_cabinet\"\n\n",
    "kids": [
     "[node name=\"KeyCabinetVisual\" type=\"Polygon2D\" parent=\"KeyCabinet\"]\nz_index = 1\ncolor = Color(0.45, 0.42, 0.3, 1)\npolygon = PackedVector2Array(-12, -14, 12, -14, 12, 14, -12, 14)\n\n",
     "[node name=\"KeyCabinetZone\" type=\"CollisionShape2D\" parent=\"KeyCabinet\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
@@ -231,7 +231,7 @@
    ]
   },
   "InkCan": {
-   "body": "[node name=\"InkCan\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(2620, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"상자 더미 옆에 인쇄기 잉크통이 쌓여 있다. 하나는 뚜껑이 헐겁다.\\n이걸 뒤집어쓰면 잠깐은 아무것도 못 보겠지. [Q] 키로 던질 수 있다.\"\nprompt_text = \"잉크통 챙기기\"\ngrants_item_id = \"ink_can\"\n\n",
+   "body": "[node name=\"InkCan\" type=\"Area2D\" parent=\".\"]\nposition = Vector2(2620, 1620)\ncollision_layer = 2\ncollision_mask = 0\nscript = ExtResource(\"3_interactable\")\nmessage = \"인쇄기 잉크통 몇 개가 구석에 쌓여 있다. 하나는 뚜껑이 헐겁다.\\n이걸 뒤집어쓰면 잠깐은 아무것도 못 보겠지. [Q] 키로 던질 수 있다.\"\nprompt_text = \"잉크통 챙기기\"\ngrants_item_id = \"ink_can\"\n\n",
    "kids": [
     "[node name=\"InkCanVisual\" type=\"Sprite2D\" parent=\"InkCan\"]\nz_index = 1\ntexture_filter = 1\ntexture = ExtResource(\"13_inkcan\")\n\n",
     "[node name=\"InkCanZone\" type=\"CollisionShape2D\" parent=\"InkCan\"]\nshape = SubResource(\"RectangleShape2D_key_zone\")\n\n"
