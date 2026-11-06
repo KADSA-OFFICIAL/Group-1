@@ -85,6 +85,13 @@ def placement_table():
         for room, objs in re.findall(r'\("(\w+)", \[([^\]]*)\]\)', fm.group(2)):
             for obj in re.findall(r'"(\w+)"', objs):
                 want[(fl, obj)] = room
+    # 판마다 바뀌는 자리(#794) — 씬에 구운 후보(`CLUE_SITE`번)의 방이어야 한다.
+    import gen_floors as G
+    for fl, groups in G.CLUE_SITES.items():
+        for objs, sites in groups:
+            room = sites[G.CLUE_SITE % len(sites)][0]
+            for obj in objs:
+                want[(fl, obj)] = room
     return want
 
 

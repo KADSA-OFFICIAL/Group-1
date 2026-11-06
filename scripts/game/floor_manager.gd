@@ -9,6 +9,9 @@ extends Node2D
 ## STAIR_A / STAIR_B / FLOOR1["stair"]와 일치해야 하며,
 ## tools/verify_stairs.py가 씬과 대조해 어긋나면 실패한다.
 
+## 판마다 바뀌는 단서·열쇠 자리(#794).
+const ClueShuffleScript = preload("res://scripts/game/clue_shuffle.gd")
+
 const FLOOR_SCENES := {
 	# 0은 층이 아니라 **탈출 뒤 걸어 나가는 바깥 구간**이다(#356). 계단이 없고,
 	# 현관에서 한 방향으로만 들어온다.
@@ -357,6 +360,9 @@ func _flush_arrival_speech() -> void:
 func _swap_floor(target: int, arrive: Vector2, record_cp: bool = true) -> void:
 	var old_background: Node = $Background
 	var next_background: Node2D = load(FLOOR_SCENES[target]).instantiate()
+	# 이 판의 단서·열쇠 자리로 옮긴다(#794). **붙이기 전에** — 붙인 뒤면 `_ready`에서
+	# 자리를 읽는 것들(상호작용 표시·근접 클로즈업)이 첫 프레임을 기본 자리로 본다.
+	ClueShuffleScript.apply(next_background, target)
 	var background_index := old_background.get_index()
 
 	old_background.name = "BackgroundOld"
