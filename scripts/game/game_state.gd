@@ -11,6 +11,9 @@ signal game_over(reason: String)
 ## 들어가므로 무엇을 세는지는 `clue_score()` 한 곳만 알면 된다(엔딩도 그 함수를 쓴다).
 signal clues_changed(found: int, total: int)
 
+## 판마다 단서·열쇠 자리를 고른다(#794).
+const ClueShuffleScript = preload("res://scripts/game/clue_shuffle.gd")
+
 @export var starting_items: Array[String] = []
 ## 시작 시 미리 세워 둘 플래그. 뒤쪽 층을 바로 확인할 때(예: stairs_f4_unlocked) 에디터에서 채워 쓴다.
 @export var starting_flags: Array[String] = []
@@ -70,8 +73,11 @@ func _enter_tree() -> void:
 
 func _ready() -> void:
 	if is_pending_restore():
+		# 체크포인트 재시도는 같은 배치를 이어 쓴다 — 고른 자리는 static이라 남아 있다.
 		var _cp = restore_from_checkpoint()
 	else:
+		# 새 판(타이틀에서 시작·처음부터 다시하기)마다 단서·열쇠 자리를 새로 고른다(#794).
+		ClueShuffleScript.new_run()
 		items = starting_items.duplicate()
 		flags = starting_flags.duplicate()
 		inventory_changed.emit(items)

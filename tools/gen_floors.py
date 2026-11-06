@@ -15,6 +15,7 @@
 
 P1 범위: 지오메트리만. 계단 자물쇠·열쇠·단서 오브젝트는 P3에서 얹는다.
 """
+import os
 import pathlib
 import re
 import json
@@ -846,6 +847,7 @@ class Scene:
         self.rooms = {}
         self.room_meta = {}   # key -> 집기 배치에 필요한 방 형상(add_props가 읽는다)
         self.clue_pts = []    # 단서·은신처 좌표 — 집기가 덮으면 조사할 수 없다
+        self.clue_clear = {}  # 좌표 -> 집기를 비울 반경(기본보다 좁힐 때만, #794)
         self.furniture = []   # add_furniture가 손으로 놓은 가구 — 절차적 집기가 피한다
         self.corridor_props = []  # 복도에 선 집기 — 복도 장식이 피한다
         self.prop_rects = []      # (이름, 경계상자, 색) — add_clutter가 훑는다(#289)
@@ -1417,38 +1419,15 @@ PLACEMENT = {
     # 방 선택은 강제 동선(도착 계단 → 그 층 열쇠 → 다음 계단/현관)에서 얼마나
     # 우회해야 하는지로 정한다(#350). 진행에 필요한 것은 +1500px, 스토리 단서는
     # +1700px 이하. **성격이 같은 방으로만 옮긴다** — 문구가 방을 가리키기 때문이다.
+    #
+    # **1~3층의 단서·열쇠는 여기 없다**(#794) — 판마다 방을 고르므로 아래
+    # `CLUE_SITES`가 쥔다. 여기 남은 것은 자리가 곧 연출인 고정물뿐이다.
     # 도입부 4층(#405) — 미술실·준비실. 학생증은 #407에서 송하람 단서를
     # 전부 없애며 빠졌다 — 실종 학생의 훅은 준비실의 소지품 봉투·날짜 벽이 맡는다.
     4: [("ArtRoom", ["KoreanBook", "SiwooPainting"]),
         ("ArtPrep", ["Belongings", "DateWall"])],
-    # 상담기록부는 **생활지도부**가 가장 자연스러운 집이고, 도착지에서 +520px다.
-    3: [("North4", ["NayeonClue", "CounselRecord"]),               # 생활지도부 ← 방송실
-        ("North5", ["JanitorWarning", "KeyCabinet", "SpareKeyHook"]),  # 2학년부 ← 교무실
-        # 잉크통은 **수위가 활동하는 첫 층**에 있어야 한다(#411). 4층이 도입부로
-        # 줄면서 갈 곳을 잃었는데, 그때까지 게임의 유일한 방어 수단을 못 얻었다.
-        # 부서실이라 복사기가 있어 "인쇄기 아래"가 그대로 맞는다.
-        ("CareerDept", ["ReportFlyer"]),                              # 진로진학부 ← 학생회실
-        # 잉크통은 **진행에 필요한 것**이라 +1500px 안이어야 한다(#350). 부서실은
-        # 전부 그보다 멀어서 창고로 보냈다 — 인쇄기 여분이 놓인 자리로 문구를 고쳤다.
-        ("StorageR", ["InkCan"]),                 # 창고 +1160px
-        # 태호 쪽지는 과학실을 직접 가리킨다. 과학실2는 +3440px이라 과학실1로.
-        ("ScienceLab1", ["ScienceClue", "TaehoNote"]),
-        ],
-    2: [
-        # 컴퓨터실은 +2800px이라 부서실로. 대응 매뉴얼은 전 부서에 돌린 문서다.
-        ("PEDept", ["YujinClue", "CrisisManual"]),
-        # 2층 계단 열쇠는 #438에서 하단 남자화장실 배수구에서 여기로 옮겼다.
-        # 창고는 도착 계단에서 +780px라 진행 필수 아이템 기준(+1500px) 안이고,
-        # 화장실보다 강제 동선에 가깝다. 그림도 범용 열쇠에서 전용 아트로
-        # 바뀌었다 — 눈구멍에 열쇠가 박힌 머리(`assets/sprites/eye_key.png`).
-        ("StorageR", ["HistoryClue", "HeadKey"]),  # 창고 +780px — 졸업앨범 + 열쇠
-        # 끌린 자국은 열쇠와 무관한 스토리 단서라 화장실에 남는다.
-        ("MensRoomL", ["ShowerMarks"]),           # 화장실 ← 샤워실 (하단 화장실은 오른쪽 축소로 없어졌다)
-        ],
-    # 교장 편지는 **교장실**에 돌아왔다(#708) — "교장 책상 위"라는 문구 그대로다.
-    # 예전에는 1층에 교장실이 없어 교무실 한쪽에 집무 구역을 흉내 냈다.
-    1: [("PrincipalRoom", ["PrincipalLetter"]),
-        ("JanitorRoom", ["PhotoWall", "StudentCards", "JanitorNotebook", "JanitorSafe"]),
+    # 수위실 사진 벽(벽에 붙는다)·금고(현관 열쇠)와 현관 문은 고정이다(#794 사용자 결정).
+    1: [("JanitorRoom", ["PhotoWall", "JanitorSafe"]),
         # 1층 계단 열쇠는 없앴다(#396) — 자물쇠도 같이 없어서 열 것이 없다.
         # story_objects.json의 StairKey 항목은 남겨 둔다(4층 #219와 같은 처리,
         # 되돌리기 쉽게).
@@ -1456,6 +1435,133 @@ PLACEMENT = {
         # YardExit + YardGateDoor 폐지(#513)
         ],
 }
+
+# ── 판마다 바뀌는 단서·열쇠 자리(#794) ─────────────────────────────
+# 층 → [(묶음, [(방, 자리들, 가리키는 말), ...]), ...]. 묶음은 **같이 움직이는
+# 노드들**이고(열쇠 보관함과 그 옆 고리의 3층 열쇠), 자리들은 묶음 순서대로다.
+# 게임을 새로 시작할 때 `scripts/game/clue_shuffle.gd`가 묶음마다 후보 하나를
+# 고르고, 층 씬을 붙이기 전에 노드와 상호작용 표시(`Mark_*`)를 옮긴다.
+#
+# - **첫 후보가 씬에 굽히는 기본 자리다**(`CLUE_SITE` 환경 변수가 0일 때) —
+#   예전 `PLACEMENT`·`POS_OVERRIDE` 자리 그대로라 기본 씬은 예전과 같은 판이다.
+# - **집기는 모든 후보 자리를 피한다**(`sc.clue_pts`). 고른 자리만 피하면 다른
+#   판에서 단서가 책상 속에 떨어진다. 그래서 후보를 늘리면 그 방 집기가 준다 —
+#   벽·구석에 둘 것.
+# - 방은 **성격이 맞는 방으로만** 묶는다(끌린 자국은 타일 바닥 화장실, 졸업앨범은
+#   창고·교육실·학년부). 방을 가리키던 문구는 장소 중립으로 고쳤다.
+# - 가리키는 말(셋째 값)은 다른 단서가 이 자리를 말할 때 쓴다 — 3층 열쇠 보관함
+#   점검표가 그 판의 2층 열쇠 방을 가리킨다(`HINT_TARGETS`).
+# - 모든 후보를 검사하려면 `python3 tools/verify_clue_sites.py` — 후보 번호마다
+#   씬을 다시 굽고 검사 7종을 돌린 뒤 기본 씬으로 되돌린다.
+CLUE_SITES = {
+    3: [
+        # 3층 열쇠(진행 필수) — 2학년부·3반·4반. 교실 후보는 가운데 가로 통로(y 280)와
+        # 문~창 세로 통로(가운데 + 24px)에 둔다: 이미 비어 있어 집기를 거의 안 밀어낸다.
+        (["KeyCabinet", "SpareKeyHook"], [
+            ("North5", [(1558, 420), (1558, 480)], ""),
+            ("North3", [(990, 280), (1050, 280)], ""),
+            ("North6", [(2098, 150), (2098, 210)], ""),
+        ]),
+        (["NayeonClue"], [
+            ("North4", [(1200, 268)], ""),
+            ("CareerDept", [(1140, 1252)], ""),
+            ("North2", [(640, 280)], ""),
+        ]),
+        (["CounselRecord"], [
+            ("North4", [(1455, 268)], ""),
+            ("North1", [(300, 280)], ""),
+            ("Class6", [(600, 1350)], ""),
+        ]),
+        (["JanitorWarning"], [
+            ("North5", [(1800, 290)], ""),
+            ("CareerDept", [(795, 1460)], ""),
+            ("North6", [(2180, 280)], ""),
+        ]),
+        (["ReportFlyer"], [
+            ("CareerDept", [(860, 1250)], ""),
+            ("Class6", [(300, 1350)], ""),
+            ("North2", [(603, 160)], ""),
+        ]),
+        # 잉크통(유일한 방어 수단). 진행 필수 후보의 우회 거리는 `verify_clue_sites`가
+        # 보고한다 — 기본 자리보다 크게 멀어지지 않게 고른다.
+        (["InkCan"], [
+            ("StorageR", [(2090, 893.6)], ""),
+            ("CareerDept", [(1310, 1460)], ""),
+            ("North3", [(978, 160)], ""),
+        ]),
+        (["ScienceClue"], [
+            ("ScienceLab1", [(1990, 1280)], ""),
+            ("StorageR", [(2040, 790)], ""),
+            ("Class6", [(520, 1350)], ""),
+        ]),
+        (["TaehoNote"], [
+            ("ScienceLab1", [(2190, 1280)], ""),
+            ("North1", [(232, 160)], ""),
+            ("StorageR", [(2110, 790)], ""),
+        ]),
+    ],
+    2: [
+        # 2층 열쇠(진행 필수). 3층 열쇠 보관함 점검표가 셋째 값을 읽는다. 체육창고도
+        # 후보였는데 기본 자리보다 +2500px 돌아가서 2반으로 바꿨다.
+        (["HeadKey"], [
+            ("StorageR", [(2215, 950)], "2층 창고 적재함"),
+            ("North2", [(640, 280)], "2층 2반 교실"),
+            ("WomensRoomL", [(1215, 850)], "2층 여자 화장실"),
+        ]),
+        (["YujinClue"], [
+            ("PEDept", [(946.7, 1390.8)], ""),
+            ("PEStorage", [(680, 1250)], ""),
+            ("North1", [(300, 280)], ""),
+        ]),
+        (["CrisisManual"], [
+            ("PEDept", [(1158, 1391)], ""),
+            ("North4", [(1200, 268)], ""),
+            ("EduRoom", [(2060, 1290)], ""),
+        ]),
+        (["HistoryClue"], [
+            ("StorageR", [(2000, 950)], ""),
+            ("EduRoom", [(2110, 1350)], ""),
+            ("North4", [(1455, 268)], ""),
+        ]),
+        # 끌린 자국은 타일 바닥이라 화장실끼리만.
+        (["ShowerMarks"], [
+            ("MensRoomL", [(880, 935)], ""),
+            ("WomensRoomL", [(1155, 935)], ""),
+        ]),
+    ],
+    1: [
+        (["PrincipalLetter"], [
+            ("PrincipalRoom", [(1570, 290)], ""),
+            ("StaffRoom", [(1200, 480)], ""),
+            ("NurseRoom", [(270, 440)], ""),
+        ]),
+        (["StudentCards"], [
+            ("JanitorRoom", [(1520, 800)], ""),
+            ("StaffRoom", [(1110, 330)], ""),
+            ("PrincipalRoom", [(1460, 470)], ""),
+        ]),
+        (["JanitorNotebook"], [
+            ("JanitorRoom", [(1810, 800)], ""),
+            ("Entrance", [(1400, 800)], ""),
+            ("NurseRoom", [(410, 440)], ""),
+        ]),
+    ],
+}
+
+# 다른 묶음의 자리를 말하는 단서(#794): (층, 노드) → (층, 묶음 첫 노드).
+# 문구 속 **기본 자리(첫 후보)의 가리키는 말**을 그 판에 고른 자리의 말로 바꾼다.
+HINT_TARGETS = {(3, "KeyCabinet"): (2, "HeadKey")}
+
+# 후보 자리 둘레에서 집기를 비울 반경(#794). 공용 값(`PROP_CLUE_CLEAR` 76)을 그대로
+# 쓰면 후보가 셋인 묶음마다 152px 네모가 방마다 생겨 교실 책상이 20 → 7로 줄었다.
+# 단서는 충돌이 없어 그 위로 걸어 지나가므로, 비울 것은 **옆에 서서 E를 누를 자리**뿐이다
+# — `verify_props.CLUE_CLEAR`(30)와 같게 둔다. 닿는지는 `verify_clue_sites`가 본다.
+SITE_CLEAR = 30
+
+# 씬에 구울 후보 번호. 기본 0(첫 후보). `verify_clue_sites.py`가 바꿔 가며 굽는다.
+CLUE_SITE = int(os.environ.get("CLUE_SITE", "0"))
+
+
 # 영구 봉인 계단(열쇠로도 열리지 않음). 2층 하단 중앙 계단은 그 아래가 1층
 # 현관·중앙 구역이라 계단이 내려갈 자리가 없다 — 도면 구조를 지키려고 막는다.
 NO_STAIRWELL = {2: {1}, 3: {1}}
@@ -1478,43 +1584,19 @@ LOCKED = {2: "stair_key_2", 3: "stair_key_3"}
 # 특정 단서의 위치를 방 안 자동 배치 대신 직접 지정한다.
 # 현관(ExitDoor)은 바깥으로 나가는 아래쪽 정문 앞에 둬야 안내와 실제 위치가 맞는다.
 POS_OVERRIDE = {
+    # 1~3층 단서·열쇠의 자리는 `CLUE_SITES`가 쥔다(#794). 예전 자리별 사연
+    # (#227·#698·#755·#761·#768·#772)은 그 표의 첫 후보로 옮겨 갔다 — git 이력 참조.
     # 현관 로비 남쪽 외벽 앞(#498, #708). 정문 그림(`Door_FrontGate`) 48px 안쪽.
     (1, "ExitDoor"): (1220, F1_BOT_Y1 - 48),
-    # 교장실 책상 위(#708) — 아래 FURNITURE의 DeskPrincipal 한가운데.
-    (1, "PrincipalLetter"): (1570, 290),
-    # 수위실(1460~1880, 720~1120, 문은 위 x 1615~1725). 단서 넷을 **네 구석**으로
-    # 벌린다 — 가운데를 비워야 집기(책상·침상)와 은신처가 들어가고, 문 앞도 안 막힌다.
-    # 사진 벽은 아래쪽(안쪽) 벽에 붙고, 금고는 문에서 가장 먼 구석이다.
+    # 수위실(1460~1880, 720~1120, 문은 위 x 1615~1725). 사진 벽은 아래쪽(안쪽)
+    # 벽에 붙고, 금고는 문에서 가장 먼 구석이다.
     (1, "PhotoWall"): (1560, 1094),
-    (1, "StudentCards"): (1520, 800),
-    (1, "JanitorNotebook"): (1810, 800),
     (1, "JanitorSafe"): (1830, 1070),
-    # YardGateDoor 폐지(#513)
     # 4층 창의체험부(750,1520)~(1640,1940) — 자동 배치는 방 한가운데라 대사와 어긋났다(#215).
     # 액자는 "벽에 걸린" 것이므로 아래쪽 벽 안쪽에 붙이고,
     # 상담기록부는 아래에 깐 책상 위(FURNITURE의 DeskCreativeDept)에 올린다.
     (4, "SiwooPainting"): (1350, 1906),
     (4, "CounselRecord"): (1045, 1752),
-    # 3층 2학년부(1527.6,20)~(1872.4,540), 내벽 안쪽 (1543.6,36)~(1856.4,524).
-    # 자동 배치는 방 한가운데 = 아래변 문(x 1645~1755) 정면이라 벽걸이 보관함이
-    # 허공에 떠 보이고 통행도 막았다(#227).
-    #
-    # **왼쪽 벽 화이트보드 아래, 문 옆이다**(#698). 예전에는 위쪽 벽 구석
-    # (1560,54)·(1620,50)이었는데 그 자리가 창문 유리(`WD_North5_win0`, y 36~70)와
-    # 겹쳐 열쇠가 파란 유리 위의 24px 금색 점 — **창문 장식으로 읽혔고**, 문(y≈524)
-    # 에서 490px라 시야 마스크(389px부터 완전히 검다)에 가려 문에서는 아예 안 보였다.
-    # 지금은 문에서 약 150px라 들어서자마자 보인다. 둘 사이 60px은 상호작용 존이
-    # 안 겹치는 최소 간격(`verify_props.CLUE_GAP` 56) 위다.
-    # 인사 기록은 오른쪽 위 서류장 쪽(#761). 방을 340으로 얕게 하자 자동 자리가
-    # 열쇠 보관함 옆(56px 안)으로 내려와 상호작용 존이 겹쳤다.
-    (3, "JanitorWarning"): (1800, 290),
-    # 3층 생활지도부(1140~1513, 200~540, 문 아래)(#772). 얕게 줄이자(#761) 자동 자리
-    # (0.62)의 단서 여유가 책상 섬 자리(아래 절반)를 다 덮어 부서실에 책상이 하나도
-    # 안 섰다. 위쪽 양 구석으로 올린다 — 가운데 위는 부장 책상 자리다.
-    (3, "NayeonClue"): (1200, 268),
-    (3, "CounselRecord"): (1455, 268),
-    (3, "KeyCabinet"): (1558, 420),
-    (3, "SpareKeyHook"): (1558, 480),
     # 도입부 4층(#405) — 자동 배치는 방을 균등 분할해서 작업대 위에 떨어진다.
     # 다섯 개 모두 놓일 물건이 정해져 있으므로 자리를 직접 적는다.
     (4, "KoreanBook"): (675, 720),      # 국어책 책상 위
@@ -1523,36 +1605,6 @@ POS_OVERRIDE = {
     (4, "SiwooPainting"): (800, 846),   # 아래쪽 벽, 학생 그림 사이
     (4, "Belongings"): (1310, 646),     # 준비실 작업대 위
     (4, "DateWall"): (1465, 848),       # 준비실 아래쪽 벽에 적힌 날짜
-    # 2층 창고(1920,720)~(2295,1000), 내벽 안쪽 (1936,736)~(2279,984) = 343x248.
-    # #438에서 계단 열쇠가 들어와 단서가 둘이 되자 **집기가 하나도 안 남았다**
-    # (verify_props: "floor2: 집기 없는 방 — StorageR"). 단서 하나가 반경
-    # PROP_CLUE_CLEAR(76)를 비우는데, 자동 배치는 방을 균등 분할해 x를 1/3·2/3
-    # (2045·2170), y를 0.62(894)에 놓는다 — 두 정사각형이 x 1969~2246,
-    # y 818~970을 덮어 폭도 높이도 자투리만 남는다.
-    #
-    # 그래서 **둘 다 아래쪽 벽에 붙여 좌우 구석으로 벌린다.** 문이 위쪽 벽
-    # 한가운데(x 2052~2162)라 위쪽 띠를 비워야 문 앞이 막히지 않는데, 이렇게
-    # 두면 y 736~874(138px)가 폭 전체로 남아 선반이 들어간다.
-    # 2층 남자 화장실(800~1075, 720~1000, 문 위) 끌린 자국(#755). 자동 배치는 방
-    # 한가운데(937,894)라 단서 여유가 오른쪽 벽의 대변기 칸 자리까지 덮어 칸이
-    # 하나도 안 섰다(집기 1.4%). 왼쪽 아래로 비켜 — 자국이 세면대 쪽에서 칸으로
-    # 끌려간 것처럼 놓인다.
-    (2, "ShowerMarks"): (880, 935),
-    # 3층 과학실1(1920~2260, 1180~1520, 문 위 가운데)(#755). 자동 배치는 방
-    # 가운데 아래(0.62)라 단서 여유가 아래 절반을 덮고, 위 절반은 문 앞 통로라
-    # 실험대가 하나도 안 섰다(집기 2.8%). 단서를 **문 쪽 양 구석**(어차피 문
-    # 통로 때문에 집기가 못 서는 띠)으로 올려 아래 절반에 실험대를 들인다.
-    (3, "ScienceClue"): (1990, 1280),
-    (3, "TaehoNote"): (2190, 1280),
-    # 2층 체육건강부 대응 매뉴얼은 "인쇄기 옆"이다(#768) — 자리를 고정하고 옆에
-    # 복사기(`FURNITURE`의 `CopierPE`)를 둔다. 방이 620폭이 되며(#761) 옆벽 집기에서
-    # 복사기가 빠져, 문구가 없는 물건을 가리켰다.
-    (2, "CrisisManual"): (1158, 1391),
-    # 3층 진로진학부 신고 전단은 "벽에 붙은" 것이다(#768). 자동 자리는 벽에서
-    # 129px 떨어진 방 한가운데였다 — 위쪽(복도 쪽) 벽 앞, 문 왼쪽으로 옮긴다.
-    (3, "ReportFlyer"): (860, 1250),
-    (2, "HistoryClue"): (2000, 950),    # 졸업앨범 — 왼쪽 아래 구석
-    (2, "HeadKey"): (2215, 950),        # 머리 — 오른쪽 아래 구석
 }
 
 # 방 안 가구(시각 전용). 충돌은 넣지 않는다 — 통행·수위 경로탐색·도달성 검사에
@@ -1604,6 +1656,8 @@ def add_furniture(sc, floor):
 # 머리가 창고 오른쪽 아래 구석(2215, 950)에 있어 오른쪽으로 내면 벽에 가까워지고,
 # **표시가 벽·몸 안에 들어가면 시야 광선이 자기 표시를 가려 영영 안 켜진다**(#359).
 # 42px은 스프라이트 반폭(26)에 마름모 반폭(7)을 더한 33보다 크다.
+# 판마다 자리가 바뀌어도(#794) 오프셋은 같이 따라간다 — 다른 후보(2반 통로·여자
+# 화장실 가운데)는 왼쪽이 트여 있다.
 MARK_OFFSET = {
     (2, "HeadKey"): (-42, 0),
 }
@@ -1846,30 +1900,87 @@ def add_story(sc, floor):
             raise SystemExit(f"floor{floor}: 배치 대상 방 {room_key}가 없다")
         x0, y0, x1, y1 = sc.rooms[room_key]
         for i, name in enumerate(names):
-            if name not in nodes:
-                raise SystemExit(f"floor{floor}: 단서 노드 {name}를 찾을 수 없다")
             if (floor, name) in POS_OVERRIDE:
                 cx, cy = POS_OVERRIDE[(floor, name)]
             else:
                 cx = x0 + (i + 1) * (x1 - x0) / (len(names) + 1)
                 cy = y0 + (y1 - y0) * 0.62  # 라벨(중앙)과 겹치지 않게 아래쪽
-            body = re.sub(r"^position = Vector2\([^)]*\)$",
-                          f"position = Vector2({n(cx)}, {n(cy)})",
-                          nodes[name]["body"], count=1, flags=re.M)
-            sc.clue_pts.append((cx, cy))
-            # 진행에 필요한 것은 호박색으로 눈에 띄게(#301).
-            # 그림이 곧 정보인 물건은 표시를 옆으로 비킨다(#501) — 자리만 옮기고
-            # 크기·색·거리 규칙은 그대로다. `clue_pts`에는 **물건 자리**를 넣는다:
-            # 집기가 피해야 하는 것은 물건이고 표시는 충돌체가 없다.
-            mdx, mdy = MARK_OFFSET.get((floor, name), (0, 0))
-            sc.mark(name, cx + mdx, cy + mdy, C_MARK_KEY)
-            if name in AUTO_PICKUP:
-                body = to_pickup(body)
-            sc.node(body if body.endswith("\n") else body + "\n")
-            for kid in nodes[name]["kids"]:
-                if name in CLUE_ART and kid.startswith(f'[node name="{name}Visual"'):
-                    kid = _clue_visual(name)
-                sc.node(kid if kid.endswith("\n") else kid + "\n")
+            _emit_story(sc, floor, nodes, name, cx, cy)
+    # 판마다 바뀌는 자리(#794). 씬에는 `CLUE_SITE`번 후보를 굽고, **집기는 모든
+    # 후보를 피하게** 전부 `clue_pts`에 넣는다 — 런타임이 다른 후보로 옮겨도
+    # 단서가 책상 속에 떨어지지 않게.
+    for names, sites in CLUE_SITES.get(floor, []):
+        for room_key, pts, _hint in sites:
+            if room_key not in sc.rooms:
+                raise SystemExit(f"floor{floor}: {names[0]} 후보 방 {room_key}가 없다")
+            if len(pts) != len(names):
+                raise SystemExit(f"floor{floor}: {names[0]} 후보 {room_key}의 자리 수가 묶음과 다르다")
+            x0, y0, x1, y1 = sc.rooms[room_key]
+            for (px, py) in pts:
+                if not (x0 < px < x1 and y0 < py < y1):
+                    raise SystemExit(f"floor{floor}: {names[0]} 후보 ({px}, {py})가 {room_key} 밖이다")
+                sc.clue_pts.append((px, py))
+                sc.clue_clear[(px, py)] = SITE_CLEAR
+        _room, pts, _hint = sites[CLUE_SITE % len(sites)]
+        for name, (cx, cy) in zip(names, pts):
+            _emit_story(sc, floor, nodes, name, cx, cy, clear=False)
+
+
+def _emit_story(sc, floor, nodes, name, cx, cy, clear=True):
+    if name not in nodes:
+        raise SystemExit(f"floor{floor}: 단서 노드 {name}를 찾을 수 없다")
+    body = re.sub(r"^position = Vector2\([^)]*\)$",
+                  f"position = Vector2({n(cx)}, {n(cy)})",
+                  nodes[name]["body"], count=1, flags=re.M)
+    if clear:
+        sc.clue_pts.append((cx, cy))
+    # 진행에 필요한 것은 호박색으로 눈에 띄게(#301).
+    # 그림이 곧 정보인 물건은 표시를 옆으로 비킨다(#501) — 자리만 옮기고
+    # 크기·색·거리 규칙은 그대로다. `clue_pts`에는 **물건 자리**를 넣는다:
+    # 집기가 피해야 하는 것은 물건이고 표시는 충돌체가 없다.
+    mdx, mdy = MARK_OFFSET.get((floor, name), (0, 0))
+    sc.mark(name, cx + mdx, cy + mdy, C_MARK_KEY)
+    if name in AUTO_PICKUP:
+        body = to_pickup(body)
+    sc.node(body if body.endswith("\n") else body + "\n")
+    for kid in nodes[name]["kids"]:
+        if name in CLUE_ART and kid.startswith(f'[node name="{name}Visual"'):
+            kid = _clue_visual(name)
+        sc.node(kid if kid.endswith("\n") else kid + "\n")
+
+
+def clue_sites_gd():
+    """런타임 후보 표 `scripts/game/clue_sites.gd`(#794). 생성물이다."""
+    out = ["## 생성물 — tools/gen_floors.py가 `CLUE_SITES`에서 쓴다. 손으로 고치지 말 것(#794).",
+           "##",
+           "## 층 → 묶음 목록. 묶음마다 함께 움직이는 노드(`nodes`)와 후보 자리(`sites`)가",
+           "## 있고, 자리마다 방 키·노드 자리(`pos`)·상호작용 표시 자리(`mark`)·가리키는 말(`hint`).",
+           "## 첫 후보가 씬에 구워진 기본 자리다. 고르기·적용은 `clue_shuffle.gd`.",
+           "extends RefCounted", "", "const SITES := {"]
+    for fl in sorted(CLUE_SITES, reverse=True):
+        out.append(f"\t{fl}: [")
+        for names, sites in CLUE_SITES[fl]:
+            out.append("\t\t{")
+            out.append("\t\t\t\"nodes\": [%s]," % ", ".join(f'"{x}"' for x in names))
+            out.append("\t\t\t\"sites\": [")
+            for room, pts, hint in sites:
+                pos = ", ".join(f"Vector2({n(x)}, {n(y)})" for x, y in pts)
+                marks = []
+                for name, (x, y) in zip(names, pts):
+                    dx, dy = MARK_OFFSET.get((fl, name), (0, 0))
+                    marks.append(f"Vector2({n(x + dx)}, {n(y + dy)})")
+                out.append(f'\t\t\t\t{{"room": "{room}", "hint": "{hint}", '
+                           f'"pos": [{pos}], "mark": [{", ".join(marks)}]}},')
+            out.append("\t\t\t],")
+            out.append("\t\t},")
+        out.append("\t],")
+    out.append("}")
+    hints = ", ".join(f'"{tn}": [{tf}, "{gf}", "{gn}"]'
+                      for (tf, tn), (gf, gn) in sorted(HINT_TARGETS.items()))
+    out += ["", "## 다른 묶음의 자리를 말하는 단서: 노드 → [그 노드의 층, 대상 층, 대상 묶음 첫 노드].",
+            "## 문구 속 대상의 **첫 후보 hint**를 그 판에 고른 후보의 hint로 바꾼다.",
+            "const HINT_TARGETS := {" + hints + "}", ""]
+    return "\n".join(out)
 
 
 def add_stair_locks(sc, floor, key_id, stairwells):
@@ -3149,8 +3260,12 @@ def add_sliding_doors(sc):
 
 
 def _keepout_for(sc, x0, x1, clear=PROP_CLUE_CLEAR):
-    out = [(px - clear, py - clear, px + clear, py + clear)
-           for px, py in sc.clue_pts if x0 - 40 <= px <= x1 + 40]
+    out = []
+    for px, py in sc.clue_pts:
+        if not x0 - 40 <= px <= x1 + 40:
+            continue
+        r = min(clear, sc.clue_clear.get((px, py), clear))
+        out.append((px - r, py - r, px + r, py + r))
     # 손배치 가구(#215) 위에도 깔지 않는다. 단서 여유(76px)로는 가구 가장자리가
     # 삐져나온다 — 창의체험부 책상은 단서보다 넓다.
     out += [(fx0 - 8, fy0 - 8, fx1 + 8, fy1 + 8)
@@ -5109,3 +5224,6 @@ if __name__ == "__main__":
         with open(path, "w", encoding="utf-8", newline="\n") as out:
             out.write(text)
         print(f"OK {name}: 노드 {len(sc.nodes)}개, 차단체 {len(sc.subs)}개")
+    with open(ROOT / "scripts/game/clue_sites.gd", "w", encoding="utf-8", newline="\n") as out:
+        out.write(clue_sites_gd())
+    print(f"OK clue_sites.gd (후보 번호 {CLUE_SITE})")

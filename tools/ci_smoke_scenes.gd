@@ -24,6 +24,8 @@ const MAIN := "res://scenes/main/main.tscn"
 const INTRO := "res://scenes/ui/intro.tscn"
 const MENU := "res://scenes/ui/main_menu.tscn"
 const INK := "res://scenes/items/ink_projectile.tscn"
+## 판마다 바뀌는 단서·열쇠 자리(#794).
+const ClueShuffle = preload("res://scripts/game/clue_shuffle.gd")
 ## 문을 열고 닫는 데 주는 시간. `sliding_door.gd`의 `open_time`보다 넉넉해야 한다.
 const DOOR_SETTLE := 0.6
 ## 프레임을 돌리는 사이 한 번에 기다릴 시간.
@@ -62,6 +64,7 @@ func _run() -> void:
 	await _check_subtitle_wrap()
 	await _check_artroom_intro()
 	await _check_ink_throw()
+	await _check_clue_shuffle()
 	await _check_jumpscare()
 	await _check_external_audio()
 	# 마지막에 둔다 — 씬을 실제로 갈아 끼워(change_scene_to_file) 본다.
@@ -829,6 +832,113 @@ func _check_ink_throw() -> void:
 	main.free()
 	await process_frame
 
+
+## 판마다 바뀌는 단서·열쇠 자리(#794). 세 가지를 본다.
+##   1. 시드마다 배치가 달라지는가 — 고르기가 늘 첫 후보로 떨어지면 무작위가 아니다.
+##   2. `apply()`가 노드와 상호작용 표시(`Mark_*`)를 고른 자리로 옮기고, 3층 열쇠
+##      보관함 점검표가 그 판의 2층 열쇠 방을 가리키는가.
+##   3. 본편에서 층을 바꾸면 실제로 적용되는가(`floor_manager._swap_floor`), 체크포인트
+##      재시도에서 배치가 유지되고 새 판에서 다시 고르는가(`GameState._ready`).
+## 어느 후보든 걸어서 닿는지는 정적 검사 `tools/verify_clue_sites.py`가 본다.
+func _check_clue_shuffle() -> void:
+	var sites: Dictionary = ClueShuffle.ClueSites.SITES
+	var layouts := {}
+	for s in 16:
+		ClueShuffle.new_run(s)
+		layouts[_clue_layout(sites)] = true
+	if layouts.size() < 2:
+		_fault("단서 배치: 시드 16개가 전부 같은 배치다")
+	else:
+		_ok("단서 배치가 시드마다 달라진다")
+
+	var bad := PackedStringArray()
+	for s in [3, 11]:
+		ClueShuffle.new_run(s)
+		for fl in sites:
+			var floor_root: Node = (load("res://scenes/background/school_floor_%d.tscn" % fl)
+				as PackedScene).instantiate()
+			ClueShuffle.apply(floor_root, fl)
+			for group in sites[fl]:
+				var nodes: Array = group["nodes"]
+				var chosen: Dictionary = ClueShuffle.site(fl, str(nodes[0]))
+				for i in nodes.size():
+					var node := floor_root.get_node_or_null(NodePath(str(nodes[i]))) as Node2D
+					var mark := floor_root.get_node_or_null(
+						NodePath("WallGlow/Marks/Mark_" + str(nodes[i]))) as Node2D
+					if node == null or mark == null:
+						bad.append("%d층 %s(또는 표시)가 없다" % [fl, nodes[i]])
+					elif node.position != chosen["pos"][i] or mark.position != chosen["mark"][i]:
+						bad.append("%d층 %s가 %s로 안 옮겨졌다(%s)"
+							% [fl, nodes[i], chosen["room"], node.position])
+			if fl == 3:
+				var cabinet: Node = floor_root.get_node_or_null("KeyCabinet")
+				var hint: String = ClueShuffle.site(2, "HeadKey")["hint"]
+				if cabinet == null or not str(cabinet.get("message")).contains(hint):
+					bad.append("3층 열쇠 보관함 점검표가 2층 열쇠 방('%s')을 안 가리킨다" % hint)
+			floor_root.free()
+	if bad.is_empty():
+		_ok("단서 배치 적용(노드·표시·점검표)")
+	else:
+		_fault("단서 배치: " + ", ".join(bad))
+
+	# 본편 — 새 판에서 고르고, 층을 바꾸면 적용된다.
+	var main: Node = (load(MAIN) as PackedScene).instantiate()
+	root.add_child(main)
+	for _i in 8:
+		await process_frame
+	var layout := _clue_layout(sites)
+	main.call("travel_to", 3)
+	if not await _until(func() -> bool:
+			return not bool(main.get("changing_floor")), 6.0):
+		_fault("단서 배치: 3층 전환이 끝나지 않는다")
+		await _drop_scenes(main)
+		return
+	var hook := main.get_node_or_null("Background/SpareKeyHook") as Node2D
+	var want: Vector2 = ClueShuffle.site(3, "KeyCabinet")["pos"][1]
+	if hook == null or hook.position != want:
+		_fault("단서 배치: 본편 3층의 3층 열쇠가 고른 자리(%s)에 없다 (%s)"
+			% [want, str(hook.position) if hook != null else "없음"])
+	else:
+		_ok("본편 층 전환에서 단서 배치 적용")
+	await _drop_scenes(main)
+
+	# 체크포인트 재시도는 같은 배치, 새 판은 다시 고른다. 새 판이 우연히 같은
+	# 배치를 고를 수 있으므로 몇 번 띄워 한 번이라도 달라지면 된다.
+	var gs_script: GDScript = load("res://scripts/game/game_state.gd")
+	var no_items: Array[String] = []
+	gs_script.call("save_checkpoint", 3, Vector2(1700, 100), no_items, no_items)
+	gs_script.call("set_pending_restore", true)
+	main = (load(MAIN) as PackedScene).instantiate()
+	root.add_child(main)
+	for _i in 8:
+		await process_frame
+	if _clue_layout(sites) != layout:
+		_fault("단서 배치: 체크포인트 재시도에서 배치가 바뀌었다")
+	else:
+		_ok("체크포인트 재시도에서 단서 배치 유지")
+	await _drop_scenes(main)
+	gs_script.call("clear_checkpoint")
+	var changed := false
+	for _n in 6:
+		main = (load(MAIN) as PackedScene).instantiate()
+		root.add_child(main)
+		await process_frame
+		changed = _clue_layout(sites) != layout
+		await _drop_scenes(main)
+		if changed:
+			break
+	if not changed:
+		_fault("단서 배치: 새 판을 여섯 번 띄워도 배치가 그대로다")
+	else:
+		_ok("새 판에서 단서 배치를 다시 고른다")
+
+
+func _clue_layout(sites: Dictionary) -> String:
+	var sig := PackedStringArray()
+	for fl in sites:
+		for group in sites[fl]:
+			sig.append(str(ClueShuffle.choice(fl, str(group["nodes"][0]))))
+	return ",".join(sig)
 
 ## 수위를 이설 오른쪽 `gap`px에 세우고 `facing` 방향으로 잉크통을 던진다.
 ## 캔은 플레이어가 던질 때와 같은 부모(조립 씬)에, 같은 스폰 거리(24px)로 낸다.
