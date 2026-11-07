@@ -722,6 +722,7 @@ func _check_artroom_intro() -> void:
 		var drained_at := -1
 		var travel_at := -1
 		var draining_at_travel := false
+		var stairs_voices := 0
 		# 대사는 카메라 이동·창틀까지 걷기가 끝난 뒤에 나온다 — 그 전의 "빈 대기열"을
 		# 끝으로 세면 안 되므로 한 번 배출이 시작된 뒤부터 본다.
 		var saw_draining := false
@@ -736,9 +737,18 @@ func _check_artroom_intro() -> void:
 			if bool(main.get("changing_floor")):
 				travel_at = now
 				draining_at_travel = bool(hud.get("_draining"))
+				# 계단 소리가 한 번만 나는가(#810) — 창문 노드와 층 관리자가 둘 다 냈었다.
+				var sfx: Node = root.get_node_or_null("Sfx")
+				if sfx != null:
+					var st: AudioStream = sfx.call("variant", &"stairs")
+					for pl in sfx.get("_players"):
+						if pl.playing and pl.stream == st:
+							stairs_voices += 1
 				break
 		if travel_at < 0:
 			_fault("창문 컷신: 40초가 지나도 층 전환이 시작되지 않는다")
+		elif stairs_voices != 1:
+			_fault("창문 컷신: 층 전환 때 계단 소리가 %d번 겹쳐 난다 (1번이어야 한다)" % stairs_voices)
 		elif draining_at_travel or drained_at < 0:
 			_fault("창문 컷신: 대사가 다 나오기 전에 층을 넘긴다 (%.1f초)"
 				% ((travel_at - t0) / 1000.0))
