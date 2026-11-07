@@ -858,6 +858,26 @@ func _check_ink_throw() -> void:
 	else:
 		_fault("잉크: 코앞(28px)에서 던졌는데 몸을 통과했다")
 
+	# ③ 맞으면 수색·방 진입도 끊긴다(#804). 스턴이 풀려도 수색을 재개하지 않는다.
+	janitor.set("blind_timer", 0.0)
+	janitor.set("search_timer", 8.0)
+	janitor.set("search_point", player.global_position)
+	janitor.set("announced_search", true)
+	janitor.set("sweep_phase", 1)
+	janitor.call("blind", 0.2)
+	if float(janitor.get("search_timer")) != 0.0 or int(janitor.get("sweep_phase")) != 0 \
+			or bool(janitor.get("announced_search")):
+		_fault("잉크: 맞았는데 수색·방 진입 상태가 남았다(#804)")
+	else:
+		await _until(func() -> bool:
+			return float(janitor.get("blind_timer")) <= 0.0, 2.0)
+		for _i in 10:
+			await process_frame
+		if float(janitor.get("search_timer")) > 0.0:
+			_fault("잉크: 스턴이 풀린 뒤 수색을 재개했다(#804)")
+		else:
+			_ok("잉크 피격이 수색·방 진입을 끊는다")
+
 	main.free()
 	await process_frame
 
