@@ -159,6 +159,8 @@ const GAME_OVER_LINE_HOLD := 0.15
 const JUMPSCARE_BLACK_HOLD := 0.35
 
 var game_over_active: bool = false
+## 진행 중인 층 전환 트윈(#803) — 게임 오버가 나면 끊어야 한다.
+var _floor_tween: Tween
 ## 다음 층에 내려서서 **페이드가 다 걷힌 뒤** 낼 대사(#700). `[화자, 문장, 감정]`의
 ## 배열이다. 층 통로(`floor_link.gd`)가 넘기기 직전에 맡긴다 — 그 노드는 층 씬과
 ## 함께 해제되므로 도착 뒤에 스스로 말할 수 없다.
@@ -226,6 +228,10 @@ func _on_game_over(reason: String) -> void:
 		return
 	game_over_active = true
 	changing_floor = true   # 계단 트리거 검사 정지
+	# 층 전환 페이드 중이면 끊는다(#803) — 안 끊으면 `_swap_floor`가 수위를 다시 깨우고
+	# 다음 층 체크포인트를 저장한다. 알파는 아래 게임 오버 페이드가 이어받는다.
+	if _floor_tween != null and _floor_tween.is_valid():
+		_floor_tween.kill()
 	Sfx.stop_music()
 
 	# 플레이어는 이동(_physics_process)과 E 상호작용(_unhandled_input)을 모두 끊고,
@@ -324,14 +330,19 @@ func travel_to(target: int, arrive: Vector2 = Vector2.INF) -> void:
 
 func _change_floor(target: int, arrive: Vector2) -> void:
 	changing_floor = true
+	# 까만 화면 속에서 붙잡히지 않게 수위를 세운다(#803). 새 층의 `sync_floor`가 다시 켠다.
+	janitor.set_physics_process(false)
 
 	Sfx.play(&"stairs")
 
 	var tween := create_tween()
+	_floor_tween = tween
 	tween.tween_property(fade_rect, "color:a", 1.0, FLOOR_FADE_OUT_SECONDS)
 	tween.tween_callback(_swap_floor.bind(target, arrive))
 	tween.tween_property(fade_rect, "color:a", 0.0, FLOOR_FADE_IN_SECONDS)
 	tween.tween_callback(func() -> void:
+		if game_over_active:
+			return
 		changing_floor = false
 		_flush_arrival_speech())
 
@@ -358,6 +369,8 @@ func _flush_arrival_speech() -> void:
 
 
 func _swap_floor(target: int, arrive: Vector2, record_cp: bool = true) -> void:
+	if game_over_active:
+		return   # 붙잡힌 뒤에는 층을 바꾸지 않는다(#803)
 	var old_background: Node = $Background
 	var next_background: Node2D = load(FLOOR_SCENES[target]).instantiate()
 	# 이 판의 단서·열쇠 자리로 옮긴다(#794). **붙이기 전에** — 붙인 뒤면 `_ready`에서

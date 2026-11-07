@@ -360,6 +360,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
   - 새 줄이 풀리면 오른쪽 위에 "수첩에 적었다 [J]"가 잠깐 뜬다. 기준은 **한 프레임 뒤에** 잡는다 — 체크포인트 재시도에서 `floor_manager`가 플래그를 복원하며 `clues_changed`를 쏘는데, 그 전에 잡으면 복원된 단서가 전부 새 내용으로 알려진다.
   - **플래그 이름을 고치면 수첩도 같이 고친다.** `verify_progression`의 `check_journal_flags()`가 수첩의 플래그가 층 씬(`grants_flag`·`pickup_id`)이나 스크립트(`set_flag`)에서 실제로 서는지 본다 — 오타 난 플래그는 화면에서 그냥 `????`로 남아 아무도 모른다(일부러 오타를 내 잡히는 것을 확인했다).
   - 단서 문구도 같이 손봤다 — 임나연 사안 파일이 "실종"이 아니라 수위의 판단 근거("장난이었다잖아")를 보여 주고, 수위 공책에 임나연 줄을 더했다(나연이 수첩의 '오해로 지목된 아이' 정리에 들어가는 근거).
+- **층 전환 중 붙잡히면 전환을 끊는다**(#803). `_change_floor`가 트윈을 `_floor_tween`에 쥐고 수위를 세우며, `_on_game_over`가 그 트윈을 kill하고 `_swap_floor`·마지막 콜백은 `game_over_active`면 돌아선다 — 안 끊으면 다음 층 체크포인트가 저장되고 수위가 깨어나 현관→운동장 페이드 중 죽은 플레이어가 탈출 처리된다. 스모크 `_check_caught_during_fade`가 본다.
 - **일시정지 메뉴(#624)**: 본편에서 **Esc**(`ui_cancel`)로 `PauseMenu`(`scenes/ui/pause_menu.tscn`, CanvasLayer **4** — HUD·`FadeRect`(3) 위)를 연다. 계속하기 / 설정(#788, 아래 전체화면 항목) / 처음부터 다시하기(체크포인트를 지우고 4층부터) / 메인 화면으로. `get_tree().paused`로 통째로 멈추고 메뉴만 `PROCESS_MODE_ALWAYS`다.
   - **현관 선택지가 이미 멈춰 둔 트리와 게임 오버 연출 중에는 열지 않는다** — 열었다 닫으면 선택지의 멈춤까지 풀린다.
   - **멈춰도 흐르는 것이 둘 있다**: `create_timer()`의 기본값(`process_always = true`)과 `await get_tree().process_frame` 루프. 그래서 `art_room_intro._wait`·`hud._hold_line`은 `create_timer(t, false)`, `_walk_to`·`floor_link._walk_player`는 `can_process()`로 거른다. **본편에 대기를 새로 쓸 때도 같은 규칙을 지킬 것** — 안 그러면 메뉴를 보는 사이 연출이 건너뛰어지고 자막이 사라진다.
