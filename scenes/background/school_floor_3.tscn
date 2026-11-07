@@ -4677,18 +4677,27 @@ color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(2214, 904, 2242, 904, 2242, 938, 2214, 938)
 
 [node name="PC_StorageR_line5_box" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1972, 954, 2012, 954, 2012, 982, 1972, 982)
+polygon = PackedVector2Array(2214, 944, 2242, 944, 2242, 978, 2214, 978)
 
 [node name="PV_StorageR_line5_box" type="Polygon2D" parent="Props"]
+texture = ExtResource("ext_crate")
+uv = PackedVector2Array(0, 0, 22, 0, 22, 28, 0, 28)
+color = Color(1, 1, 1, 1)
+polygon = PackedVector2Array(2214, 944, 2242, 944, 2242, 978, 2214, 978)
+
+[node name="PC_StorageR_line6_box" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1972, 954, 2012, 954, 2012, 982, 1972, 982)
+
+[node name="PV_StorageR_line6_box" type="Polygon2D" parent="Props"]
 texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 28, 0, 28)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1972, 954, 2012, 954, 2012, 982, 1972, 982)
 
-[node name="PC_StorageR_line6_box" type="CollisionPolygon2D" parent="PropBodies"]
+[node name="PC_StorageR_line7_box" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(2138, 954, 2172, 954, 2172, 982, 2138, 982)
 
-[node name="PV_StorageR_line6_box" type="Polygon2D" parent="Props"]
+[node name="PV_StorageR_line7_box" type="Polygon2D" parent="Props"]
 texture = ExtResource("ext_crate")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 28, 0, 28)
 color = Color(1, 1, 1, 1)
