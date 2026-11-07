@@ -76,6 +76,7 @@ func _run() -> void:
 	await _check_inventory()
 	await _check_ending_backgrounds()
 	await _check_ending_result()
+	await _check_cutscene_input()
 
 	print("")
 	if _fail.is_empty():
@@ -1891,3 +1892,53 @@ func _check_ending_result() -> void:
 			_ok("타이틀로 간 뒤 엔딩 곡 정지")
 	sfx.call("stop_theme")
 	await _drop_scenes(ending)
+
+
+## 컷신 입력·트윈(#809) — 시작 페이드 중 E가 첫 대사를 건너뛰게 하지 않는가, 엔딩 건너뛰기가
+## 장면 전환 트윈을 죽이는가.
+##
+## 시작 페이드(0.5~0.6초) 동안 `transitioning`이 false이던 때는 E가 0번 줄을 띄우고 이어서
+## 페이드 콜백의 `_next_line()`이 그것을 1번 줄로 덮었다 — 끝난 뒤 `line_index`가 1이었다.
+func _check_cutscene_input() -> void:
+	if current_scene != null:
+		current_scene.free()
+		await process_frame
+	set_meta("ending_kind", &"after_school")
+	var cuts: Array = [
+		["엔딩", "res://scenes/ui/ending.tscn"],
+		["프롤로그", INTRO],
+	]
+	for cut: Array in cuts:
+		var label: String = cut[0]
+		var node: Node = (load(cut[1]) as PackedScene).instantiate()
+		root.add_child(node)
+		await process_frame
+		var ev := InputEventAction.new()
+		ev.action = &"interact"
+		ev.pressed = true
+		root.push_input(ev)
+		if not await _until(func() -> bool: return int(node.get("line_index")) >= 0, 3.0):
+			_fault("%s 첫 대사: 시작 페이드가 끝나도 첫 줄이 안 나온다" % label)
+		else:
+			await _wait(1.0)   # 시작 페이드(0.6초)의 콜백까지 지나야 덮어쓰기가 드러난다
+			if int(node.get("line_index")) != 0:
+				_fault("%s 첫 대사: 시작 페이드 중 E로 첫 줄이 건너뛰어졌다 (line_index=%d)"
+						% [label, int(node.get("line_index"))])
+			else:
+				_ok("%s 시작 페이드 중 입력이 첫 대사를 안 건너뜀" % label)
+		if label == "엔딩":
+			# 장면 전환 도중 건너뛰기 — 전환 트윈이 살아 있다가 죽어야 한다.
+			node.call("_next_scene")
+			var st: Tween = node.get("scene_tween")
+			if st == null or not st.is_valid():
+				_fault("엔딩 건너뛰기: 장면 전환 트윈을 scene_tween에 안 담았다")
+			else:
+				node.call("_finish")
+				if st.is_valid():
+					_fault("엔딩 건너뛰기: 장면 전환 중 건너뛰었는데 그 트윈이 계속 돈다")
+				else:
+					_ok("엔딩 건너뛰기가 장면 전환 트윈을 죽임")
+		node.free()
+		await process_frame
+	if has_meta("ending_kind"):
+		remove_meta("ending_kind")
