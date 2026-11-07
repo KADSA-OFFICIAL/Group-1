@@ -65,6 +65,7 @@ func _run() -> void:
 	await _check_artroom_intro()
 	await _check_ink_throw()
 	await _check_clue_shuffle()
+	await _check_pickup_janitor()
 	await _check_jumpscare()
 	await _check_external_audio()
 	# 마지막에 둔다 — 씬을 실제로 갈아 끼워(change_scene_to_file) 본다.
@@ -854,6 +855,46 @@ func _check_ink_throw() -> void:
 		_fault("잉크: 코앞(28px)에서 던졌는데 몸을 통과했다")
 
 	main.free()
+	await process_frame
+
+
+## 수위가 접촉 획득 존에 들어서도 줍지 않는다(#805). 수위도 CharacterBody2D(layer 1)라
+## 거르지 않으면 열쇠가 원격으로 인벤토리에 들어가고 플래그가 선다.
+func _check_pickup_janitor() -> void:
+	var stub_script := GDScript.new()
+	stub_script.source_code = "extends Node\nvar items: Array = []\nvar flags: Array = []\nvar notices: int = 0\nfunc add_item(i) -> bool:\n\titems.append(i)\n\treturn true\nfunc set_flag(f) -> void:\n\tflags.append(f)\nfunc request_notice(_m) -> void:\n\tnotices += 1\nfunc has_flag(_f) -> bool:\n\treturn false\n"
+	stub_script.reload()
+	var gs := Node.new()
+	gs.set_script(stub_script)
+	gs.add_to_group("game_state")
+	root.add_child(gs)
+
+	var pick := Area2D.new()
+	pick.set_script(load("res://scripts/interactions/pickup_item.gd"))
+	pick.set("item_id", "stair_key_2")
+	pick.set("pickup_id", "t805_pick")
+	pick.set("keep_after_pickup", true)
+	root.add_child(pick)
+
+	var jan := CharacterBody2D.new()
+	jan.add_to_group("janitor")
+	root.add_child(jan)
+	pick.call("_on_body_entered", jan)
+	if gs.items.is_empty() and gs.flags.is_empty() and gs.notices == 0:
+		_ok("수위는 접촉 획득 아이템을 줍지 않는다")
+	else:
+		_fault("수위가 아이템을 주웠다: items=%s flags=%s" % [gs.items, gs.flags])
+
+	var pl := CharacterBody2D.new()
+	pl.add_to_group("player")
+	root.add_child(pl)
+	pick.call("_on_body_entered", pl)
+	if gs.items == ["stair_key_2"] and gs.flags.has("t805_pick"):
+		_ok("플레이어는 접촉 획득 아이템을 줍는다")
+	else:
+		_fault("플레이어가 아이템을 못 주웠다: items=%s flags=%s" % [gs.items, gs.flags])
+	for n in [pick, jan, pl, gs]:
+		n.free()
 	await process_frame
 
 

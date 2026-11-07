@@ -41,7 +41,8 @@ func _disable_pickup() -> void:
 
 
 func _on_body_entered(body: Node) -> void:
-	if not body is CharacterBody2D:
+	# 수위도 CharacterBody2D이고 layer 1이라 mask 1에 걸린다(#805) — 플레이어만 줍는다.
+	if not body is CharacterBody2D or body.is_in_group("janitor"):
 		return
 
 	var game_state = get_tree().get_first_node_in_group("game_state")
