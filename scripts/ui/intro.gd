@@ -84,9 +84,14 @@ func _ready() -> void:
 	# 누른 Enter/Space가 버튼을 눌러 프롤로그가 통째로 날아간다. 그래서 키보드는 Esc다.
 	skip_button.pressed.connect(_on_skip_pressed)
 
+	# 시작 페이드가 끝날 때까지 입력을 막는다(#809) — 안 막으면 그 사이 E가 0번 줄을
+	# 띄우고, 이어서 콜백의 _next_line()이 그것을 1번 줄로 덮어 첫 대사가 사라진다.
+	transitioning = true
 	scene_tween = create_tween()
 	scene_tween.tween_property(fade_rect, "color:a", 0.0, SCENE_FADE_SECONDS)
-	scene_tween.tween_callback(_next_line)
+	scene_tween.tween_callback(func() -> void:
+		transitioning = false
+		_next_line())
 
 
 func _unhandled_input(event: InputEvent) -> void:
