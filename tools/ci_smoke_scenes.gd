@@ -64,6 +64,7 @@ func _run() -> void:
 	await _check_subtitle_wrap()
 	await _check_artroom_intro()
 	await _check_ink_throw()
+	await _check_catch_through_wall()
 	await _check_clue_shuffle()
 	await _check_pickup_janitor()
 	await _check_jumpscare()
@@ -816,6 +817,67 @@ func _check_artroom_intro() -> void:
 ## `_physics_process`가 곧바로 돌아 나가 추격·접촉 판정이 아예 안 돌므로,
 ## 검사 도중에 이설을 붙잡아 게임 오버 씬으로 넘어가는 일이 없다. 맞으면
 ## `blind()`가 `maxf`로 5초를 새로 얹으므로 4.5초를 넘는지로 가른다.
+## 세로 벽 너머에서는 붙잡지 않는다(#807). 두께 16px 벽을 사이에 두면 두 중심이
+## 33px까지 가까워져 거리(CONTACT_DISTANCE 36)만으로는 붙잡혔다. 같은 거리라도
+## 벽이 없으면 붙잡아야 한다(양성 대조).
+func _check_catch_through_wall() -> void:
+	var packed: PackedScene = load(MAIN)
+	var main: Node = packed.instantiate()
+	root.add_child(main)
+	for _i in 8:
+		await process_frame
+	main.call("travel_to", 3)
+	if not await _until(func() -> bool:
+			return not bool(main.get("changing_floor")), 6.0):
+		_fault("벽 너머 접촉: 3층 전환이 끝나지 않는다")
+		main.free()
+		return
+	var player := main.get_node_or_null("Player") as Node2D
+	var janitor := main.get_node_or_null("Janitor") as Node2D
+	var walls := main.get_node_or_null("Background").find_children("RoomWalls", "StaticBody2D", true, false)
+	if player == null or janitor == null or walls.is_empty():
+		_fault("벽 너머 접촉: Player·Janitor·RoomWalls를 못 찾았다")
+		main.free()
+		return
+	# 세로로 길고 얇은(16px) 벽 하나를 고른다.
+	var wall := Vector2.ZERO
+	var found := false
+	for shape in (walls[0] as Node).get_children():
+		if shape is CollisionPolygon2D and (shape as CollisionPolygon2D).polygon.size() > 0:
+			var poly := (shape as CollisionPolygon2D).polygon
+			var lo := poly[0]
+			var hi := poly[0]
+			for pt in poly:
+				lo = lo.min(pt)
+				hi = hi.max(pt)
+			if absf((hi.x - lo.x) - 16.0) < 0.5 and hi.y - lo.y > 200.0:
+				wall = Vector2(lo.x, (lo.y + hi.y) * 0.5)
+				found = true
+				break
+	if not found:
+		_fault("벽 너머 접촉: 세로 벽을 못 찾았다")
+		main.free()
+		return
+	player.global_position = Vector2(wall.x - 8.0 - 0.5, wall.y)
+	janitor.global_position = Vector2(wall.x + 16.0 + 9.0, wall.y)   # 중심 간격 약 33px
+	await physics_frame
+	await physics_frame
+	if bool(janitor.call("_can_catch")):
+		_fault("벽 너머 접촉: 세로 벽 33px 너머에서 붙잡을 수 있다")
+	else:
+		_ok("벽 너머 접촉 차단")
+	# 양성 대조: 벽이 없는 같은 거리는 붙잡는다.
+	janitor.global_position = player.global_position + Vector2(0.0, -33.0)
+	await physics_frame
+	await physics_frame
+	if janitor.global_position.distance_to(player.global_position) > 36.0 \
+			or bool(janitor.call("_can_catch")) == false:
+		_fault("벽 너머 접촉: 벽 없는 33px에서 붙잡지 못한다(양성 대조)")
+	else:
+		_ok("벽 없는 접촉 유지")
+	main.free()
+
+
 func _check_ink_throw() -> void:
 	var packed: PackedScene = load(MAIN)
 	if packed == null:

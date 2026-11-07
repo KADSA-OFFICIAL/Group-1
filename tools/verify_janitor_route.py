@@ -161,7 +161,7 @@ def floor_extent(floor: int) -> tuple[float, float]:
     return x1, y1
 
 
-def load_blockers(floor: int) -> list[tuple[float, float, float, float]]:
+def load_blockers(floor: int, skip_props: bool = False) -> list[tuple[float, float, float, float]]:
     """StaticBody2D 하위 충돌 도형만 모은다(janitor._collect_blockers와 같음)."""
     text = scene_text(floor)
     shapes = {
@@ -186,6 +186,9 @@ def load_blockers(floor: int) -> list[tuple[float, float, float, float]]:
         # 미닫이 교실문은 수위가 밀고 지나간다 — 장애물로 세지 않는다
         # (janitor._collect_blockers도 같은 이름 규칙으로 건너뛴다).
         if "SDPanel" in parent:
+            continue
+        # 접촉 판정 광선(janitor._can_catch)은 집기를 뚫는다(#807).
+        if skip_props and parent.split("/")[-1] == "PropBodies":
             continue
         if kind == "CollisionPolygon2D":
             poly = re.search(r'polygon = PackedVector2Array\(([^)]*)\)', body)
@@ -395,7 +398,7 @@ def player_spot(rects, x: float, y: float):
     return None if best is None else best[1:]
 
 
-def final_leg(rects, start, goal) -> float:
+def final_leg(rects, start, goal, walls=()) -> float:
     """경로 끝 칸에서 목표로 몸을 밀고 들어간다(janitor._path_to가 덧붙인 마지막
     지점). move_and_slide를 축 단위 미끄러짐으로 흉내 내고, 가장 가까이 간 거리를
     돌려준다. 몸통은 캡슐 대신 상자라 실제보다 조금 박하다."""
@@ -407,7 +410,8 @@ def final_leg(rects, start, goal) -> float:
     for _ in range(4000):
         distance = math.dist((x, y), goal)
         best = min(best, distance)
-        if distance <= CONTACT_DISTANCE:
+        # janitor._can_catch — 거리 + 벽에 안 가림(#807)
+        if distance <= CONTACT_DISTANCE and ray_clear(walls, (x, y), goal):
             return distance
         ux, uy = (goal[0] - x) / distance, (goal[1] - y) / distance
         for nx, ny in ((x + ux, y + uy), (x + ux, y), (x, y + uy)):
@@ -429,6 +433,7 @@ def check_catch(floor: int, solid, rects, grid_w: int, grid_h: int) -> None:
     walls, _rooms, (width, height), _wins = reach_mod.parse(
         ROOT / f"scenes/background/school_floor_{floor}.tscn")
     blocked, cols, rows = reach_mod.build_grid(walls, width, height)
+    walls_only = load_blockers(floor, skip_props=True)
     start = {1: (200, 630)}.get(floor, (200, 700))
     spots = reach_mod.flood(blocked, cols, rows, start)
     far = []
@@ -443,10 +448,11 @@ def check_catch(floor: int, solid, rects, grid_w: int, grid_h: int) -> None:
         x, y = spot
         target = target_cell(solid, rects, x, y, grid_w, grid_h)
         center = cell_center(*target)
-        if math.dist((x, y), center) <= CONTACT_DISTANCE:
+        if (math.dist((x, y), center) <= CONTACT_DISTANCE
+                and ray_clear(walls_only, center, (x, y))):
             continue
         pushed += 1
-        closest = final_leg(rects, center, (x, y))
+        closest = final_leg(rects, center, (x, y), walls_only)
         if closest > CONTACT_DISTANCE + 1.0:   # 1px 걸음의 반올림 여유
             far.append((closest, x, y))
     if far:
