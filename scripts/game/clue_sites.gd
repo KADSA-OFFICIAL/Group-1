@@ -11,8 +11,8 @@ const SITES := {
 			"nodes": ["KeyCabinet", "SpareKeyHook"],
 			"sites": [
 				{"room": "North5", "hint": "", "pos": [Vector2(1558, 420), Vector2(1558, 480)], "mark": [Vector2(1558, 420), Vector2(1558, 480)]},
-				{"room": "North3", "hint": "", "pos": [Vector2(990, 280), Vector2(1050, 280)], "mark": [Vector2(990, 280), Vector2(1050, 280)]},
-				{"room": "North6", "hint": "", "pos": [Vector2(2098, 150), Vector2(2098, 210)], "mark": [Vector2(2098, 150), Vector2(2098, 210)]},
+				{"room": "North3", "hint": "", "pos": [Vector2(1100, 505), Vector2(1040, 505)], "mark": [Vector2(1100, 505), Vector2(1040, 505)]},
+				{"room": "North4", "hint": "", "pos": [Vector2(1170, 400), Vector2(1170, 460)], "mark": [Vector2(1170, 400), Vector2(1170, 460)]},
 			],
 		},
 		{
@@ -60,7 +60,6 @@ const SITES := {
 			"sites": [
 				{"room": "ScienceLab1", "hint": "", "pos": [Vector2(1990, 1280)], "mark": [Vector2(1990, 1280)]},
 				{"room": "StorageR", "hint": "", "pos": [Vector2(2040, 790)], "mark": [Vector2(2040, 790)]},
-				{"room": "Class6", "hint": "", "pos": [Vector2(520, 1350)], "mark": [Vector2(520, 1350)]},
 			],
 		},
 		{
