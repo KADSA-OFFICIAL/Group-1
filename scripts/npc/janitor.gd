@@ -1085,7 +1085,7 @@ func _is_chasing() -> bool:
 
 
 func _move_chase(delta: float) -> void:
-	if position.distance_to(player.position) <= CONTACT_DISTANCE:
+	if _can_catch():
 		velocity = Vector2.ZERO
 		_face(position.direction_to(player.position))
 		stuck_time = 0.0
@@ -1562,6 +1562,27 @@ func _side_offset(direction: Vector2) -> Vector2:
 	var extent := absf(perpendicular.x) * BODY_HALF_WIDTH \
 		+ absf(perpendicular.y) * BODY_HALF_HEIGHT - BODY_PROBE_MARGIN
 	return perpendicular * maxf(extent, 0.0)
+
+
+## 거리 안이고 사이에 벽이 없을 때만 붙잡는다(#807). 두께 16px 세로 벽은 두 중심이
+## 33px까지 가까워져 거리만 보면 벽 너머에서 붙잡혔다. **집기(PropBodies)는 막지
+## 않는다** — #799의 책상·벽 틈 붙잡기는 집기 옆에서 일어난다.
+func _can_catch() -> bool:
+	if position.distance_to(player.position) > CONTACT_DISTANCE:
+		return false
+	var exclude: Array[RID] = [get_rid(), player.get_rid()]
+	for _i in 8:
+		var query := PhysicsRayQueryParameters2D.create(
+				position, player.position, WALL_MASK, exclude)
+		var hit := get_world_2d().direct_space_state.intersect_ray(query)
+		if hit.is_empty():
+			return true
+		var collider := hit.get("collider") as Node
+		if collider != null and collider.name == "PropBodies":
+			exclude.append(hit["rid"])
+			continue
+		return false
+	return false
 
 
 func _clear_ray(from: Vector2, to: Vector2) -> bool:
