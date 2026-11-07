@@ -114,7 +114,7 @@ func interact(_player: Node) -> void:
 				arrival_lines[i],
 				arrival_emotions[i] if i < arrival_emotions.size() else ""])
 		manager.call("queue_arrival_speech", lines)
-	Sfx.play(&"stairs")
+	# 계단 소리는 `travel_to()` → `_change_floor()`가 낸다(#810) — 여기서 또 내면 겹친다.
 	manager.call("travel_to", target_floor, arrive_at)
 
 
