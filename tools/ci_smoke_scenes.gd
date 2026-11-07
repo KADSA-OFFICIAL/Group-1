@@ -1846,10 +1846,26 @@ func _check_jumpscare() -> void:
 	await process_frame
 	gs.call("request_speech", "수위", catch_text, "")
 	gs.call("trigger_game_over", "caught")
-	if not await _until(func() -> bool: return js_root.visible, 6.0):
+	# 앞에 밀린 줄은 버리고 체포 대사만 남는다(#835) — 게임 오버 뒤로 앞 줄이 다시
+	# 보이면 안 되고, 점프스케어까지가 체포 대사 타이핑 남짓이어야 한다.
+	var t_caught := Time.get_ticks_msec()
+	var stale_shown := false
+	var stale_label := sub.get_node_or_null("Lines/TextLabel") as Label if sub != null else null
+	while not js_root.visible and Time.get_ticks_msec() - t_caught < 6000:
+		if stale_label != null and stale_label.text == "거기 있었구나.":
+			stale_shown = true
+		await process_frame
+	if not js_root.visible:
 		_fault("점프스케어: 붙잡혔는데 오버레이가 안 뜬다")
 		await _drop_scenes(main)
 		return
+	var catch_ms := Time.get_ticks_msec() - t_caught
+	if stale_shown:
+		_fault("점프스케어: 게임 오버 뒤에 앞 줄이 떴다 — 대기열이 안 끊겼다(#835)")
+	elif catch_ms > 1500:
+		_fault("점프스케어: 붙잡힌 뒤 얼굴까지 %dms — 앞 줄을 기다린 것 같다(#835)" % catch_ms)
+	else:
+		_ok("점프스케어는 앞 줄을 끊고 체포 대사만 (%dms)" % catch_ms)
 	if sub == null:
 		_fault("점프스케어: 자막 노드를 못 찾았다")
 	else:
