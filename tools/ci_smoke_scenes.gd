@@ -643,6 +643,20 @@ func _check_artroom_intro() -> void:
 				% [wp.visible, wp.get("_target"), win_pos])
 		else:
 			_ok("도입부 3막 국어책 챙긴 뒤 표시가 창문으로")
+			# 다시 조사해도 "챙겼어" 대사는 한 번뿐이다(#811).
+			var said := [0]
+			var counter := func(_sp: String, msg: String, _em: String = "") -> void:
+				if msg.contains("챙겼어"):
+					said[0] += 1
+			gs.connect("speech_requested", counter)
+			bg.get_node("KoreanBook").call("interact", player)
+			bg.get_node("KoreanBook").call("interact", player)
+			await process_frame
+			gs.disconnect("speech_requested", counter)
+			if said[0] != 0:
+				_fault("도입부 3막: 국어책 재조사마다 '챙겼어' 대사가 되풀이된다 (%d회)" % said[0])
+			else:
+				_ok("도입부 3막 국어책 재조사 시 '챙겼어' 반복 없음")
 
 	# ── 창문으로 내려가기 시작하면 유예가 끊긴다(#472) ─────────────
 	# 컷신(#468)이 도는 18초 동안에도 4층 씬은 살아 있어 유예(20초)가 계속 돌았고,
