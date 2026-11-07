@@ -143,6 +143,8 @@ var _warned: bool = false
 ## 2막이 도는 중 — 캐비넷에서 못 나온다.
 var _scene_locked: bool = false
 var _step_clock: float = 0.0
+## 3막에서 "챙겼어. 창문으로."를 이미 했다 — 재조사마다 되풀이하지 않는다(#811).
+var _book_line_said: bool = false
 
 
 func _ready() -> void:
@@ -178,7 +180,9 @@ func _on_investigated(_player: Node, name: String) -> void:
 		# 3막 도중에 국어책을 챙겼다 — 표시를 **창문으로 옮긴다**(#700).
 		# 남겨 두면 이미 가방에 있는 것을 계속 가리켜 "아직 덜 됐다"로 읽히고(#477),
 		# 걷기만 하면 다음 목표를 말로만 듣고 화면에서는 못 찾는다.
-		if name == BACKSTOP_NODE and _grace > 0.0:
+		# **한 번만**(#811) — 이후 재조사는 책 본래 문구만 낸다.
+		if name == BACKSTOP_NODE and _grace > 0.0 and not _book_line_said:
+			_book_line_said = true
 			_seen[name] = true
 			_point_at(escape_path, "창문")
 			_say(get_tree().get_first_node_in_group("game_state"), "이설",
