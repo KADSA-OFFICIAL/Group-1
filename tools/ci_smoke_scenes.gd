@@ -71,6 +71,7 @@ func _run() -> void:
 	# 마지막에 둔다 — 씬을 실제로 갈아 끼워(change_scene_to_file) 본다.
 	await _check_pause_menu()
 	await _check_fullscreen()
+	await _check_exit_choice_layer()
 	await _check_audio_settings()
 	await _check_journal()
 	await _check_inventory()
@@ -1360,6 +1361,39 @@ func _press_fullscreen_key() -> void:
 	ev.action = &"fullscreen"
 	ev.pressed = true
 	root.push_input(ev)
+
+
+## 현관 신고 선택지가 화면 공간 CanvasLayer(3 이상)에 뜨고 뷰포트 안에 드는가(#802).
+## Node2D 아래에 붙이면 월드 공간에 그려져 어둠 속 화면 밖에 떨어졌다.
+func _check_exit_choice_layer() -> void:
+	var main := Node2D.new()
+	root.add_child(main)
+	var prev: Node = current_scene
+	current_scene = main
+	var door: Area2D = Area2D.new()
+	door.set_script(load("res://scripts/interactions/exit_door.gd"))
+	main.add_child(door)
+	door.call("_ask", null)
+	await process_frame
+	await process_frame
+	var panel: Control = null
+	for n in main.find_children("*", "Control", true, false):
+		if n.has_signal("chosen"):
+			panel = n
+	if panel == null:
+		_fault("현관 선택지: 패널이 안 뜬다")
+	else:
+		var layer := panel.get_parent() as CanvasLayer
+		if layer == null or layer.layer < 3:
+			_fault("현관 선택지: 패널이 화면 공간 CanvasLayer(3 이상)에 있지 않다")
+		else:
+			var view := Rect2(Vector2.ZERO, root.get_visible_rect().size)
+			if not view.encloses(panel.get_global_rect()):
+				_fault("현관 선택지: 패널 영역 %s이 뷰포트 %s 밖이다" % [panel.get_global_rect(), view])
+	paused = false
+	main.queue_free()
+	current_scene = prev
+	await process_frame
 
 
 ## 전체화면(#778, #781, #788) — F11·타이틀 설정창 옵션·일시정지 설정창 옵션이 같은 전환을 타는가, 버튼 글자가
