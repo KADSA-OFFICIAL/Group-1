@@ -195,6 +195,9 @@ var scene_index: int = 0
 var line_index: int = -1
 var transitioning: bool = false
 var finished: bool = false
+## 시작 페이드·장면 전환에 쓰는 트윈(#809). 건너뛰기가 도중에 끼어들 때 죽여야
+## 페이드가 서로 싸우지 않는다(intro.gd와 같다).
+var scene_tween: Tween = null
 
 
 func _ready() -> void:
@@ -211,9 +214,14 @@ func _ready() -> void:
 	skip_button.pressed.connect(_on_skip_pressed)
 	_apply_scene()
 
-	var tween := create_tween()
-	tween.tween_property(fade_rect, "color:a", 0.0, SCENE_FADE_SECONDS)
-	tween.tween_callback(_next_line)
+	# 시작 페이드가 끝날 때까지 입력을 막는다(#809) — 안 막으면 그 사이 E가 0번 줄을
+	# 띄우고, 이어서 콜백의 _next_line()이 그것을 1번 줄로 덮어 첫 대사가 사라진다.
+	transitioning = true
+	scene_tween = create_tween()
+	scene_tween.tween_property(fade_rect, "color:a", 0.0, SCENE_FADE_SECONDS)
+	scene_tween.tween_callback(func() -> void:
+		transitioning = false
+		_next_line())
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -280,6 +288,7 @@ func _next_scene() -> void:
 	transitioning = true
 
 	var tween := create_tween()
+	scene_tween = tween
 	tween.tween_property(fade_rect, "color:a", 1.0, SCENE_FADE_SECONDS)
 	tween.tween_callback(func() -> void:
 		scene_index += 1
@@ -305,6 +314,9 @@ func _finish() -> void:
 	if finished:
 		return
 	finished = true
+	# 시작 페이드·장면 전환 도중에 건너뛰면 그 트윈이 계속 돌아 페이드를 도로 걷어낸다(#809).
+	if scene_tween != null and scene_tween.is_valid():
+		scene_tween.kill()
 
 	var tween := create_tween()
 	tween.tween_property(fade_rect, "color:a", 1.0, SCENE_FADE_SECONDS)
