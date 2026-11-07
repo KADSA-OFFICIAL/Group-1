@@ -246,8 +246,8 @@ func _on_game_over(reason: String) -> void:
 	# 수위의 마지막 대사가 자막에 다 찍힐 때까지 기다린다 — 페이드를 바로 걸면
 	# 문장이 절반쯤 나온 채로 화면이 어두워진다(#199). 이미 다 찍혔으면
 	# await_subtitle()이 곧바로 돌아오고 아래 유예만 적용된다.
-	if hud.has_method("await_subtitle"):
-		await hud.await_subtitle()
+	if hud.has_method("await_last_line_typed"):
+		await hud.await_last_line_typed()
 	await get_tree().create_timer(GAME_OVER_LINE_HOLD).timeout
 
 	# 점프스케어(#662) — 얼굴이 덮친 뒤 검은 바탕만 남기고 끝난다. 페이드 없이
