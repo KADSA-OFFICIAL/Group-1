@@ -13,6 +13,9 @@ WallGlow로 옮겼다)에서 "문 앞 대기
   4. 루트가 층의 방을 실제로 도는가(연속 구간이 지나치게 길지 않은가)
   5. 스폰·순찰이 복도로 한정되는가(#313) — 복도망(복도 칸의 가장 큰 연결 성분)에
      계단실·방 안쪽 칸이 없고, 모든 대기 지점이 그 안에 있는가
+  6. 플레이어가 설 수 있는 자리마다 수위가 붙잡을 거리까지 오는가(#799) —
+     추격은 `_nearest_free_cell(플레이어)`로 가므로, 그 칸이 멀면 플레이어가
+     거기 붙어 있는 한 영영 못 붙잡는다(교실 창가가 그랬다)
 
 격자·몸통·벽 수집 규칙은 scripts/npc/janitor.gd와 같게 맞췄다. 격자 크기는
 janitor.gd처럼 Floor 폴리곤에서 계산한다 — 상수로 박아 두면 맵이 커졌을 때
@@ -39,8 +42,10 @@ JANITOR = ROOT / "scripts/npc/janitor.gd"
 # janitor.gd와 같은 값(아래 read_janitor_constants가 실제 값과 대조한다)
 BODY_HALF_WIDTH = 9.0
 BODY_HALF_HEIGHT = 15.0
-CELL = 25.0
+CELL = 12.5
 DOOR_APPROACH = 46.0
+NEAREST_RINGS = 14
+CONTACT_DISTANCE = 36.0
 
 # floor_manager.gd
 WALL_T, ARRIVE_DY, ARRIVE_DX = 16.0, 28.0, 59.0
@@ -89,6 +94,8 @@ def read_janitor_constants() -> None:
         "BODY_HALF_HEIGHT": BODY_HALF_HEIGHT,
         "CELL": CELL,
         "DOOR_APPROACH": DOOR_APPROACH,
+        "NEAREST_RINGS": NEAREST_RINGS,
+        "CONTACT_DISTANCE": CONTACT_DISTANCE,
     }
     for name, value in expected.items():
         match = re.search(rf"const {name} := ([\d.]+)", text)
@@ -240,6 +247,215 @@ def build_solid(rects, grid_w: int, grid_h: int) -> set[tuple[int, int]]:
                 if gx0 <= px <= gx1 and gy0 <= py <= gy1:
                     solid.add((cx, cy))
     return solid
+
+
+def seal_isolated(solid, grid_w: int, grid_h: int) -> None:
+    """janitor._seal_isolated_cells — 가장 큰 연결 성분 밖의 열린 칸을 막는다(#799)."""
+    seen: set[tuple[int, int]] = set()
+    best: set[tuple[int, int]] = set()
+    for sx in range(grid_w):
+        for sy in range(grid_h):
+            if (sx, sy) in solid or (sx, sy) in seen:
+                continue
+            component = {(sx, sy)}
+            seen.add((sx, sy))
+            stack = [(sx, sy)]
+            while stack:
+                cx, cy = stack.pop()
+                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    nxt = (cx + dx, cy + dy)
+                    if not (0 <= nxt[0] < grid_w and 0 <= nxt[1] < grid_h):
+                        continue
+                    if nxt in solid or nxt in seen:
+                        continue
+                    seen.add(nxt)
+                    component.add(nxt)
+                    stack.append(nxt)
+            if len(component) > len(best):
+                best = component
+    for cx in range(grid_w):
+        for cy in range(grid_h):
+            if (cx, cy) not in best:
+                solid.add((cx, cy))
+
+
+def nearest_free_cell(solid, x: float, y: float, grid_w: int, grid_h: int):
+    """janitor._nearest_cell(corridor_only = false)와 같다."""
+    cx = min(max(int(x // CELL), 0), grid_w - 1)
+    cy = min(max(int(y // CELL), 0), grid_h - 1)
+    if (cx, cy) not in solid:
+        return cx, cy
+    for radius in range(1, NEAREST_RINGS + 1):
+        best, best_distance = None, math.inf
+        for ox in range(-radius, radius + 1):
+            for oy in range(-radius, radius + 1):
+                if abs(ox) != radius and abs(oy) != radius:
+                    continue
+                probe = (cx + ox, cy + oy)
+                if not (0 <= probe[0] < grid_w and 0 <= probe[1] < grid_h):
+                    continue
+                if probe in solid:
+                    continue
+                px, py = cell_center(*probe)
+                distance = (px - x) ** 2 + (py - y) ** 2
+                if distance < best_distance:
+                    best, best_distance = probe, distance
+        if best is not None:
+            return best
+    return cx, cy
+
+
+def ray_clear(rects, a, b) -> bool:
+    """janitor._clear_ray(중심선 한 발) — 선분이 충돌 상자 안을 지나는가.
+    시작점이 상자 안이면 그 상자는 무시한다(hit_from_inside 꺼짐과 같다)."""
+    (ax, ay), (bx, by) = a, b
+    dx, dy = bx - ax, by - ay
+    for x0, y0, x1, y1 in rects:
+        if x0 < ax < x1 and y0 < ay < y1:
+            continue
+        t0, t1 = 0.0, 1.0
+        hit = True
+        for p, q in ((-dx, ax - x0), (dx, x1 - ax), (-dy, ay - y0), (dy, y1 - ay)):
+            if p == 0:
+                if q <= 0:
+                    hit = False
+                    break
+                continue
+            t = q / p
+            if p < 0:
+                t0 = max(t0, t)
+            else:
+                t1 = min(t1, t)
+            if t0 >= t1:
+                hit = False
+                break
+        if hit:
+            return False
+    return True
+
+
+def target_cell(solid, rects, x: float, y: float, grid_w: int, grid_h: int):
+    """janitor._target_cell — 가장 가까운 칸 중 목표가 **보이는** 칸(#799)."""
+    cx = min(max(int(x // CELL), 0), grid_w - 1)
+    cy = min(max(int(y // CELL), 0), grid_h - 1)
+    if (cx, cy) not in solid:
+        return cx, cy
+    for radius in range(1, NEAREST_RINGS + 1):
+        ring = []
+        for ox in range(-radius, radius + 1):
+            for oy in range(-radius, radius + 1):
+                if abs(ox) != radius and abs(oy) != radius:
+                    continue
+                probe = (cx + ox, cy + oy)
+                if not (0 <= probe[0] < grid_w and 0 <= probe[1] < grid_h):
+                    continue
+                if probe in solid:
+                    continue
+                px, py = cell_center(*probe)
+                ring.append(((px - x) ** 2 + (py - y) ** 2, probe))
+        for _distance, probe in sorted(ring):
+            if ray_clear(rects, cell_center(*probe), (x, y)):
+                return probe
+    return nearest_free_cell(solid, x, y, grid_w, grid_h)
+
+
+def body_fits(rects, x: float, y: float) -> bool:
+    for x0, y0, x1, y1 in rects:
+        if (x - BODY_HALF_WIDTH < x1 and x + BODY_HALF_WIDTH > x0
+                and y - BODY_HALF_HEIGHT < y1 and y + BODY_HALF_HEIGHT > y0):
+            return False
+    return True
+
+
+PLAYER_HALF_WIDTH = 8.0     # player.tscn 캡슐 반경
+PLAYER_HALF_HEIGHT = 13.0   # 캡슐 높이 26의 절반
+
+
+def player_fits(rects, x: float, y: float) -> bool:
+    """플레이어 캡슐(반경 8, 높이 26 — 가운데 선분 ±5)이 어느 상자와도 안 겹치는가."""
+    seg = PLAYER_HALF_HEIGHT - PLAYER_HALF_WIDTH
+    for x0, y0, x1, y1 in rects:
+        dx = max(x0 - x, 0.0, x - x1)
+        dy = max(y0 - (y + seg), 0.0, (y - seg) - y1)
+        if dx * dx + dy * dy < PLAYER_HALF_WIDTH * PLAYER_HALF_WIDTH - 1e-6:
+            return False
+    return True
+
+
+def player_spot(rects, x: float, y: float):
+    """도달 격자 칸 안에서 플레이어가 실제로 설 수 있는 자리 — 칸 중심에서 가장
+    가까운 곳. 26px 틈처럼 몸에 꼭 맞는 자리는 칸 중심이 빗나가기 쉽다."""
+    best = None
+    for oy in range(-10, 11, 1):
+        for ox in range(-10, 11, 2):
+            if player_fits(rects, x + ox, y + oy):
+                d = ox * ox + oy * oy
+                if best is None or d < best[0]:
+                    best = (d, x + ox, y + oy)
+    return None if best is None else best[1:]
+
+
+def final_leg(rects, start, goal) -> float:
+    """경로 끝 칸에서 목표로 몸을 밀고 들어간다(janitor._path_to가 덧붙인 마지막
+    지점). move_and_slide를 축 단위 미끄러짐으로 흉내 내고, 가장 가까이 간 거리를
+    돌려준다. 몸통은 캡슐 대신 상자라 실제보다 조금 박하다."""
+    near = [r for r in rects
+            if r[0] < max(start[0], goal[0]) + 60 and r[2] > min(start[0], goal[0]) - 60
+            and r[1] < max(start[1], goal[1]) + 60 and r[3] > min(start[1], goal[1]) - 60]
+    x, y = start
+    best = math.dist((x, y), goal)
+    for _ in range(4000):
+        distance = math.dist((x, y), goal)
+        best = min(best, distance)
+        if distance <= CONTACT_DISTANCE:
+            return distance
+        ux, uy = (goal[0] - x) / distance, (goal[1] - y) / distance
+        for nx, ny in ((x + ux, y + uy), (x + ux, y), (x, y + uy)):
+            if (nx, ny) != (x, y) and body_fits(near, nx, ny):
+                x, y = nx, ny
+                break
+        else:
+            return best
+    return best
+
+
+def check_catch(floor: int, solid, rects, grid_w: int, grid_h: int) -> None:
+    """플레이어가 걸어서 설 수 있는 자리마다 수위가 붙잡는 거리까지 오는가(#799).
+
+    추격은 목표 칸(`_target_cell`)까지 격자로 가고 마지막에 플레이어에게 몸으로
+    밀고 들어간다. 그 끝에서 CONTACT_DISTANCE 안에 못 들면 플레이어가 거기 붙어
+    있는 한 영영 안 붙잡힌다 — 25px 격자일 때 교실 창가가 그랬다."""
+    import verify_floor_reach as reach_mod
+    walls, _rooms, (width, height), _wins = reach_mod.parse(
+        ROOT / f"scenes/background/school_floor_{floor}.tscn")
+    blocked, cols, rows = reach_mod.build_grid(walls, width, height)
+    start = {1: (200, 630)}.get(floor, (200, 700))
+    spots = reach_mod.flood(blocked, cols, rows, start)
+    far = []
+    pushed = 0
+    for r, c in spots:
+        x, y = (c + 0.5) * reach_mod.CELL, (r + 0.5) * reach_mod.CELL
+        # 도달 격자는 벽을 반경 10으로만 부풀려 캡슐 반높이(13)보다 박하지 않다 —
+        # 칸 안에서 플레이어 캡슐이 실제로 서는 자리를 찾아 그 자리로 본다.
+        spot = player_spot(rects, x, y)
+        if spot is None:
+            continue
+        x, y = spot
+        target = target_cell(solid, rects, x, y, grid_w, grid_h)
+        center = cell_center(*target)
+        if math.dist((x, y), center) <= CONTACT_DISTANCE:
+            continue
+        pushed += 1
+        closest = final_leg(rects, center, (x, y))
+        if closest > CONTACT_DISTANCE + 1.0:   # 1px 걸음의 반올림 여유
+            far.append((closest, x, y))
+    if far:
+        far.sort(reverse=True)
+        sample = ", ".join(f"({x:.0f},{y:.0f}) {d:.0f}px" for d, x, y in far[:5])
+        fail(f"{floor}층: 수위가 붙잡으러 못 오는 자리 {len(far)}곳 — {sample}")
+    else:
+        print(f"        붙잡기: 플레이어 자리 {len(spots)}곳 전부 닿는다 "
+              f"(격자 끝에서 몸으로 밀고 들어가는 곳 {pushed}곳)")
 
 
 def reachable_cells(solid, seeds, grid_w: int, grid_h: int) -> set[tuple[int, int]]:
@@ -400,6 +616,7 @@ def check_floor(floor: int, stairs, show_list: bool) -> None:
 
     rects = load_blockers(floor)
     solid = build_solid(rects, grid_w, grid_h)
+    seal_isolated(solid, grid_w, grid_h)
     seeds = arrive_points(floor, stairs)
     reach = reachable_cells(solid, seeds, grid_w, grid_h)
 
@@ -439,6 +656,7 @@ def check_floor(floor: int, stairs, show_list: bool) -> None:
         print("        건너뜀: "
               + ", ".join(f"{n}({x:.0f},{y:.0f})" for n, (x, y) in skipped))
     check_corridor(floor, solid, grid_w, grid_h, route)
+    check_catch(floor, solid, rects, grid_w, grid_h)
 
     if show_list:
         for i, (name, stop, _door) in enumerate(route):

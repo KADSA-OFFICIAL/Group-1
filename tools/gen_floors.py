@@ -3609,7 +3609,15 @@ def _line_walls(sc, key, kind, x0, x1, topf, botf, door, keepout):
         while a < a1:
             name, d, ln, color = items[i % len(items)]
             if a + ln > a1:
-                break
+                # 차례인 것이 안 들어가면 들어가는 짧은 것으로 끝을 채운다(#799).
+                # 그냥 멈추면 벽 끝에 장 하나 길이만큼 빈칸이 남는데, 그 칸이
+                # 격자 집기 줄과 벽 사이 틈(34px)으로만 이어지면 플레이어(26)는
+                # 들어가고 수위(30)는 못 비집는 구석이 된다 — 1층 현관 오른쪽
+                # 아래가 추격 중에도 안 잡히는 자리였다.
+                short = [it for it in items if a + it[2] <= a1]
+                if not short:
+                    break
+                name, d, ln, color = short[0]
             cell = cell_of(a, d, ln)
             if any(_overlap(cell, k) for k in block):
                 a += 8

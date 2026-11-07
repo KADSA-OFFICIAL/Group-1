@@ -46,7 +46,11 @@ const ARRIVE_DISTANCE := 6.0
 const STUCK_SECONDS := 0.6      # 가려던 방향으로 못 나아간 시간이 이만큼이면 막힌 것
 const PROGRESS_RATIO := 0.3     # 기대 전진량의 이 비율 미만이면 나아가지 못한 것으로 본다
 const REPATH_SECONDS := 0.3     # 경로 재계산 주기
-const CONTACT_DISTANCE := 30.0  # 이 안까지 붙으면 멈춰 마주보고 붙잡는다(#4)
+# 이 안까지 붙으면 멈춰 마주보고 붙잡는다(#4). 30 → 36(#799): 책상과 벽 사이
+# 26~30px 틈은 플레이어(캡슐 높이 26)만 들어가고 수위(30)는 못 들어가서, 30이면
+# 틈 입구에서 33~36px 앞에 서서 영영 못 붙잡았다. 두 그림(74x76·48x80)이 이미
+# 크게 겹치는 거리라 6px 늘어도 화면에서는 같아 보인다.
+const CONTACT_DISTANCE := 36.0
 const WALL_MASK := 1            # LOS 레이캐스트 대상(벽·바리케이드)
 
 # 콜리전 캡슐(18×30)은 회전하지 않으므로 반폭이 축마다 다르다.
@@ -59,10 +63,17 @@ const BODY_PROBE_MARGIN := 1.0
 # 격자: 층 씬 크기에서 매번 계산한다. 예전엔 2800×1800 고정이라 맵이 커지자
 # (#159로 3400×2500) 격자가 왼쪽 위만 덮어 바깥 구역이 통째로 경로탐색에서
 # 빠졌다 — 1층 현관·수위실 띠(y 2120~2480)가 격자 밖이었다.
-const CELL := 25.0
+#
+# **칸은 12.5px다**(#799, 예전 25). 칸 중심이 부풀린 벽 밖에 떨어져야 열린
+# 칸인데, 25px에서는 교실 창가처럼 몸이 들어가는 좁은 띠에 중심이 하나도 안
+# 떨어져 띠 전체가 막혔다 — 플레이어가 거기 붙으면 수위가 80px 앞 책상 너머
+# 칸에서 멈춰 영영 못 붙잡았다. 칸을 줄였으면 칸 수로 적은 값(최근접 칸 탐색
+# 반경·경로 다듬기 앞보기)도 같은 월드 거리가 되게 함께 고친다.
+const CELL := 12.5
 const NEIGHBORS := [Vector2i.LEFT, Vector2i.RIGHT, Vector2i.UP, Vector2i.DOWN]
-const GRID_FALLBACK := Vector2i(136, 100)
-const PATH_LOOKAHEAD := 12      # 경로 다듬기에서 앞쪽 몇 지점까지 시야를 볼지
+const GRID_FALLBACK := Vector2i(272, 200)
+const PATH_LOOKAHEAD := 24      # 경로 다듬기에서 앞쪽 몇 지점까지 시야를 볼지(약 300px)
+const NEAREST_RINGS := 14       # 최근접 빈 칸을 찾는 테두리 수(약 175px)
 const FAR_SPAWN_RATIO := 0.6    # 스폰 후보: 플레이어에게서 최대 거리의 이 비율 이상인 칸
 
 # ── 순찰 루트 (#141) ─────────────────────────────────────────────
@@ -447,26 +458,26 @@ func _rebuild_grid(floor_root: Node) -> void:
 				if grown.has_point(_cell_center(cell)):
 					astar_grid.set_point_solid(cell, true)
 
-	walkable_cells.clear()
-	for cell_x in grid_size.x:
-		for cell_y in grid_size.y:
-			var cell := Vector2i(cell_x, cell_y)
-			if not astar_grid.is_point_solid(cell):
-				walkable_cells.append(cell)
+	_seal_isolated_cells()
 
-	# 순찰용 복도 칸: 방·계단실 폴리곤 안에 들어가는 칸을 뺀다.
+	# 순찰용 복도 칸: 방·계단실 폴리곤 안에 들어가는 칸을 뺀다. 칸마다 방을
+	# 전부 훑지 않고 방마다 자기 칸 범위만 칠한다 — 칸이 네 배가 된 뒤(#799)
+	# 층 전환 시간이 늘지 않게.
 	var indoor: Array[Rect2] = []
 	_collect_indoor_rects(floor_root, indoor)
+	var indoor_lookup: Dictionary = {}
+	for rect in indoor:
+		var min_cell := _cell_of(rect.position)
+		var max_cell := _cell_of(rect.end)
+		for cell_x in range(maxi(min_cell.x, 0), mini(max_cell.x, grid_size.x - 1) + 1):
+			for cell_y in range(maxi(min_cell.y, 0), mini(max_cell.y, grid_size.y - 1) + 1):
+				var cell := Vector2i(cell_x, cell_y)
+				if rect.has_point(_cell_center(cell)):
+					indoor_lookup[cell] = true
 	corridor_cells.clear()
 	corridor_lookup.clear()
 	for cell in walkable_cells:
-		var center := _cell_center(cell)
-		var inside := false
-		for rect in indoor:
-			if rect.has_point(center):
-				inside = true
-				break
-		if not inside:
+		if not indoor_lookup.has(cell):
 			corridor_cells.append(cell)
 			corridor_lookup[cell] = true
 	if corridor_cells.is_empty():
@@ -481,6 +492,49 @@ func _rebuild_grid(floor_root: Node) -> void:
 
 	# 경로탐색과 순찰 목표가 모두 준비된 뒤에 사용 가능으로 표시한다.
 	grid_ready = not walkable_cells.is_empty()
+
+
+## 열린 칸 중 **가장 큰 연결 성분**만 남기고 나머지는 막는다(#799).
+##
+## 외벽 바깥 띠·집기 사이 틈처럼 열려 있어도 수위가 갈 수 없는 칸이 있다.
+## 남겨 두면 `_nearest_free_cell()`이 벽에 붙은 플레이어의 가장 가까운 칸으로
+## 그것을 골라(교실 창가 구석 → 외벽 너머 x < 20) A*가 빈 경로를 돌려주고,
+## 수위는 책상에 대고 직진하다 멈춘다. 막아 두면 최근접 칸이 늘 갈 수 있는 칸이다.
+func _seal_isolated_cells() -> void:
+	var open: Dictionary = {}
+	for cell_x in grid_size.x:
+		for cell_y in grid_size.y:
+			var cell := Vector2i(cell_x, cell_y)
+			if not astar_grid.is_point_solid(cell):
+				open[cell] = true
+
+	var seen: Dictionary = {}
+	var best: Array[Vector2i] = []
+	for start in open:
+		if seen.has(start):
+			continue
+		var component: Array[Vector2i] = []
+		var queue: Array[Vector2i] = [start]
+		seen[start] = true
+		while not queue.is_empty():
+			var cell: Vector2i = queue.pop_back()
+			component.append(cell)
+			for step in NEIGHBORS:
+				var probe: Vector2i = cell + step
+				if seen.has(probe) or not open.has(probe):
+					continue
+				seen[probe] = true
+				queue.append(probe)
+		if component.size() > best.size():
+			best = component
+
+	var keep: Dictionary = {}
+	for cell in best:
+		keep[cell] = true
+	for cell in open:
+		if not keep.has(cell):
+			astar_grid.set_point_solid(cell, true)
+	walkable_cells = best
 
 
 ## 복도 밖(방·계단실)을 통행 불가로 막은 순찰 전용 격자.
@@ -720,6 +774,56 @@ func _nearest_free_cell(point: Vector2) -> Vector2i:
 	return _nearest_cell(point, false)
 
 
+## 쫓아갈 목표(플레이어·은신처)의 칸. `_nearest_free_cell`과 같되, **목표가 보이는
+## 칸**만 고른다(#799). 거리만 보면 벽 너머 옆방 칸을 고를 수 있다 — 1층 현관
+## 신발장 뒤에 붙으면 벽 너머 수위실 칸이 가장 가까운 칸으로 뽑혔다.
+## 보이는 칸이 없으면 예전처럼 가장 가까운 칸으로 떨어진다.
+func _target_cell(point: Vector2) -> Vector2i:
+	var cell := _cell_of(point)
+	cell.x = clampi(cell.x, 0, grid_size.x - 1)
+	cell.y = clampi(cell.y, 0, grid_size.y - 1)
+	if not astar_grid.is_point_solid(cell):
+		return cell
+	for radius in range(1, NEAREST_RINGS + 1):
+		var ring: Array = []
+		for offset_x in range(-radius, radius + 1):
+			for offset_y in range(-radius, radius + 1):
+				if absi(offset_x) != radius and absi(offset_y) != radius:
+					continue
+				var probe := Vector2i(cell.x + offset_x, cell.y + offset_y)
+				if probe.x < 0 or probe.y < 0 \
+						or probe.x >= grid_size.x or probe.y >= grid_size.y:
+					continue
+				if astar_grid.is_point_solid(probe):
+					continue
+				ring.append([_cell_center(probe).distance_squared_to(point), probe])
+		ring.sort_custom(func(a, b): return a[0] < b[0])
+		for entry in ring:
+			if _clear_ray(_cell_center(entry[1]), point):
+				return entry[1]
+	return _nearest_free_cell(point)
+
+
+## 목표까지의 경로. 격자 경로는 목표 칸 중심에서 끝나는데, 목표가 벽·집기에 붙어
+## 있으면 그 칸이 목표에서 멀 수 있다(칸 중심이 몸이 들어가는 좁은 띠를 비껴간
+## 경우). 그래서 **마지막에 목표 자체를 덧붙여** 남은 거리를 몸으로 밀고
+## 들어가게 한다(#799) — `move_and_slide`가 집기 모서리를 미끄러져 넘는다.
+##
+## 이미 그 칸보다 목표에 가깝고 사이가 트여 있으면 빈 경로(= 곧장 민다)를 준다.
+## 격자에 없는 좁은 띠(신발장 밑 34px 틈)에 들어선 수위는 자기 칸이 막힌 칸이라
+## `_nearest_free_cell(position)`이 **뒤쪽** 칸을 돌려준다 — 그대로 다시 짜면
+## 0.3초마다 띠 입구로 되돌아가 들락날락했다(1층 현관에서 실제로 그랬다).
+func _path_to(target: Vector2) -> PackedVector2Array:
+	var goal := _target_cell(target)
+	if position.distance_to(target) < _cell_center(goal).distance_to(target) \
+			and _clear_ray(position, target):
+		return PackedVector2Array()
+	var path := astar_grid.get_point_path(_nearest_free_cell(position), goal)
+	if not path.is_empty() and path[path.size() - 1].distance_to(target) > ARRIVE_DISTANCE:
+		path.append(target)
+	return path
+
+
 ## 같은 보정을 복도 칸으로 한정해서 한다(순찰 목표·스폰 기준점).
 func _nearest_corridor_cell(point: Vector2) -> Vector2i:
 	return _nearest_cell(point, true)
@@ -738,7 +842,7 @@ func _nearest_cell(point: Vector2, corridor_only: bool) -> Vector2i:
 	if _cell_allowed(cell, corridor_only):
 		return cell
 
-	for radius in range(1, 8):
+	for radius in range(1, NEAREST_RINGS + 1):
 		var best := Vector2i(-1, -1)
 		var best_distance := INF
 		for offset_x in range(-radius, radius + 1):
@@ -1019,8 +1123,7 @@ func _move_search(delta: float) -> void:
 	if repath_timer <= 0.0:
 		repath_timer = REPATH_SECONDS
 		if grid_ready and not _clear_line(position, search_point):
-			path_points = astar_grid.get_point_path(
-				_nearest_free_cell(position), _nearest_free_cell(search_point))
+			path_points = _path_to(search_point)
 		else:
 			path_points = PackedVector2Array()
 
@@ -1072,8 +1175,7 @@ func _update_chase_path() -> void:
 	if _clear_line(position, player.position):
 		path_points = PackedVector2Array()   # 몸통이 지나갈 직선이 있으면 직진
 		return
-	path_points = astar_grid.get_point_path(
-		_nearest_free_cell(position), _nearest_free_cell(player.position))
+	path_points = _path_to(player.position)
 
 
 func _move_patrol(delta: float) -> void:

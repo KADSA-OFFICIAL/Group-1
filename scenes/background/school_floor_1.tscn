@@ -2502,41 +2502,59 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.1998, 0.3246, 0.2248, 1)
 polygon = PackedVector2Array(998, 984, 1024, 984, 1024, 1010, 998, 1010)
 
-[node name="PC_Entrance_line2_shoes" type="CollisionPolygon2D" parent="PropBodies"]
+[node name="PC_Entrance_line2_plant" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(998, 1040, 1024, 1040, 1024, 1066, 998, 1066)
+
+[node name="PV_Entrance_line2_plant" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_plant")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.1958, 0.3182, 0.2204, 1)
+polygon = PackedVector2Array(998, 1040, 1024, 1040, 1024, 1066, 998, 1066)
+
+[node name="PC_Entrance_line3_shoes" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1416, 836, 1442, 836, 1442, 906, 1416, 906)
 
-[node name="PV_Entrance_line2_shoes" type="Polygon2D" parent="Props"]
+[node name="PV_Entrance_line3_shoes" type="Polygon2D" parent="Props"]
 texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1416, 836, 1442, 836, 1442, 906, 1416, 906)
 
-[node name="PC_Entrance_line3_plant" type="CollisionPolygon2D" parent="PropBodies"]
+[node name="PC_Entrance_line4_plant" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1416, 912, 1442, 912, 1442, 938, 1416, 938)
 
-[node name="PV_Entrance_line3_plant" type="Polygon2D" parent="Props"]
+[node name="PV_Entrance_line4_plant" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_plant")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.2022, 0.3286, 0.2275, 1)
+color = Color(0.1948, 0.3166, 0.2193, 1)
 polygon = PackedVector2Array(1416, 912, 1442, 912, 1442, 938, 1416, 938)
 
-[node name="PC_Entrance_line4_shoes" type="CollisionPolygon2D" parent="PropBodies"]
+[node name="PC_Entrance_line5_shoes" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1416, 944, 1442, 944, 1442, 1014, 1416, 1014)
 
-[node name="PV_Entrance_line4_shoes" type="Polygon2D" parent="Props"]
+[node name="PV_Entrance_line5_shoes" type="Polygon2D" parent="Props"]
 texture = ExtResource("ext_bookshelf_side")
 uv = PackedVector2Array(0, 0, 15, 0, 15, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1416, 944, 1442, 944, 1442, 1014, 1416, 1014)
 
-[node name="PC_Entrance_line5_plant" type="CollisionPolygon2D" parent="PropBodies"]
+[node name="PC_Entrance_line6_plant" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1416, 1020, 1442, 1020, 1442, 1046, 1416, 1046)
 
-[node name="PV_Entrance_line5_plant" type="Polygon2D" parent="Props"]
+[node name="PV_Entrance_line6_plant" type="Polygon2D" parent="Props"]
 texture = ExtResource("tex_obj_plant")
 uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.2089, 0.3395, 0.2351, 1)
+color = Color(0.2003, 0.3255, 0.2254, 1)
 polygon = PackedVector2Array(1416, 1020, 1442, 1020, 1442, 1046, 1416, 1046)
+
+[node name="PC_Entrance_line7_plant" type="CollisionPolygon2D" parent="PropBodies"]
+polygon = PackedVector2Array(1416, 1052, 1442, 1052, 1442, 1078, 1416, 1078)
+
+[node name="PV_Entrance_line7_plant" type="Polygon2D" parent="Props"]
+texture = ExtResource("tex_obj_plant")
+uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
+color = Color(0.2013, 0.3271, 0.2265, 1)
+polygon = PackedVector2Array(1416, 1052, 1442, 1052, 1442, 1078, 1416, 1078)
 
 [node name="PC_JanitorRoom_0" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1641, 1000.3, 1737, 1000.3, 1737, 1040.3, 1641, 1040.3)
@@ -3399,24 +3417,6 @@ z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
-[node name="Exam_Entrance_line4_shoes" type="Area2D" parent="."]
-position = Vector2(1429, 979)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("3_interactable")
-interact_priority = 3
-message = "운동화 한 짝이 뒤집힌 채 칸에 걸쳐 있다. 이름이 지워져 있다."
-prompt_text = "살펴보기"
-
-[node name="Zone" type="CollisionShape2D" parent="Exam_Entrance_line4_shoes"]
-shape = SubResource("RectangleShape2D_exam_zone")
-
-[node name="Mark_Exam_Entrance_line4_shoes" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(1429, 979)
-z_index = 5
-color = Color(0.60, 0.68, 0.78, 1)
-polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
-
 [node name="Exam_Entrance_line0_shoes" type="Area2D" parent="."]
 position = Vector2(1011, 807)
 collision_layer = 2
@@ -3431,6 +3431,24 @@ shape = SubResource("RectangleShape2D_exam_zone")
 
 [node name="Mark_Exam_Entrance_line0_shoes" type="Polygon2D" parent="WallGlow/Marks"]
 position = Vector2(1011, 807)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
+[node name="Exam_Entrance_line5_shoes" type="Area2D" parent="."]
+position = Vector2(1429, 979)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "운동화 한 짝이 뒤집힌 채 칸에 걸쳐 있다. 이름이 지워져 있다."
+prompt_text = "살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_Entrance_line5_shoes"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_Entrance_line5_shoes" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1429, 979)
 z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
