@@ -53,6 +53,12 @@ var _speech_queue: Array[Array] = []
 ## 빈 배열이면 아무것도 안 뜨고 있다.
 var _current: Array = []
 var _draining: bool = false
+## 배출 루프 세대(#835). `cut_to_last_line()`이 올리면 기다리던 옛 루프는 깨어나서
+## 아무것도 건드리지 않고 돌아선다 — 새 루프가 자막을 쥐고 있다.
+var _drain_gen: int = 0
+## 마지막으로 **요청된** 줄(#835). 같은 줄이라 버려졌어도(#505) 기억한다 — 체포 대사가
+## 지금 떠 있는 줄과 같으면 대기열에는 없기 때문이다.
+var _last_requested: Array = []
 var current_items: Array[String] = []
 var max_items: int = 5
 
@@ -238,6 +244,28 @@ func await_last_line_typed() -> void:
 		await get_tree().process_frame
 
 
+## 붙잡혔을 때 대기열을 **마지막으로 요청된 줄(체포 대사)만 남기고** 끊는다(#835).
+##
+## `await_last_line_typed()`(#806)만으로는 앞에 밀린 줄이 읽는 시간까지 다 흘러간 뒤에야
+## 체포 대사가 떠서, 단서 문구·혼잣말이 쌓여 있으면 점프스케어가 몇 초씩 늘어졌다.
+## 죽은 뒤에 읽을 줄은 없다 — 지금 찍히는 줄도 끊고 체포 대사를 곧바로 띄운다.
+## 체포 대사가 이미 찍히는 중이면 뒤에 밀린 것만 버린다.
+func cut_to_last_line() -> void:
+	if _last_requested.is_empty():
+		return
+	var last := _last_requested
+	if _same_line(_current, last):
+		_speech_queue.clear()
+		return
+	if _current.is_empty() and _speech_queue.size() == 1 and _same_line(_speech_queue[0], last):
+		return   # 이미 체포 대사 하나뿐이다 — 한 프레임 뒤 배출이 띄운다(#569).
+	_drain_gen += 1
+	_speech_queue.clear()
+	_current = []
+	_draining = false
+	_show_subtitle(last[0], last[1], last[2])
+
+
 ## **같은 줄이 겹치면 버린다**(#505). `interactable.gd`는 E를 누를 때마다
 ## `request_notice`를 부르고(되풀이 조사는 의도된 동작이다, #301) 대기열은 받은 것을
 ## 그대로 쌓았다 — 그래서 E를 세 번 누르면 같은 문장이 세 번 떴고, 뒤에 줄이 있으면
@@ -247,6 +275,7 @@ func await_last_line_typed() -> void:
 ## **자막이 끝난 뒤 다시 조사하면 다시 나온다** — 지금 떠 있는 줄과 대기열만 본다.
 func _show_subtitle(speaker: String, text: String, emotion: String) -> void:
 	var line_now: Array = [speaker, text, emotion]
+	_last_requested = line_now
 	if _same_line(_current, line_now):
 		return
 	for queued: Array in _speech_queue:
@@ -257,6 +286,7 @@ func _show_subtitle(speaker: String, text: String, emotion: String) -> void:
 		return
 
 	_draining = true
+	var gen := _drain_gen
 
 	# **한 프레임 미루고 시작한다**(#569). 장면 대사는 줄을 한꺼번에 넘기는 것이
 	# 규약인데(#471), 첫 줄이 여기서 곧바로 배출을 시작하면 나머지 줄이 아직
@@ -268,6 +298,8 @@ func _show_subtitle(speaker: String, text: String, emotion: String) -> void:
 	# 한 프레임만 미루면 첫 줄도 밀린 줄로 보인다. 16ms 라 눈에 띄지 않는다.
 	if get_tree() != null:
 		await get_tree().process_frame
+	if gen != _drain_gen:
+		return   # 끊겼다(#835) — 새 루프가 자막을 쥐고 있다.
 
 	while not _speech_queue.is_empty() and is_instance_valid(subtitle):
 		var line: Array = _speech_queue.pop_front()
@@ -280,6 +312,8 @@ func _show_subtitle(speaker: String, text: String, emotion: String) -> void:
 		# 읽는 시간을 준다. 뒤에 줄이 더 있으면 짧게 준다: 한 사람이 이어서
 		# 말하는데 매 줄 3초씩 쉬면 대화가 아니라 안내문이 된다.
 		await _hold_line(subtitle.last_typing_seconds)
+		if gen != _drain_gen:
+			return
 
 	# 기다리는 사이 씬이 바뀌었을 수 있다(체포·탈출).
 	if is_instance_valid(subtitle):

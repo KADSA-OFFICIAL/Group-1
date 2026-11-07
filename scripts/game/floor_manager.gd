@@ -244,8 +244,11 @@ func _on_game_over(reason: String) -> void:
 	GameOverScreen.pending_reason = reason
 
 	# 수위의 마지막 대사가 자막에 다 찍힐 때까지 기다린다 — 페이드를 바로 걸면
-	# 문장이 절반쯤 나온 채로 화면이 어두워진다(#199). 이미 다 찍혔으면
-	# await_subtitle()이 곧바로 돌아오고 아래 유예만 적용된다.
+	# 문장이 절반쯤 나온 채로 화면이 어두워진다(#199). 앞에 밀린 줄은 버리고
+	# 체포 대사만 남긴다(#835) — 안 그러면 그 줄들이 다 흘러갈 때까지 늘어진다.
+	# 이미 다 찍혔으면 곧바로 돌아오고 아래 유예만 적용된다.
+	if hud.has_method("cut_to_last_line"):
+		hud.cut_to_last_line()
 	if hud.has_method("await_last_line_typed"):
 		await hud.await_last_line_typed()
 	await get_tree().create_timer(GAME_OVER_LINE_HOLD).timeout
