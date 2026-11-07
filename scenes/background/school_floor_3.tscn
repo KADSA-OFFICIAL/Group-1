@@ -2273,7 +2273,7 @@ position = Vector2(1558, 420)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
-message = "교무용 열쇠 보관함. '2F 계단' 고리에는 열쇠 대신 점검표가 걸려 있다. — '2층 창고 적재함 정리. 확인 요망. -박'"
+message = "열쇠 보관함. '2F 계단' 고리에는 열쇠 대신 점검표가 걸려 있다. — '2층 창고 적재함 정리. 확인 요망. -박'"
 prompt_text = "보관함 열기"
 grants_flag = "opened_key_cabinet"
 
@@ -2324,7 +2324,7 @@ position = Vector2(1200, 268)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
-message = "생활지도부 사안 파일. '1학년 6반 임나연 — SNS 따돌림 주도.' 붙은 캡처는 단톡방 농담 한 줄이 퍼진 것뿐이다. 여백에 볼펜 글씨 — '장난이었다잖아.' 맨 위에 빨간 도장: 실종 신고 접수."
+message = "사안 파일. 표지에 '생활지도부' 도장이 찍혀 있다. '1학년 6반 임나연 — SNS 따돌림 주도.' 붙은 캡처는 단톡방 농담 한 줄이 퍼진 것뿐이다. 여백에 볼펜 글씨 — '장난이었다잖아.' 맨 위에 빨간 도장: 실종 신고 접수."
 prompt_text = "조사"
 grants_flag = "found_imnayeon"
 
@@ -2480,7 +2480,7 @@ position = Vector2(2190, 1280)
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("3_interactable")
-message = "교구함에 쪽지가 붙어 있다. '민혁아, 과학실 기구 부수지 마. 걸리면 너만 혼나. 열쇠 여기 숨겨둘게. -태호' 쪽지 밑 못에는 아무것도 걸려 있지 않다. 누가 먼저 가져간 모양이다."
+message = "벽에 쪽지가 붙어 있다. '민혁아, 과학실 기구 부수지 마. 걸리면 너만 혼나. 열쇠 여기 숨겨둘게. -태호' 쪽지 밑 못에는 아무것도 걸려 있지 않다. 누가 먼저 가져간 모양이다."
 prompt_text = "쪽지 살펴보기"
 grants_flag = "read_taeho_note"
 
@@ -3482,15 +3482,6 @@ uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
 color = Color(0.2345, 0.3209, 0.2962, 1)
 polygon = PackedVector2Array(1094, 60, 1124, 60, 1124, 98, 1094, 98)
 
-[node name="PC_North3_bin" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1100, 476, 1124, 476, 1124, 500, 1100, 500)
-
-[node name="PV_North3_bin" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_bin")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.2127, 0.2378, 0.2628, 1)
-polygon = PackedVector2Array(1100, 476, 1124, 476, 1124, 500, 1100, 500)
-
 [node name="PC_North3_back0" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1094, 106, 1124, 106, 1124, 146, 1094, 146)
 
@@ -3754,15 +3745,6 @@ uv = PackedVector2Array(0, 0, 44, 0, 44, 52, 0, 52)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1019.8, 381, 1063.8, 381, 1063.8, 433, 1019.8, 433)
 
-[node name="PC_North3_d7" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1019.8, 443, 1063.8, 443, 1063.8, 495, 1019.8, 495)
-
-[node name="PV_North3_d7" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_hs_student_desk")
-uv = PackedVector2Array(0, 0, 44, 0, 44, 52, 0, 52)
-color = Color(1, 1, 1, 1)
-polygon = PackedVector2Array(1019.8, 443, 1063.8, 443, 1063.8, 495, 1019.8, 495)
-
 [node name="PC_North4_desk0_0" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1259.7, 364, 1303.7, 364, 1303.7, 422, 1259.7, 422)
 
@@ -3825,24 +3807,6 @@ texture = ExtResource("ext_cabinet")
 uv = PackedVector2Array(0, 0, 44, 0, 44, 32, 0, 32)
 color = Color(1, 1, 1, 1)
 polygon = PackedVector2Array(1174, 304, 1220, 304, 1220, 338, 1174, 338)
-
-[node name="PC_North4_shelfL0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1174, 354, 1214, 354, 1214, 412, 1174, 412)
-
-[node name="PV_North4_shelfL0" type="Polygon2D" parent="Props"]
-texture = ExtResource("ext_bookshelf_side")
-uv = PackedVector2Array(15, 0, 0, 0, 0, 32, 15, 32)
-color = Color(1, 1, 1, 1)
-polygon = PackedVector2Array(1174, 354, 1214, 354, 1214, 412, 1174, 412)
-
-[node name="PC_North4_copierL0" type="CollisionPolygon2D" parent="PropBodies"]
-polygon = PackedVector2Array(1174, 428, 1226, 428, 1226, 470, 1174, 470)
-
-[node name="PV_North4_copierL0" type="Polygon2D" parent="Props"]
-texture = ExtResource("tex_obj_cabinet")
-uv = PackedVector2Array(0, 0, 32, 0, 32, 32, 0, 32)
-color = Color(0.3767, 0.3892, 0.4144, 1)
-polygon = PackedVector2Array(1174, 428, 1226, 428, 1226, 470, 1174, 470)
 
 [node name="PC_North4_cabR0" type="CollisionPolygon2D" parent="PropBodies"]
 polygon = PackedVector2Array(1433.3, 304, 1479.3, 304, 1479.3, 338, 1433.3, 338)
@@ -5940,6 +5904,24 @@ z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
 
+[node name="Exam_North3_back3" type="Area2D" parent="."]
+position = Vector2(1109, 264)
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("3_interactable")
+interact_priority = 3
+message = "문이 잠겨 있다. 이름표는 떼어졌다."
+prompt_text = "사물함 살펴보기"
+
+[node name="Zone" type="CollisionShape2D" parent="Exam_North3_back3"]
+shape = SubResource("RectangleShape2D_exam_zone")
+
+[node name="Mark_Exam_North3_back3" type="Polygon2D" parent="WallGlow/Marks"]
+position = Vector2(1109, 264)
+z_index = 5
+color = Color(0.60, 0.68, 0.78, 1)
+polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
+
 [node name="Exam_North3_shelf1" type="Area2D" parent="."]
 position = Vector2(830.2, 466)
 collision_layer = 2
@@ -5954,24 +5936,6 @@ shape = SubResource("RectangleShape2D_exam_zone")
 
 [node name="Mark_Exam_North3_shelf1" type="Polygon2D" parent="WallGlow/Marks"]
 position = Vector2(830.2, 466)
-z_index = 5
-color = Color(0.60, 0.68, 0.78, 1)
-polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
-
-[node name="Exam_North3_d6" type="Area2D" parent="."]
-position = Vector2(1041.8, 407)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("3_interactable")
-interact_priority = 3
-message = "책상 밑에 껌이 붙어 있다. 아직 말랑하다."
-prompt_text = "책상 살펴보기"
-
-[node name="Zone" type="CollisionShape2D" parent="Exam_North3_d6"]
-shape = SubResource("RectangleShape2D_exam_zone")
-
-[node name="Mark_Exam_North3_d6" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(1041.8, 407)
 z_index = 5
 color = Color(0.60, 0.68, 0.78, 1)
 polygon = PackedVector2Array(0, -5, 5, 0, 0, 5, -5, 0)
