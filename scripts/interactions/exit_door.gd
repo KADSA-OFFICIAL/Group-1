@@ -25,8 +25,14 @@ const CHOICE_PROMPT := "이대로 나가면 아무도 모른다."
 const CHOICE_REPORT := "신고한다"
 const CHOICE_LEAVE := "그냥 나간다"
 
+## 탈출 흐름이 시작됐다(#808). 선택지가 열려 있는 동안도 포함한다 — 페이드 중에
+## E를 다시 누르면 선택지가 두 번 뜨고 판정 메타·탈출음이 덮어써졌다.
+var _leaving := false
+
 
 func interact(_player: Node) -> void:
+	if _leaving:
+		return
 	var game_state = get_tree().get_first_node_in_group("game_state")
 
 	if game_state != null and not required_item_id.is_empty() and not game_state.call("has_item", required_item_id):
@@ -37,6 +43,7 @@ func interact(_player: Node) -> void:
 	# 전부 아는 플레이어에게 신고 여부를 다시 묻지 않는다 — 히든이 우선이다.
 	if game_state != null and not game_state.call("has_full_truth") \
 			and game_state.call("saw_coverup"):
+		_leaving = true
 		_ask(game_state)
 		return
 
@@ -66,6 +73,7 @@ func _ask(game_state) -> void:
 
 
 func _leave(game_state, reported: bool) -> void:
+	_leaving = true
 	var kind := &"after_school"
 	if game_state != null:
 		kind = game_state.call("ending_kind", reported)
