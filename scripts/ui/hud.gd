@@ -224,6 +224,20 @@ func await_subtitle() -> void:
 		await subtitle.typing_finished
 
 
+## 대기열의 **마지막 줄이 타이핑을 마칠 때까지** 기다린다(#806). 읽는 시간은 안 기다린다.
+##
+## `await_subtitle()`은 지금 찍히는 줄만 본다. 대사를 요청하고 같은 프레임에 게임 오버를
+## 부르면 배출이 한 프레임 미뤄져(#569) 아직 `typing`이 false라 곧바로 돌아오고, 다른
+## 줄이 떠 있으면 그 줄만 기다려서 **체포 대사가 2~3글자에서 점프스케어에 덮였다.**
+## 앞 줄들은 순서대로 흘러가므로 읽는 시간까지 지나고, 마지막 줄만 타이핑이 끝나면 돌아온다.
+func await_last_line_typed() -> void:
+	while _draining and is_instance_valid(subtitle) \
+			and (not _speech_queue.is_empty() or subtitle.typing):
+		if get_tree() == null:
+			return
+		await get_tree().process_frame
+
+
 ## **같은 줄이 겹치면 버린다**(#505). `interactable.gd`는 E를 누를 때마다
 ## `request_notice`를 부르고(되풀이 조사는 의도된 동작이다, #301) 대기열은 받은 것을
 ## 그대로 쌓았다 — 그래서 E를 세 번 누르면 같은 문장이 세 번 떴고, 뒤에 줄이 있으면

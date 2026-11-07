@@ -1749,11 +1749,38 @@ func _check_jumpscare() -> void:
 	js.connect("finished", func() -> void:
 		finished_black[0] = js_root.visible and not face.visible)
 
+	# 체포 대사는 요청과 게임 오버가 **같은 프레임**이다(#806) — 앞 줄이 떠 있는 채로
+	# 대기열 뒤에 붙는다. 점프스케어는 그 마지막 줄이 다 찍힌 뒤에야 떠야 한다.
+	var hud_node: Node = main.get_node_or_null("HUD")
+	var sub: SubtitleDialogue = null
+	if hud_node != null:
+		sub = hud_node.get_node_or_null("Root/Subtitle") as SubtitleDialogue
+	var catch_text := "…잡았다. 이제 아무 데도 못 가."
+	# 시작 힌트(페이드 뒤에 뜬다)가 떠 있는 동안에 요청해야 "다른 줄이 떠 있는" 경우가 된다.
+	if hud_node != null:
+		await _until(func() -> bool: return bool(hud_node.call("is_speaking")), 4.0)
+	gs.call("request_speech", "수위", "거기 있었구나.", "")
+	await process_frame
+	await process_frame
+	gs.call("request_speech", "수위", catch_text, "")
 	gs.call("trigger_game_over", "caught")
-	if not await _until(func() -> bool: return js_root.visible, 4.0):
+	if not await _until(func() -> bool: return js_root.visible, 6.0):
 		_fault("점프스케어: 붙잡혔는데 오버레이가 안 뜬다")
 		await _drop_scenes(main)
 		return
+	if sub == null:
+		_fault("점프스케어: 자막 노드를 못 찾았다")
+	else:
+		var label := sub.get_node_or_null("Lines/TextLabel") as Label
+		var shown := label.text if label != null else ""
+		var full: bool = label != null and label.visible_characters == -1 \
+			or (label != null and label.visible_characters >= label.get_total_character_count())
+		if sub.typing or shown != catch_text or not full:
+			_fault("점프스케어: 체포 대사가 다 찍히기 전에 얼굴이 덮쳤다 (typing=%s, 대사=\"%s\", 글자 %s/%s)"
+				% [sub.typing, shown, label.visible_characters if label else -2,
+					label.get_total_character_count() if label else -2])
+		else:
+			_ok("점프스케어는 체포 대사가 다 찍힌 뒤")
 	var screamed := false
 	var sfx: Node = root.get_node_or_null("Sfx")
 	if sfx != null:
