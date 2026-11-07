@@ -997,6 +997,11 @@ func blind(seconds: float) -> void:
 	path_points = PackedVector2Array()
 	velocity = Vector2.ZERO
 	announced_chase = false
+	# 수색(#298)·방 진입(#321)도 끊는다(#804) — 스턴 중에는 `_move_search`가 안 돌아
+	# 남은 시간이 얼어 있다가 풀린 뒤 그대로 이어졌다. 알던 것을 전부 잊어야 한다.
+	search_timer = 0.0
+	announced_search = false
+	_end_sweep(false)
 	body.modulate = BLIND_MODULATE
 
 	_say_line(_pick(BLIND_LINES))
