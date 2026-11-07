@@ -20,6 +20,7 @@ const CHOICE_SCENE: PackedScene = preload("res://scenes/ui/choice_prompt.tscn")
 @export var arrive_at: Vector2 = Vector2.INF
 
 ## 어른 쪽 은폐를 본 플레이어에게만 묻는다. 아무것도 못 봤으면 신고할 거리가 없다.
+const CHOICE_LAYER := 4
 const CHOICE_PROMPT := "이대로 나가면 아무도 모른다."
 const CHOICE_REPORT := "신고한다"
 const CHOICE_LEAVE := "그냥 나간다"
@@ -49,8 +50,16 @@ func _ask(game_state) -> void:
 	if host == null:
 		_leave(game_state, false)
 		return
-	host.add_child(panel)
+	# 패널은 루트가 Control이라 Node2D 아래에 붙이면 월드 공간(레이어 0)에 그려져
+	# 어둠·시야 마스크를 받고 화면 밖에 떨어진다(#802). HUD·FadeRect(3) 위 화면 공간에 둔다.
+	var layer := CanvasLayer.new()
+	layer.name = "ChoiceLayer"
+	layer.layer = CHOICE_LAYER
+	layer.process_mode = Node.PROCESS_MODE_ALWAYS
+	host.add_child(layer)
+	layer.add_child(panel)
 	panel.chosen.connect(func(index: int) -> void:
+		layer.queue_free()
 		_leave(game_state, index == 0))
 	panel.call("open", CHOICE_PROMPT,
 		[CHOICE_REPORT, CHOICE_LEAVE] as Array[String])

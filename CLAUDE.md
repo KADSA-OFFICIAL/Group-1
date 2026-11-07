@@ -506,6 +506,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
   - 고른 **즉시** 멈춤을 푼다 — `paused`는 SceneTree에 남으므로 안 풀고 씬을 바꾸면 다음 씬이 통째로 멈춘 채 뜬다.
   - **자식 참조를 `@onready`로 잡지 않는다.** `open()`이 `add_child()` 바로 다음 줄에서 불릴 수 있는데 그 시점에 `_ready`가 아직 안 돌았으면 전부 null이다(헤드리스에서 실제로 그랬다).
   - ↑/↓(`move_up`/`move_down`)로 옮기고 E/Enter로 고른다. 마우스는 쓰지 않는다 — 본편이 키보드 전용이다.
+  - **패널은 `ChoiceLayer`(CanvasLayer 4, `exit_door._ask`)에 건다**(#802). 루트가 Control이라 `Main`(Node2D)에 바로 붙이면 월드 공간·레이어 0에 그려져 카메라·어둠·시야 마스크를 받고 화면 밖에 떨어졌다 — 질문이 안 보이고 E가 조용히 "신고한다"를 골랐다. 스모크(`_check_exit_choice_layer`)가 레이어 3 이상·뷰포트 안인지 본다.
 - 새 기획서 기준 스토리 작업(#137 1~4단계)은 전부 끝났다. 옥상 씬은 계획 없음.
 
 ### 개발 시 주의
