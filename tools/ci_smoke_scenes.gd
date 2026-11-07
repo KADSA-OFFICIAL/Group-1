@@ -1883,8 +1883,9 @@ func _check_exit_door_reentry() -> void:
 	door.call("interact", null)
 	door.call("interact", null)
 	await process_frame
+	# 패널은 화면 공간 레이어(ChoiceLayer, #802) 아래에 붙으므로 자손까지 찾는다.
 	var panels: Array[Node] = []
-	for c in host.get_children():
+	for c in host.find_children("*", "", true, false):
 		if c.has_signal("chosen"):
 			panels.append(c)
 	if panels.size() != 1:
