@@ -75,6 +75,7 @@ func _run() -> void:
 	await _check_audio_settings()
 	await _check_journal()
 	await _check_inventory()
+	await _check_exit_door_reentry()
 	await _check_ending_backgrounds()
 	await _check_ending_result()
 	await _check_cutscene_input()
@@ -1850,6 +1851,81 @@ func _check_ending_backgrounds() -> void:
 ##
 ## 엔딩 종류·점수는 static으로 넘어가므로(`EndingResultScreen.pending_*`) 정적
 ## 검사로는 배선이 끊겨도 모른다 — 실제 `_finish()`를 지나 씬을 갈아 끼워 본다.
+## 현관 문 재진입(#808) — 탈출 흐름이 시작된 뒤 E를 다시 눌러도 한 번만 돈다.
+func _check_exit_door_reentry() -> void:
+	if current_scene != null:
+		current_scene.free()
+		await process_frame
+	var host := Node2D.new()
+	root.add_child(host)
+	current_scene = host
+	var gs := Node.new()
+	var gs_script := GDScript.new()
+	gs_script.source_code = "extends Node\nvar coverup := true\nfunc has_item(_i):\n\treturn true\nfunc has_full_truth():\n\treturn false\nfunc saw_coverup():\n\treturn coverup\nfunc ending_kind(_r):\n\tget_tree().set_meta(\"kind_calls\", int(get_tree().get_meta(\"kind_calls\", 0)) + 1)\n\treturn &\"after_school\"\nfunc clue_score():\n\treturn [0, 18]\nfunc request_notice(_t):\n\tpass\n"
+	gs_script.reload()
+	gs.set_script(gs_script)
+	gs.add_to_group("game_state")
+	var fm := Node.new()
+	var fm_script := GDScript.new()
+	fm_script.source_code = "extends Node\nvar calls := 0\nfunc travel_to(_f, _a):\n\tcalls += 1\n"
+	fm_script.reload()
+	fm.set_script(fm_script)
+	fm.add_to_group("floor_manager")
+	host.add_child(gs)
+	host.add_child(fm)
+	var door := Area2D.new()
+	door.set_script(load("res://scripts/interactions/exit_door.gd"))
+	door.set("next_floor", 0)
+	host.add_child(door)
+	set_meta("kind_calls", 0)
+
+	# 선택지 경로 — 신고 선택지가 열려 있는 동안 E를 다시 눌러도 하나뿐이다.
+	door.call("interact", null)
+	door.call("interact", null)
+	await process_frame
+	# 패널은 화면 공간 레이어(ChoiceLayer, #802) 아래에 붙으므로 자손까지 찾는다.
+	var panels: Array[Node] = []
+	for c in host.find_children("*", "", true, false):
+		if c.has_signal("chosen"):
+			panels.append(c)
+	if panels.size() != 1:
+		_fault("현관 재진입: 선택지가 %d개 떴다(1개여야 한다)" % panels.size())
+	else:
+		_ok("현관 재진입 선택지 1개")
+	for p in panels:
+		p.emit_signal("chosen", 1)
+	paused = false
+	await process_frame
+	door.call("interact", null)
+	if int(fm.get("calls")) != 1 or int(get_meta("kind_calls", 0)) != 1:
+		_fault("현관 재진입: 선택 뒤 E가 또 먹었다(travel_to %d회, 판정 %d회)" % [
+			int(fm.get("calls")), int(get_meta("kind_calls", 0))])
+	else:
+		_ok("현관 재진입 선택 뒤 무시")
+
+	# 선택지 없는 경로 — E 두 번이 판정·이동을 한 번만 낸다.
+	gs.set("coverup", false)
+	var door2 := Area2D.new()
+	door2.set_script(load("res://scripts/interactions/exit_door.gd"))
+	door2.set("next_floor", 0)
+	host.add_child(door2)
+	set_meta("kind_calls", 0)
+	fm.set("calls", 0)
+	door2.call("interact", null)
+	door2.call("interact", null)
+	if int(fm.get("calls")) != 1 or int(get_meta("kind_calls", 0)) != 1:
+		_fault("현관 재진입: E 두 번에 travel_to %d회, 판정 %d회(각 1회여야 한다)" % [
+			int(fm.get("calls")), int(get_meta("kind_calls", 0))])
+	else:
+		_ok("현관 재진입 선택지 없는 경로 1회")
+	remove_meta("kind_calls")
+	remove_meta("ending_kind")
+	remove_meta("clue_score")
+	host.free()
+	current_scene = null
+	await process_frame
+
+
 func _check_ending_result() -> void:
 	if current_scene != null:
 		current_scene.free()
