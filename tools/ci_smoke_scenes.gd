@@ -67,6 +67,7 @@ func _run() -> void:
 	await _check_clue_shuffle()
 	await _check_pickup_janitor()
 	await _check_jumpscare()
+	await _check_caught_during_fade()
 	await _check_external_audio()
 	# 마지막에 둔다 — 씬을 실제로 갈아 끼워(change_scene_to_file) 본다.
 	await _check_pause_menu()
@@ -1777,6 +1778,42 @@ func _check_jumpscare() -> void:
 		_fault("점프스케어: 끝날 때 검은 바탕이 안 남았다(게임 화면이 한 번 비친다)")
 	else:
 		_ok("점프스케어 → 게임 오버")
+	await _drop_scenes(main)
+
+
+## 층 전환 페이드 중에 붙잡히면 전환이 끊기는가(#803) — 층이 안 바뀌고, 다음 층
+## 체크포인트가 안 저장되고, 수위가 다시 깨어나지 않아야 한다.
+func _check_caught_during_fade() -> void:
+	if current_scene != null:
+		current_scene.free()
+		await process_frame
+	var main: Node = (load(MAIN) as PackedScene).instantiate()
+	root.add_child(main)
+	for i in 8:
+		await process_frame
+	await _wait(0.4)
+	var gs: Node = main.get_node_or_null("GameState")
+	var janitor: Node = main.get("janitor")
+	if gs == null or janitor == null:
+		_fault("페이드 중 붙잡힘: GameState/수위를 못 찾았다")
+		await _drop_scenes(main)
+		return
+	gs.get_script().call("clear_checkpoint")
+	var before: int = main.get("current_floor")
+	main.call("travel_to", 3)
+	await _wait(0.1)   # 페이드 아웃(0.25초) 도중
+	if janitor.is_physics_processing():
+		_fault("페이드 중 붙잡힘: 층 전환이 시작됐는데 수위가 안 멈춘다")
+	gs.call("trigger_game_over", "caught")
+	await _wait(0.6)
+	if main.get("current_floor") != before:
+		_fault("페이드 중 붙잡힘: 붙잡혔는데 층이 %d → %d로 바뀌었다" % [before, main.get("current_floor")])
+	elif gs.get_script().call("has_checkpoint"):
+		_fault("페이드 중 붙잡힘: 붙잡혔는데 다음 층 체크포인트가 저장됐다")
+	elif janitor.is_physics_processing():
+		_fault("페이드 중 붙잡힘: 붙잡힌 뒤 수위가 다시 깨어났다")
+	else:
+		_ok("페이드 중 붙잡힘 → 층 전환 중단")
 	await _drop_scenes(main)
 
 
