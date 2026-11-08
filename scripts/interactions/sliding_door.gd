@@ -106,7 +106,7 @@ func _apply() -> void:
 	# 방 달빛은 문 상태를 따라간다(#292). 여기가 상태가 **바뀌는 순간**이라
 	# hold/release가 정확히 한 번씩 짝을 이룬다.
 	if _lights != null:
-		_lights.call("hold" if _open else "release")
+		_lights.call("hold" if _open else "release", self)
 
 	# 열 때는 충돌부터 끈다 — 문에 붙어 선 채로 열면 미는 동안 몸이 낀다.
 	# 닫을 때는 다 닫힌 뒤에 켠다. 순서를 반대로 하면 닫히는 판이 플레이어를
