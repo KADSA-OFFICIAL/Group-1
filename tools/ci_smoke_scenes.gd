@@ -506,6 +506,17 @@ func _check_artroom_intro() -> void:
 			_fault("main: 4층에 %s가 없다" % want)
 	_ok("4층 도입부 노드")
 
+	# 4층 은신처는 미술실 캐비닛 하나뿐이다(#838). 2막의 수위는 늘 그 앞에서 자백하므로
+	# 다른 데 숨을 수 있으면 수위가 시야 마스크 밖에 서서 자막만 흘러간다.
+	var hides: Array[String] = []
+	for c in bg.get_children():
+		if String(c.name).begins_with("Hide") and c.has_method("interact"):
+			hides.append(String(c.name))
+	if hides != ["HideArtCabinet"]:
+		_fault("main: 4층 은신처가 미술실 캐비닛 하나가 아니다 %s(#838)" % [hides])
+	else:
+		_ok("4층 은신처 하나")
+
 	# 창문 컷신(#468) — 생성기가 대사를 안 실으면 계단처럼 지나가 버린다.
 	var win: Node = bg.get_node_or_null("PrepWindowEscape")
 	if win != null:
