@@ -915,30 +915,54 @@ func _check_catch_through_wall() -> void:
 		_fault("벽 너머 접촉: Player·Janitor·RoomWalls를 못 찾았다")
 		main.free()
 		return
-	# 세로로 길고 얇은(16px) 벽 하나를 고른다.
-	var wall := Vector2.ZERO
+	# 세로로 길고 얇은(16px) **내벽** 하나를 고른다. 첫 벽이 외벽이면 플레이어가 맵 밖에
+	# 서서 검사가 의미를 잃는다(#847) — 양쪽 자리가 다른 몸과 안 겹치는 벽만 쓴다.
+	var space := (player as Node2D).get_world_2d().direct_space_state
+	var fm_consts: Dictionary = (main.get_script() as Script).get_script_constant_map()
+	var bounds: Rect2 = (fm_consts["FLOOR_BOUNDS"] as Dictionary).get(3, fm_consts["DEFAULT_BOUNDS"])
+	var p_pos := Vector2.ZERO
+	var j_pos := Vector2.ZERO
 	var found := false
 	for shape in (walls[0] as Node).get_children():
-		if shape is CollisionPolygon2D and (shape as CollisionPolygon2D).polygon.size() > 0:
-			var poly := (shape as CollisionPolygon2D).polygon
-			var lo := poly[0]
-			var hi := poly[0]
-			for pt in poly:
-				lo = lo.min(pt)
-				hi = hi.max(pt)
-			if absf((hi.x - lo.x) - 16.0) < 0.5 and hi.y - lo.y > 200.0:
-				wall = Vector2(lo.x, (lo.y + hi.y) * 0.5)
+		if not (shape is CollisionPolygon2D) or (shape as CollisionPolygon2D).polygon.size() == 0:
+			continue
+		var poly := (shape as CollisionPolygon2D).polygon
+		var lo := poly[0]
+		var hi := poly[0]
+		for pt in poly:
+			lo = lo.min(pt)
+			hi = hi.max(pt)
+		if absf((hi.x - lo.x) - 16.0) >= 0.5 or hi.y - lo.y <= 200.0:
+			continue
+		if lo.x - 60.0 < bounds.position.x or hi.x + 60.0 > bounds.end.x:
+			continue
+		# 벽을 따라 몇 자리를 훑어 양쪽이 비어 있는 곳을 찾는다.
+		for k in range(1, 8):
+			var y := lo.y + (hi.y - lo.y) * k / 8.0
+			var pp := Vector2(lo.x - 8.0 - 0.5, y)
+			var jp := Vector2(hi.x + 9.0, y)   # 중심 간격 약 33px
+			# 벽 자체(RoomWalls)는 빼고 본다 — 두 자리 다 벽에 붙어 있다. 반지름은 캡슐 반폭.
+			var ignore := [player, janitor, walls[0]]
+			if _free_spot(space, pp, 8.0, ignore) \
+					and _free_spot(space, jp, 9.0, ignore) \
+					and _free_spot(space, pp + Vector2(0.0, -33.0), 9.0, ignore):
+				p_pos = pp
+				j_pos = jp
 				found = true
 				break
+		if found:
+			break
 	if not found:
-		_fault("벽 너머 접촉: 세로 벽을 못 찾았다")
+		_fault("벽 너머 접촉: 양쪽이 빈 세로 내벽을 못 찾았다")
 		main.free()
 		return
-	player.global_position = Vector2(wall.x - 8.0 - 0.5, wall.y)
-	janitor.global_position = Vector2(wall.x + 16.0 + 9.0, wall.y)   # 중심 간격 약 33px
+	player.global_position = p_pos
+	janitor.global_position = j_pos
 	await physics_frame
 	await physics_frame
-	if bool(janitor.call("_can_catch")):
+	if not bounds.has_point(player.global_position) or not bounds.has_point(janitor.global_position):
+		_fault("벽 너머 접촉: 검사 자리가 맵 밖이다 (%s / %s)" % [player.global_position, janitor.global_position])
+	elif bool(janitor.call("_can_catch")):
 		_fault("벽 너머 접촉: 세로 벽 33px 너머에서 붙잡을 수 있다")
 	else:
 		_ok("벽 너머 접촉 차단")
@@ -952,6 +976,23 @@ func _check_catch_through_wall() -> void:
 	else:
 		_ok("벽 없는 접촉 유지")
 	main.free()
+
+
+
+## 반지름 r 원이 `exclude` 밖의 어떤 몸과도 안 겹치면 참.
+func _free_spot(space: PhysicsDirectSpaceState2D, at: Vector2, r: float, exclude: Array) -> bool:
+	var circle := CircleShape2D.new()
+	circle.radius = r
+	var q := PhysicsShapeQueryParameters2D.new()
+	q.shape = circle
+	q.transform = Transform2D(0.0, at)
+	q.collision_mask = 1
+	var ex: Array[RID] = []
+	for n in exclude:
+		if n is CollisionObject2D:
+			ex.append((n as CollisionObject2D).get_rid())
+	q.exclude = ex
+	return space.intersect_shape(q, 1).is_empty()
 
 
 func _check_ink_throw() -> void:
@@ -1999,18 +2040,33 @@ func _check_caught_during_fade() -> void:
 		_fault("페이드 중 붙잡힘: GameState/수위를 못 찾았다")
 		await _drop_scenes(main)
 		return
+	# 4층은 수위가 원래 꺼져 있어(JANITOR_FREE_FLOOR) "전환 중 멈춘다"가 늘 참이다(#847).
+	# 수위가 활동하는 3층에서 출발해 2층으로 내려가며 본다.
 	gs.get_script().call("clear_checkpoint")
-	var before: int = main.get("current_floor")
 	main.call("travel_to", 3)
+	if not await _until(func() -> bool:
+			return not bool(main.get("changing_floor")), 6.0):
+		_fault("페이드 중 붙잡힘: 3층 전환이 끝나지 않는다")
+		await _drop_scenes(main)
+		return
+	await _wait(0.2)
+	if not janitor.is_physics_processing():
+		_fault("페이드 중 붙잡힘: 3층인데 수위가 활동 상태가 아니다(출발 조건)")
+		await _drop_scenes(main)
+		return
+	var before: int = main.get("current_floor")
+	var cp_before: int = int(gs.get_script().call("get_checkpoint").get("floor", -1))
+	main.call("travel_to", 2)
 	await _wait(0.1)   # 페이드 아웃(0.25초) 도중
 	if janitor.is_physics_processing():
 		_fault("페이드 중 붙잡힘: 층 전환이 시작됐는데 수위가 안 멈춘다")
 	gs.call("trigger_game_over", "caught")
 	await _wait(0.6)
+	var cp_after: int = int(gs.get_script().call("get_checkpoint").get("floor", -1))
 	if main.get("current_floor") != before:
 		_fault("페이드 중 붙잡힘: 붙잡혔는데 층이 %d → %d로 바뀌었다" % [before, main.get("current_floor")])
-	elif gs.get_script().call("has_checkpoint"):
-		_fault("페이드 중 붙잡힘: 붙잡혔는데 다음 층 체크포인트가 저장됐다")
+	elif cp_after != cp_before:
+		_fault("페이드 중 붙잡힘: 붙잡혔는데 체크포인트가 %d층 → %d층으로 바뀌었다" % [cp_before, cp_after])
 	elif janitor.is_physics_processing():
 		_fault("페이드 중 붙잡힘: 붙잡힌 뒤 수위가 다시 깨어났다")
 	else:

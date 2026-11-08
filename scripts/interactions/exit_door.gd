@@ -19,8 +19,9 @@ const CHOICE_SCENE: PackedScene = preload("res://scenes/ui/choice_prompt.tscn")
 ## 도착 지점. Vector2.INF면 그 층의 기본 등장 지점으로 간다(현관이 그렇다).
 @export var arrive_at: Vector2 = Vector2.INF
 
-## 어른 쪽 은폐를 본 플레이어에게만 묻는다. 아무것도 못 봤으면 신고할 거리가 없다.
+## 선택지를 거는 CanvasLayer(#802). HUD·FadeRect(3) 위라야 화면 공간에 보인다.
 const CHOICE_LAYER := 4
+## 어른 쪽 은폐를 본 플레이어에게만 묻는다. 아무것도 못 봤으면 신고할 거리가 없다.
 const CHOICE_PROMPT := "이대로 나가면 아무도 모른다."
 const CHOICE_REPORT := "신고한다"
 const CHOICE_LEAVE := "그냥 나간다"
