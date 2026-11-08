@@ -523,7 +523,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
 
 ### 개발 시 주의
 
-- 이 환경에는 Godot 바이너리가 없음 — 실행 검증(F5)은 사용자가 수동으로 함. 정적 검증(기하·경로 대조 스크립트)을 기록하고 PR을 연 뒤 사용자 확인을 기다린다.
+- **로컬에 Godot 4.6 바이너리가 있다**(`~/Downloads/Godot.app/Contents/MacOS/Godot`) — 푸시 전에 CI와 같은 헤드리스 검증을 직접 돌린다: `--headless --path . --import`, `--headless --path . --script res://tools/ci_load_scenes.gd`, `--headless --path . --script res://tools/ci_smoke_scenes.gd`(로그에서 `SCRIPT ERROR|Parse Error|Cannot get node|Invalid call|스모크: `를 찾는다 — 파싱 오류에도 종료 코드가 0일 수 있다). macOS에는 `timeout`이 없어 `perl -e 'alarm N; exec @ARGV'`로 감싼다. **손맛·화면·소리(F5)는 여전히 사용자 몫이다** — 헤드리스로 확인한 것과 플레이로 확인할 것을 PR에 나눠 적는다.
 - `ci_load_scenes.gd`는 씬을 instantiate만 하고 트리에 붙이지 않는다 — `_ready`가 돌지 않는다. **그 빈틈은 `tools/ci_smoke_scenes.gd`(#240)가 메운다** — 씬을 `root.add_child()`로 붙이고 프레임을 돌려 미닫이문 여닫기(몸·시각·충돌), 프롤로그 건너뛰기 버튼, 미술실 도입부 발동·카메라 복귀·유예를 본다. CI에 잡으로 들어 있다.
   - 이 검사가 있는 이유: `_ready`가 안 돌던 시절 **버그 둘이 `main`까지 머지됐다**(#225 → #234) — 문짝 시각이 레이어 0에 있어 안 보였고, 문 존의 `collision_mask = 1`에 벽·집기가 걸려 **모든 문이 씬을 여는 순간 영구히 열린 채**였다. 둘 다 정적 검사로는 못 잡고 프레임 한 번이면 드러난다.
   - **일부러 깨뜨려 잡히는 것을 확인했다**: `_apply()`의 `want`를 `true`로 고정(문이 저절로 열림) → 6건 실패, 트윈에서 `_leaf`를 빼기(시각이 안 따라옴) → 실패, `CLUES_TO_TRIGGER`를 1로(잘못 발동) → 실패.
