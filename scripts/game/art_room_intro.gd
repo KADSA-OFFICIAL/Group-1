@@ -199,7 +199,7 @@ func _on_investigated(_player: Node, name: String) -> void:
 			_seen[name] = true
 			_point_at(escape_path, "창문")
 			_say(get_tree().get_first_node_in_group("game_state"), "이설",
-				"(챙겼어. 창문으로.)", "fear")
+				"(됐다, 챙겼어. 이제 창문으로 가자.)", "fear")
 		return
 	_seen[name] = true
 	if name == BACKSTOP_NODE or _clue_count() >= CLUES_TO_TRIGGER:
@@ -239,7 +239,7 @@ func _act1_warning() -> void:
 	if door != null and not door_after_message.is_empty():
 		door.set("message", door_after_message)
 
-	_say(gs, "이설", "(들어온다. 왼쪽 벽 캐비닛에 숨어야 해.)", "fear")
+	_say(gs, "이설", "(누가 들어와… 왼쪽 캐비닛, 일단 저기 숨자.)", "fear")
 	_pulse_mark(cabinet_mark_path)
 	_point_at(cabinet_path, "숨을 곳")
 
@@ -250,7 +250,7 @@ func _act1_warning() -> void:
 	# 화면 표시(`_point_at`)는 캐비넷이 쓴다 — 지금은 숨는 것이 먼저이고, 표시가
 	# 하나뿐이라 둘을 같이 가리키면 어디로 갈지가 흐려진다. 책은 월드 표시만 부풀린다.
 	if _missing_book():
-		_say(gs, "이설", "(국어책… 아직 책상 위야. 숨고 나서 챙기자.)", "fear")
+		_say(gs, "이설", "(책 아직 책상에 있는데… 일단 숨고 나서 가지러 가자.)", "fear")
 		_pulse_mark(book_mark_path)
 
 	_hide_left = HIDE_SECONDS
@@ -456,15 +456,15 @@ func _act3_grace(gs) -> void:
 	# 나왔다 — 선택하기 전에 그 근거를 본 적이 없었다.
 	#
 	# 한 줄이 늘지만 유예 여유(#506, 44초 중 10.4초) 안이다 — 대사는 걸으면서 읽는다.
-	_say(gs, "이설", "(지금밖에 없어. 문은 안 돼 — 열쇠 들고 금방 돌아와.)", "fear")
-	_say(gs, "이설", "(준비실 창문. 바깥 난간 끝에 배수관이 아래층까지 내려가 있었어.)", "fear")
+	_say(gs, "이설", "(지금 아니면 못 나가. 문은 안 돼, 열쇠 가지고 금방 올 거야.)", "fear")
+	_say(gs, "이설", "(준비실 창문 밖에 난간 있었잖아. 그 끝에 배수관 타면 아래층까지 갈 수 있을 거야.)", "fear")
 	# 유예는 책 유무로 가르지 않는다 (#506) — 근거는 `GRACE_SECONDS` 주석에 있다.
 	_grace = GRACE_SECONDS
 	# 책이 없으면 **다시** 알린다 (#477). 1막에서 한 번 말했지만 그 사이에
 	# 자백 28초가 지나갔고, 그동안 플레이어는 캐비넷에 갇혀 아무것도 못 했다.
 	# 여기서는 표시도 책으로 옮긴다 — 숨을 곳은 이미 다 쓴 안내다.
 	if _missing_book():
-		_say(gs, "이설", "(국어책부터. 그거 가지러 온 거야.)", "fear")
+		_say(gs, "이설", "(아 맞다, 국어책. 그거 가지러 온 건데.)", "fear")
 		_point_at(book_path, "국어책")
 	else:
 		# **책이 있으면 곧바로 창문을 가리킨다**(#700). 예전에는 이 갈래에서 아무
