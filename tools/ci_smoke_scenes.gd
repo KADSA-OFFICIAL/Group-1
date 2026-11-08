@@ -66,6 +66,7 @@ func _run() -> void:
 	await _check_artroom_intro()
 	await _check_ink_throw()
 	await _check_catch_through_wall()
+	await _check_room_light_los()
 	await _check_clue_shuffle()
 	await _check_pickup_janitor()
 	await _check_jumpscare()
@@ -993,6 +994,52 @@ func _free_spot(space: PhysicsDirectSpaceState2D, at: Vector2, r: float, exclude
 			ex.append((n as CollisionObject2D).get_rid())
 	q.exclude = ex
 	return space.intersect_shape(q, 1).is_empty()
+
+
+## 열린 문 방의 달빛(#849) — 옆 방에서는 벽 너머로 안 보이고, 복도에서 문을 보면·방 안에
+## 들어가면 켜지고, 문을 닫으면 꺼진다. 2층 4반(North5)과 왼쪽 1학년부(North4)로 본다.
+func _check_room_light_los() -> void:
+	var main: Node = (load(MAIN) as PackedScene).instantiate()
+	root.add_child(main)
+	for _i in 8:
+		await process_frame
+	main.call("travel_to", 2)
+	if not await _until(func() -> bool:
+			return not bool(main.get("changing_floor")), 6.0):
+		_fault("달빛 시야: 2층 전환이 끝나지 않는다")
+		main.free()
+		return
+	var player := main.get_node_or_null("Player") as Node2D
+	var janitor := main.get_node_or_null("Janitor") as Node2D
+	var door := main.get_node_or_null("Background/SlideDoor_North5")
+	var lights := main.get_node_or_null("Background/Lights/Room_North5") as CanvasItem
+	if player == null or janitor == null or door == null or lights == null:
+		_fault("달빛 시야: Player·Janitor·4반 문·달빛 묶음을 못 찾았다")
+		main.free()
+		return
+	janitor.set_physics_process(false)
+	janitor.global_position = Vector2(100, 1400)
+	var cases := [
+		["복도 문 앞(문 열기)", Vector2(1700, 620), true, "open"],
+		["옆 방 1학년부 벽 앞", Vector2(1488, 380), false, ""],
+		["옆 방 1학년부 가운데", Vector2(1330, 380), false, ""],
+		["4반 안", Vector2(1700, 300), true, ""],
+		["복도 멀리(문이 보인다)", Vector2(1100, 620), true, ""],
+		["복도 문 앞(문 닫기)", Vector2(1700, 620), false, "close"],
+	]
+	var bad := 0
+	for c in cases:
+		player.global_position = c[1]
+		await _wait(0.3)
+		if c[3] != "":
+			door.call("interact", player)
+			await _wait(0.4)
+		if lights.visible != bool(c[2]):
+			bad += 1
+			_fault("달빛 시야: %s에서 4반 달빛이 %s" % [c[0], "꺼져 있다" if c[2] else "켜져 있다(벽 너머로 보인다)"])
+	if bad == 0:
+		_ok("달빛 시야(열린 문은 보일 때만)")
+	main.free()
 
 
 func _check_ink_throw() -> void:
