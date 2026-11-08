@@ -23,7 +23,7 @@ func interact(player: Node) -> void:
 	var game_state = get_tree().get_first_node_in_group("game_state")
 
 	if game_state != null and not required_item_id.is_empty() and not game_state.call("has_item", required_item_id):
-		game_state.call("request_notice", locked_message)
+		game_state.call("request_notice_sentences", locked_message)
 		Sfx.play(&"door_locked")
 		return
 

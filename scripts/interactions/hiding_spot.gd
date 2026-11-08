@@ -22,4 +22,4 @@ func interact(player: Node) -> void:
 
 	var game_state = get_tree().get_first_node_in_group("game_state")
 	if game_state != null:
-		game_state.call("request_notice", message)
+		game_state.call("request_notice_sentences", message)   # 문장마다(#841)

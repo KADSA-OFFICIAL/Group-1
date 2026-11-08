@@ -78,7 +78,7 @@ func interact(_player: Node) -> void:
 
 	if game_state != null and not required_item_id.is_empty() \
 			and not game_state.call("has_item", required_item_id):
-		game_state.call("request_notice", locked_message)
+		game_state.call("request_notice_sentences", locked_message)   # 문장마다(#841)
 		Sfx.play(&"door_locked")
 		return
 
@@ -104,7 +104,7 @@ func interact(_player: Node) -> void:
 		await _play_cutscene(game_state)
 
 	if game_state != null and not message.is_empty():
-		game_state.call("request_notice", message)
+		game_state.call("request_notice_sentences", message)
 	# 도착 대사는 층 관리자에 맡긴다(#700) — 이 씬은 곧 해제된다.
 	if not arrival_lines.is_empty() and manager.has_method("queue_arrival_speech"):
 		var lines: Array = []

@@ -2099,7 +2099,7 @@ func _check_exit_door_reentry() -> void:
 	current_scene = host
 	var gs := Node.new()
 	var gs_script := GDScript.new()
-	gs_script.source_code = "extends Node\nvar coverup := true\nfunc has_item(_i):\n\treturn true\nfunc has_full_truth():\n\treturn false\nfunc saw_coverup():\n\treturn coverup\nfunc ending_kind(_r):\n\tget_tree().set_meta(\"kind_calls\", int(get_tree().get_meta(\"kind_calls\", 0)) + 1)\n\treturn &\"after_school\"\nfunc clue_score():\n\treturn [0, 18]\nfunc request_notice(_t):\n\tpass\n"
+	gs_script.source_code = "extends Node\nvar coverup := true\nfunc has_item(_i):\n\treturn true\nfunc has_full_truth():\n\treturn false\nfunc saw_coverup():\n\treturn coverup\nfunc ending_kind(_r):\n\tget_tree().set_meta(\"kind_calls\", int(get_tree().get_meta(\"kind_calls\", 0)) + 1)\n\treturn &\"after_school\"\nfunc clue_score():\n\treturn [0, 18]\nfunc request_notice(_t):\n\tpass\nfunc request_notice_sentences(_t):\n\tpass\n"
 	gs_script.reload()
 	gs.set_script(gs_script)
 	gs.add_to_group("game_state")

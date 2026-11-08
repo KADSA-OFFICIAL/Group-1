@@ -26,7 +26,7 @@ func interact(_player: Node) -> void:
 	var game_state = get_tree().get_first_node_in_group("game_state")
 
 	if game_state != null and not required_item_id.is_empty() and not game_state.call("has_item", required_item_id):
-		game_state.call("request_notice", locked_message)
+		game_state.call("request_notice_sentences", locked_message)   # 문장마다(#841)
 		Sfx.play(&"door_locked")
 		return
 
@@ -35,7 +35,7 @@ func interact(_player: Node) -> void:
 			game_state.call("remove_item", required_item_id)
 		if not door_id.is_empty():
 			game_state.call("set_flag", door_id)
-		game_state.call("request_notice", open_message)
+		game_state.call("request_notice_sentences", open_message)
 
 	Sfx.play(&"door_open")
 	_open()
