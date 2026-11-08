@@ -75,6 +75,8 @@ func _ready() -> void:
 	if game_state != null:
 		if game_state.has_signal("notice_requested"):
 			game_state.connect("notice_requested", Callable(self, "show_notice"))
+		if game_state.has_signal("notice_sentences_requested"):
+			game_state.connect("notice_sentences_requested", Callable(self, "show_notice_sentences"))
 		if game_state.has_signal("speech_requested"):
 			game_state.connect("speech_requested", Callable(self, "show_speech"))
 		if game_state.has_signal("inventory_changed"):
@@ -208,6 +210,23 @@ func show_notice(text: String) -> void:
 ## 화자가 있는 대사(수위 등). 이름 줄이 붙고 본문이 크고 밝게 나온다.
 func show_speech(speaker: String, text: String, emotion: String = "") -> void:
 	_show_subtitle(speaker, text, emotion)
+
+
+## 단서 문구를 문장마다 한 줄씩 대기열에 넣는다(#841).
+##
+## **묶음째로 중복을 거른다.** 한 줄씩 거르면(#505) 둘째 문장이 떠 있을 때 같은 단서를
+## 다시 조사했을 때 첫 문장만 다시 붙어 셋째 뒤에 나왔다 — 순서가 뒤섞인다. 그 단서의
+## 문장이 하나라도 떠 있거나 기다리는 중이면 통째로 버린다. 다 지나간 뒤에는 다시 나온다.
+func show_notice_sentences(lines: PackedStringArray) -> void:
+	for text in lines:
+		var line := ["", text, ""]
+		if _same_line(_current, line):
+			return
+		for queued: Array in _speech_queue:
+			if _same_line(queued, line):
+				return
+	for text in lines:
+		_show_subtitle("", text, "")
 
 
 ## **대기열이 통째로 빌 때까지** 기다린다(#471).

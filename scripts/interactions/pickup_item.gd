@@ -55,7 +55,7 @@ func _on_body_entered(body: Node) -> void:
 			game_state.call("set_flag", pickup_id)
 		if not grants_flag.is_empty():
 			game_state.call("set_flag", grants_flag)
-		game_state.call("request_notice", message)
+		game_state.call("request_notice_sentences", message)   # 문장마다(#841)
 		Sfx.play(&"pickup")
 
 	if keep_after_pickup:

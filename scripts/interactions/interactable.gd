@@ -35,7 +35,8 @@ func interact(player: Node) -> void:
 
 	if game_state != null:
 		game_state.call("set_flag", grants_flag)
-		game_state.call("request_notice", message)
+		# 문장마다 따로 띄운다(#841) — 긴 단서가 서너 줄로 한꺼번에 뜨면 읽기 어렵다.
+		game_state.call("request_notice_sentences", message)
 
 	# 아이템을 준 조사는 획득음, 읽기만 하는 조사는 조사음.
 	Sfx.play(&"pickup" if not grants_item_id.is_empty() else &"investigate")

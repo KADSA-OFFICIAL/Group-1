@@ -2,6 +2,8 @@ extends Node
 
 signal inventory_changed(items: Array[String])
 signal notice_requested(message: String)
+## 단서 문구를 문장마다 나눠 띄운다(#841). HUD가 묶음째로 중복을 거른다.
+signal notice_sentences_requested(lines: PackedStringArray)
 ## 화자가 있는 대사(#193). 지문인 notice_requested와 나뉘어 있어야 HUD가
 ## 프롤로그와 같은 두 가지 자막 배치 중 하나를 고를 수 있다.
 signal speech_requested(speaker: String, message: String, emotion: String)
@@ -148,6 +150,17 @@ func request_notice(message: String) -> void:
 		return
 
 	notice_requested.emit(message)
+
+
+## 단서 문구를 **문장마다 따로** 띄운다(#841). 한 문장뿐이면 `request_notice`와 같다.
+func request_notice_sentences(message: String) -> void:
+	if message.is_empty():
+		return
+	var lines := SubtitleDialogue.split_sentences(message)
+	if lines.size() <= 1:
+		request_notice(message)
+		return
+	notice_sentences_requested.emit(lines)
 
 
 ## 화자 이름이 붙는 대사를 띄운다. emotion은 subtitle_dialogue.gd의 EMOTIONS 키.
