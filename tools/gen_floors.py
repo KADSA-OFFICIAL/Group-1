@@ -4978,13 +4978,13 @@ def build_intro():
         # 배수관을 넣었다(학교 외벽에 흔하다). 줄 수는 6줄 그대로라 #618의 시간
         # 맞춤(대사 끝에 맞춰 넘긴다)이 그대로 맞는다.
         'cutscene_speaker = "이설"',
-        'cutscene_lines = PackedStringArray(\"창문을 밀었다. 밤바람이 얼굴을 친다.\", \"…4층이야. 아래 보지 마.\", \"외벽 난간에 발을 올렸다. 한 뼘. 그래도 있어.\", \"난간 끝에 배수관 — 아래층 창틀까지 내려가 있다.\", \"배관을 끌어안고 한 층을 내려간다. 손바닥이 쓸린다.\", \"3층 창문 — 열려 있어.\")',
+        'cutscene_lines = PackedStringArray(\"바람 진짜 세다…\", \"여기 4층이잖아… 아래는 보지 말자.\", \"난간 엄청 좁네… 그래도 발은 올라가.\", \"저 끝에 배수관 있다. 아래층 창문까지 이어져 있어.\", \"꽉 잡고 천천히… 아, 손바닥 다 쓸리겠다.\", \"3층 창문 열려 있다. 다행이다.\")',
         'cutscene_emotions = PackedStringArray(\"\", \"fear\", \"fear\", \"\", \"fear\", \"\")',
         # 3층에 내려선 **뒤**의 대사(#700) — 원문 3-5의 마지막. 위층에서 수위가 돌아와
         # 빈 방을 확인한다. 간발의 차였다는 확인이 없으면 위험이 실제였는지 모른다.
         # 페이드가 다 걷힌 뒤에 나온다(`floor_manager._flush_arrival_speech`).
         'arrival_speakers = PackedStringArray(\"\", \"수위\", \"이설\")',
-        'arrival_lines = PackedStringArray(\"머리 위, 미술실 쪽에서 문 여는 소리. 열쇠 꾸러미가 짤랑인다.\", \"…없구만. 당분간은 다시 안 오겠지.\", \"(조금만 늦었으면.)\")',
+        'arrival_lines = PackedStringArray(\"머리 위, 미술실 쪽에서 문 여는 소리. 열쇠 꾸러미가 짤랑인다.\", \"…없구만. 당분간은 다시 안 오겠지.\", \"(조금만 늦었으면 진짜 큰일 날 뻔했다.)\")',
         'arrival_emotions = PackedStringArray(\"\", \"\", \"fear\")',
         "cutscene_look_at = Vector2(1465, %s)" % n(IY0 + T + 10),
         "target_floor = 3",
