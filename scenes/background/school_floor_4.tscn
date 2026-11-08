@@ -1015,30 +1015,6 @@ z_index = 5
 color = Color(0.42, 0.86, 0.82, 1)
 polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
 
-[node name="HidePrepShelf" type="Area2D" parent="."]
-position = Vector2(1720, 665)
-collision_layer = 2
-collision_mask = 0
-script = ExtResource("5_hiding")
-prompt_text = "적재함 뒤에 숨기"
-message = "준비실 적재함 뒤. 테레빈유 냄새가 코를 찌른다."
-
-[node name="HidePrepShelfVisual" type="Polygon2D" parent="HidePrepShelf"]
-z_index = 1
-texture = ExtResource("ext_bookshelf")
-uv = PackedVector2Array(0, 0, 30, 0, 30, 32, 0, 32)
-color = Color(1, 1, 1, 1)
-polygon = PackedVector2Array(0, -20, 44, -20, 44, 20, 0, 20)
-
-[node name="HidePrepShelfZone" type="CollisionShape2D" parent="HidePrepShelf"]
-shape = SubResource("RectangleShape2D_key_zone")
-
-[node name="Mark_HidePrepShelf" type="Polygon2D" parent="WallGlow/Marks"]
-position = Vector2(1720, 665)
-z_index = 5
-color = Color(0.42, 0.86, 0.82, 1)
-polygon = PackedVector2Array(0, -7, 7, 0, 0, 7, -7, 0)
-
 [node name="Mark_KoreanBook" type="Polygon2D" parent="WallGlow/Marks"]
 position = Vector2(675, 720)
 z_index = 5
