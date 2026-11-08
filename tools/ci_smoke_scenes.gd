@@ -62,6 +62,7 @@ func _run() -> void:
 	await _check_intro()
 	await _check_subtitle_queue()
 	await _check_subtitle_wrap()
+	await _check_sentence_split()
 	await _check_artroom_intro()
 	await _check_ink_throw()
 	await _check_catch_through_wall()
@@ -479,6 +480,70 @@ func _check_subtitle_wrap() -> void:
 		_ok("자막 어절 단위 줄바꿈(%d줄)" % (breaks + 1))
 	sub.free()
 	await process_frame
+
+
+## 단서 문구를 문장마다 따로 띄우는가(#841). 인용 안은 안 끊고, 짧은 문장 줄은 묶고,
+## 같은 단서를 표시 중에 다시 조사해도 문장이 뒤섞이지 않아야 한다.
+func _check_sentence_split() -> void:
+	var notebook := "손때 묻은 공책. 이름과 짧은 판단이 줄줄이 적혀 있다. '강유진 — 후배 때림.' '임나연 — 애들 시켜 한 명을 따돌림.' 그리고 마지막 줄. '조민혁 — 기물 파손. 집에서 맞고 온다는 걸 안다. 다른 애한테도 그럴지는 확실하지 않다. 그래도 만약을 위해.'"
+	var parts := SubtitleDialogue.split_sentences(notebook)
+	if parts.size() != 6 or not parts[5].begins_with("'조민혁") or not parts[5].ends_with("만약을 위해.'"):
+		_fault("문장 나누기: 수위 공책이 인용 단위로 안 나뉜다 %s" % [parts])
+	else:
+		_ok("문장 나누기: 인용 안은 안 끊는다")
+	var dates := SubtitleDialogue.split_sentences("벽에 날짜가 적혀 있다. 3월 14일. 5월 22일. 8월 9일. 11월 3일. 1월 18일. 다섯 개. 뉴스에서 들은 실종 시기와 같다.")
+	if dates.size() != 3 or not (dates[1].begins_with("3월 14일.") and dates[1].ends_with("다섯 개.")):
+		_fault("문장 나누기: 짧은 문장 줄이 한 줄로 안 묶인다 %s" % [dates])
+	else:
+		_ok("문장 나누기: 짧은 문장 묶기")
+	var mid := SubtitleDialogue.split_sentences("사안 파일. 표지에 '생활지도부' 도장이 찍혀 있다. '2F 계단' 고리에는 점검표가 걸려 있다.")
+	var taeho := SubtitleDialogue.split_sentences("벽에 쪽지가 붙어 있다. '민혁아, 과학실 기구 부수지 마. 열쇠 여기 숨겨둘게. -태호' 쪽지 밑 못에는 아무것도 걸려 있지 않다.")
+	if mid.size() != 3 or taeho.size() != 3 or not taeho[1].ends_with("-태호'"):
+		_fault("문장 나누기: 문장 가운데 인용·여러 문장 인용 처리 %s / %s" % [mid, taeho])
+	else:
+		_ok("문장 나누기: 짧은 인용은 문장 안, 여러 문장 인용은 끊는다")
+
+	# HUD — 첫 문장만 뜨고, 연타해도 문장이 다시 붙지 않는다.
+	var main: Node = (load(MAIN) as PackedScene).instantiate()
+	root.add_child(main)
+	for i in 8:
+		await process_frame
+	var hud: Node = main.get_node_or_null("HUD")
+	var gs: Node = main.get_node_or_null("GameState")
+	if hud == null or gs == null:
+		_fault("문장 나누기: HUD/GameState를 못 찾았다")
+		await _drop_scenes(main)
+		return
+	await _until(func() -> bool: return not bool(hud.call("is_speaking")), 8.0)
+	var msg := "구석 사물함에 체육복 상의가 개켜져 있다. 이름표는 3학년 1반 강유진. 주머니에서 나온 쪽지 — '유진아 후배 병원 갔다더라.'"
+	gs.call("request_notice_sentences", msg)
+	await process_frame
+	await process_frame
+	var label := hud.get_node("Root/Subtitle/Lines/TextLabel") as Label
+	var queued := (hud.get("_speech_queue") as Array).size()
+	if label.text.replace("\n", " ") != "구석 사물함에 체육복 상의가 개켜져 있다." or queued != 2:
+		_fault("문장 나누기: 첫 문장만 떠야 한다 (\"%s\", 대기 %d)" % [label.text, queued])
+	else:
+		_ok("문장 나누기: 첫 문장만 뜨고 나머지는 대기열")
+	# **둘째 문장이 떠 있을 때** 다시 조사한다 — 그때는 첫 문장이 화면에도 대기열에도
+	# 없어서, 한 줄씩 거르면(#505) 첫 문장만 다시 붙어 셋째 뒤에 나온다.
+	await _until(func() -> bool:
+		return label.text.replace("\n", " ") == "이름표는 3학년 1반 강유진.", 8.0)
+	# 대기열 크기를 고정값으로 보지 않는다 — 시작 힌트(floor_manager)가 조금 늦게 끼어든다.
+	var before := (hud.get("_speech_queue") as Array).size()
+	gs.call("request_notice_sentences", msg)
+	await process_frame
+	var q: Array = hud.get("_speech_queue")
+	var readded := false
+	for line: Array in q:
+		if String(line[1]) == "구석 사물함에 체육복 상의가 개켜져 있다.":
+			readded = true
+	if readded or q.size() != before:
+		_fault("문장 나누기: 둘째 문장 표시 중 다시 조사했더니 문장이 뒤섞였다 (대기 %d → %d)"
+			% [before, q.size()])
+	else:
+		_ok("문장 나누기: 연타해도 안 섞인다")
+	await _drop_scenes(main)
 
 
 func _check_artroom_intro() -> void:
@@ -959,7 +1024,7 @@ func _check_ink_throw() -> void:
 ## 거르지 않으면 열쇠가 원격으로 인벤토리에 들어가고 플래그가 선다.
 func _check_pickup_janitor() -> void:
 	var stub_script := GDScript.new()
-	stub_script.source_code = "extends Node\nvar items: Array = []\nvar flags: Array = []\nvar notices: int = 0\nfunc add_item(i) -> bool:\n\titems.append(i)\n\treturn true\nfunc set_flag(f) -> void:\n\tflags.append(f)\nfunc request_notice(_m) -> void:\n\tnotices += 1\nfunc has_flag(_f) -> bool:\n\treturn false\n"
+	stub_script.source_code = "extends Node\nvar items: Array = []\nvar flags: Array = []\nvar notices: int = 0\nfunc add_item(i) -> bool:\n\titems.append(i)\n\treturn true\nfunc set_flag(f) -> void:\n\tflags.append(f)\nfunc request_notice(_m) -> void:\n\tnotices += 1\nfunc request_notice_sentences(_m) -> void:\n\tnotices += 1\nfunc has_flag(_f) -> bool:\n\treturn false\n"
 	stub_script.reload()
 	var gs := Node.new()
 	gs.set_script(stub_script)
@@ -2034,7 +2099,7 @@ func _check_exit_door_reentry() -> void:
 	current_scene = host
 	var gs := Node.new()
 	var gs_script := GDScript.new()
-	gs_script.source_code = "extends Node\nvar coverup := true\nfunc has_item(_i):\n\treturn true\nfunc has_full_truth():\n\treturn false\nfunc saw_coverup():\n\treturn coverup\nfunc ending_kind(_r):\n\tget_tree().set_meta(\"kind_calls\", int(get_tree().get_meta(\"kind_calls\", 0)) + 1)\n\treturn &\"after_school\"\nfunc clue_score():\n\treturn [0, 18]\nfunc request_notice(_t):\n\tpass\n"
+	gs_script.source_code = "extends Node\nvar coverup := true\nfunc has_item(_i):\n\treturn true\nfunc has_full_truth():\n\treturn false\nfunc saw_coverup():\n\treturn coverup\nfunc ending_kind(_r):\n\tget_tree().set_meta(\"kind_calls\", int(get_tree().get_meta(\"kind_calls\", 0)) + 1)\n\treturn &\"after_school\"\nfunc clue_score():\n\treturn [0, 18]\nfunc request_notice(_t):\n\tpass\nfunc request_notice_sentences(_t):\n\tpass\n"
 	gs_script.reload()
 	gs.set_script(gs_script)
 	gs.add_to_group("game_state")

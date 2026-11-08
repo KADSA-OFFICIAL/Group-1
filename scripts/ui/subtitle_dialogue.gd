@@ -157,6 +157,77 @@ func show_line(speaker: String, text: String, emotion: String = "",
 	_start_typing(emotion, queued)
 
 
+## 문장을 끝맺는 부호(#841). 뒤에 띄어쓰기나 글 끝이 와야 문장 끝으로 본다
+## ("3.5"·"…이" 같은 안쪽 부호는 안 끊는다).
+const SENTENCE_ENDS := ".?!…"
+## 이만큼(글자 수, 띄어쓰기 포함) 이하인 문장이 **둘 이상 이어지면** 한 줄로 묶는다(#841).
+## 날짜 벽의 "3월 14일. 5월 22일. …"을 한 줄씩 띄우면 1초마다 깜빡이는 목록이 된다.
+## 홀로 선 짧은 문장("사안 파일.", "— 도와줘.")은 그대로 한 줄이다.
+const SHORT_SENTENCE := 8
+
+
+## 단서 문구를 **문장 단위로** 나눈다(#841). 긴 단서를 한 자막에 통째로 띄우면
+## 서너 줄이 한꺼번에 떠서 읽기 어려웠다(사용자 보고).
+##
+## - **작은따옴표 안은 안 끊는다.** 수위 공책의 `'조민혁 — 기물 파손. 집에서 맞고
+##   온다는 걸 안다. …'`는 인용 하나라 한 줄이어야 한다.
+## - 인용이 문장부호로 끝나고 닫히면(`…때림.' '임나연…`) 거기서 끊는다.
+##   `'생활지도부' 도장이`처럼 문장 가운데 인용에서는 안 끊는다.
+## - 줄바꿈(`\n`)은 그대로 문장 경계다.
+## - 짧은 문장이 둘 이상 이어지면 묶는다(`SHORT_SENTENCE`).
+static func split_sentences(text: String) -> PackedStringArray:
+	var raw: PackedStringArray = []
+	for para in text.split("\n", false):
+		var cur := ""
+		var in_quote := false
+		var quote_has_end := false   # 지금 인용 안에 문장 끝 부호가 있었나
+		var n := para.length()
+		for i in n:
+			var ch := para[i]
+			cur += ch
+			if ch == "'":
+				in_quote = not in_quote
+				if in_quote:
+					quote_has_end = false
+			elif in_quote and SENTENCE_ENDS.contains(ch):
+				quote_has_end = true
+			if i + 1 < n and para[i + 1] != " ":
+				continue
+			var ends := false
+			if SENTENCE_ENDS.contains(ch) and not in_quote:
+				ends = true
+			elif ch == "'" and not in_quote and i > 0:
+				# 인용이 문장부호로 끝났거나("…때림.'"), 문장 첫머리부터 여러 문장을 담은
+				# 인용이면("'민혁아, … 숨겨둘게. -태호'") 닫히는 자리가 문장 끝이다.
+				# "'2F 계단' 고리에는"처럼 짧은 인용은 문장의 일부라 안 끊는다.
+				ends = SENTENCE_ENDS.contains(para[i - 1]) \
+					or (quote_has_end and cur.strip_edges().begins_with("'"))
+			if ends:
+				raw.append(cur.strip_edges())
+				cur = ""
+		if not cur.strip_edges().is_empty():
+			raw.append(cur.strip_edges())
+
+	var out: PackedStringArray = []
+	var run: PackedStringArray = []
+	for s in raw:
+		if s.length() <= SHORT_SENTENCE:
+			run.append(s)
+			continue
+		out.append_array(_flush_short(run))
+		run.clear()
+		out.append(s)
+	out.append_array(_flush_short(run))
+	return out
+
+
+## 짧은 문장 묶음을 내보낸다 — 둘 이상이면 한 줄, 하나면 그대로.
+static func _flush_short(run: PackedStringArray) -> PackedStringArray:
+	if run.size() >= 2:
+		return PackedStringArray([" ".join(run)])
+	return run
+
+
 ## 글을 **띄어쓰기 자리에서만** 줄바꿈해 돌려준다(#770).
 ##
 ## Godot의 자동 줄바꿈(ICU, UAX #14)은 한글 음절 사이를 전부 줄을 바꿀 수 있는
