@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Script" path="res://scripts/ui/main_menu.gd" id="1_menu_script"]
 [ext_resource type="FontFile" path="res://assets/fonts/EastSeaDokdo-Regular.ttf" id="2_title_font"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://scripts/ui/menu_button.gd" id="4_menu_button"]
 [ext_resource type="PackedScene" path="res://scenes/ui/settings_panel.tscn" id="5_settings_panel"]
 [ext_resource type="Texture2D" path="res://assets/ui/settings_gear.png" id="6_gear"]
+[ext_resource type="PackedScene" path="res://scenes/ui/credits_panel.tscn" id="7_credits_panel"]
 
 [sub_resource type="StyleBoxEmpty" id="StyleBox_gear"]
 
@@ -99,7 +100,32 @@ icon = ExtResource("6_gear")
 flat = true
 expand_icon = true
 
+[node name="CreditsButton" type="Button" parent="."]
+; 오른쪽 아래 크레딧(#865) — 오른쪽 위 설정과 짝을 이루는 구석 자리. 시작 버튼과 같은
+; 메뉴 테마·붉은 선이되 선을 짧게 둔다(오른쪽 가장자리에 뻗을 자리가 좁다).
+custom_minimum_size = Vector2(150, 52)
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -190.0
+offset_top = -76.0
+offset_right = -40.0
+offset_bottom = -24.0
+grow_horizontal = 0
+grow_vertical = 0
+theme = ExtResource("3_button_theme")
+theme_override_font_sizes/font_size = 27
+script = ExtResource("4_menu_button")
+line_gap = 8.0
+line_length = 14.0
+text = "크레딧"
+
 [node name="SettingsPanel" parent="." instance=ExtResource("5_settings_panel")]
+
+[node name="CreditsPanel" parent="." instance=ExtResource("7_credits_panel")]
 
 [node name="Fade" type="ColorRect" parent="."]
 layout_mode = 1

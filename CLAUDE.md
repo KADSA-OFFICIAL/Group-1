@@ -558,6 +558,11 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
     - **일시정지 메뉴에도 같은 설정창이 있다**(#788, `PauseMenu/Root/SettingsPanel`) — "설정" 버튼이 연다. 타이틀과 같은 씬이라 전체화면·배경음악·효과음이 거기 있고 `AudioSettings`·`DisplayMode`가 같아 어느 쪽에서 바꿔도 같다. 처음에는 일시정지 메뉴에 `전체화면` 버튼이 따로 있었는데 설정창 안의 옵션으로 옮겼다(F11도 그대로).
       - **Esc는 두 단계다** — 설정창이 열려 있으면 그것만 닫고 게임은 멈춘 채 메뉴가 남는다, 닫힌 뒤 Esc가 게임을 재개한다. `PauseMenu._unhandled_input`이 설정창이 열려 있으면 맨 앞에서 돌아선다(W/S/E가 아래 버튼을 누르는 것도 같이 막는다). 설정창 노드가 트리에서 더 깊어 보통 먼저 받지만 `main.tscn`의 노드 순서에 기대지 않으려는 이중 안전이다.
       - 열린 동안 메뉴 버튼은 `focus_mode = FOCUS_NONE`(Enter가 "처음부터 다시하기"를 누르면 안 된다), 닫히면 되돌리고 설정 버튼에 포커스를 준다 — 타이틀(`main_menu.gd`)과 같은 방식이다. 설정창은 `PauseMenu`(`PROCESS_MODE_ALWAYS`)의 자손이라 트리가 멈춘 중에도 입력을 받는다.
+- **크레딧 창(#865)**: 타이틀 **오른쪽 아래** "크레딧" 버튼(오른쪽 위 설정과 짝)이 `CreditsPanel`(`scenes/ui/credits_panel.tscn` + `scripts/ui/credits_panel.gd`)을 연다. 설정창과 같은 갈색 종이 톤·열고 닫기 규약(`open()`/`close()`/`closed`, 열린 동안 타이틀 버튼 `FOCUS_NONE`, 닫히면 크레딧 버튼에 포커스)이다.
+  - **내용은 `credits_panel.gd`의 `SECTIONS` 표 하나**다 — 만든 사람(기획 김근형 / 프로그래밍 윤준서·이원재 / 디자인 고범서·정해원), 외부 그림·소리(제작자·라이선스), 글꼴(OFL). 외부 에셋을 들이거나 빼면 `CREDITS.md`와 **이 표를 같이** 고친다. 이름 같은 새 글자를 넣으면 `gen_font_subsets.py`를 다시 굽는다(#853 — 연성은 2350자가 없어 제목 글자 하나로도 깨진다).
+  - **맨 아래 엔진 고지는 의무다** — Godot MIT 전문(`Engine.get_license_text()`)과 엔진에 든 FreeType 문구·ENet(Expat)·Mbed TLS(Apache-2.0) 고지를 `Engine.get_copyright_info()`/`get_license_info()`에서 읽는다. 엔진을 올려도 손댈 것이 없다. 엔진 구성 요소 이름은 "The FreeType Project"·"ENet"·"Mbed TLS"다(이름으로 거른다).
+  - **↑/↓ 스크롤은 `_input`에서 받는다.** `_unhandled_input`이면 닫기 버튼의 포커스 이동(이웃이 자기 자신)이 먼저 먹어 안 내려온다(실제로 그랬다). Esc는 `_unhandled_input`이다. 한국어 줄은 자동 줄바꿈을 안 건다(#770) — 짧게 쓸 것. 영어 라이선스 전문만 단어 단위로 접는다.
+  - 스모크 `_check_credits`가 버튼 위치·열림·포커스 차단·내용(이름 다섯·에셋·OFL·Godot/FreeType/ENet/Mbed TLS)·↓ 스크롤·Esc 닫기와 포커스 복귀를 본다.
 - project.godot에 사용자의 미커밋 변경이 있을 수 있음 — 내 커밋에 섞지 말 것(필요 시 stash로 분리).
 - .gd 스크립트를 새로 만들면 사용자 에디터가 .uid 파일을 생성함 — 발견 시 해당 이슈 브랜치에 커밋.
 
