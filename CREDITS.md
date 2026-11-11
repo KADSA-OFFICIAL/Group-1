@@ -10,13 +10,15 @@
 
 | 게임 안 파일 | 쓰는 곳 | 원본 | 제작자 | 라이선스 |
 |---|---|---|---|---|
-| `assets/audio/ext/ambience_dark.wav` | 본편 앰비언트 | "Dark Ambient Music - Loopable" — [Horror Sound Pack](https://phlegmlee.itch.io/horror-sound-pack) | Phlegmlee | CC0 1.0 |
-| `assets/audio/ext/chase_eerie.wav` | 추격 BGM | "Eerie Loop" — 같은 팩 | Phlegmlee | CC0 1.0 |
+| `assets/audio/ext/ambience_dark.ogg` | 본편 앰비언트 | "Dark Ambient Music - Loopable" — [Horror Sound Pack](https://phlegmlee.itch.io/horror-sound-pack) | Phlegmlee | CC0 1.0 |
+| `assets/audio/ext/chase_eerie.ogg` | 추격 BGM | "Eerie Loop" — 같은 팩 | Phlegmlee | CC0 1.0 |
 | `assets/audio/ext/door_creak.wav` | 문 여닫기(이설·수위) | "Creaking Door (6)" — [Free Horror SFX vol.1](https://liminal-space-dev.itch.io/free-horror-sfx-sounds) | Liminal Games | CC0 1.0 (팩 자체 재배포 금지) |
-| `assets/audio/ext/yard_wind.wav` | 운동장 바람 | "Ambient Wind (7)" — 같은 팩 | Liminal Games | CC0 1.0 (팩 자체 재배포 금지) |
+| `assets/audio/ext/yard_wind.ogg` | 운동장 바람 | "Ambient Wind (7)" — 같은 팩 | Liminal Games | CC0 1.0 (팩 자체 재배포 금지) |
 
 - 원본 팩은 저장소에 넣지 않는다. 가공(모노·22050Hz·루프 이음매·음량)은
-  `tools/import_ext_audio.py`가 하고, 그 결과만 커밋한다.
+  `tools/import_ext_audio.py`가 하고, 그 결과만 커밋한다. 루프 셋은 가공 결과(PCM)를
+  마스터(`assets/audio/masters/ext/`, 내보내기 제외)로 두고 `tools/encode_music.py`가
+  Ogg Vorbis로 구운 것을 게임이 쓴다(#855).
 - Liminal Games 팩은 페이지에 AI로 만든 소리라고 적혀 있다.
 
 ## Haunted School 그림 (#717, #723, #725, #727)

@@ -18,12 +18,21 @@ const SFX_DIR := "res://assets/audio/"
 ## 가공은 `tools/import_ext_audio.py`, 출처·라이선스는 `CREDITS.md`. 합성 원본
 ## (`gen_sfx.py`·`gen_music.py`가 굽는 `ambience`·`chase`·`door_open`)은 그대로
 ## 남는다 — 이 표에서 줄을 빼면 곧바로 되돌아간다.
+##
+## 긴 루프 셋은 Ogg Vorbis다(#855) — 아래 `MUSIC_OGG`와 같은 이유.
 const EXTERNAL := {
-	"ambience": "res://assets/audio/ext/ambience_dark.wav",
-	"chase": "res://assets/audio/ext/chase_eerie.wav",
+	"ambience": "res://assets/audio/ext/ambience_dark.ogg",
+	"chase": "res://assets/audio/ext/chase_eerie.ogg",
 	"door_open": "res://assets/audio/ext/door_creak.wav",
-	"yard_wind": "res://assets/audio/ext/yard_wind.wav",
+	"yard_wind": "res://assets/audio/ext/yard_wind.ogg",
 }
+
+## Ogg Vorbis로 들어가는 테마(#855). wav는 PCM 전체를 메모리에 올리고 배포본에도
+## 그대로 들어가서 긴 곡이 짐이었다 — 곡당 1.1~1.4MB가 200KB 남짓이 된다.
+## PCM 마스터는 `assets/audio/masters/`(`.gdignore`), 굽기는 `tools/encode_music.py`.
+## 효과음은 짧아서 이득이 없으므로 wav(PCM) 그대로다 — #185(QOA 지글거림) 참고.
+const MUSIC_OGG := ["title", "prologue", "ending_after_school", "ending_adults_work",
+		"ending_break_time"]
 
 ## 소리별 음량(dB). 합성 단계에서도 크기를 맞췄지만, 실제로 섞어 보면
 ## 스팅어가 조사음을 잡아먹는 식의 불균형이 남는다 — 최종 조정은 여기서 한다.
@@ -105,7 +114,7 @@ const THEME_FADE := 1.6
 # ── 종료 (#615) ──────────────────────────────────────────────────
 ## 창을 닫을 때 소리를 끄고 이만큼 기다린 뒤 끝낸다. 재생 중인 채로 끝내면
 ## 오디오 서버가 재생 상태를 정리하기 전에 엔진이 내려가 AudioStreamWAV·
-## AudioStreamPlaybackWAV가 `ObjectDB instances leaked at exit`로 남았다(루프
+## AudioStreamPlaybackWAV(음악은 #855부터 OggVorbis)가 `ObjectDB instances leaked at exit`로 남았다(루프
 ## 음악은 늘 재생 중이라 매번). stop()만으로는 안 된다 — 정리는 오디오 스레드가
 ## 다음 믹스에서 하므로 그 한 번을 기다려야 한다(실측: 바로 끝내면 5/5회 누수,
 ## 0.1초 기다리면 0/5회).
@@ -166,7 +175,13 @@ func _make_loop_player(id: StringName) -> AudioStreamPlayer:
 
 func _loop_stream(id: StringName) -> AudioStream:
 	var stream := _stream_for(id)
-	if stream is AudioStreamWAV:
+	if stream is AudioStreamOggVorbis:
+		# 처음부터 끝까지 한 바퀴가 루프다. 이음매는 굽기 전에 마스터에서 맞췄고
+		# 길이는 encode_music.py가 샘플 단위로 검사한다(#855).
+		var ogg := stream as AudioStreamOggVorbis
+		ogg.loop = true
+		ogg.loop_offset = 0.0
+	elif stream is AudioStreamWAV:
 		var wav := stream as AudioStreamWAV
 		wav.loop_mode = AudioStreamWAV.LOOP_FORWARD
 		wav.loop_begin = 0
@@ -390,7 +405,8 @@ func _stream_for(id: StringName) -> AudioStream:
 	if _streams.has(key):
 		return _streams[key]
 
-	var path: String = EXTERNAL.get(key, SFX_DIR + key + ".wav")
+	var ext := ".ogg" if key in MUSIC_OGG else ".wav"
+	var path: String = EXTERNAL.get(key, SFX_DIR + key + ext)
 	var stream: AudioStream = null
 	if ResourceLoader.exists(path):
 		stream = load(path) as AudioStream

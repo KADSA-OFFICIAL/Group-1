@@ -3,7 +3,8 @@
 
 **원본 팩은 저장소에 넣지 않는다** — Liminal Games 팩은 "팩 자체를 재배포하지
 말 것"이 조건이고, 원본 wav는 곡당 10~24MB다. 여기서 가공한 결과
-(`assets/audio/ext/*.wav`)만 커밋하고, 출처·라이선스는 `CREDITS.md`에 적는다.
+(루프 셋은 `assets/audio/masters/ext/*.wav` 마스터 → `encode_music.py`가 굽는
+`assets/audio/ext/*.ogg`(#855), 문 소리는 `assets/audio/ext/door_creak.wav`)만 커밋하고, 출처·라이선스는 `CREDITS.md`에 적는다.
 
     python3 tools/import_ext_audio.py <Horror Sound Pack 폴더> <Liminal PCM 폴더>
 
@@ -26,6 +27,9 @@ import wave
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = ROOT / "assets/audio/ext"
+## 루프 셋은 PCM 마스터로 쓰고 `encode_music.py`가 ogg로 굽는다(#855).
+## 원본 팩이 저장소에 없으므로 이 마스터가 다시 구울 수 있는 유일한 원본이다.
+MASTER_OUT = ROOT / "assets/audio/masters/ext"
 RATE = 22050          # 게임의 다른 소리와 같은 샘플레이트(gen_sfx/gen_music)
 TAPS = 31             # 44100 → 22050 저역 통과 필터 길이
 
@@ -112,12 +116,12 @@ def gain_to(x, rms_target=None, peak_max=-1.0):
     return x
 
 
-def write(name, x):
-    OUT.mkdir(parents=True, exist_ok=True)
+def write(name, x, out=OUT):
+    out.mkdir(parents=True, exist_ok=True)
     a = array.array("h", (max(-32767, min(32767, int(round(v * 32767)))) for v in x))
     if sys.byteorder != "little":
         a.byteswap()
-    with wave.open(str(OUT / name), "wb") as w:
+    with wave.open(str(out / name), "wb") as w:
         w.setnchannels(1)
         w.setsampwidth(2)
         w.setframerate(RATE)
@@ -154,7 +158,7 @@ def main():
         y = halve(make_loop(x, sr, skip, xf, cut), circular=True)
         gain_to(y, target)
         jump, gap = check_loop(name, y)
-        write(name, y)
+        write(name, y, MASTER_OUT)
         print(f"{name}: {len(y) / RATE:.1f}s RMS {rms_db(y):.1f}dB 피크 {peak_db(y):.1f}dB "
               f"이음매 {jump:.4f}/{gap:.1f}dB")
 
@@ -169,6 +173,7 @@ def main():
     gain_to(y, None, peak_max=-3.0)
     write("door_creak.wav", y)
     print(f"door_creak.wav: {len(y) / RATE:.2f}s RMS {rms_db(y):.1f}dB 피크 {peak_db(y):.1f}dB")
+    print("루프 셋은 마스터에 썼다 — python3 tools/encode_music.py로 ogg를 굽는다(#855).")
 
 
 if __name__ == "__main__":
