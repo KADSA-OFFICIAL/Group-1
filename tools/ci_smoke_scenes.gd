@@ -75,6 +75,7 @@ func _run() -> void:
 	# 마지막에 둔다 — 씬을 실제로 갈아 끼워(change_scene_to_file) 본다.
 	await _check_pause_menu()
 	await _check_fullscreen()
+	await _check_credits()
 	await _check_exit_choice_layer()
 	await _check_audio_settings()
 	await _check_journal()
@@ -1697,6 +1698,69 @@ func _check_exit_choice_layer() -> void:
 ##
 ## 헤드리스에는 창이 없어 `DisplayMode`가 상태 변수만 바꾼다(파일도 안 쓴다) —
 ## 창 모드가 실제로 바뀌는지는 사용자의 수동 F5 몫이다.
+## 타이틀 크레딧(#865) — 오른쪽 아래 버튼 → 창 → 내용·스크롤 → Esc로 닫고 포커스 복귀.
+func _check_credits() -> void:
+	var menu: Node = (load(MENU) as PackedScene).instantiate()
+	root.add_child(menu)
+	await process_frame
+	var btn := menu.get_node_or_null("CreditsButton") as Button
+	var panel := menu.get_node_or_null("CreditsPanel") as Control
+	var start_btn := menu.get_node_or_null("Layout/StartButton") as Button
+	var view := root.get_visible_rect().size
+	if btn == null or panel == null or start_btn == null:
+		_fault("크레딧: 타이틀에 CreditsButton/CreditsPanel이 없다")
+	elif panel.visible:
+		_fault("크레딧: 크레딧 창이 처음부터 열려 있다")
+	elif btn.get_global_rect().end.x < view.x - 80.0 or btn.get_global_rect().end.y < view.y - 80.0 \
+			or btn.get_global_rect().end.x > view.x or btn.get_global_rect().end.y > view.y:
+		_fault("크레딧: 크레딧 버튼이 오른쪽 아래 화면 안에 없다(%s)" % btn.get_global_rect())
+	else:
+		btn.pressed.emit()
+		await process_frame
+		await process_frame
+		var text: String = panel.call("body_text")
+		var scroll := panel.get_node_or_null("%Scroll") as ScrollContainer
+		var close_btn := panel.get_node_or_null("%CloseButton") as Button
+		var missing: Array[String] = []
+		for want in ["김근형", "윤준서", "이원재", "고범서", "정해원", "Thurraya", "AnisAous",
+				"Phlegmlee", "Liminal Games", "SIL Open Font License", "Godot Engine", "MIT", "FreeType", "ENet", "Mbed TLS"]:
+			if not text.contains(want):
+				missing.append(want)
+		if not panel.visible or not bool(panel.get("is_open")):
+			_fault("크레딧: 버튼을 눌러도 창이 안 열린다")
+		elif start_btn.focus_mode != Control.FOCUS_NONE or btn.focus_mode != Control.FOCUS_NONE:
+			_fault("크레딧: 창이 열린 동안 타이틀 버튼이 포커스를 받는다")
+		elif not missing.is_empty():
+			_fault("크레딧: 내용에 빠진 것이 있다 %s" % [missing])
+		elif scroll == null or close_btn == null or not close_btn.has_focus():
+			_fault("크레딧: 스크롤/닫기 버튼이 없거나 닫기에 포커스가 없다")
+		elif not Rect2(Vector2.ZERO, view).encloses((panel.get_node("Panel") as Control).get_global_rect()):
+			_fault("크레딧: 창이 화면 밖으로 나간다(%s)" % (panel.get_node("Panel") as Control).get_global_rect())
+		else:
+			# ↓가 본문을 굴린다(본문이 창보다 길다 — 엔진 라이선스 전문).
+			var down := InputEventAction.new()
+			down.action = &"ui_down"
+			down.pressed = true
+			root.push_input(down)
+			await process_frame
+			if scroll.scroll_vertical <= 0:
+				_fault("크레딧: ↓를 눌러도 본문이 안 굴러간다")
+			elif not close_btn.has_focus():
+				_fault("크레딧: ↓가 포커스를 닫기 버튼 밖으로 옮겼다")
+			else:
+				_ok("크레딧 창 열기·내용·스크롤")
+			_press_cancel()
+			await process_frame
+			if panel.visible:
+				_fault("크레딧: Esc로 창이 안 닫힌다")
+			elif start_btn.focus_mode != Control.FOCUS_ALL or not btn.has_focus():
+				_fault("크레딧: 창을 닫고 포커스가 크레딧 버튼으로 안 돌아온다")
+			else:
+				_ok("크레딧 창 닫기")
+	menu.free()
+	await process_frame
+
+
 func _check_fullscreen() -> void:
 	var dm: Node = root.get_node_or_null("DisplayMode")
 	if dm == null:
