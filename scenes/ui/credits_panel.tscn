@@ -1,0 +1,100 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/credits_panel.gd" id="1_credits_script"]
+[ext_resource type="FontFile" path="res://assets/fonts/YeonSung-Regular.ttf" id="2_title_font"]
+[ext_resource type="Theme" path="res://assets/ui/menu_button_theme.tres" id="3_button_theme"]
+[ext_resource type="Script" path="res://scripts/ui/menu_button.gd" id="4_menu_button"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_panel"]
+; 크레딧 창 바탕(#865) — 설정창(#781)·소지품 창(#745)과 같은 어두운 갈색 종이 톤.
+bg_color = Color(0.09, 0.085, 0.08, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.36, 0.33, 0.28, 1)
+
+[node name="CreditsPanel" type="Control"]
+; 타이틀 위에 얹는 크레딧 창(#865). 내용은 credits_panel.gd의 SECTIONS가 만든다.
+; 열고 닫는 것은 `open()`/`close()`, 닫히면 `closed`를 쏜다(설정창과 같다).
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_credits_script")
+
+[node name="Dim" type="ColorRect" parent="."]
+; mouse_filter 기본값(STOP)이라 아래 타이틀 버튼이 클릭을 못 받는다.
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.02, 0.02, 0.03, 0.72)
+
+[node name="Panel" type="PanelContainer" parent="."]
+custom_minimum_size = Vector2(820, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_panel")
+
+[node name="Margin" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 40
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 40
+theme_override_constants/margin_bottom = 24
+
+[node name="Rows" type="VBoxContainer" parent="Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="Panel/Margin/Rows"]
+; 제목은 설정창·소지품 창과 같은 연성 + 붉은 그림자.
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91, 0.86, 0.75, 1)
+theme_override_colors/font_shadow_color = Color(0.42, 0.07, 0.06, 1)
+theme_override_constants/shadow_offset_x = 3
+theme_override_constants/shadow_offset_y = 3
+theme_override_fonts/font = ExtResource("2_title_font")
+theme_override_font_sizes/font_size = 48
+text = "크레딧"
+
+[node name="Rule" type="ColorRect" parent="Panel/Margin/Rows"]
+custom_minimum_size = Vector2(0, 1)
+layout_mode = 2
+color = Color(0.36, 0.33, 0.28, 0.6)
+
+[node name="Scroll" type="ScrollContainer" parent="Panel/Margin/Rows"]
+; 본문이 창보다 길다(엔진 라이선스 전문) — 높이를 묶고 굴린다. 가로 스크롤을 끄면
+; 본문 폭이 창에 맞춰져 영어 전문이 단어 단위로 접힌다.
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 520)
+layout_mode = 2
+horizontal_scroll_mode = 0
+
+[node name="Body" type="VBoxContainer" parent="Panel/Margin/Rows/Scroll"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="CloseButton" type="Button" parent="Panel/Margin/Rows"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(200, 52)
+layout_mode = 2
+size_flags_horizontal = 4
+theme = ExtResource("3_button_theme")
+theme_override_font_sizes/font_size = 27
+script = ExtResource("4_menu_button")
+text = "닫기"
