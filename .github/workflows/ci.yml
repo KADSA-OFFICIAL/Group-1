@@ -26,6 +26,13 @@ jobs:
       - name: verify_scenes.py 실행
         run: python3 tools/verify_scenes.py
 
+      # 폰트는 쓰는 글자만 남긴 서브셋이다(#853). 게임 문구에 서브셋 밖 글자가 생기면
+      # 화면에서 네모로 깨지므로 여기서 막는다 — 고치려면 gen_font_subsets.py로 다시 굽는다.
+      - name: 폰트 서브셋이 게임 문구를 다 덮는지
+        run: |
+          python3 -m pip install --quiet fonttools
+          python3 tools/gen_font_subsets.py --check
+
       # 판마다 바뀌는 단서·열쇠 자리(#794). 후보 번호마다 씬을 다시 구워 검사 7종을
       # 돌리고 기본 씬으로 되돌린다 — 결정론적이라 커밋한 씬·후보 표와 같아야 한다.
       - name: verify_clue_sites.py 실행 (모든 단서 후보 자리)
