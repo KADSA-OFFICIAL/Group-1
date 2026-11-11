@@ -359,6 +359,49 @@ func _check_variants() -> void:
 	_ok("발소리 변형")
 
 
+## Ogg로 구운 음악(#855)을 Godot이 마스터 wav와 같은 길이로 읽는가. 인코더
+## 패딩·프리스킵을 디코더가 안 잘라 내면 한 바퀴가 길어져 루프 박자가 밀린다.
+## 마스터는 `.gdignore` 폴더라 리소스가 아니므로 wav 헤더를 직접 읽는다.
+func _check_music_ogg_length(sfx: Node) -> void:
+	var consts: Dictionary = sfx.get_script().get_script_constant_map()
+	var pairs := {}
+	for id in consts.get("MUSIC_OGG", []):
+		pairs["res://assets/audio/%s.ogg" % id] = "res://assets/audio/masters/%s.wav" % id
+	for id in consts.get("EXTERNAL", {}):
+		var path: String = consts["EXTERNAL"][id]
+		if path.ends_with(".ogg"):
+			pairs[path] = path.replace("res://assets/audio/", "res://assets/audio/masters/").replace(".ogg", ".wav")
+	if pairs.size() != 8:
+		_fault("음악 ogg: 8곡이어야 하는데 %d곡이다" % pairs.size())
+		return
+	for ogg_path in pairs:
+		var master_samples := _wav_samples(pairs[ogg_path])
+		var stream := load(ogg_path) as AudioStreamOggVorbis
+		if stream == null or master_samples <= 0:
+			_fault("음악 ogg: %s 또는 마스터를 못 읽었다" % ogg_path)
+			continue
+		var got := roundi(stream.get_length() * 22050.0)
+		if absi(got - master_samples) > 1:
+			_fault("음악 ogg: %s 길이 %d샘플 ≠ 마스터 %d샘플" % [ogg_path, got, master_samples])
+			return
+	_ok("음악 ogg 길이 = 마스터 길이 (%d곡)" % pairs.size())
+
+
+## 16bit 모노 wav의 샘플 수(data 청크 크기 / 2). 못 읽으면 -1.
+func _wav_samples(path: String) -> int:
+	var f := FileAccess.open(path, FileAccess.READ)
+	if f == null:
+		return -1
+	f.seek(12)
+	while f.get_position() + 8 <= f.get_length():
+		var tag := f.get_buffer(4).get_string_from_ascii()
+		var size := f.get_32()
+		if tag == "data":
+			return size / 2
+		f.seek(f.get_position() + size + (size & 1))
+	return -1
+
+
 ## 지금 테마가 id이고 그 곡을 실제로 틀고 있는가. 틀고 있는 플레이어를 돌려준다.
 func _expect_theme(sfx: Node, id: StringName, label: String) -> AudioStreamPlayer:
 	if StringName(sfx.get("_theme_id")) != id:
@@ -366,8 +409,13 @@ func _expect_theme(sfx: Node, id: StringName, label: String) -> AudioStreamPlaye
 		return null
 	var players: Array = sfx.get("_theme_players")
 	var player := players[int(sfx.get("_theme_index"))] as AudioStreamPlayer
-	if player.stream == null or not player.stream.resource_path.ends_with("%s.wav" % id):
-		_fault("테마: %s 플레이어에 %s.wav가 안 물려 있다" % [label, id])
+	# 테마는 전부 Ogg Vorbis다(#855).
+	if player.stream == null or not player.stream.resource_path.ends_with("%s.ogg" % id):
+		_fault("테마: %s 플레이어에 %s.ogg가 안 물려 있다" % [label, id])
+		return null
+	var ogg := player.stream as AudioStreamOggVorbis
+	if ogg == null or not ogg.loop:
+		_fault("테마: %s 곡에 루프가 안 걸렸다" % label)
 		return null
 	if not player.playing:
 		_fault("테마: %s 곡이 재생 중이 아니다" % label)
@@ -1936,10 +1984,11 @@ func _check_external_audio() -> void:
 			_fault("외부 음원: %s가 %s를 안 쓴다" % [id, table[id]])
 	for id in ["ambience", "chase"]:
 		var p: AudioStreamPlayer = sfx.get("_" + id)
-		var wav := p.stream as AudioStreamWAV if p != null else null
-		if wav == null or wav.loop_mode != AudioStreamWAV.LOOP_FORWARD:
+		var ogg := p.stream as AudioStreamOggVorbis if p != null else null
+		if ogg == null or not ogg.loop or ogg.loop_offset != 0.0:
 			_fault("외부 음원: %s 루프가 안 걸렸다" % id)
 	_ok("외부 음원 경로·루프")
+	_check_music_ogg_length(sfx)
 
 	if current_scene != null:
 		current_scene.free()

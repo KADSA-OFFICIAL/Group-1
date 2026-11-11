@@ -391,7 +391,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
   - 음량은 **재생 크기(파일 RMS + dB)를 예전과 맞췄다**: 추격 -22.5dBFS(`CHASE_DB` -10 → -2.5, 파일이 -20dB라서), 문 `door_open` -12 → -17·수위 `DoorSound` -6 → -11(파일 -22 → -17.4dB), 앰비언트는 파일을 -16dB로 맞춰 `AMBIENCE_DB` 그대로.
   - **운동장 바람은 테마로 튼다**(`THEME_DB["yard_wind"]` -13). 현관 문이 본편 음악을 끈 뒤 `floor_manager._apply_environment`가 0층에서 `play_theme`, 다른 층으로 가면 `stop_theme_if(&"yard_wind")`(다른 테마를 끊지 않게). 정문 뒤 엔딩 테마가 크로스페이드로 이어받는다.
   - 발소리·점프스케어·타이틀/엔딩 테마는 **그대로**다 — 사용자가 여러 번 청음해 고른 소리다.
-  - `.import`는 `--import`가 QOA(`compress/mode=2`)로 만든다 — 0으로 고치고 한 번 더 임포트했다(#185·#676과 같다).
+  - `.import`는 `--import`가 QOA(`compress/mode=2`)로 만든다 — 0으로 고치고 한 번 더 임포트했다(#185·#676과 같다). 루프 셋은 #855에서 Ogg Vorbis로 바뀌어 이제 이 규칙은 `door_creak.wav`에만 걸린다.
 - 사운드(#9): 에셋을 받아오지 않고 **`tools/gen_sfx.py`가 8비트 톤으로 합성**해 `assets/audio/*.wav`로 커밋한다(위 외부 음원 넷은 예외, #713)(표준 라이브러리만, 고정 시드라 재생성해도 바이트가 같다). 톤을 바꾸려면 그 스크립트의 `build_all()` 숫자를 고치고 다시 돌린다. 비위치 효과음은 autoload `Sfx`(`scripts/game/sound_manager.gd`)의 `Sfx.play(&"id")`, 위치가 정보인 소리(수위 발소리·열쇠·문)는 `janitor.tscn`의 AudioStreamPlayer2D가 낸다. **하단 알림 텍스트는 소리와 병행**한다 — 소리를 못 듣는 상황에서도 단서가 남아야 한다. 오디오 버스는 `Music`·`SFX` 둘이고(#783, 아래 음량 설정 항목) 소리별 균형은 `sound_manager.gd`의 `VOLUMES`·`THEME_DB`에서 맞춘다.
   - **수위 발소리는 음정 없는 구두 한 걸음이고 변형이 넷이다**(#611). 예전 것은 삼각파가 90→55Hz로 떨어지는 성분(75Hz에서 평균의 19.9배짜리 봉우리)이 있어 "뽁"이었고, 그 한 파일을 고정 간격으로 되풀이해 메트로놈이 됐다. 지금은 `gen_sfx.py`의 `footstep()`이 **필터 건 노이즈만으로** 뒤꿈치(굽·둔탁·무게) → 94~110ms 뒤 앞꿈치 → 어두운 복도 반사음을 낸다(`biquad`). 변형은 `JANITOR_STEPS`(왼발 1·3 무겁게, 오른발 2·4 가볍게), 재생 쪽은 `Sfx.VARIANTS`가 **바로 앞 것을 피해** 고르고 음높이를 ±2.5% 흔든다. 변형마다 피크를 `FOOTSTEP_PEAK`로 직접 맞춘다(저역 노이즈는 시드마다 세기가 0.45~0.88로 흔들린다).
     - **수위 발소리는 이제 이설의 운동화 걸음을 `JANITOR_PITCH`(0.80, 약 -3.9반음)로 늦춘 것이다**(사용자: "주인공 발소리를 기반으로 피치를 살짝 낮춰봐" → 0.80으로 **확정**, 2026-10-24). 구두를 직접 합성한 네 갈래가 전부 사용자에게 구리다/찢어진다였다 — ① 좁은 대역 노이즈 굽(+열두 반사) ② 공진기 모드 합성 ③ 넓은 대역 딱 두 번 + 벨벳 울림 ④ 굽 딸깍 + '똑' + `corridor()`(가장 나았지만 "음질이 찢어진다", 어택·고역을 눕혀도 "그래도 별로"). 녹음(CC0)은 거절당했다. **되돌리지 말 것.** `gen_sfx.py`의 `footstep()`은 `sneaker_step()`을 부르고 `lower_pitch()`(테이프식 재생 속도 — 길이도 1/0.80배)로 내린다. 시드(61101~)·간격(`janitor.gd` 0.52초)·크기(`FOOTSTEP_PEAK` 0.62, 재생 -4dB)가 이설(-15dB)과 다르다.
@@ -408,11 +408,16 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
   - 저장은 `user://settings.cfg`의 `[audio] music/sfx`(정수 단계)이고 전체화면(`[display]`)과 같은 파일이라 **저장할 때 읽고 한 키만 바꿔** 쓴다. 헤드리스에서는 읽지도 쓰지도 않는다.
   - 막대는 `scripts/ui/volume_bar.gd` — 네모 칸 10개를 `_draw()`로 그리는 도트 컨트롤이다(기본 `HSlider`는 어두운 종이 톤 창에서 웹 폼처럼 겉돌고, 매끈한 벡터는 #739에서 거절됐다). 포커스는 붉은 테두리, ←/→는 한 칸이고 그 입력을 막대가 먹어서 포커스가 안 옮겨 간다. 마우스는 칸을 누르면 거기까지 채우고 끌면 따라오며, 첫 칸이 이미 마지막이면 한 번 더 눌러 끈다.
   - 효과음 막대를 바꾸면 클릭음이 한 번 난다(들어 보게). 배경음악은 재생 중이면 바로 크기가 바뀌므로 따로 안 낸다.
+- **긴 음악 8곡은 Ogg Vorbis다(#855)** — 외부 루프 셋(`ext/ambience_dark`·`chase_eerie`·`yard_wind`)과 테마 다섯(`title`·`prologue`·`ending_*`). 무압축 wav 13.2MB가 pck에 그대로 들어가고 `AudioStreamWAV`가 PCM 전체를 메모리에 올려서(본편 내내 앰비언트+추격 5.9MB) 배포본·메모리의 짐이었다 — ogg 2.44MB, 8곡 다 올려도 메모리 3.0MB(실측). **효과음은 PCM 그대로다**(짧아서 이득이 없다, 아래 `compress/mode=0` 규칙도 효과음 몫이다).
+  - **PCM 마스터는 `assets/audio/masters/`(`.gdignore`)에 남긴다** — 내보내기에서 빠지고, 외부 음원 원본 팩이 저장소에 없으므로(#713) 그게 다시 구울 수 있는 유일한 원본이다. `gen_music.py`(테마 `OGG_TRACKS`)·`import_ext_audio.py`(루프 셋)가 마스터에 쓰고 **`tools/encode_music.py`가 ogg로 굽는다**(`soundfile`·`numpy` 필요 — 표준 라이브러리로는 Vorbis를 못 굽는다).
+  - 굽기는 **결정론적이다** — libsndfile이 Ogg 일련번호를 무작위로 골라 매번 바이트가 달라지므로 페이지마다 고정값으로 바꾸고 CRC를 다시 쓴다. `--check`가 다시 구운 것과 커밋된 ogg를 대조한다.
+  - 품질은 q0.8(`QUALITY` 0.2)이다. #185의 QOA는 20샘플마다 4비트 잔차로 깎아 사각파 모서리를 못 따라갔고, Vorbis는 지각 코덱이라 다르지만 **손실이므로 청음은 사용자 F5 몫이다.** 도구가 디코드 길이 = 마스터 길이(인코더 패딩·프리스킵으로 루프 주기가 밀리지 않게), 루프 이음매, 깨진 인코딩(SNR 20dB 문턱 — 파형 SNR은 음질이 아니다: 잡음성 추격 루프는 23.6dB, 음정 있는 곡 36~38dB)을 본다.
+  - 루프는 `_loop_stream`이 `AudioStreamOggVorbis.loop`로 건다(`.import`의 `loop=false`는 그대로 — wav 때와 같이 런타임이 정한다). 테마 경로는 `MUSIC_OGG`, 외부 셋은 `EXTERNAL`이 쥔다. 스모크가 루프·테마 경로(`.ogg`)와 **Godot이 읽은 길이 = 마스터 wav 길이**(`_check_music_ogg_length`, 마스터 헤더를 직접 읽는다)를 본다 — 마스터를 100샘플 늘려 잡히는 것을 확인했다.
 - 앰비언트·추격 BGM(#176): `tools/gen_music.py`가 만든다(루프라 위상을 루프 길이에 맞춰 고정하고, 이음매 불연속을 자체 검사한다). 본편 진입에 `Sfx.start_music()`, 체포·탈출에 `Sfx.stop_music()`. 수위가 `Sfx.set_chasing()`으로 매 프레임 추격 여부를 알리면 추격 BGM이 페이드 인하고 앰비언트가 낮아진다. **해제는 2.5초 미룬다** — `lose_sight_seconds`(1.5)보다 길어야 모퉁이에서 음악이 깜빡이지 않는다. 루프 지점은 `.import`가 아니라 런타임에 정한다(그 파일은 커밋에 빠질 수 있다).
 - 타이틀·프롤로그 테마(#606): 같은 `gen_music.py`가 `title.wav`·`prologue.wav`를 만든다. **동기는 학교 종(웨스트민스터 차임 "미도레솔/솔레미도")을 가단조 같은 도수(C·A·B·E)로 옮긴 고장 난 오르골**이고, 프롤로그 5~6마디에서 반 박자로 느려져 멀리서 한 번 돌아온다. 재생은 `Sfx.play_theme(id)`/`stop_theme()` — 본편 `start_music`과 분리했다(추격 상태가 얽혀 있어서). 타이틀(`main_menu._ready`) → 인트로(`intro._ready`)는 플레이어 둘을 번갈아 써서 **크로스페이드**, 본편으로 가면 `intro._finish`가 끄고 `start_music()`도 한 번 더 끈다(건너뛰기·게임오버 재시도 경로).
   - **템포는 한 박이 정수 샘플인 값만** 쓴다(22050·60/BPM — 72·70은 되고 66은 안 된다). 아니면 마디가 밀려 루프 끝에서 박이 어긋난다.
   - 선율은 음표 꼬리가 루프 끝을 넘으므로 `place()`가 **처음으로 감아 넣는다.** 잘라 내면 되감길 때 뚝 끊긴다.
-  - **새 wav에는 `.import`를 같이 커밋한다**(`compress/mode=0`). 없으면 에디터가 기본값 QOA로 임포트해 #185를 되돌린다. `--import`가 새로 만든 `.import`도 `compress/mode=2`(QOA)로 나온다 — **손으로 0으로 고치고 한 번 더 임포트한다**(#676에서 실제로 그랬다).
+  - **새 wav에는 `.import`를 같이 커밋한다**(`compress/mode=0`, 효과음 — 테마는 #855부터 마스터 wav → ogg라 이 규칙 밖이다). 없으면 에디터가 기본값 QOA로 임포트해 #185를 되돌린다. `--import`가 새로 만든 `.import`도 `compress/mode=2`(QOA)로 나온다 — **손으로 0으로 고치고 한 번 더 임포트한다**(#676에서 실제로 그랬다).
 - **엔딩 테마 셋(#676)**: 같은 `gen_music.py`가 `ending_after_school`·`ending_adults_work`·`ending_break_time.wav`를 만든다. **엔딩마다 한 곡이고 셋 다 타이틀의 종 동기를 쓴다** — 같은 종이 결말마다 다르게 울린다.
   - **방과 후**(63 BPM, 가단조): 타이틀보다 더 처지고(-6~-18센트) 더 흔들린다. 2마디에서 종 둘째 소절(E·B·C·A)의 **마지막 A가 끝내 안 온다** — 말하지 못한 결말. 5마디부터 성겨지고 8마디는 화음(3음 없는 Esus4)만 남는다.
   - **어른들의 일**(75 BPM, 라단조): 오르골이 주인공이 아니다. 박마다 짧은 근음(굴러가는 절차) + 형광등 같은 높은 A 지속음이 깔리고, 종은 5~6마디에 라단조 도수(F·D·E·A)로 낮게 한 번. 형광등 A가 7마디 Ebmaj7(나폴리)과 증4도로 부딪친다.
@@ -633,6 +638,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
 - 엔딩 배경이나 그 원본을 고쳤으면 `python3 tools/gen_ending_backgrounds.py`(팔레트 한도·뷰포트 크기·밝은 색 유무를 스스로 검사하고, 결정론적이라 원본을 안 바꿨으면 diff가 나오지 않습니다). 새 PNG면 Godot `--import`도 돌립니다.
 - 자체 가구 그림(교장실·보건실·선반·캐비닛·상자·단서 셋)을 고쳤으면 `python3 tools/gen_furniture_sprites.py` 후 `python3 tools/gen_floors.py`(#791). 외부 가구 그림은 `python3 tools/import_ext_sprites.py --haunted <Haunted School 폴더> --horror <Horror 팩 폴더>`(하나만 줘도 된다) 후 `python3 tools/gen_floors.py`. 새 PNG면 Godot `--import`.
 - 외부 음원을 바꿨으면 `python3 tools/import_ext_audio.py <Horror Sound Pack 폴더> <Liminal PCM 폴더>`(이음매·피크를 스스로 검사), 새 wav면 `.import`의 `compress/mode=0`을 확인하고 `CREDITS.md`를 갱신한다(#713).
+- 테마·외부 루프의 마스터를 바꿨으면(`gen_music.py`·`import_ext_audio.py` 뒤) `python3 tools/encode_music.py`(#855, `soundfile`·`numpy` 필요 — 길이·이음매·깨진 인코딩을 스스로 검사하고 결정론적이라 마스터를 안 바꿨으면 diff가 없다). 새 ogg면 Godot `--import`로 `.import`를 만들어 같이 커밋한다.
 - 효과음을 고쳤으면 `python3 tools/gen_sfx.py`, 앰비언트·BGM은 `python3 tools/gen_music.py`로
   재생성합니다(길이·피크·DC 오프셋·루프 이음매를 스스로 검사하고, 결정론적이라
   톤을 안 바꿨으면 diff가 나오지 않습니다).
