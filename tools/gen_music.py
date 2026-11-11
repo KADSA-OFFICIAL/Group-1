@@ -14,6 +14,9 @@ Godot 쪽 loop 설정은 .import 파일이 아니라 런타임에서 한다
 (sound_manager.gd의 _prepare_loop) — .import는 에디터가 만드는 파일이라
 커밋되지 않을 수 있어 의존하지 않는다.
 
+테마 다섯(`OGG_TRACKS`)은 `assets/audio/masters/`에 PCM 마스터로 쓰고, 게임이 읽는
+ogg는 `tools/encode_music.py`가 굽는다(#855).
+
   python tools/gen_music.py            # 생성
   python tools/gen_music.py --check    # 점검만
 
@@ -63,6 +66,12 @@ def cycles(hz: float, duration: float) -> float:
     12초 루프에서 55Hz를 55.0833Hz로 미는 정도라 음정 차이는 들리지 않는다.
     """
     return max(round(hz * duration), 1) / duration
+
+
+## 게임에는 Ogg Vorbis로 들어가는 곡(#855). wav는 마스터 폴더(`.gdignore`)에 쓴다.
+MASTER_DIR = OUT_DIR / "masters"
+OGG_TRACKS = {"title", "prologue", "ending_after_school", "ending_adults_work",
+              "ending_break_time"}
 
 
 def drone(duration: float, hz: float, wave_fn, amount: float) -> list[float]:
@@ -543,6 +552,7 @@ def main() -> int:
     check_only = "--check" in sys.argv
     if not check_only:
         OUT_DIR.mkdir(parents=True, exist_ok=True)
+        MASTER_DIR.mkdir(parents=True, exist_ok=True)
 
     tracks = {"ambience": build_ambience(), "chase": build_chase(),
               "title": build_title(), "prologue": build_prologue(),
@@ -553,7 +563,9 @@ def main() -> int:
 
     for name, raw in sorted(tracks.items()):
         samples, raw_peak = normalize(dc_block_loop(raw))
-        path = OUT_DIR / f"{name}.wav"
+        # 테마는 마스터 폴더에 쓰고 encode_music.py가 ogg로 굽는다(#855).
+        # 합성 앰비언트·추격은 외부 음원으로 대체돼(#713) 그대로 wav다.
+        path = (MASTER_DIR if name in OGG_TRACKS else OUT_DIR) / f"{name}.wav"
         if not check_only:
             write_wav(path, samples)
 
@@ -579,6 +591,8 @@ def main() -> int:
         return 1
 
     print("문제 없음")
+    if not check_only:
+        print("테마를 바꿨으면 python3 tools/encode_music.py로 ogg를 다시 굽는다(#855).")
     return 0
 
 
