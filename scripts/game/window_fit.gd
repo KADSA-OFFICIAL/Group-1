@@ -27,6 +27,10 @@ func _ready() -> void:
 	# 헤드리스(CI·스모크)에는 창이 없다.
 	if DisplayServer.get_name() == "headless":
 		return
+	# 웹(#871)은 창이 아니라 페이지 안 캔버스다 — 크기는 페이지(itch.io 틀)가 정하고,
+	# 브라우저의 기기 배율(Retina 2배)은 Godot이 캔버스 해상도에 이미 반영한다.
+	if OS.has_feature("web"):
+		return
 	# 전체 화면으로 시작하면 맞출 것이 없다.
 	if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED:
 		return

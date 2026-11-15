@@ -29,6 +29,12 @@ func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	if _headless():
 		return
+	# 웹(#871)에서는 저장된 전체화면을 시작할 때 복원하지 않는다 — 브라우저는 사용자가
+	# 누르거나 클릭한 순간에만 전체화면을 허락해서, 페이지가 열릴 때 요청하면 거절된다.
+	# 그때도 창 상태를 직접 읽으므로 버튼 글자는 맞는다.
+	if OS.has_feature("web"):
+		_fullscreen = _window_is_fullscreen()
+		return
 	var cfg := ConfigFile.new()
 	if cfg.load(SETTINGS_PATH) == OK:
 		set_fullscreen(bool(cfg.get_value(SECTION, KEY, false)), false)
