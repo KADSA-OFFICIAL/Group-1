@@ -551,6 +551,7 @@ main_menu → intro(프롤로그 컷신: street→back_gate 두 장면뿐, `scri
 - **웹(#871)**: 세 번째 프리셋 `Web`(스레드 없는 빌드 — SharedArrayBuffer·교차 출처 격리가 필요 없다). `godot --headless --path . --export-release "Web" build/web/index.html` 뒤 `build/web`의 파일을 **zip 맨 위에** 담아 `build/v<버전>/AfterSchool-v<버전>-web.zip`(itch.io는 zip 루트의 `index.html`을 연다). v1.0.0 zip 17.9MB(엔진 wasm 37.7MB가 대부분).
   - **렌더러는 Compatibility(WebGL 2)다** — 프로젝트는 Forward+지만 웹은 엔진 기본값이 Compatibility다. 어둠·손전등 그림자·달빛·시야 마스크가 데스크톱 캡처와 거의 같게 나오는 것을 Chrome으로 확인했다.
   - **웹은 OS 글꼴이 없다.** 글꼴을 따로 안 준 Label(HUD 진행도·목표·층수·방 이름·일시정지 안내 등)이 데스크톱에서는 OS 한글 글꼴로 떨어지는데 웹에서는 **전부 네모로 깨졌다.** `project.godot`의 `gui/theme/custom_font.web`이 `assets/fonts/web_default_font.tres`(Noto Sans KR 가변 글꼴 + `wght` 400)를 웹에서만 기본 글꼴로 건다 — 가변 글꼴의 기본 인스턴스는 가장 가늘어서 굵기를 준다. 데스크톱 화면은 그대로다. **새 Label에 한글을 넣으면 웹에서도 보이는지 이 기본 글꼴의 서브셋(#853)에 글자가 있는지가 관건이다**(`gen_font_subsets.py --check`).
+  - **글자 키 조작은 `physical_keycode`로 묶는다**(#874 — 이동 WASD·조사 E·소지품 R·잉크 Q·수첩 J). 한글 입력기가 켜져 있으면 브라우저가 D를 글자 'ㅇ'로 넘기고(code는 `KeyD`) Godot 웹은 글자로 keycode를 정해서, keycode로 묶은 키가 **웹에서만 전부 안 먹었다**(사용자 보고). 키 위치로 묶으면 입력기·자판 배열과 무관하다. **새 글자 키 조작을 더할 때도 physical로 묶을 것.**
   - `WindowFit`(창 크기 맞춤)·`DisplayMode`의 시작 시 전체화면 복원은 웹에서 건너뛴다 — 캔버스 크기는 페이지가 정하고, 브라우저는 클릭·키 입력 순간에만 전체화면을 허락한다.
   - 소리는 웹 기본값인 **샘플 재생**이다(스레드 없는 빌드 권장값 — 스트림 재생은 층 전환처럼 메인 스레드가 막히면 끊긴다). 버스 이펙트는 안 되지만 이 게임은 버스에 이펙트가 없다. **청음은 사용자 몫이다**(헤드리스 Chrome으로는 오류 유무만 봤다).
   - 확인 방법: `build/web`에서 `python3 -m http.server` 후 Chrome(헤드리스면 puppeteer)으로 열어 콘솔과 화면을 본다. 디버그 내보내기(`--export-debug`)면 숫자키 층 이동(#507)이 된다.
