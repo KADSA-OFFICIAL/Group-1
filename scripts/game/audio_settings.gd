@@ -82,7 +82,11 @@ func _apply(kind: StringName) -> void:
 func _ensure_bus(bus: StringName) -> void:
 	if AudioServer.get_bus_index(bus) >= 0:
 		return
-	AudioServer.add_bus()
+	# `add_bus()`를 쓰지 않는다(#877). Godot 4.6 웹(샘플 재생)에서 `add_bus()`는 드라이버에
+	# 위치 -1을 넘기고, 웹 JS가 그것을 "끝"이 아니라 splice(-2)로 받아 새 버스를 **Master 앞**에
+	# 끼운다 — 그 뒤 send가 엉켜 Master가 destination에서 끊기고 소리가 하나도 안 났다.
+	# 버스 수를 늘리면 JS도 끝에 붙이고 0번(Master)으로 보낸다. 데스크톱 결과는 같다.
+	AudioServer.bus_count += 1
 	var idx := AudioServer.bus_count - 1
 	AudioServer.set_bus_name(idx, bus)
 	AudioServer.set_bus_send(idx, &"Master")
