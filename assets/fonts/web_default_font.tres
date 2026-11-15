@@ -1,0 +1,13 @@
+[gd_resource type="FontVariation" load_steps=2 format=3]
+
+[ext_resource type="FontFile" uid="uid://b3wnqk7ftxvm5" path="res://assets/fonts/NotoSansKR-VF.ttf" id="1_noto"]
+
+[resource]
+; 웹 빌드의 기본 글꼴(#871, project.godot `gui/theme/custom_font.web`).
+; 데스크톱은 글꼴을 따로 안 준 Label(HUD 진행도·목표·층수·방 이름 등)이 OS 한글 글꼴로
+; 떨어지는데, 브라우저 안의 Godot은 OS 글꼴을 못 써서 그 글자가 전부 네모로 깨졌다.
+; 가변 글꼴의 기본 인스턴스는 가장 가는 굵기라 OS 글꼴(보통 굵기)에 맞춰 400을 건다.
+base_font = ExtResource("1_noto")
+variation_opentype = {
+2003265652: 400
+}
